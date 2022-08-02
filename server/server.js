@@ -4,6 +4,12 @@ const bodyParser = require("body-parser");
 const router = express.Router();
 const faker = require("faker");
 const port = process.env.PORt || 8000;
+const Attempt = require("./models/attempt");
+const Card = require("./models/card");
+const Category = require("./models/category");
+const Deck = require("./models/deck");
+const Group = require("./models/group");
+const User = require("./models/user");
 
 mongoose.connect("mongodb://localhost/flash-card-app", {
     //use MongoDB's new connection string parser instead of the old deprecated one

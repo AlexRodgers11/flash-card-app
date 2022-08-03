@@ -2,6 +2,7 @@ const express = require("express");
 const userRouter = express.Router();
 
 const User = require("../models/user");
+const Group = require("../models/group");
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
@@ -20,6 +21,18 @@ userRouter.param("userId", (req, res, next, userId) => {
 
 userRouter.get("/:userId", (req, res, next) => {
     res.status(200).send(req.user);
+});
+
+userRouter.get("/:userId/groups", (req, res, next) => {
+    Group.find({members: req.user._id}, (err, groups) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            //should probably come back and map groups to a smaller object needed to render the page
+            res.status(200).send(groups);
+        }
+    });
 });
 
 module.exports = userRouter;

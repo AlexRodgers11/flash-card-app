@@ -12,8 +12,7 @@ const User = new Schema({
         last: String
     },
     email: String,
-    photo: String,
-    groups: [{type: Schema.Types.ObjectId, ref: "group"}]
+    photo: String
 });
 
 module.exports = mongoose.model("user", User);

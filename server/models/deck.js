@@ -8,12 +8,12 @@ const Deck = new Schema({
     creator: {type: Schema.Types.ObjectId, ref: "user"},
     dateCreated: Date, 
     cards: [{type: Schema.Types.ObjectId, ref: "card"}],
-    permissions: [{
+    permissions: {
         view: [{type: Schema.Types.ObjectId, ref: "user"}],
         edit: [{type: Schema.Types.ObjectId, ref: "user"}],
         copy: Boolean,
         suggest: Boolean
-    }]
+    }
 });
 
 module.exports = mongoose.model("deck", Deck);

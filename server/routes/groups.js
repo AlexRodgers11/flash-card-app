@@ -61,4 +61,15 @@ groupRouter.delete("/:groupId", (req, res, next) => {
     });
 });
 
+groupRouter.put("/:groupId", (req, res, next) => {
+    Group.findByIdAndUpdate(req.group._id, req.body, (err, group) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            res.status(200).send(group);
+        }
+    });
+});
+
 module.exports = groupRouter;

@@ -18,4 +18,8 @@ userRouter.param("userId", (req, res, next, userId) => {
     });
 });
 
+userRouter.get("/:userId", (req, res, next) => {
+    res.status(200).send(req.user);
+});
+
 module.exports = userRouter;

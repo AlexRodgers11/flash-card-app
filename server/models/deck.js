@@ -10,9 +10,10 @@ const Deck = new Schema({
     cards: [{type: Schema.Types.ObjectId, ref: "card"}],
     permissions: [{
         view: [{type: Schema.Types.ObjectId, ref: "user"}],
-        edit: [{type: Schema.Types.ObjectId, ref: "user"}]
-    }],
-    attempts: [{type: Schema.Types.ObjectId, ref: "attempt"}]
+        edit: [{type: Schema.Types.ObjectId, ref: "user"}],
+        copy: Boolean,
+        suggest: Boolean
+    }]
 });
 
 module.exports = mongoose.model("deck", Deck);

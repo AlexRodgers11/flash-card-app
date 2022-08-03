@@ -12,7 +12,8 @@ const User = new Schema({
         last: String
     },
     email: String,
-    photo: String
+    photo: String,
+    attempts: [{type: Schema.Types.ObjectId, ref: "attempt"}]
 });
 
 module.exports = mongoose.model("user", User);

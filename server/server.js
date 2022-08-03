@@ -12,6 +12,8 @@ const Group = require("./models/group");
 const User = require("./models/user");
 const { getRandomCardType } = require("./utils");
 
+const groupRouter = require("./routes/groups");
+
 mongoose.connect("mongodb://localhost/flash-card-app", {
     //use MongoDB's new connection string parser instead of the old deprecated one
     useNewUrlParser: true,
@@ -40,6 +42,8 @@ app.use(
         extended: true
     })
 );
+
+app.use("/groups", groupRouter);
 
 router.get("/test", (req, res, next) => {
     console.log("connected");

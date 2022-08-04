@@ -12,7 +12,7 @@ userRouter.param("userId", (req, res, next, userId) => {
             res.status(500).send("There was an error with your request");
         } else {
             if(!user) {
-                res.status(404).send("Group not found");
+                res.status(404).send("User not found");
             } else {
                 req.user = user;
                 next();

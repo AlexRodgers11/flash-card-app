@@ -110,97 +110,124 @@ router.get("/seed-database", (req, res, next) => {
         console.log("Done creating groups");
 
         Promise.all(groups).then((groups) => {
-            console.log("Creating decks");
-            let decks = [];
-            let randomDeckNumber = 50 + Math.ceil(Math.random() * 150);
-            
-            while(decks.length < randomDeckNumber) {
-                decks.push(new Promise((resolve, reject) => {
-                    let deck = new Deck();
-                    deck.name = faker.hacker.adjective();
-                    deck.public = Math.random() > .7 ? true : false;
-                    deck.creator = users[Math.floor(Math.random() * users.length)]._id;
-                    deck.dateCreated = Date.now();
-                    // console.log("Beginning to create cards");
-                    let cards = [];
-                    let randomCardNumber = 5 + Math.ceil(Math.random() * 50);
-                    let deckAttemptCount = Math.floor(Math.random() * 20);
-                    while(cards.length < randomCardNumber) {
-                        cards.push(new Promise((reso, reje) => {
-                            let card = new Card();
-                            card.creator = deck.creator;
-                            card.dateCreated = Date.now();
-                            card.type = getRandomCardType(Math.random());
-                            card.question = faker.hacker.phrase();
-                            if(card.type === "multiple-choice") {
-                                let randomNum = Math.random();
-                                card.correctAnswer = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
-                                card.wrongAnswerOne = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
-                                card.wrongAnswerTwo = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
-                                card.wrongAnswerThree = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
-                            } else if(card.type === "true-false") {
-                                card.correctAnswer = Math.random() > .5 ? "True" : "False";
-                                card.wrongAnswerOne = card.correctAnswer === "True" ? "False" : "True";
-                            } else {
-                                card.correctAnswer = Math.random() > .5 ? faker.hacker.noun() : faker.hacker.phrase();
-                            }
-                            if(Math.random > .7) {
-                                faker.hint = faker.hacker.phrase();
-                            }
-                            card.stats.numberCorrect = deckAttemptCount - Math.floor(Math.random() * deckAttemptCount);
-                            card.stats.numberIncorrect = deckAttemptCount - card.stats.numberCorrect;
-                            card.save((err, card) => {
-                                if(err) {
-                                    throw err;
-                                } 
-                                deck.cards.push(card);
-                                reso(card);
-                            });
-                        }));
-                    }
-                    // console.log("Done creating cards");
-                    Promise.all(cards).then((cards) => {
-                        // console.log("cards finished loading");
-                        // console.log(cards);
-                        deck.cards = cards;
-                        let randomViewStartIndex = Math.floor(Math.random() * (users.length - 1));
-                        let randomViewStopIndex = randomViewStartIndex + Math.ceil(Math.random() * (users.length - randomViewStartIndex));
-                        let randomGroupIndex = Math.floor(Math.random() * groups.length);
-                        console.log(`Group length: ${groups.length}, randomGroupIndex: ${randomGroupIndex}`);
-                        let inGroup = Math.random() > .7;
-                        if(inGroup) {console.log("this deck should be added to a group's decks")}
-                        deck.permissions.view = inGroup ? groups[randomGroupIndex].members.map(user => user._id) : users.slice(randomViewStartIndex, randomViewStopIndex).map(user => user._id);
-                        if(deck.permissions.view.indexOf(deck.creator._id) === -1) {
-                            deck.permissions.view.unshift(deck.creator._id);
+            let categories = [];
+            console.log("creating categories");
+
+            while(categories.length < 75) {
+                categories.push(new Promise((categoryResolve, categoryReject) => {
+                    let category = new Category();
+                    category.name = faker.hacker.noun() + faker.hacker.adjective() + faker.hacker.verb();
+                    category.save((err, category) => {
+                        if(err) {
+                            throw err;
+                        } else {
+                            categoryResolve(category);
                         }
-                        let randomEditStartIndex = Math.floor(Math.random() * (deck.permissions.view.length - 1));
-                        let randomEditStopIndex = randomEditStartIndex + Math.ceil(Math.random() * (deck.permissions.view.length - randomEditStartIndex));
-                        deck.permissions.edit = deck.permissions.view.slice(randomEditStartIndex, randomEditStopIndex);
-                        if(deck.permissions.view.indexOf(deck.creator._id) === -1) {
-                            deck.permissions.edit.unshift(deck.creator._id);
-                        }
-                        deck.permissions.copy = (deck.permissions.view.length > 0 || deck.public) && Math.random() > .7 ? true : false;
-                        deck.permissions.suggest = (deck.permissions.view.length > 0 || deck.public) && Math.random() > .3 ? true : false;
-                        let deckPromise = deck.save((err, deck) => {
-                            if(err) {
-                                throw err;
-                            }
-                            if(inGroup) {
-                                let groupPromise = Group.findByIdAndUpdate(groups[randomGroupIndex]._id, {$push: {decks: deck._id}});
-                                groupPromise.catch(err => {throw err}).then(console.log("done"));
-                            }
-                            let userPromise = User.findByIdAndUpdate(deck.creator, {$push: {decks: deck}}).exec();
-                            userPromise.catch(err => {throw err}).then(() => {
-                                return deck;
-                            });
-                        });
-                        resolve(deckPromise);
-                    });
+                    })
                 }));
             }
-            Promise.all(decks).then(
-                res.send("Database seeding complete")
-            );
+            Promise.all(categories).then((categories) => {
+                console.log("Creating decks");
+                let decks = [];
+                let randomDeckNumber = 50 + Math.ceil(Math.random() * 250);
+                
+                while(decks.length < randomDeckNumber) {
+                    decks.push(new Promise((resolve, reject) => {
+                        let deck = new Deck();
+                        deck.name = faker.hacker.adjective();
+                        deck.public = Math.random() > .7 ? true : false;
+                        deck.creator = users[Math.floor(Math.random() * users.length)]._id;
+                        deck.dateCreated = Date.now();
+                        // console.log("Beginning to create cards");
+                        let cards = [];
+                        let randomCardNumber = 5 + Math.ceil(Math.random() * 50);
+                        let deckAttemptCount = Math.floor(Math.random() * 20);
+                        while(cards.length < randomCardNumber) {
+                            cards.push(new Promise((reso, reje) => {
+                                let card = new Card();
+                                card.creator = deck.creator;
+                                card.dateCreated = Date.now();
+                                card.type = getRandomCardType(Math.random());
+                                card.question = faker.hacker.phrase();
+                                if(card.type === "multiple-choice") {
+                                    let randomNum = Math.random();
+                                    card.correctAnswer = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
+                                    card.wrongAnswerOne = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
+                                    card.wrongAnswerTwo = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
+                                    card.wrongAnswerThree = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
+                                } else if(card.type === "true-false") {
+                                    card.correctAnswer = Math.random() > .5 ? "True" : "False";
+                                    card.wrongAnswerOne = card.correctAnswer === "True" ? "False" : "True";
+                                } else {
+                                    card.correctAnswer = Math.random() > .5 ? faker.hacker.noun() : faker.hacker.phrase();
+                                }
+                                if(Math.random > .7) {
+                                    faker.hint = faker.hacker.phrase();
+                                }
+                                card.stats.numberCorrect = deckAttemptCount - Math.floor(Math.random() * deckAttemptCount);
+                                card.stats.numberIncorrect = deckAttemptCount - card.stats.numberCorrect;
+                                card.save((err, card) => {
+                                    if(err) {
+                                        throw err;
+                                    } 
+                                    deck.cards.push(card);
+                                    reso(card);
+                                });
+                            }));
+                        }
+                        // console.log("Done creating cards");
+                        Promise.all(cards).then((cards) => {
+                            // console.log("cards finished loading");
+                            // console.log(cards);
+                            deck.cards = cards;
+                            let randomViewStartIndex = Math.floor(Math.random() * (users.length - 1));
+                            let randomViewStopIndex = randomViewStartIndex + Math.ceil(Math.random() * (users.length - randomViewStartIndex));
+                            let randomGroupIndex = Math.floor(Math.random() * groups.length);
+                            let inGroup = Math.random() > .7;
+                            deck.permissions.view = inGroup ? groups[randomGroupIndex].members.map(user => user._id) : users.slice(randomViewStartIndex, randomViewStopIndex).map(user => user._id);
+                            if(deck.permissions.view.indexOf(deck.creator._id) === -1) {
+                                deck.permissions.view.unshift(deck.creator._id);
+                            }
+                            let randomEditStartIndex = Math.floor(Math.random() * (deck.permissions.view.length - 1));
+                            let randomEditStopIndex = randomEditStartIndex + Math.ceil(Math.random() * (deck.permissions.view.length - randomEditStartIndex));
+                            deck.permissions.edit = deck.permissions.view.slice(randomEditStartIndex, randomEditStopIndex);
+                            if(deck.permissions.view.indexOf(deck.creator._id) === -1) {
+                                deck.permissions.edit.unshift(deck.creator._id);
+                            }
+                            deck.permissions.copy = (deck.permissions.view.length > 0 || deck.public) && Math.random() > .7 ? true : false;
+                            deck.permissions.suggest = (deck.permissions.view.length > 0 || deck.public) && Math.random() > .3 ? true : false;
+                            let deckPromise = deck.save((err, deck) => {
+                                if(err) {
+                                    throw err;
+                                }
+                                if(inGroup) {
+                                    let groupPromise = Group.findByIdAndUpdate(groups[randomGroupIndex]._id, {$push: {decks: deck._id}});
+                                    groupPromise.catch(err => {throw err}).then(console.log("done"));
+                                }
+                                let userPromise = User.findByIdAndUpdate(deck.creator, {$push: {decks: deck}}).exec();
+                                userPromise.catch(err => {throw err}).then(() => {
+                                    return deck;
+                                });
+                                categories.forEach(category => {
+                                    if(Math.random() > .9) {
+                                        // console.log("deck should be added to a category");
+                                        let categoryPromise = Category.findByIdAndUpdate(category._id, {$push: {decks: deck._id}}).exec();
+                                        categoryPromise.then(() => {
+                                            // console.log("category promise completed")
+                                            return;
+                                        });
+                                    }
+                                });
+                                console.log("deck added to one or more categories");
+                            });
+                            resolve(deckPromise);
+                        });
+                    }));
+                }
+                Promise.all(decks).then(
+                    res.send("Database seeding complete")
+                );
+            })
         });
     });
 });

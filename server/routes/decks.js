@@ -99,4 +99,23 @@ deckRouter.put("/:deckId", (req, res, next) => {
     });
 });
 
+deckRouter.post("/:deckId/cards", (req, res, next) => {
+    let newCard = new Card(req.body);
+    newCard.save((err, card) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            Deck.findByIdAndUpdate(req.deck._id, {$push: {cards: card}}, (err, deck) => {
+                if(err) {
+                    res.status(500).send("There was an error with your request");
+                    throw err;
+                } else {
+                    res.status(200).send(deck);
+                }
+            });
+        }
+    });
+});
+
 module.exports = deckRouter;

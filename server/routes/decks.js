@@ -1,7 +1,11 @@
 const express = require("express");
 const deckRouter = express.Router();
 
+const Attempt = require("../models/attempt");
+const Card = require("../models/card");
 const Deck = require("../models/deck");
+const Group = require("../models/group");
+const Category = require("../models/category");
 
 deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
@@ -44,6 +48,44 @@ deckRouter.post("/", (req, res, next) => {
 
 deckRouter.get("/:deckId", (req, res, next) => {
     res.status(200).send(req.deck);
+});
+
+deckRouter.delete("/:deckId", (req, res, next) => {
+    Deck.findByIdAndDelete(req.deck._id)
+        .catch(err => {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        })
+        .then(() => {
+            Card.deleteMany({_id: {$in: req.deck.cards}})
+                .catch(err => {
+                    res.status(500).send("There was an error with your request");
+                    throw err;
+                })
+                .then(() => {
+                    Group.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}})
+                        .catch(err => {
+                            res.status(500).send("There was an error with your request");
+                            throw err;
+                        })
+                        .then(() => {
+                            Attempt.deleteMany({deck: req.deck._id})
+                                .catch(err => {
+                                    res.status(500).send("There was an error with your request");
+                                })
+                                .then(() => {
+                                    Category.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}}, (err, categories) => {
+                                        if(err) {
+                                            res.status(500).send("There was an error with your request");
+                                            throw err;
+                                        } else {
+                                            res.status(200).send(req.deck);
+                                        }
+                                    });
+                                })
+                        })
+                })
+        });
 });
 
 deckRouter.put("/:deckId", (req, res, next) => {

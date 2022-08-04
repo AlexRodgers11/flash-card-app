@@ -63,7 +63,7 @@ router.get("/seed-database", (req, res, next) => {
     console.log("creating users");
     let users = [];
     //create users
-    while(users.length < 50) {
+    while(users.length < 100) {
         users.push(new Promise((resolve, reject) => {
             let user = new User();
             user.login.username = faker.random.word() + faker.random.word();
@@ -92,7 +92,7 @@ router.get("/seed-database", (req, res, next) => {
                 group.name = faker.random.word() + Math.ceil(Math.random() * 100);
                 group.decks = [];
                 users.forEach(user => {
-                    if(Math.random() > .65) {
+                    if(Math.random() > .80) {
                         group.members.push(user._id);
                     }
                 });
@@ -100,7 +100,10 @@ router.get("/seed-database", (req, res, next) => {
                     if(err) {
                         throw err;
                     }
-                    resolve(group);
+                    let usersPromise = User.updateMany({_id: {$in: group.members}}, {$push: {groups: group._id}});
+                    usersPromise.catch(err => {throw err}).then(() => {
+                        resolve(group);
+                    });
                 });
             }));
         };

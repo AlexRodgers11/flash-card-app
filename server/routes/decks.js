@@ -30,6 +30,18 @@ deckRouter.get("/", (req, res, next) => {
     });
 });
 
+deckRouter.post("/", (req, res, next) => {
+    let newDeck = new Deck(req.body);
+    newDeck.save((err, deck) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            res.status(200).send(deck);
+        }
+    });
+});
+
 deckRouter.get("/:deckId", (req, res, next) => {
     res.status(200).send(req.deck);
 });

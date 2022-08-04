@@ -2,6 +2,7 @@ const express = require("express");
 const groupRouter = express.Router();
 
 const Group = require("../models/group");
+const User = require("../models/user");
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
     Group.findById(groupId, (err, group) => {
@@ -11,7 +12,6 @@ groupRouter.param("groupId", (req, res, next, groupId) => {
             if(!group) {
                 res.status(404).send("Group not found");
             } else {
-                console.log(group);
                 req.group = group;
                 next();
             }
@@ -68,6 +68,28 @@ groupRouter.put("/:groupId", (req, res, next) => {
             throw err;
         } else {
             res.status(200).send(group);
+        }
+    });
+});
+
+groupRouter.post("/:groupId", (req, res, next) => {
+    User.findById(req.body._id, (err, user) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            if(!user) {
+                res.status(404).send("User not found");
+            } else {
+                Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}}, (err, group) => {
+                    if(err) {
+                        res.status(500).send("There was an error with your request");
+                        throw err;
+                    } else {
+                        res.status(200).send(user);
+                    }
+                });
+            }
         }
     });
 });

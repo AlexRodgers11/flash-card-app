@@ -184,9 +184,12 @@ router.get("/seed-database", (req, res, next) => {
                             }
                             if(inGroup) {
                                 let groupPromise = Group.findByIdAndUpdate(groups[randomGroupIndex]._id, {$push: {decks: deck._id}});
-                                groupPromise.catch(err).then(console.log("done"));
+                                groupPromise.catch(err => {throw err}).then(console.log("done"));
                             }
-                            return deck;
+                            let userPromise = User.findByIdAndUpdate(deck.creator, {$push: {decks: deck}}).exec();
+                            userPromise.catch(err => {throw err}).then(() => {
+                                return deck;
+                            });
                         });
                         resolve(deckPromise);
                     });

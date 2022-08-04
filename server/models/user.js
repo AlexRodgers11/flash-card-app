@@ -13,6 +13,7 @@ const User = new Schema({
     },
     email: String,
     photo: String,
+    decks: [{type: Schema.Types.ObjectId, ref: "deck"}],
     attempts: [{type: Schema.Types.ObjectId, ref: "attempt"}]
 });
 

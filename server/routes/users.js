@@ -35,4 +35,14 @@ userRouter.get("/:userId/groups", (req, res, next) => {
     });
 });
 
+userRouter.put("/:userId", (req, res, next) => {
+    User.findByIdAndUpdate(req.user._id, req.body, (err, user) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+        } else {
+            res.status(200).send(user)
+        }
+    });
+});
+
 module.exports = userRouter;

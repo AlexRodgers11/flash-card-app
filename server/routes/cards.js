@@ -19,4 +19,8 @@ cardRouter.param("cardId", (req, res, next, cardId) => {
     });
 });
 
+cardRouter.get("/:cardId", (req, res, next) => {
+    res.status(200).send(req.card);
+});
+
 module.exports = cardRouter;

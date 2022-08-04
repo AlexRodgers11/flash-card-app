@@ -30,4 +30,8 @@ deckRouter.get("/", (req, res, next) => {
     });
 });
 
+deckRouter.get("/:deckId", (req, res, next) => {
+    res.status(200).send(req.deck);
+});
+
 module.exports = deckRouter;

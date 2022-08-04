@@ -3,7 +3,7 @@ const deckRouter = express.Router();
 
 const Deck = require("../models/deck");
 
-deckRouter.param("groupId", (req, res, next, deckId) => {
+deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
         if(err) {
             res.status(500).send("There was an error with your request");

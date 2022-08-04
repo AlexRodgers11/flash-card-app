@@ -46,4 +46,15 @@ deckRouter.get("/:deckId", (req, res, next) => {
     res.status(200).send(req.deck);
 });
 
+deckRouter.put("/:deckId", (req, res, next) => {
+    Deck.findByIdAndUpdate(req.deck._id, req.body, (err, deck) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            res.status(200).send(deck);
+        }
+    });
+});
+
 module.exports = deckRouter;

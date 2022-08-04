@@ -124,4 +124,17 @@ userRouter.put("/:userId", (req, res, next) => {
     });
 });
 
+userRouter.post("/:userId/decks", (req, res, next) => {
+    let newDeck = new Deck(req.body);
+    newDeck.save((err, deck) => {
+        User.findByIdAndUpdate(req.user._id, {$push: {decks: newDeck}}, (err, deck) => {
+            if(err) {
+                res.status(500).send("There was an error with your request");
+            } else {
+                res.status(200).send(newDeck);
+            }
+        });
+    });
+});
+
 module.exports = userRouter;

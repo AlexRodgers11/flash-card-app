@@ -18,4 +18,16 @@ deckRouter.param("groupId", (req, res, next, deckId) => {
     });
 });
 
+//come back and add logic to only send a certain number at a time and load more on scroll down
+deckRouter.get("/", (req, res, next) => {
+    Deck.find({}, (err, decks) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            res.status(200).send(decks);
+        }
+    });
+});
+
 module.exports = deckRouter;

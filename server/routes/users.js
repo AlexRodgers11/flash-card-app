@@ -37,6 +37,18 @@ userRouter.get("/:userId/groups", (req, res, next) => {
     });
 });
 
+userRouter.post("/", (req, res, next) => {
+    let newUser = new User(req.body);
+    newUser.save((err, user) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            res.status(200).send(user)
+        }
+    });
+});
+
 userRouter.delete("/:userId", (req, res, next) => {
     User.findByIdAndDelete(req.user._id, (err, user) => {
         if(err) {

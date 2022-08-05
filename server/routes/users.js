@@ -138,14 +138,9 @@ userRouter.post("/:userId/decks", (req, res, next) => {
 });
 
 userRouter.post("/:userId/attempts", (req, res, next) => {
-    console.log(req.body);
-    console.log("____");
     let newAttempt = new Attempt(req.body);
-    console.log(newAttempt);
     newAttempt.save((err, attempt) => {
-        console.log(attempt);
         User.findByIdAndUpdate(req.user._id, {$push: {attempts: attempt}}, (err, user) => {
-            // console.log(user);
             if(err) {
                 res.status(500).send("There was an error with your request");
                 throw err;
@@ -153,6 +148,22 @@ userRouter.post("/:userId/attempts", (req, res, next) => {
                 res.status(200).send(attempt);
             }
         });
+    });
+});
+
+userRouter.delete("/:userId/attempts/:attemptId", (req, res, next) => {
+    User.findByIdAndUpdate(req.user._id, {$pull: {attempts: req.params.attemptId}}, (err, user) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+        } else {
+            Attempt.findByIdAndDelete(req.params.attemptId, (err, attempt) => {
+                if(err) {
+                    res.status(500).send("There was an error with your request");
+                } else {
+                    res.status(200).send(attempt);
+                } 
+            });
+        }
     });
 });
 

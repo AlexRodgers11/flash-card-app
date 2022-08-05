@@ -29,4 +29,8 @@ categoryRouter.get("/", (req, res, next) => {
     });
 });
 
+categoryRouter.get("/:categoryId", (req, res, next) => {
+    res.status(200).send(req.category);
+});
+
 module.exports = categoryRouter;

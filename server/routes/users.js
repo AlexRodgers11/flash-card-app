@@ -137,6 +137,24 @@ userRouter.post("/:userId/decks", (req, res, next) => {
     });
 });
 
+userRouter.post("/:userId/attempts", (req, res, next) => {
+    console.log(req.body);
+    console.log("____");
+    let newAttempt = new Attempt(req.body);
+    console.log(newAttempt);
+    newAttempt.save((err, attempt) => {
+        console.log(attempt);
+        User.findByIdAndUpdate(req.user._id, {$push: {attempts: attempt}}, (err, user) => {
+            // console.log(user);
+            if(err) {
+                res.status(500).send("There was an error with your request");
+                throw err;
+            } else {
+                res.status(200).send(attempt);
+            }
+        });
+    });
+});
 
 
 module.exports = userRouter;

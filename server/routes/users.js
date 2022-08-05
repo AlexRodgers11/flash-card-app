@@ -185,5 +185,31 @@ userRouter.delete("/:userId/attempts", (req, res, next) => {
     });
 });
 
+userRouter.delete("/:userId/decks/:deckId/attempts", (req, res, next) => {
+    Attempt.find({$and: [{_id: {$in: req.user.attempts}}, {deck: req.params.deckId}]}, (err, attempts) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            let attemptIds = attempts.map(attempt => attempt._id);
+            Attempt.deleteMany({_id: {$in: attemptIds}}, (err, deletedAttemptsObj) => {
+                if(err) {
+                    res.status(500).send("There was an error with your request");
+                    throw err;
+                } else {
+                    User.findByIdAndUpdate(req.user._id, {$pull: {attempts: {$in: attemptIds}}}, (err, user) => {
+                        if(err) {
+                            res.status(500).send("There was an error with your request");
+                            throw err;
+                        } else {
+                            res.status(200).send(JSON.stringify(deletedAttemptsObj.deletedCount));
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+
 
 module.exports = userRouter;

@@ -6,6 +6,8 @@ const Card = require("../models/card");
 const Deck = require("../models/deck");
 const Group = require("../models/group");
 const Category = require("../models/category");
+const User = require("../models/user");
+const deck = require("../models/deck");
 
 deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
@@ -47,7 +49,26 @@ deckRouter.post("/", (req, res, next) => {
 });
 
 deckRouter.get("/:deckId", (req, res, next) => {
-    res.status(200).send(req.deck);
+    if(req.query.thumbnail) {
+        User.findById(req.deck.creator, (err, user) => {
+            if(err) {
+                res.status(500).send("There was an error with your request");
+                throw err;
+            } else {
+                let response = {
+                    name: req.deck.name,
+                    public: req.deck.public,
+                    creator: user.login.username,
+                    dateCreated: req.deck.dateCreated,
+                    cardCount: req.deck.cards.length,
+                    permissions: req.deck.permissions
+                };
+                res.status(200).send(JSON.stringify(response));
+            }
+        });
+    } else {
+        res.status(200).send(req.deck);
+    }
 });
 
 deckRouter.delete("/:deckId", (req, res, next) => {

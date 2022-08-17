@@ -8,7 +8,7 @@ function DeckThumbnail(props) {
 
     useEffect(() => {
         const baseURL = 'http://localhost:8000';
-        axios.get(`${baseURL}/decks/${props.deckId}`)
+        axios.get(`${baseURL}/decks/${props.deckId}?thumbnail=true`)
             .then((response) => setDeckData(response.data))
             .catch((err) => console.log(err));
     }, [props.deckId]);
@@ -19,6 +19,7 @@ function DeckThumbnail(props) {
         <p>{deckData.creator}</p>
         <p>{deckData.dateCreated}</p>
         <p>{deckData.public}</p>
+        <p>{deckData.cardCount}</p>
     </div>
   )
 }

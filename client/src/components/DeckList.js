@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDecksOfCategory, fetchDecksOfGroup, fetchDecksOfUser } from '../reducers/decksSlice';
+import DeckThumbnail from './DeckThumbnail';
 
 export default function DeckList(props) {
     const dispatch = useDispatch();
@@ -30,8 +31,8 @@ export default function DeckList(props) {
 
     return (
         <div>
-            Test
-            {deckIds.map(deckId => <p>{deckId}</p>)}
+            Decks:
+            {deckIds.map(deckId => <DeckThumbnail key={deckId} deckId={deckId} />)}
         </div>
     )
 }

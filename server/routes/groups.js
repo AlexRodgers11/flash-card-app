@@ -49,6 +49,10 @@ groupRouter.get("/:groupId", (req, res, next) => {
     res.status(200).send(req.group);
 });
 
+groupRouter.get("/:groupId/decks", (req, res, next) => {
+    res.status(200).send(JSON.stringify(req.group.decks));
+});
+
 groupRouter.delete("/:groupId", (req, res, next) => {
     Group.findByIdAndDelete(req.group._id, (err, group) => {
         if(err) {

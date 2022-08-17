@@ -126,14 +126,7 @@ userRouter.put("/:userId", (req, res, next) => {
 });
 
 userRouter.get("/:userId/decks", (req, res, next) => {
-    Deck.find({creator: req.user._id}, (err, decks) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } else {
-            res.status(200).send(JSON.stringify(decks));
-        }
-    });
+    res.status(200).send(JSON.stringify(req.user.decks));
 });
 
 userRouter.post("/:userId/decks", (req, res, next) => {

@@ -10,6 +10,7 @@ userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
         if(err) {
             res.status(500).send("There was an error with your request");
+            throw err;
         } else {
             if(!user) {
                 res.status(404).send("User not found");
@@ -124,6 +125,17 @@ userRouter.put("/:userId", (req, res, next) => {
     });
 });
 
+userRouter.get("/:userId/decks", (req, res, next) => {
+    Deck.find({creator: req.user._id}, (err, decks) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            res.status(200).send(JSON.stringify(decks));
+        }
+    });
+});
+
 userRouter.post("/:userId/decks", (req, res, next) => {
     let newDeck = new Deck(req.body);
     newDeck.save((err, deck) => {
@@ -155,10 +167,12 @@ userRouter.delete("/:userId/attempts/:attemptId", (req, res, next) => {
     User.findByIdAndUpdate(req.user._id, {$pull: {attempts: req.params.attemptId}}, (err, user) => {
         if(err) {
             res.status(500).send("There was an error with your request");
+            throw err;
         } else {
             Attempt.findByIdAndDelete(req.params.attemptId, (err, attempt) => {
                 if(err) {
                     res.status(500).send("There was an error with your request");
+                    throw err;
                 } else {
                     res.status(200).send(attempt);
                 } 

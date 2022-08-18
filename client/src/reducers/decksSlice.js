@@ -9,7 +9,7 @@ const initialState = {
     deckIds: []
 };
 
-export const fetchDecksOfUser = createAsyncThunk("", async (userId) => {
+export const fetchDecksOfUser = createAsyncThunk("decks/fetchDecksOfUser", async (userId) => {
     console.log("in fetchDecksOfUser");
     console.log(baseURL + "users/" + userId + "/decks");
     try {

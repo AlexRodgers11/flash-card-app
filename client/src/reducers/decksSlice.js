@@ -11,7 +11,7 @@ const initialState = {
 
 export const fetchDecksOfUser = createAsyncThunk("decks/fetchDecksOfUser", async (userId) => {
     console.log("in fetchDecksOfUser");
-    console.log(baseURL + "users/" + userId + "/decks");
+    console.log(baseURL + "/users/" + userId + "/decks");
     try {
         const response = await axios.get(baseURL + "/users/" + userId + "/decks");
         return {

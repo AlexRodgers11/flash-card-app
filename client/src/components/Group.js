@@ -23,7 +23,7 @@ function Group() {
     return (
         <div>
             <p>{groupName}</p>
-            <GroupMemberList groupMembersIds={groupMemberIds} />
+            <GroupMemberList groupMemberIds={groupMemberIds} />
             <DeckList listType="group" listId={groupId} />
         </div>
   )

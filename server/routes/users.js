@@ -23,7 +23,18 @@ userRouter.param("userId", (req, res, next, userId) => {
 });
 
 userRouter.get("/:userId", (req, res, next) => {
-    res.status(200).send(req.user);
+    if(req.query.partial) {
+        let partialData = {
+            firstName: req.user.name.first,
+            lastName: req.user.name.last,
+            username: req.user.login.username,
+            email: req.user.email,
+            photo: req.user.photo,
+        }
+        res.status(200).send(partialData);
+    } else {
+        res.status(200).send(req.user);
+    }
 });
 
 userRouter.get("/:userId/groups", (req, res, next) => {

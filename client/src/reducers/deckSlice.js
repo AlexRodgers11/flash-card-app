@@ -11,7 +11,7 @@ const baseURL = 'http://localhost:8000';
 const initialState = {
     deckId: "",
     name: "",
-    public: false,
+    publiclyAvailable: false,
     creator: "",
     cards: [],
     permissions: {
@@ -20,6 +20,7 @@ const initialState = {
         copy: false,
         suggest: false
     }
+
 }
 
 export const fetchDeck = createAsyncThunk("deck/fetchDeck", async (deckId) => {
@@ -41,7 +42,7 @@ export const deckSlice = createSlice({
         builder.addCase(fetchDeck.fulfilled, (state, action) => {
             state.deckId = action.payload._id;
             state.name = action.payload.name;
-            state.public = action.payload.public;
+            state.publiclyAvailable = action.payload.public;
             state.creator = action.payload.creator;
             state.cards = [...action.payload.cards];
             state.permissions.view = action.payload.permissions.view;

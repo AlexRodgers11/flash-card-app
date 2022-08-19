@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchDeck } from '../reducers/deckSlice';
 import { useParams } from 'react-router';
+import Card from './Card';
 
 function Deck() {
     // const { deckId, name, publiclyAvailable, creator, cards, permissions } = useSelector((state) => state.deck);
@@ -28,7 +29,7 @@ function Deck() {
             <h1>{name}</h1>
             <h3>{creator}</h3>
             <p>Public?: {publiclyAvailable ? "True" : "False"}</p>
-            {cards.map(card => <p>{card}</p>)}
+            {cards.map(card => <p><Card cardId={card} /></p>)}
         </div>
     )
 }

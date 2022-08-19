@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchDeck } from '../reducers/deckSlice';
 import { useParams } from 'react-router';
@@ -32,10 +31,6 @@ function Deck() {
             {cards.map(card => <p>{card}</p>)}
         </div>
     )
-}
-
-Deck.propTypes = {
-    deckId: PropTypes.string
 }
 
 export default Deck

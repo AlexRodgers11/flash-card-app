@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
@@ -8,4 +8,4 @@ const Group = new Schema({
     decks: [{type: Schema.Types.ObjectId, ref: "deck"}]
 });
 
-module.exports = mongoose.model("group", Group);
+export default mongoose.model("group", Group);

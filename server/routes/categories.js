@@ -1,7 +1,7 @@
-const express = require("express");
+import express from "express";
 const categoryRouter = express.Router();
 
-const Category = require("../models/category");
+import Category from "../models/category.js";
 
 categoryRouter.param("categoryId", (req, res, next, categoryId) => {
     Category.findById(categoryId, (err, category) => {
@@ -37,4 +37,4 @@ categoryRouter.get("/:categoryId/decks", (req, res, next) => {
     res.status(200).send(req.category.decks);
 });
 
-module.exports = categoryRouter;
+export default categoryRouter;

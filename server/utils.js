@@ -1,4 +1,4 @@
-module.exports.getRandomCardType = num => {
+const getRandomCardType = num => {
     if(num < .33) {
         return "multiple-choice"
     } else if(num < .66) {
@@ -7,3 +7,5 @@ module.exports.getRandomCardType = num => {
         return "flash"
     }
 }
+
+export default getRandomCardType;

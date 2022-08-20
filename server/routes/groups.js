@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const groupRouter = express.Router();
 
-const Group = require("../models/group");
-const User = require("../models/user");
+import Group from "../models/group.js";
+import User from "../models/user.js";
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
     Group.findById(groupId, (err, group) => {
@@ -98,4 +98,4 @@ groupRouter.post("/:groupId", (req, res, next) => {
     });
 });
 
-module.exports = groupRouter;
+export default groupRouter;

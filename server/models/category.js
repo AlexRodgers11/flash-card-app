@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
@@ -7,4 +7,4 @@ const Category = new Schema({
     decks: [{type: Schema.Types.ObjectId, ref: "deck"}]
 });
 
-module.exports = mongoose.model("category", Category);
+export default mongoose.model("category", Category);

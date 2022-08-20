@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 const cardRouter = express.Router();
 
-const Card = require("../models/card");
-const Deck = require("../models/deck");
+import Card from "../models/card.js";
+import Deck from "../models/deck.js";
 
 cardRouter.param("cardId", (req, res, next, cardId) => {
     Card.findById(cardId, (err, card) => {
@@ -52,4 +52,4 @@ cardRouter.delete("/:cardId", (req, res, next) => {
     });
 });
 
-module.exports = cardRouter;
+export default cardRouter;

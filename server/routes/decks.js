@@ -1,13 +1,13 @@
-const express = require("express");
+import express from "express";
 const deckRouter = express.Router();
 
-const Attempt = require("../models/attempt");
-const Card = require("../models/card");
-const Deck = require("../models/deck");
-const Group = require("../models/group");
-const Category = require("../models/category");
-const User = require("../models/user");
-const deck = require("../models/deck");
+import Attempt from "../models/attempt.js";
+import Card from "../models/card.js";
+import Deck from "../models/deck.js";
+import Group from "../models/group.js";
+import Category from "../models/category.js";
+import User from "../models/user.js";
+
 
 deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
@@ -139,4 +139,4 @@ deckRouter.post("/:deckId/cards", (req, res, next) => {
     });
 });
 
-module.exports = deckRouter;
+export default deckRouter;

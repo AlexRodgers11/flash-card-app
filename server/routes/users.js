@@ -1,10 +1,10 @@
-const express = require("express");
+import express from "express";
 const userRouter = express.Router();
 
-const User = require("../models/user");
-const Group = require("../models/group");
-const Deck = require("../models/deck");
-const Attempt = require("../models/attempt");
+import User from "../models/user.js";
+import Group from "../models/group.js";
+import Deck from "../models/deck.js";
+import Attempt from "../models/attempt.js";
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
@@ -230,4 +230,4 @@ userRouter.delete("/:userId/decks/:deckId/attempts", (req, res, next) => {
 });
 
 
-module.exports = userRouter;
+export default userRouter;

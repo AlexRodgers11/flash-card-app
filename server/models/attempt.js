@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
@@ -13,4 +13,5 @@ const Attempt = new Schema({
     }]
 });
 
-module.exports = mongoose.model("attempt", Attempt);
+const attemptModel = mongoose.model("attempt", Attempt);
+export default attemptModel;

@@ -1,22 +1,22 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const router = express.Router();
-const faker = require("faker");
+import express from "express";
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
+import faker from "faker";
+import Attempt from "./models/attempt.js";
+import Card from "./models/card.js";
+import Category from "./models/category.js";
+import Deck from "./models/deck.js";
+import Group from "./models/group.js";
+import User from "./models/user.js";
+import getRandomCardType from "./utils.js";
 const port = process.env.port || 8000;
-const Attempt = require("./models/attempt");
-const Card = require("./models/card");
-const Category = require("./models/category");
-const Deck = require("./models/deck");
-const Group = require("./models/group");
-const User = require("./models/user");
-const { getRandomCardType } = require("./utils");
+const router = express.Router();
 
-const categoryRouter = require("./routes/categories");
-const cardRouter = require("./routes/cards");
-const deckRouter = require("./routes/decks");
-const groupRouter = require("./routes/groups");
-const userRouter = require("./routes/users");
+import categoryRouter from "./routes/categories.js";
+import cardRouter from "./routes/cards.js";
+import deckRouter from "./routes/decks.js";
+import groupRouter from "./routes/groups.js";
+import userRouter from "./routes/users.js"
 
 mongoose.connect("mongodb://localhost/flash-card-app", {
     //use MongoDB's new connection string parser instead of the old deprecated one

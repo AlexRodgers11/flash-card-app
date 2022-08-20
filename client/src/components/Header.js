@@ -1,10 +1,18 @@
-import React from 'react'
+import React from 'react';
+import { useNavigate } from 'react-router';
 
 function Header() {
-  return (
+    const navigate = useNavigate();
+
+    const handleClick = evt => {
+        navigate(`/${evt.target.value}`);
+    }
+
+
+    return (
     <div>
-        <button>Login</button>
-        <button>Sign Up</button>
+        <button value="login" onClick={handleClick}>Login</button>
+        <button value="register" onClick={handleClick}>Sign Up</button>
     </div>
   )
 }

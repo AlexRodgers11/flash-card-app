@@ -4,8 +4,8 @@ import useFormInput from '../hooks/useFormInput';
 
 function Login() {
     const navigate = useNavigate();
-    const [usernameOrEmail, setUsernameOrEmail] = useFormInput('');
-    const [password, setPassword] = useFormInput('');
+    const [usernameOrEmail, clearUsernameOrEmail, setUsernameOrEmail] = useFormInput('');
+    const [password, clearPassword, setPassword] = useFormInput('');
 
     const handleSubmit = evt => {
         evt.preventDefault();

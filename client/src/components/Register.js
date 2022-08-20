@@ -4,10 +4,10 @@ import useFormInput from '../hooks/useFormInput';
 
 function Register() {
     const navigate = useNavigate();
-    const [usernameOrEmail, setUsernameOrEmail] = useFormInput('');
-    const [password, setPassword] = useFormInput('');
+    const [usernameOrEmail, clearUsernameOrEmail, setUsernameOrEmail] = useFormInput('');
+    const [password, clearPassword, setPassword] = useFormInput('');
     const [showVerifyPassword, setShowVerifyPassword] = useState(false);
-    const [verifyPassword, setVerifyPassword] = useFormInput('');
+    const [verifyPassword, clearVerifyPassword, setVerifyPassword] = useFormInput('');
 
     const handleSubmit = evt => {
         evt.preventDefault();

@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import Deck from './Deck';
 import Group from './Group';
+import Login from './Login';
 import User from './User';
 
 function Router() {
@@ -11,6 +12,7 @@ function Router() {
             <Route exact path="/groups/:groupId" element={<Group />} />
             <Route exact path="/decks/:deckId" element={<Deck />} />
             <Route exact path="/users/:userId" element={<User />} />
+            <Route exact path="/login" element={<Login />} />
         </Routes>
     )
 }

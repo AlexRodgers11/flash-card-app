@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import Deck from './Deck';
 import Group from './Group';
 import Login from './Login';
+import Register from './Register';
 import User from './User';
 
 function Router() {
@@ -13,6 +14,7 @@ function Router() {
             <Route exact path="/decks/:deckId" element={<Deck />} />
             <Route exact path="/users/:userId" element={<User />} />
             <Route exact path="/login" element={<Login />} />
+            <Route exact path="/register" element={<Register />} />
         </Routes>
     )
 }

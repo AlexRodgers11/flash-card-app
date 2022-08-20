@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import axios from "axios";
 
 
-function DeckThumbnail(props) {
+function DeckTile(props) {
     const baseURL = 'http://localhost:8000';
     const [deckData, setDeckData] = useState({});
     const navigate = useNavigate();
@@ -13,7 +13,7 @@ function DeckThumbnail(props) {
     }
 
     useEffect(() => {
-        axios.get(`${baseURL}/decks/${props.deckId}?thumbnail=true`)
+        axios.get(`${baseURL}/decks/${props.deckId}?tile=true`)
             .then((response) => setDeckData(response.data))
             .catch((err) => console.log(err));
     }, [props.deckId]);
@@ -30,8 +30,8 @@ function DeckThumbnail(props) {
   )
 }
 
-DeckThumbnail.propTypes = {
+DeckTile.propTypes = {
     deckId: PropTypes.string
 }
 
-export default DeckThumbnail
+export default DeckTile

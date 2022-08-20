@@ -49,7 +49,7 @@ deckRouter.post("/", (req, res, next) => {
 });
 
 deckRouter.get("/:deckId", (req, res, next) => {
-    if(req.query.thumbnail) {
+    if(req.query.tile) {
         User.findById(req.deck.creator, (err, user) => {
             if(err) {
                 res.status(500).send("There was an error with your request");

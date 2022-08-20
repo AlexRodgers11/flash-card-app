@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 function UserTile(props) {
+    const navigate = useNavigate();
     const [userData, setUserData] = useState({});
 
     useEffect(() => {
@@ -12,8 +14,13 @@ function UserTile(props) {
             .then((response) => setUserData(response.data));
     }, [props.memberId]);
 
+    const handleClick = evt => {
+        evt.preventDefault();
+        navigate(`/users/${props.memberId}`);
+    }
+
     return (
-        <div>
+        <div onClick={handleClick}>
             <h1>{userData.username}</h1>
             <h2>{userData.firstName} {userData.lastName}</h2>
             <p>{userData.email}</p>

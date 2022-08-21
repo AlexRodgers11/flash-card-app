@@ -17,6 +17,13 @@ import cardRouter from "./routes/cards.js";
 import deckRouter from "./routes/decks.js";
 import groupRouter from "./routes/groups.js";
 import userRouter from "./routes/users.js"
+import loginRouter, { requireSignIn } from "./routes/login.js";
+
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import jwt from "jwt-simple";
+import { ExtractJwt } from "passport-jwt";
+import { Strategy as JwtStrategy } from  "passport-jwt";
 
 mongoose.connect("mongodb://localhost/flash-card-app", {
     //use MongoDB's new connection string parser instead of the old deprecated one
@@ -47,11 +54,78 @@ app.use(
     })
 );
 
+app.use(passport.initialize());
+
+// passport.use(
+//     "login",
+//     new LocalStrategy(
+//         {
+//             usernameField: "usernameOrEmail",
+//             passwordField: "password"
+//         },
+//         (usernameOrEmail, password, done) => {
+//         console.log("finding user");
+//         return User.find({
+//             $and: [
+//                 {$or: [
+//                     {"login.username": usernameOrEmail},
+//                     {"email": usernameOrEmail}
+//                 ]},
+//                 {"login.password": password}
+//             ]
+//         }, (err, user) => {
+//             if(err) {
+//                 console.error(err);
+//                 throw err;
+//             }
+//             if(user) {
+//                 console.log("user found");
+//                 return done(null, user);
+//             } else {
+//                 return done(null, false);
+//             }
+//         })
+//     })
+// );
+
+// const jwtOptions = {
+//     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+//     secretOrKey: "kacchan"
+// }
+
+// passport.use(
+//     "jwt",
+//     new JwtStrategy(jwtOptions, (payload, done) => {
+//         console.log("in jwt strategy creation");
+//         return done(null, {});
+//     })
+// );
+
+// const requireSignIn = passport.authenticate("login", {session: false});
+
+// const tokenForUser = user => {
+//     console.log("creating token for user");
+//     return jwt.encode({
+//         sub: user._id,
+//         iat: Math.round(Date.now() / 1000),
+//         //expire after 2 hours
+//         exp: Math.round(Date.now() / 1000 + 2 * 60 * 60)
+//     },
+//     "theblackswordsman");
+// }
+// app.post("/login", requireSignIn, (req, res, next) => {
+//     console.log("POST request received");
+//     res.send({
+//         token: tokenForUser(req.user)
+//     });
+// });
+
 app.use("/categories", categoryRouter);
 app.use("/cards", cardRouter);
 app.use("/decks", deckRouter);
 app.use("/groups", groupRouter);
 app.use("/users", userRouter);
+app.use("/login", loginRouter);
 
 router.get("/test", (req, res, next) => {
     console.log("connected");

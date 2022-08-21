@@ -46,7 +46,17 @@ groupRouter.post("/", (req, res, next) => {
 });
 
 groupRouter.get("/:groupId", (req, res, next) => {
-    res.status(200).send(req.group);
+    let response;
+    if(req.query.tile) {
+        response = {
+            name: req.group.name,
+            memberCount: req.group.members.length,
+            deckCount: req.group.decks.length
+        }
+    } else {
+        response = req.group;
+    }
+    res.status(200).send(response);
 });
 
 groupRouter.get("/:groupId/decks", (req, res, next) => {

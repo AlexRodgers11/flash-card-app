@@ -11,7 +11,7 @@ function GroupMemberList(props) {
 }
 
 GroupMemberList.propTypes = {
-    members: PropTypes.array
+    groupMemberIds: PropTypes.array
 }
 
 export default GroupMemberList

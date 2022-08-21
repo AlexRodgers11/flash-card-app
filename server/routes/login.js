@@ -29,7 +29,7 @@ passport.use(
         },
         (usernameOrEmail, password, done) => {
         console.log("finding user");
-        return User.find({
+        User.findOne({
             $and: [
                 {$or: [
                     {"login.username": usernameOrEmail},
@@ -67,7 +67,8 @@ const tokenForUser = user => {
 loginRouter.post("/", requireSignIn, (req, res, next) => {
     console.log("POST request received");
     res.send({
-        token: tokenForUser(req.user)
+        token: tokenForUser(req.user),
+        userId: req.user._id
     });
 });
 

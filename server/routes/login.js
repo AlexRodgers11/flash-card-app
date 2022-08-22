@@ -52,7 +52,23 @@ passport.use(
     })
 );
 
+passport.use(
+    "register",
+    new LocalStrategy((username, password, done) => {
+        console.log("finding user");
+        const newUser = new User({login: {username: username, password: password}});
+        newUser.save((err, user) => {
+            if(err) {
+                return done(null, false);
+            } else {
+                return done(null, user)
+            }
+        });
+    })
+);
+
 const requireSignIn = passport.authenticate("login", {session: false});
+const requireRegister = passport.authenticate("register", {session: false});
 
 const tokenForUser = user => {
     console.log("creating token for user");
@@ -64,9 +80,19 @@ const tokenForUser = user => {
     },
     "theblackswordsman");
 }
+
 loginRouter.post("/", requireSignIn, (req, res, next) => {
     console.log("POST request received");
     res.send({
+        token: tokenForUser(req.user),
+        userId: req.user._id
+    });
+});
+
+
+
+loginRouter.post("/new", requireRegister, (req, res, next) => {
+    res.status(200).send({
         token: tokenForUser(req.user),
         userId: req.user._id
     });

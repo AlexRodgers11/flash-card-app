@@ -1,16 +1,30 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
+import { register } from '../reducers/loginSlice';
 
 function Register() {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [usernameOrEmail, clearUsernameOrEmail, setUsernameOrEmail] = useFormInput('');
+    const [username, clearUsername, setUsername] = useFormInput('');
     const [password, clearPassword, setPassword] = useFormInput('');
     const [showVerifyPassword, setShowVerifyPassword] = useState(false);
     const [verifyPassword, clearVerifyPassword, setVerifyPassword] = useFormInput('');
 
     const handleSubmit = evt => {
         evt.preventDefault();
+        if(password === verifyPassword) {
+            console.log("about to dispatch register action");
+            dispatch(register({username, password}));
+            clearUsername();
+        } else {
+            
+            alert("Passwords do not match");
+        }
+        clearPassword();
+        clearVerifyPassword();
+        
     }
 
     useEffect(() => {
@@ -25,8 +39,8 @@ function Register() {
         <div>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="usernameOrEmail">Username or email</label>
-                    <input type="text" id="usernameOrEmail" name="usernameOrEmail" value={usernameOrEmail} onChange={setUsernameOrEmail} />
+                    <label htmlFor="username">Username</label>
+                    <input type="text" id="username" name="username" value={username} onChange={setUsername} />
                 </div>
                 <div>
                     <label htmlFor="password">Password</label>
@@ -40,6 +54,7 @@ function Register() {
                     :
                     null
                 }
+                <button type="submit">Submit</button>
             </form>
         </div>
     )

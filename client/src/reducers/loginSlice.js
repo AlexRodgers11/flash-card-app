@@ -33,6 +33,23 @@ export const login = createAsyncThunk("login/login", async({usernameOrEmail, pas
     }
 });
 
+export const register = createAsyncThunk("login/register", async({username, password}) => {
+    console.log("in login action");
+    console.log({username, password});
+    try {
+        const response = await axios.post(`${baseURL}/login/new`, {
+            username,
+            password
+        });
+        return {
+            token: response.data.token,
+            userId: response.data.userId
+        }
+    } catch (err) {
+        return err;
+    }
+});
+
 export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserData", async (userId) => {
     try {
         const response = await axios.get(`${baseURL}/users/${userId}`);
@@ -73,6 +90,10 @@ export const loginSlice = createSlice({
         builder.addCase(login.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId
+        });
+        builder.addCase(register.fulfilled, (state, action) => {
+            state.token = action.payload.token;
+            state.userId = action.payload.userId;
         });
     }
 });

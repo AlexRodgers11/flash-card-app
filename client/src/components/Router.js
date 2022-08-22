@@ -3,7 +3,7 @@ import Dashboard from './Dashboard';
 import Deck from './Deck';
 import Group from './Group';
 import Login from './Login';
-import Register from './Register';
+import RegisterCredentialsForm from './RegisterCredentialsForm';
 import User from './User';
 
 function Router() {
@@ -15,7 +15,7 @@ function Router() {
             <Route exact path="/decks/:deckId" element={<Deck />} />
             <Route exact path="/users/:userId" element={<User />} />
             <Route exact path="/login" element={<Login />} />
-            <Route exact path="/register" element={<Register />} />
+            <Route exact path="/register/signup" element={<RegisterCredentialsForm />} />
             <Route exact path="/dashboard" element={<Dashboard />} />
         </Routes>
     )

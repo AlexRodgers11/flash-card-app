@@ -54,9 +54,14 @@ passport.use(
 
 passport.use(
     "register",
-    new LocalStrategy((username, password, done) => {
+    new LocalStrategy(
+        {
+            usernameField: "email",
+            passwordField: "password"
+        },
+        (email, password, done) => {
         console.log("finding user");
-        const newUser = new User({login: {username: username, password: password}});
+        const newUser = new User({login: {password: password}, email: email});
         newUser.save((err, user) => {
             if(err) {
                 return done(null, false);

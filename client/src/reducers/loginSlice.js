@@ -33,12 +33,12 @@ export const login = createAsyncThunk("login/login", async({usernameOrEmail, pas
     }
 });
 
-export const register = createAsyncThunk("login/register", async({username, password}) => {
+export const signUp = createAsyncThunk("login/signUp", async({email, password}) => {
     console.log("in login action");
-    console.log({username, password});
+    console.log({email, password});
     try {
         const response = await axios.post(`${baseURL}/login/new`, {
-            username,
+            email,
             password
         });
         return {
@@ -91,7 +91,7 @@ export const loginSlice = createSlice({
             state.token = action.payload.token;
             state.userId = action.payload.userId
         });
-        builder.addCase(register.fulfilled, (state, action) => {
+        builder.addCase(signUp.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId;
         });

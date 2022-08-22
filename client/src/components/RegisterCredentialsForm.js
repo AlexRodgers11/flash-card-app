@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { register } from '../reducers/loginSlice';
 
-function Register() {
+function RegisterCredentialsForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [username, clearUsername, setUsername] = useFormInput('');
+    const [email, clearEmail, setEmail] = useFormInput('');
     const [password, clearPassword, setPassword] = useFormInput('');
     const [showVerifyPassword, setShowVerifyPassword] = useState(false);
     const [verifyPassword, clearVerifyPassword, setVerifyPassword] = useFormInput('');
@@ -16,8 +16,8 @@ function Register() {
         evt.preventDefault();
         if(password === verifyPassword) {
             console.log("about to dispatch register action");
-            dispatch(register({username, password}));
-            clearUsername();
+            dispatch(register({email, password}));
+            clearEmail();
         } else {
             
             alert("Passwords do not match");
@@ -39,8 +39,8 @@ function Register() {
         <div>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="username">Username</label>
-                    <input type="text" id="username" name="username" value={username} onChange={setUsername} />
+                    <label htmlFor="email">Email</label>
+                    <input type="text" id="email" name="email" value={email} onChange={setEmail} />
                 </div>
                 <div>
                     <label htmlFor="password">Password</label>
@@ -60,4 +60,4 @@ function Register() {
     )
 }
 
-export default Register
+export default RegisterCredentialsForm;

@@ -12,7 +12,7 @@ function Header() {
     return (
     <div>
         <button value="login" onClick={handleClick}>Login</button>
-        <button value="register" onClick={handleClick}>Sign Up</button>
+        <button value="register/signup" onClick={handleClick}>Sign Up</button>
     </div>
   )
 }

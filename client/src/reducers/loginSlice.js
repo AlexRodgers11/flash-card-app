@@ -52,6 +52,25 @@ export const signUp = createAsyncThunk("login/signUp", async({email, password}) 
     }
 });
 
+export const setIdentificationData = createAsyncThunk("login/setIdentificationData", async({userId, username, firstName, lastName, photo}) => {
+    console.log("updating user info");
+    try {
+        const response = await axios.put(`${baseURL}/users/${userId}`, {
+            login: {
+                username: username
+            },
+            name: {
+                first: firstName,
+                last: lastName
+            },
+            photo: photo
+        });
+        return response.data;
+    } catch (err) {
+        return err;
+    }
+});
+
 export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserData", async (userId) => {
     try {
         const response = await axios.get(`${baseURL}/users/${userId}`);
@@ -97,6 +116,11 @@ export const loginSlice = createSlice({
             state.token = action.payload.token;
             state.userId = action.payload.userId;
             state.email = action.payload.email;
+        });
+        builder.addCase(setIdentificationData.fulfilled, (state, action) => {
+            state.username = action.payload.username;
+            state.name = action.payload.name;
+            state.photo = action.payload.photo;
         });
     }
 });

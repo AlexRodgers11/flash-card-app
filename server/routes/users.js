@@ -126,7 +126,7 @@ userRouter.delete("/:userId", (req, res, next) => {
 });
 
 userRouter.put("/:userId", (req, res, next) => {
-    User.findByIdAndUpdate(req.user._id, req.body, (err, user) => {
+    User.findByIdAndUpdate(req.user._id, req.body, {new: true}, (err, user) => {
         if(err) {
             res.status(500).send("There was an error with your request");
             throw err;

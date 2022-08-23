@@ -88,18 +88,21 @@ const tokenForUser = user => {
 
 loginRouter.post("/", requireSignIn, (req, res, next) => {
     console.log("POST request received");
+    
     res.send({
         token: tokenForUser(req.user),
-        userId: req.user._id
+        userId: req.user._id,
+        
     });
 });
 
 
 
-loginRouter.post("/new", requireRegister, (req, res, next) => {
+loginRouter.post("/new", requireRegister, (req, res, next) => { 
     res.status(200).send({
         token: tokenForUser(req.user),
-        userId: req.user._id
+        userId: req.user._id,
+        email: req.user.email
     });
 });
 

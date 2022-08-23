@@ -26,7 +26,8 @@ export const login = createAsyncThunk("login/login", async({usernameOrEmail, pas
         });
         return {
             token: response.data.token,
-            userId: response.data.userId
+            userId: response.data.userId,
+            email: response.data.email
         }
     } catch (err) {
         return err;
@@ -43,7 +44,8 @@ export const signUp = createAsyncThunk("login/signUp", async({email, password}) 
         });
         return {
             token: response.data.token,
-            userId: response.data.userId
+            userId: response.data.userId,
+            email: response.data.email
         }
     } catch (err) {
         return err;
@@ -94,6 +96,7 @@ export const loginSlice = createSlice({
         builder.addCase(signUp.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId;
+            state.email = action.payload.email;
         });
     }
 });

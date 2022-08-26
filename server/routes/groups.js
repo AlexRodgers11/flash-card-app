@@ -20,14 +20,28 @@ groupRouter.param("groupId", (req, res, next, groupId) => {
 });
 
 groupRouter.get("/", (req, res, next) => {
-    Group.find({}, (err, groups) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } else {
-            res.status(200).send(groups);
-        }
-    });
+    if(req.query.search) {
+        // console.log(req.query.search);
+        const regex = new RegExp(req.query.search, 'i');
+        Group.find({name: {$regex: regex}}, (err, groups) => {
+            if(err) {
+                res.status(500).send("There was an error with your request");
+                throw err;
+            } else {
+                res.status(200).send(groups);
+            }
+        });
+    } else {
+        Group.find({}, (err, groups) => {
+            if(err) {
+                res.status(500).send("There was an error with your request");
+                throw err;
+            } else {
+                res.status(200).send(groups);
+            }
+        });
+    }
+    
 });
 
 groupRouter.post("/", (req, res, next) => {

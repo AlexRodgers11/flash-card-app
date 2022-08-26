@@ -96,7 +96,11 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
 export const loginSlice = createSlice({
     name: "login",
     initialState,
-    reducers: {},
+    reducers: {
+        setGroups: (state, action) => {
+            state.groups = action.payload;
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(fetchLoggedInUserData.fulfilled, (state, action) => {
             // state.userId = action.payload._id;
@@ -125,4 +129,5 @@ export const loginSlice = createSlice({
     }
 });
 
+export const { setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

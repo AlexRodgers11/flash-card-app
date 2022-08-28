@@ -66,6 +66,15 @@ deckRouter.get("/:deckId", (req, res, next) => {
                 res.status(200).send(JSON.stringify(response));
             }
         });
+    } else if(req.query.practice) {
+        Deck.findById(req.deck._id)
+            .populate({
+                path: "cards"
+            })
+            .catch(err => {
+                throw err;
+            })
+            .then(deck => res.status(200).send(deck));
     } else {
         res.status(200).send(req.deck);
     }

@@ -7,8 +7,7 @@ const Attempt = new Schema({
     deck: {type: Schema.Types.ObjectId, ref: "deck"},
     datePracticed: Date,
     cards: [{
-        question: String,
-        answer: String,
+        cardId: String,
         answeredCorrectly: Boolean
     }]
 });

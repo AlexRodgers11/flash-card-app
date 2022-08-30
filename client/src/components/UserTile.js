@@ -20,7 +20,7 @@ function UserTile(props) {
     }
 
     return (
-        <div onClick={handleClick}>
+        <div onClick={handleClick} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
             <h1>{userData.username}</h1>
             <h2>{userData.firstName} {userData.lastName}</h2>
             <p>{userData.email}</p>

@@ -18,7 +18,7 @@ function GroupTile(props) {
     }, [props.groupId]);
   
     return (
-        <div onClick={handleViewGroup}>
+        <div onClick={handleViewGroup} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
             <h1>{groupData.name}</h1>
             <p>Members: {groupData.memberCount}</p>
             <p>Decks: {groupData.deckCount}</p>

@@ -99,7 +99,8 @@ export const loginSlice = createSlice({
     reducers: {
         setGroups: (state, action) => {
             state.groups = action.payload;
-        }
+        },
+        logout: (state) => initialState
     },
     extraReducers: (builder) => {
         builder.addCase(fetchLoggedInUserData.fulfilled, (state, action) => {
@@ -129,5 +130,5 @@ export const loginSlice = createSlice({
     }
 });
 
-export const { setGroups } = loginSlice.actions;
+export const { logout, setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

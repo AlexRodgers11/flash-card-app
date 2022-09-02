@@ -31,7 +31,6 @@ export default function DeckList(props) {
 
     return (
         <div>
-            Decks:
             {deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
         </div>
     )

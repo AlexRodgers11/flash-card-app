@@ -109,7 +109,7 @@ deckRouter.delete("/:deckId", (req, res, next) => {
                                             res.status(500).send("There was an error with your request");
                                             throw err;
                                         } else {
-                                            res.status(200).send(req.deck);
+                                            res.status(200).send(req.deck._id);
                                         }
                                     });
                                 })

@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import Deck from './Deck';
+import DeckForm from './DeckForm';
 import Group from './Group';
 import Login from './Login';
 import PracticeSession from './PracticeSession';
@@ -16,6 +17,7 @@ function Router() {
         <Routes>
             <Route exact path="/groups/:groupId" element={<Group />} />
             <Route exact path="/decks/:deckId" element={<Deck />} />
+            <Route exact path="/users/:userId/decks/new" element={<DeckForm />} />
             <Route exact path="/users/:userId" element={<User />} />
             <Route exact path="/login" element={<Login />} />
             <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
@@ -28,3 +30,7 @@ function Router() {
 }
 
 export default Router;
+
+//login/register
+//dashboard
+//add deck

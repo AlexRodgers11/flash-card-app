@@ -1,13 +1,14 @@
-import React from 'react';
+    import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import { logout } from '../reducers/loginSlice';
 
 function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const username = useSelector((state) => state.login.username);
-
+    
     const handleClick = evt => {
         navigate(`/${evt.target.value}`);
     }
@@ -19,7 +20,7 @@ function Header() {
 
 
     return (
-        <div style={{display: "flex", justifyContent: "space-between", padding: ".5em 2em"}}>
+        <div style={{display: "flex", justifyContent: "space-between", padding: ".5em 2em"}}>            
             <div><strong>{username ? username: null}</strong></div>
             {!username ? 
                 <div>
@@ -28,6 +29,9 @@ function Header() {
                 </div>
                 :
                 <div>
+                    <NavLink to="/dashboard">Home</NavLink>
+                    <NavLink to="/dashboard">Practice</NavLink>
+                    <NavLink to="/">Explore</NavLink>
                     <button value="logout" onClick={handleLogout}>Logout</button>
                 </div>
             }

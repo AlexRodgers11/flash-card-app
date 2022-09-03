@@ -54,7 +54,9 @@ export const decksSlice = createSlice({
     name: "decks",
     initialState,
     reducers: {
-        
+        addDeck: (state, action) => {
+            state.deckIds = [...state.deckIds, action.payload.deckId]
+        }
     },
     //for async requests
     extraReducers: (builder) => {
@@ -77,4 +79,5 @@ export const decksSlice = createSlice({
 
 });
 
+export const { addDeck } = decksSlice.actions;
 export default decksSlice.reducer;

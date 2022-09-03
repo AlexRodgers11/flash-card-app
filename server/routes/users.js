@@ -141,13 +141,18 @@ userRouter.get("/:userId/decks", (req, res, next) => {
 });
 
 userRouter.post("/:userId/decks", (req, res, next) => {
-    let newDeck = new Deck(req.body);
+    let newDeck = new Deck({
+        name: req.body.deckName,
+        public: req.body.public,
+        creator: req.body.creator,
+        dateCreated: req.body.dateCreated
+    });
     newDeck.save((err, deck) => {
         User.findByIdAndUpdate(req.user._id, {$push: {decks: deck}}, (err, user) => {
             if(err) {
                 res.status(500).send("There was an error with your request");
             } else {
-                res.status(200).send(deck);
+                res.status(200).send(newDeck._id);
             }
         });
     });

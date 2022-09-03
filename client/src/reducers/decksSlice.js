@@ -56,6 +56,9 @@ export const decksSlice = createSlice({
     reducers: {
         addDeck: (state, action) => {
             state.deckIds = [...state.deckIds, action.payload.deckId]
+        },
+        deleteDeck: (state, action) => {
+            state.deckIds = state.deckIds.filter(id => id !== action.payload.deckId);
         }
     },
     //for async requests
@@ -79,5 +82,5 @@ export const decksSlice = createSlice({
 
 });
 
-export const { addDeck } = decksSlice.actions;
+export const { addDeck, deleteDeck } = decksSlice.actions;
 export default decksSlice.reducer;

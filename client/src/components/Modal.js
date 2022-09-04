@@ -8,7 +8,7 @@ function Modal(props) {
 			<div className='Modal_backdrop' onClick={props.hideModal}></div>
 			<div className='Modal_content'>
 				<p className='Modal_close' onClick={props.hideModal}>X</p>
-				{React.cloneElement(props.children,{hideModal: props.hideModal})}
+				{props.children}
 			</div>
 		</div>
 )

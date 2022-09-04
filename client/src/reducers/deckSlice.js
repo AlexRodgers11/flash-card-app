@@ -37,7 +37,14 @@ export const fetchDeck = createAsyncThunk("deck/fetchDeck", async (deckId) => {
 export const deckSlice = createSlice({
     name: "deck",
     initialState,
-    reducers: {},
+    reducers: {
+        editDeckName: (state, action) => {
+            state.name = action.payload.name
+        },
+        editPubliclyAvailable: (state, action) => {
+            state.publiclyAvailable = action.payload.public;
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(fetchDeck.fulfilled, (state, action) => {
             state.deckId = action.payload._id;
@@ -53,4 +60,5 @@ export const deckSlice = createSlice({
     }
 });
 
+export const { editDeckName, editPubliclyAvailable } = deckSlice.actions;
 export default deckSlice.reducer;

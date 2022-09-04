@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchDeck } from '../reducers/deckSlice';
 import { useNavigate, useParams } from 'react-router';
 import Card from './Card';
+import Modal from './Modal';
 import useToggle from '../hooks/useToggle';
 import axios from 'axios';
 import { deleteDeck } from '../reducers/decksSlice';
@@ -10,13 +11,13 @@ import { deleteDeck } from '../reducers/decksSlice';
 const baseURL = 'http://localhost:8000';
 
 function Deck() {
-    // const { deckId, name, publiclyAvailable, creator, cards, permissions } = useSelector((state) => state.deck);
     const storedDeckId = useSelector((state) => state.deck.deckId);
     const name = useSelector((state) => state.deck.name);
     const publiclyAvailable = useSelector((state) => state.deck.publiclyAvailable);
     const creator = useSelector((state) => state.deck.creator);
     const cards = useSelector((state) => state.deck.cards);
     const permissions = useSelector((state) => state.deck.permissions);
+    const [editId, setEditId] = useState("");
     const [editMode, toggleEditMode] = useToggle(false);
     const [deleteInitiated, toggleDeleteInitiated] = useToggle(false);
     
@@ -44,6 +45,14 @@ function Deck() {
             })
     };
 
+    const openCardEditor = evt => {
+        setEditId(evt.target.id);
+    }
+
+    const closeCardEditor = () => {
+        setEditId("");
+    }
+
     useEffect(() => {
         console.log("use effect ran");
         if(!storedDeckId || storedDeckId !== deckId) {
@@ -52,7 +61,7 @@ function Deck() {
     }, [deckId, dispatch, storedDeckId]);
     
     return (
-        <div>
+        <div className="Deck" >
             <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>
             <button onClick={initiateDeleteDeck}>Delete</button>
             {!deleteInitiated ?
@@ -66,7 +75,10 @@ function Deck() {
             <h1>{name}</h1>
             <h3>{creator}</h3>
             <p>Public?: {publiclyAvailable ? "True" : "False"}</p>
-            {cards.map(card => <p><Card cardId={card} /></p>)}
+            {cards.map(card => <p><span id={card} onClick={openCardEditor}>E</span><Card cardId={card} /></p>)}
+            <Modal showModal={editId ? true : false} hideModal={closeCardEditor}>
+                <Card cardId={editId}/>
+            </Modal>
         </div>
     )
 }

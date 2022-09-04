@@ -6,12 +6,13 @@ function Card(props) {
     const [cardData, setCardData] = useState({});
 
     useEffect(() => {
-        console.log("useEffect ran");
+        console.log("Card use effect running");
         const baseURL = 'http://localhost:8000';
         axios.get(`${baseURL}/cards/${props.cardId}`)
             .then((response) => setCardData(response.data))
             .catch((err) => console.log(err));
-    }, [props.cardId]);
+    // }, [props.cardId]);
+    }, [props]);
 
     return (
         <div>{cardData.question}</div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchDeck } from '../reducers/deckSlice';
+import { editDeckName, fetchDeck } from '../reducers/deckSlice';
 import { useNavigate, useParams } from 'react-router';
 import Card from './Card';
 import Modal from './Modal';
@@ -8,12 +8,15 @@ import useToggle from '../hooks/useToggle';
 import axios from 'axios';
 import { deleteDeck } from '../reducers/decksSlice';
 import CardForm from './CardForm';
+import useFormInput from '../hooks/useFormInput';
 
 const baseURL = 'http://localhost:8000';
 
 function Deck() {
     const storedDeckId = useSelector((state) => state.deck.deckId);
     const name = useSelector((state) => state.deck.name);
+    const [nameEditMode, toggleNameEditMode] = useToggle(false);
+    const [editedName, clearEditedName, handleChangeEditedName, setEditedName] = useFormInput('');
     const publiclyAvailable = useSelector((state) => state.deck.publiclyAvailable);
     const creator = useSelector((state) => state.deck.creator);
     const cards = useSelector((state) => state.deck.cards);
@@ -46,12 +49,27 @@ function Deck() {
             })
     };
 
+    const handleToggleNameEditMode = () => {
+        setEditedName(name);
+        toggleNameEditMode();
+    }
+    
     const openCardEditor = evt => {
         setEditId(evt.target.id);
     }
 
     const closeCardEditor = () => {
         setEditId("");
+    }
+
+    const saveDeckNameChange = evt => {
+        axios.put(`${baseURL}/decks/${deckId}`, {name: editedName})
+            .then((response) => {
+                dispatch(editDeckName({name: response.data.name}));
+                clearEditedName();
+                toggleNameEditMode();
+            })
+            .catch(err => console.error(err));
     }
 
     useEffect(() => {
@@ -72,10 +90,17 @@ function Deck() {
                     <button onClick={cancelDeleteDeck}>No</button>
                 </div>
             }
-            <h1>{name}</h1>
+            {!nameEditMode ? 
+                <h1>{name}<span onClick={handleToggleNameEditMode}> Edit</span></h1> 
+                : 
+                <div>
+                    <input type="text" name="name" id="name" value={editedName} onChange={handleChangeEditedName} />
+                    <button type="button" onClick={saveDeckNameChange}>Save</button>
+                </div>
+            }
             <h3>{creator}</h3>
             <p>Public?: {publiclyAvailable ? "True" : "False"}</p>
-            {cards.map(card => <p><span id={card} onClick={openCardEditor}>E</span><Card cardId={card} /></p>)}
+            {cards.map(card => <div key={card}><span id={card} onClick={openCardEditor}>E</span><Card cardId={card} /></div>)}
             {!editId ? 
                 null
                 :

@@ -11,7 +11,7 @@ const useFormInput = (initialValue) => {
         setInput(evt.target.value);
     }
 
-    return [input, clearInput, handleChangeInput];
+    return [input, clearInput, handleChangeInput, setInput];
 }
 
 export default useFormInput;

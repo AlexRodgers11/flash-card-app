@@ -4,7 +4,7 @@ import './Modal.css';
 
 function Modal(props) {
 	return (
-		<div className={`Modal${props.showModal? '_active' : '_hidden'}`}>
+		<div className='Modal_active'>
 			<div className='Modal_backdrop' onClick={props.hideModal}></div>
 			<div className='Modal_content'>
 				<p className='Modal_close' onClick={props.hideModal}>X</p>

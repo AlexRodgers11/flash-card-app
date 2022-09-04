@@ -77,9 +77,13 @@ function Deck() {
             <h3>{creator}</h3>
             <p>Public?: {publiclyAvailable ? "True" : "False"}</p>
             {cards.map(card => <p><span id={card} onClick={openCardEditor}>E</span><Card cardId={card} /></p>)}
-            <Modal showModal={editId ? true : false} hideModal={closeCardEditor}>
-                <Card cardId={editId}/>
-            </Modal>
+            {!editId ? 
+                null
+                :
+                <Modal hideModal={closeCardEditor}>
+                    <CardForm cardId={editId} />
+                </Modal>
+            }
         </div>
     )
 }

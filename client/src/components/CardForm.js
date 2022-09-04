@@ -28,7 +28,6 @@ function CardForm(props) {
 		}
 		axios.put(`${baseURL}/cards/${props.cardId}`, updatedCard)
 			.then(response => {
-				//store action
 				clearType();
 				clearQuestion();
 				clearHint();
@@ -36,8 +35,7 @@ function CardForm(props) {
 				clearWrongAnswerOne();
 				clearWrongAnswerTwo();
 				clearWrongAnswerThree();
-				
-				props.hideModal();
+				props.saveCardChanges();
 			})
 			.catch(err => console.error(err));
 	}
@@ -77,12 +75,11 @@ function CardForm(props) {
 				:
 				<form onSubmit={handleSubmit}>
 					<div>
-						{/* <label htmlFor='type'>Card Type</label>
-						<input name='type' id='type' value={type} /> */}
+
 						<label htmlFor="type">Card Type: </label>
                         <select id="type" name="type" value={type} onChange={handleChangeType}>
                             <option selected value={null}></option>
-                            <option value="flash-card">Flash Card</option>
+                            <option value="flash">Flash Card</option>
                             <option value="multiple-choice">Multiple Choice</option>
                             <option value="true-false">True/False</option>
                         </select>
@@ -144,6 +141,7 @@ function CardForm(props) {
 							</div>
 						</div>
 					}
+					<button type="submit">Submit</button>
 				</form>
 			}
 		</div>

@@ -55,7 +55,6 @@ function Deck() {
     }
 
     useEffect(() => {
-        console.log("use effect ran");
         if(!storedDeckId || storedDeckId !== deckId) {
             dispatch(fetchDeck(deckId));
         }
@@ -81,7 +80,7 @@ function Deck() {
                 null
                 :
                 <Modal hideModal={closeCardEditor}>
-                    <CardForm cardId={editId} />
+                    <CardForm cardId={editId} saveCardChanges={closeCardEditor}/>
                 </Modal>
             }
         </div>

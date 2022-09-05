@@ -23,6 +23,7 @@ function Deck() {
     const permissions = useSelector((state) => state.deck.permissions);
     const [editId, setEditId] = useState('');
     const [deleteId, setDeleteId] = useState('');
+    const [viewId, setViewId] = useState('');
     const [addMode, toggleAddMode] = useToggle(false);
     const [editMode, toggleEditMode] = useToggle(false);
     const [deleteDeckInitiated, toggleDeleteDeckInitiated] = useToggle(false);
@@ -118,6 +119,10 @@ function Deck() {
             .catch(err => console.error(err));
     }
 
+    const viewCard = (evt) => {
+        setViewId(evt.target.dataset.cardid);
+    }
+
     useEffect(() => {
         if(!storedDeckId || storedDeckId !== deckId) {
             dispatch(fetchDeck(deckId));
@@ -127,7 +132,7 @@ function Deck() {
     return (
         <div className="Deck" >
             <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>
-            <button onClick={initiateDeleteDeck}>Delete</button>
+            {editMode && <button onClick={initiateDeleteDeck}>Delete</button>}
             {!deleteDeckInitiated ?
                 null
                 :
@@ -180,7 +185,10 @@ function Deck() {
                             <span data-cardid={card} onClick={initiateDeleteCard}>D</span>
                         </div>
                     }
-                    <Card cardId={card} />
+                    <div>
+                        <span data-cardid={card} onClick={viewCard}>[V] </span>
+                        <Card cardId={card} />
+                    </div>
                 </div>))}
             {!editId ? 
                 null
@@ -204,7 +212,13 @@ function Deck() {
                         <h3>Are you sure you want to delete this card? This action cannot be undone.</h3>
                         <button onClick={cancelDeleteCard}>Cancel</button><button onClick={confirmDeleteCard}>Delete</button>
                     </div>
-                    
+                </Modal>
+            }
+            {!viewId ? 
+                null
+                :
+                <Modal hideModal={() => setViewId('')}>
+                    <Card cardId={viewId} displayMode={true}/>
                 </Modal>
             }
         </div>

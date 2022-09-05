@@ -42,7 +42,7 @@ export const deckSlice = createSlice({
             state.name = action.payload.name
         },
         editPubliclyAvailable: (state, action) => {
-            state.publiclyAvailable = action.payload.public;
+            state.publiclyAvailable = action.payload.publiclyAvailable;
         }
     },
     extraReducers: (builder) => {

@@ -1,10 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-//user has array of decks to choose from
-////when user chooses a deck that is theirs they can view, practice, or delete
-////when they are viewing need all the cards and all the cards' questions at a minimum. Could include answers or have that be a separate card modal
-
 const baseURL = 'http://localhost:8000';
 
 
@@ -38,6 +34,9 @@ export const deckSlice = createSlice({
     name: "deck",
     initialState,
     reducers: {
+        addCard: (state, action) => {
+            state.cards = [...state.cards, action.payload.cardId];
+        },
         editDeckName: (state, action) => {
             state.name = action.payload.name
         },
@@ -60,5 +59,5 @@ export const deckSlice = createSlice({
     }
 });
 
-export const { editDeckName, editPubliclyAvailable } = deckSlice.actions;
+export const { addCard, editDeckName, editPubliclyAvailable } = deckSlice.actions;
 export default deckSlice.reducer;

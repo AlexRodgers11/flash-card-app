@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { editDeckName, fetchDeck } from '../reducers/deckSlice';
+import { editDeckName, editPubliclyAvailable, fetchDeck } from '../reducers/deckSlice';
 import { useNavigate, useParams } from 'react-router';
 import Card from './Card';
 import Modal from './Modal';
@@ -21,7 +21,7 @@ function Deck() {
     const creator = useSelector((state) => state.deck.creator);
     const cards = useSelector((state) => state.deck.cards);
     const permissions = useSelector((state) => state.deck.permissions);
-    const [editId, setEditId] = useState("");
+    const [editId, setEditId] = useState('');
     const [editMode, toggleEditMode] = useToggle(false);
     const [deleteInitiated, toggleDeleteInitiated] = useToggle(false);
     
@@ -49,6 +49,16 @@ function Deck() {
             })
     };
 
+    const handleChangePubliclyAvailable = evt => {
+        let editedPubliclyAvailable = evt.target.value === "true";
+        axios.put(`${baseURL}/decks/${deckId}`, {public: editedPubliclyAvailable})
+            .then((response) => {
+                console.log(response.data);
+                dispatch(editPubliclyAvailable({publiclyAvailable: response.data.public}));
+            })
+            .catch(err => console.error(err));
+    }
+    
     const handleToggleNameEditMode = () => {
         setEditedName(name);
         toggleNameEditMode();
@@ -99,7 +109,26 @@ function Deck() {
                 </div>
             }
             <h3>{creator}</h3>
-            <p>Public?: {publiclyAvailable ? "True" : "False"}</p>
+            <div>
+                <label htmlFor='public'>Public</label>
+                <input 
+                    type="radio"
+                    id="public"
+                    name="publicly-available"
+                    value="true"
+                    checked={publiclyAvailable}
+                    onChange={handleChangePubliclyAvailable}
+                />
+                <label htmlFor='private'>Private</label>
+                <input 
+                    type="radio"
+                    id="private"
+                    name="publicly-available"
+                    value="false"
+                    checked={!publiclyAvailable}
+                    onChange={handleChangePubliclyAvailable}
+                />
+            </div>
             {cards.map(card => <div key={card}><span id={card} onClick={openCardEditor}>E</span><Card cardId={card} /></div>)}
             {!editId ? 
                 null

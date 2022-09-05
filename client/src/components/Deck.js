@@ -131,10 +131,13 @@ function Deck() {
             {!deleteDeckInitiated ?
                 null
                 :
-                <div>
-                    <button onClick={confirmDeleteDeck}>Yes</button>
-                    <button onClick={cancelDeleteDeck}>No</button>
-                </div>
+                <Modal hideModal={cancelDeleteDeck}>
+                    <div>
+                        <h3>Are you sure you want to delete this deck? This action cannot be undone.</h3>
+                        <button onClick={cancelDeleteDeck}>Cancel</button>
+                        <button onClick={confirmDeleteDeck}>Delete</button>
+                    </div>
+                </Modal>
             }
             {!nameEditMode ? 
                 <h1>{name}<span onClick={handleToggleNameEditMode}> Edit</span></h1> 

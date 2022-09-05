@@ -141,7 +141,7 @@ deckRouter.post("/:deckId/cards", (req, res, next) => {
                     res.status(500).send("There was an error with your request");
                     throw err;
                 } else {
-                    res.status(200).send(deck);
+                    res.status(200).send(card);
                 }
             });
         }

@@ -170,7 +170,18 @@ function Deck() {
             </div>
             <h2>Cards</h2>
             <button onClick={toggleAddMode}>Add Card</button>
-            {cards.map(card => <div key={card}><span id={card} onClick={openCardEditor}>E</span><span data-cardid={card} onClick={initiateDeleteCard}>D</span><Card cardId={card} /></div>)}
+            {cards.map(card => 
+                (<div key={card}>
+                    {!editMode ? 
+                        null
+                        :
+                        <div>
+                            <span id={card} onClick={openCardEditor}>E</span>
+                            <span data-cardid={card} onClick={initiateDeleteCard}>D</span>
+                        </div>
+                    }
+                    <Card cardId={card} />
+                </div>))}
             {!editId ? 
                 null
                 :

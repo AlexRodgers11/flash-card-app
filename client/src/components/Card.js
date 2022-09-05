@@ -15,12 +15,32 @@ function Card(props) {
     }, [props]);
 
     return (
-        <div>{cardData.question}</div>
+        <>
+            {!props.displayMode ?
+                <>{cardData.question}</>
+                :
+                <>
+                <h3>Question: {cardData.question}</h3>
+                <p>Hint: {cardData.hint || 'No hint given'}</p>
+                <p>Correct Answer: {cardData.correctAnswer}</p>
+                {cardData.type !== 'multiple-choice' ?
+                    null
+                    :
+                    <>
+                    <p>Wrong Answer One: {cardData.wrongAnswerOne}</p>
+                    <p>Wrong Answer Two: {cardData.wrongAnswerTwo}</p>
+                    <p>Wrong Answer Three: {cardData.wrongAnswerThree}</p>
+                    </>
+                }
+                </>
+            }
+        </>
     )
 }
 
 Card.propTypes = { 
-    cardId: PropTypes.string
+    cardId: PropTypes.string,
+    displayMode: PropTypes.bool
 }
 
 export default Card

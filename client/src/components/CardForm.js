@@ -17,7 +17,7 @@ function CardForm(props) {
 
 	const handleSubmit = evt => {
 		evt.preventDefault();
-		let updatedCard = {
+		let card = {
 			type, 
 			question,
 			correctAnswer,
@@ -26,18 +26,15 @@ function CardForm(props) {
 			wrongAnswerThree,
 			hint
 		}
-		axios.put(`${baseURL}/cards/${props.cardId}`, updatedCard)
-			.then(response => {
-				clearType();
-				clearQuestion();
-				clearHint();
-				clearCorrectAnswer();
-				clearWrongAnswerOne();
-				clearWrongAnswerTwo();
-				clearWrongAnswerThree();
-				props.saveCardChanges();
-			})
-			.catch(err => console.error(err));
+		clearType();
+		clearQuestion();
+		clearHint();
+		clearCorrectAnswer();
+		clearWrongAnswerOne();
+		clearWrongAnswerTwo();
+		clearWrongAnswerThree();
+		props.submit(card);
+		
 	}
 
 	useEffect(() => {

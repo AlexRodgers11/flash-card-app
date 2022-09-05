@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { editDeckName, editPubliclyAvailable, fetchDeck } from '../reducers/deckSlice';
+import { addCard, editDeckName, editPubliclyAvailable, fetchDeck } from '../reducers/deckSlice';
 import { useNavigate, useParams } from 'react-router';
 import Card from './Card';
 import Modal from './Modal';
@@ -22,6 +22,7 @@ function Deck() {
     const cards = useSelector((state) => state.deck.cards);
     const permissions = useSelector((state) => state.deck.permissions);
     const [editId, setEditId] = useState('');
+    const [addMode, toggleAddMode] = useToggle(false);
     const [editMode, toggleEditMode] = useToggle(false);
     const [deleteInitiated, toggleDeleteInitiated] = useToggle(false);
     
@@ -49,6 +50,23 @@ function Deck() {
             })
     };
 
+    const handleAddCard = (newCard) => {
+        axios.post(`${baseURL}/decks/${deckId}/cards`, newCard)
+            .then((response) => {
+                dispatch(addCard({cardId: response.data._id}));
+                toggleAddMode();
+            })
+            .catch(err => console.error(err));
+    }
+
+    const handleSaveCardChanges = (editedCard) => {
+        axios.put(`${baseURL}/cards/${editId}`, editedCard)
+			.then(response => {
+                setEditId('');
+            })
+			.catch(err => console.error(err));
+    }
+    
     const handleChangePubliclyAvailable = evt => {
         let editedPubliclyAvailable = evt.target.value === "true";
         axios.put(`${baseURL}/decks/${deckId}`, {public: editedPubliclyAvailable})
@@ -129,12 +147,21 @@ function Deck() {
                     onChange={handleChangePubliclyAvailable}
                 />
             </div>
+            <h2>Cards</h2>
+            <button onClick={toggleAddMode}>Add Card</button>
             {cards.map(card => <div key={card}><span id={card} onClick={openCardEditor}>E</span><Card cardId={card} /></div>)}
             {!editId ? 
                 null
                 :
                 <Modal hideModal={closeCardEditor}>
-                    <CardForm cardId={editId} saveCardChanges={closeCardEditor}/>
+                    <CardForm cardId={editId}  submit={handleSaveCardChanges}/>
+                </Modal>
+            }
+            {!addMode ?
+                null
+                :
+                <Modal hideModal={toggleAddMode}>
+                    <CardForm submit={handleAddCard} />
                 </Modal>
             }
         </div>

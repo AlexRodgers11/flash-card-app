@@ -37,6 +37,9 @@ export const deckSlice = createSlice({
         addCard: (state, action) => {
             state.cards = [...state.cards, action.payload.cardId];
         },
+        deleteCard: (state, action) => {
+            state.cards = state.cards.filter(cardId => cardId !== action.payload.cardId);
+        },
         editDeckName: (state, action) => {
             state.name = action.payload.name
         },
@@ -59,5 +62,5 @@ export const deckSlice = createSlice({
     }
 });
 
-export const { addCard, editDeckName, editPubliclyAvailable } = deckSlice.actions;
+export const { addCard, deleteCard, editDeckName, editPubliclyAvailable } = deckSlice.actions;
 export default deckSlice.reducer;

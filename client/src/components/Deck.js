@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addCard, editDeckName, editPubliclyAvailable, fetchDeck } from '../reducers/deckSlice';
+import { addCard, deleteCard, editDeckName, editPubliclyAvailable, fetchDeck } from '../reducers/deckSlice';
 import { useNavigate, useParams } from 'react-router';
 import Card from './Card';
 import Modal from './Modal';
@@ -22,9 +22,10 @@ function Deck() {
     const cards = useSelector((state) => state.deck.cards);
     const permissions = useSelector((state) => state.deck.permissions);
     const [editId, setEditId] = useState('');
+    const [deleteId, setDeleteId] = useState('');
     const [addMode, toggleAddMode] = useToggle(false);
     const [editMode, toggleEditMode] = useToggle(false);
-    const [deleteInitiated, toggleDeleteInitiated] = useToggle(false);
+    const [deleteDeckInitiated, toggleDeleteDeckInitiated] = useToggle(false);
     
     const { deckId } = useParams();
 
@@ -32,11 +33,11 @@ function Deck() {
     const navigate = useNavigate();
 
     const initiateDeleteDeck = () => {
-        toggleDeleteInitiated();
+        toggleDeleteDeckInitiated();
     }
 
     const cancelDeleteDeck = () => {
-        toggleDeleteInitiated();
+        toggleDeleteDeckInitiated();
     };
 
     const confirmDeleteDeck = () => {
@@ -49,6 +50,23 @@ function Deck() {
                 console.error(err);
             })
     };
+
+    const initiateDeleteCard = (evt) => {
+        setDeleteId(evt.target.dataset.cardid);
+    }
+
+    const cancelDeleteCard = () => {
+        setDeleteId('');
+    }
+
+    const confirmDeleteCard = () => {
+        axios.delete(`${baseURL}/cards/${deleteId}`)
+            .then(() => {
+                dispatch(deleteCard({cardId: deleteId}));
+                setDeleteId('');
+            })
+            .catch(err => console.error(err));
+    }
 
     const handleAddCard = (newCard) => {
         axios.post(`${baseURL}/decks/${deckId}/cards`, newCard)
@@ -110,7 +128,7 @@ function Deck() {
         <div className="Deck" >
             <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>
             <button onClick={initiateDeleteDeck}>Delete</button>
-            {!deleteInitiated ?
+            {!deleteDeckInitiated ?
                 null
                 :
                 <div>
@@ -149,7 +167,7 @@ function Deck() {
             </div>
             <h2>Cards</h2>
             <button onClick={toggleAddMode}>Add Card</button>
-            {cards.map(card => <div key={card}><span id={card} onClick={openCardEditor}>E</span><Card cardId={card} /></div>)}
+            {cards.map(card => <div key={card}><span id={card} onClick={openCardEditor}>E</span><span data-cardid={card} onClick={initiateDeleteCard}>D</span><Card cardId={card} /></div>)}
             {!editId ? 
                 null
                 :
@@ -162,6 +180,17 @@ function Deck() {
                 :
                 <Modal hideModal={toggleAddMode}>
                     <CardForm submit={handleAddCard} />
+                </Modal>
+            }
+            {!deleteId ? 
+                null
+                :
+                <Modal hideModal={cancelDeleteCard}>
+                    <div>
+                        <h3>Are you sure you want to delete this card? This action cannot be undone.</h3>
+                        <button onClick={cancelDeleteCard}>Cancel</button><button onClick={confirmDeleteCard}>Delete</button>
+                    </div>
+                    
                 </Modal>
             }
         </div>

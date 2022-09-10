@@ -211,7 +211,7 @@ router.get("/seed-database", (req, res, next) => {
                     decks.push(new Promise((resolve, reject) => {
                         let deck = new Deck();
                         deck.name = faker.hacker.adjective();
-                        deck.public = Math.random() > .7 ? true : false;
+                        deck.publiclyAvailable = Math.random() > .7 ? true : false;
                         deck.creator = users[Math.floor(Math.random() * users.length)]._id;
                         deck.dateCreated = Date.now();
                         // console.log("Beginning to create cards");

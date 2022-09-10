@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const Deck = new Schema({
     name: String,
-    public: Boolean,
+    publiclyAvailable: Boolean,
     creator: {type: Schema.Types.ObjectId, ref: "user"},
     dateCreated: Date, 
     cards: [{type: Schema.Types.ObjectId, ref: "card"}],

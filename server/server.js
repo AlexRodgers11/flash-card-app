@@ -8,6 +8,7 @@ import Category from "./models/category.js";
 import Deck from "./models/deck.js";
 import Group from "./models/group.js";
 import User from "./models/user.js";
+import Activity from "./models/activity.js";
 import getRandomCardType from "./utils.js";
 const port = process.env.port || 8000;
 const router = express.Router();
@@ -24,6 +25,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import jwt from "jwt-simple";
 import { ExtractJwt } from "passport-jwt";
 import { Strategy as JwtStrategy } from  "passport-jwt";
+
 
 mongoose.connect("mongodb://localhost/flash-card-app", {
     //use MongoDB's new connection string parser instead of the old deprecated one
@@ -139,7 +141,7 @@ router.get("/seed-database", (req, res, next) => {
     console.log("creating users");
     let users = [];
     //create users
-    while(users.length < 2000) {
+    while(users.length < 750) {
         users.push(new Promise((resolve, reject) => {
             let user = new User();
             user.login.username = faker.random.word() + faker.random.word();
@@ -162,25 +164,46 @@ router.get("/seed-database", (req, res, next) => {
         console.log("Creating groups");
         let groups = [];
         //create groups
-        while(groups.length < 250) {
+        while(groups.length < 100) {
             groups.push(new Promise((resolve, reject) => {
                 let group = new Group();
                 group.name = faker.random.word() + Math.ceil(Math.random() * 100);
                 group.decks = [];
+                group.joinCode = Math.random() > .5 ? faker.random.word() : ''
                 users.forEach(user => {
-                    if(Math.random() > .80) {
+                    if(Math.random() > .90) {
                         group.members.push(user._id);
                     }
                 });
-                group.save((err, group) => {
-                    if(err) {
-                        throw err;
-                    }
-                    let usersPromise = User.updateMany({_id: {$in: group.members}}, {$push: {groups: group._id}});
-                    usersPromise.catch(err => {throw err}).then(() => {
-                        resolve(group);
-                    });
+                
+                if(group.members.length < 1) {
+                    group.members.push(users[0]);
+                }
+                group.creator = group.members[0];
+                if(group.members.length > 5) {
+                    group.administrators = group.members.slice(3);
+                } else {
+                    group.administrators = [group.creator];
+                }
+                let createActivity = new Activity({
+                    date: Date.now(),
+                    actor: group.creator,
+                    type: 'create group',
+                    content: ''
                 });
+                createActivity.save((activity, err) => {
+                    group.activity = [activity];
+                    group.save((err, group) => {
+                        if(err) {
+                            throw err;
+                        }
+                        let usersPromise = User.updateMany({_id: {$in: group.members}}, {$push: {groups: group._id}});
+                        usersPromise.catch(err => {throw err}).then(() => {
+                            resolve(group);
+                        });
+                    });
+                })
+                
             }));
         };
         console.log("Done creating groups");
@@ -205,7 +228,7 @@ router.get("/seed-database", (req, res, next) => {
             Promise.all(categories).then((categories) => {
                 console.log("Creating decks");
                 let decks = [];
-                let randomDeckNumber = 2000 + Math.ceil(Math.random() * 1000);
+                let randomDeckNumber = 3000 + Math.ceil(Math.random() * 4000);
                 
                 while(decks.length < randomDeckNumber) {
                     decks.push(new Promise((resolve, reject) => {
@@ -216,7 +239,7 @@ router.get("/seed-database", (req, res, next) => {
                         deck.dateCreated = Date.now();
                         // console.log("Beginning to create cards");
                         let cards = [];
-                        let randomCardNumber = 5 + Math.ceil(Math.random() * 50);
+                        let randomCardNumber = 3 + Math.ceil(Math.random() * 30);
                         let deckAttemptCount = Math.floor(Math.random() * 20);
                         while(cards.length < randomCardNumber) {
                             cards.push(new Promise((reso, reje) => {

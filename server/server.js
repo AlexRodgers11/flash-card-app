@@ -185,14 +185,14 @@ router.get("/seed-database", (req, res, next) => {
                 } else {
                     group.administrators = [group.creator];
                 }
-                let createActivity = new Activity({
-                    date: Date.now(),
-                    actor: group.creator,
-                    type: 'create group',
-                    content: ''
-                });
-                createActivity.save((activity, err) => {
-                    group.activity = [activity];
+                let createActivity = new Activity();
+                createActivity.date = Date.now();
+                createActivity.actor = group.creator;
+                createActivity.type = 'create-group';
+                createActivity.content = '';
+                createActivity.save((err, activity) => {
+                    if(err) console.log(err);
+                    group.activity = [activity._id];
                     group.save((err, group) => {
                         if(err) {
                             throw err;

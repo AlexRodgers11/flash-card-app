@@ -13,12 +13,13 @@ import getRandomCardType from "./utils.js";
 const port = process.env.port || 8000;
 const router = express.Router();
 
+import activityRouter from "./routes/activity.js";
 import categoryRouter from "./routes/categories.js";
 import cardRouter from "./routes/cards.js";
 import deckRouter from "./routes/decks.js";
 import groupRouter from "./routes/groups.js";
-import userRouter from "./routes/users.js"
 import loginRouter, { requireSignIn } from "./routes/login.js";
+import userRouter from "./routes/users.js"
 
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
@@ -122,12 +123,13 @@ app.use(passport.initialize());
 //     });
 // });
 
+app.use("/activities", activityRouter);
 app.use("/categories", categoryRouter);
 app.use("/cards", cardRouter);
 app.use("/decks", deckRouter);
 app.use("/groups", groupRouter);
-app.use("/users", userRouter);
 app.use("/login", loginRouter)
+app.use("/users", userRouter);
 
 router.get("/test", (req, res, next) => {
     console.log("connected");

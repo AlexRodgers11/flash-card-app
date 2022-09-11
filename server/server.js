@@ -181,7 +181,7 @@ router.get("/seed-database", (req, res, next) => {
                 }
                 group.creator = group.members[0];
                 if(group.members.length > 5) {
-                    group.administrators = group.members.slice(3);
+                    group.administrators = group.members.slice(0,3);
                 } else {
                     group.administrators = [group.creator];
                 }

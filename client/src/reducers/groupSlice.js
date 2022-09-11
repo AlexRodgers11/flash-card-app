@@ -6,7 +6,11 @@ const baseURL = "http://localhost:8000";
 const initialState = {
     groupId: "",
     name: "",
-    memberIds: []
+    memberIds: [],
+    creator: "",
+    administrators: [],
+    activity: [],
+    joinCode: ""
 };
 
 export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async (groupId) => {
@@ -15,7 +19,11 @@ export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async (gr
         return {
             groupId: response.data._id,
             name: response.data.name,
-            memberIds: [...response.data.members]
+            creator: response.data.creator,
+            administrators: response.data.administrators,
+            memberIds: [...response.data.members],
+            activity: response.data.activity,
+            joinCode: response.data.joinCode
         }
     } catch (err) {
         return err;
@@ -33,6 +41,10 @@ export const groupSlice = createSlice({
             state.groupId = action.payload.groupId;
             state.name = action.payload.name;
             state.memberIds = action.payload.memberIds;
+            state.creator = action.payload.creator;
+            state.administrators = action.payload.administrators;
+            state.activity = action.payload.activity;
+            state.joinCode = action.payload.joinCode;
         });
     }
 });

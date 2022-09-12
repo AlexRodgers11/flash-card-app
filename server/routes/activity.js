@@ -20,7 +20,7 @@ activityRouter.param("activityId", (req, res, next, activityId) => {
 
 activityRouter.get("/:activityId", (req, res, next) => {
     Activity.findById(req.activity._id)
-        .populate('actor')
+        .populate('actor', 'login.username name photo')
         .populate('groupTarget')
         .populate('deckTarget')
         .then((activity) => {

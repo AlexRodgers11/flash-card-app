@@ -192,6 +192,7 @@ router.get("/seed-database", (req, res, next) => {
                 createActivity.actor = group.creator._id;
                 createActivity.type = 'create-group';
                 createActivity.content = '';
+                createActivity.groupTarget = group._id;
                 createActivity.save((err, activity) => {
                     if(err) console.log(err);
                     group.activity = [activity._id];
@@ -302,8 +303,25 @@ router.get("/seed-database", (req, res, next) => {
                                     throw err;
                                 }
                                 if(inGroup) {
-                                    let groupPromise = Group.findByIdAndUpdate(groups[randomGroupIndex]._id, {$push: {decks: deck._id}});
-                                    groupPromise.catch(err => {throw err}).then(console.log("done"));
+                                    let randomMemberIndex = Math.floor(Math.random() * groups[randomGroupIndex].members.length)
+                                    let addDeckActivity = new Activity({
+                                        date: Date.now(),
+                                        actor: groups[randomGroupIndex].members[randomMemberIndex],
+                                        type: 'add-deck',
+                                        content: '',
+                                        groupTarget: groups[randomGroupIndex]._id,
+                                        deckTarget: deck._id
+                                    });
+                                    addDeckActivity.save((err, activity) => {
+                                        if(err) {
+                                            console.error(err);
+                                            throw err;
+                                        } else {
+                                            // let groupPromise = Group.findByIdAndUpdate(groups[randomGroupIndex]._id, {$push: {decks: deck._id}, $push: {activity: activity._id}})
+                                            let groupPromise = Group.findByIdAndUpdate(groups[randomGroupIndex]._id, {$push: {decks: deck._id, activity: activity._id}});
+                                            groupPromise.catch(err => {throw err}).then(console.log("done"));
+                                        }
+                                    });                                    
                                 }
                                 let userPromise = User.findByIdAndUpdate(deck.creator, {$push: {decks: deck}}).exec();
                                 userPromise.catch(err => {throw err}).then(() => {

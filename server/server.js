@@ -189,7 +189,7 @@ router.get("/seed-database", (req, res, next) => {
                 }
                 let createActivity = new Activity();
                 createActivity.date = Date.now();
-                createActivity.actor = group.creator;
+                createActivity.actor = group.creator._id;
                 createActivity.type = 'create-group';
                 createActivity.content = '';
                 createActivity.save((err, activity) => {

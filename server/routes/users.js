@@ -28,6 +28,7 @@ userRouter.get("/:userId", (req, res, next) => {
             firstName: req.user.name.first,
             lastName: req.user.name.last,
             username: req.user.login.username,
+            password: req.user.login.password, /////////////////////////delete this once testing is done
             email: req.user.email,
             photo: req.user.photo,
         }

@@ -1,4 +1,6 @@
 import express from "express";
+import Activity from "../models/activity.js";
+import Deck from "../models/deck.js";
 const groupRouter = express.Router();
 
 import Group from "../models/group.js";
@@ -75,6 +77,41 @@ groupRouter.get("/:groupId", (req, res, next) => {
 
 groupRouter.get("/:groupId/decks", (req, res, next) => {
     res.status(200).send(JSON.stringify(req.group.decks));
+});
+
+groupRouter.post("/:groupId/decks", (req, res, next) => {
+    let newDeck = new Deck()
+    newDeck.name = req.body.name;
+    newDeck.publiclyAvailable = req.body.publiclyAvailable || false;
+    newDeck.creator = req.body.creatorId;
+    newDeck.dateCreated = Date.now();
+    newDeck.save((err, deck) => {
+        if(err) {
+            console.error(err);
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            let newActivity = new Activity();
+            newActivity.date = Date.now();
+            newActivity.actor = req.body.creatorId;
+            newActivity.type = "add-deck";
+            newActivity.groupTarget = req.group._id;
+            newActivity.deckTarget = deck._id
+            newActivity.save((err, activity) => {
+                if(err) {
+                    res.status(500).send("There was an error with your request");
+                    throw err;
+                } else {
+                    Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
+                    .then(res.status(200).send(deck))
+                    .catch(err => {
+                        console.error(err);
+                        res.status(500).send("There was an error with your request");
+                    })
+                }
+            });
+        }
+    }); 
 });
 
 groupRouter.delete("/:groupId", (req, res, next) => {

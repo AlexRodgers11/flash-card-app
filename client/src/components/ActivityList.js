@@ -5,7 +5,7 @@ import Activity from './Activity'
 function ActivityList(props) {
   return (
     <div>
-        {props.activityIds.map(id => <Activity activityId={id} />)}
+        {props.activityIds.map(id => <Activity key={id} activityId={id} />)}
     </div>
   )
 }

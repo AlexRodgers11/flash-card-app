@@ -34,7 +34,15 @@ userRouter.get("/:userId", (req, res, next) => {
         }
         res.status(200).send(partialData);
     } else {
-        res.status(200).send(req.user);
+        User.findById(req.user._id)
+            .populate('decks', 'name')
+             .then((user) => {
+                res.status(200).send(user);          
+            })
+            .catch(err => {
+                res.status(500).send("There was an error with your request");
+                throw err;
+            });
     }
 });
 

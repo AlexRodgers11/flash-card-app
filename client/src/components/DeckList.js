@@ -11,7 +11,6 @@ export default function DeckList(props) {
     const listId = useSelector((state) => state.decks.listId);
 
     useEffect(() => {
-        console.log("use effect running");
         if(!listType && !listId) {
             switch(props.listType) {
                 case "category":

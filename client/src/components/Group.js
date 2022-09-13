@@ -9,7 +9,6 @@ import GroupMemberList from './GroupMemberList';
 function Group() {
     const dispatch = useDispatch();
     let { groupId } = useParams();
-    console.log(`paramsGroupId: ${groupId}`);
     let storedGroupId = useSelector((state) => state.group.groupId);
     let groupName = useSelector((state) => state.group.name);
     let groupMemberIds = useSelector((state) => state.group.memberIds);

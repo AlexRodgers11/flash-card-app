@@ -8,7 +8,6 @@ function UserTile(props) {
     const [userData, setUserData] = useState({});
 
     useEffect(() => {
-        console.log(props.memberId);
         const baseURL = 'http://localhost:8000';
         axios.get(`${baseURL}/users/${props.memberId}?partial=true`)
             .then((response) => setUserData(response.data));

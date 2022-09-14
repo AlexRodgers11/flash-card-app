@@ -14,6 +14,29 @@ function Activity(props) {
     const [groupTarget, setGroupTarget] = useState('');
     const [deckTarget, setDeckTarget] = useState('');
 
+    const renderActivity = () => {
+        let activityType = type;
+        switch(activityType) {
+            case 'create-group':
+                console.log('group create reached')
+                return (
+                    <div>
+                        <p>{date}</p>
+                        <p>{groupTarget} was created by {actor.login.username}</p>
+                    </div>
+                )
+            case 'add-deck':
+                return (
+                    <div>
+                        <p>{date}</p>
+                        <p>Deck {deckTarget} was added by {actor.login.username}</p>
+                    </div>
+                )
+            default:
+                return null;
+        }
+    }
+    
     useEffect(() => {
         if(!type) {
             axios.get(`${baseURL}/activities/${props.activityId}`)
@@ -22,17 +45,17 @@ function Activity(props) {
                     setDate(response.data.date);
                     setActor(response.data.actor);
                     setContent(response.data.content);
-                    setGroupTarget(response.data.groupTarget);
-                    setDeckTarget(response.data.deckTarget);
+                    setGroupTarget(response.data.groupTarget?.name);
+                    setDeckTarget(response.data.deckTarget?.name);
                 })
                 .catch(err => {
                     console.log(err);
                 });
         }
-    }, [props.activityId]);
+    }, [props.activityId, type]);
 
     return (
-        <div>Activity</div>
+        <div>{renderActivity()}</div>
     )
 }
 

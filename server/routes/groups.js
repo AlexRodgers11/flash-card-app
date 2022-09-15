@@ -83,8 +83,10 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
     let newDeck = new Deck()
     newDeck.name = req.body.name;
     newDeck.publiclyAvailable = req.body.publiclyAvailable || false;
-    newDeck.creator = req.body.creatorId;
+    newDeck.creator = req.body.creator;
     newDeck.dateCreated = Date.now();
+    newDeck.cards = req.body.cards;
+    newDeck.permissions = req.body.permissions;
     newDeck.save((err, deck) => {
         if(err) {
             console.error(err);
@@ -93,7 +95,7 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
         } else {
             let newActivity = new Activity();
             newActivity.date = Date.now();
-            newActivity.actor = req.body.creatorId;
+            newActivity.actor = req.body.creator;
             newActivity.type = "add-deck";
             newActivity.groupTarget = req.group._id;
             newActivity.deckTarget = deck._id
@@ -102,8 +104,15 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
                     res.status(500).send("There was an error with your request");
                     throw err;
                 } else {
-                    Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
-                    .then(res.status(200).send(deck))
+                    console.log({activity});
+                    console.log({deck});
+                        Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
+                    .then(() => {
+                        res.status(200).send({
+                            newDeck: deck._id,
+                            newActivity: activity._id
+                        });
+                    })
                     .catch(err => {
                         console.error(err);
                         res.status(500).send("There was an error with your request");

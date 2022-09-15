@@ -34,7 +34,10 @@ export const groupSlice = createSlice({
     name: "group", 
     initialState,
     reducers: {
-
+        addActivity: (state, action) => {
+            console.log(action);
+            state.activity = [...state.activity, action.payload.activityId];
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(fetchGroupData.fulfilled, (state, action) => {
@@ -48,5 +51,7 @@ export const groupSlice = createSlice({
         });
     }
 });
+
+export const { addActivity } = groupSlice.actions;
 
 export default groupSlice.reducer;

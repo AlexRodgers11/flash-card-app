@@ -15,7 +15,9 @@ const User = new Schema({
     photo: String,
     decks: [{type: Schema.Types.ObjectId, ref: "deck"}],
     groups: [{type: Schema.Types.ObjectId, ref: "group"}],
-    attempts: [{type: Schema.Types.ObjectId, ref: "attempt"}]
+    attempts: [{type: Schema.Types.ObjectId, ref: "attempt"}],
+    messages: [{type: Schema.Types.ObjectId, ref: "message"}],
+    notifications: [{type: Schema.Types.ObjectId, ref: "notification"}]
 });
 
 export default mongoose.model("user", User);

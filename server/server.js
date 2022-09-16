@@ -188,7 +188,7 @@ router.get("/seed-database", (req, res, next) => {
                     group.administrators = [group.creator];
                 }
                 let createActivity = new Activity();
-                createActivity.date = Date.now();
+                // createActivity.date = Date.now();
                 createActivity.actor = group.creator._id;
                 createActivity.type = 'create-group';
                 createActivity.content = '';
@@ -239,7 +239,7 @@ router.get("/seed-database", (req, res, next) => {
                         deck.name = faker.hacker.adjective();
                         deck.publiclyAvailable = Math.random() > .7 ? true : false;
                         deck.creator = users[Math.floor(Math.random() * users.length)]._id;
-                        deck.dateCreated = Date.now();
+                        // deck.dateCreated = Date.now();
                         // console.log("Beginning to create cards");
                         let cards = [];
                         let randomCardNumber = 3 + Math.ceil(Math.random() * 30);
@@ -248,7 +248,7 @@ router.get("/seed-database", (req, res, next) => {
                             cards.push(new Promise((reso, reje) => {
                                 let card = new Card();
                                 card.creator = deck.creator;
-                                card.dateCreated = Date.now();
+                                // card.dateCreated = Date.now();
                                 card.type = getRandomCardType(Math.random());
                                 card.question = faker.hacker.phrase();
                                 if(card.type === "multiple-choice") {
@@ -305,7 +305,7 @@ router.get("/seed-database", (req, res, next) => {
                                 if(inGroup) {
                                     let randomMemberIndex = Math.floor(Math.random() * groups[randomGroupIndex].members.length)
                                     let addDeckActivity = new Activity({
-                                        date: Date.now(),
+                                        // date: Date.now(),
                                         actor: groups[randomGroupIndex].members[randomMemberIndex],
                                         type: 'add-deck',
                                         content: '',
@@ -388,7 +388,7 @@ app.get("/seed-attempts", (req, res, next) => {
                                 }
                                 attempt.user = user._id;
                                 attempt.deck = deck._id;
-                                attempt.datePracticed = Date.now();
+                                // attempt.datePracticed = Date.now();
                                 attempt.save((err, attempt) => {
                                     if(err) {
                                         throw err;
@@ -416,6 +416,22 @@ app.get("/seed-attempts", (req, res, next) => {
         res.status(200).send("done");
     });
 });
+
+
+app.get("/seed-admin-privileges", (req, res, next) => {
+    Group.find({}, (err, groups) => {
+        if(err) {
+            console.error(err);
+            throw err;
+        }
+        groups.forEach(async group => {
+            User.updateMany({_id: {$in: group.administrators}}, {$push: {adminOf: group._id}}).catch(err => {
+                console.error(err);
+                throw err;
+            });
+        });
+    });
+})
 
 app.use(router);
 

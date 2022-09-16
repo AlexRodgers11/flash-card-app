@@ -10,7 +10,7 @@ const Attempt = new Schema({
         cardId: String,
         answeredCorrectly: Boolean
     }]
-});
+}, {timestamps: true});
 
 const attemptModel = mongoose.model("attempt", Attempt);
 export default attemptModel;

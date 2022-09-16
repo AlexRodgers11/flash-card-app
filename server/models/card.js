@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 
 const Card = new Schema({
     creator: {type: Schema.Types.ObjectId, ref: "user"},
-    dateCreated: Date,
     type: String,
     question: String,
     correctAnswer: String,
@@ -16,6 +15,6 @@ const Card = new Schema({
         numberCorrect: Number,
         numberIncorrect: Number
     }
-});
+}, {timestamps: true});
 
 export default mongoose.model("card", Card);

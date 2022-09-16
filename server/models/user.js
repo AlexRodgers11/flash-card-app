@@ -18,6 +18,6 @@ const User = new Schema({
     attempts: [{type: Schema.Types.ObjectId, ref: "attempt"}],
     messages: [{type: Schema.Types.ObjectId, ref: "message"}],
     notifications: [{type: Schema.Types.ObjectId, ref: "notification"}]
-});
+}, {timestamps: true});
 
 export default mongoose.model("user", User);

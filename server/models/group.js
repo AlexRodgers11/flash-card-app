@@ -10,6 +10,6 @@ const Group = new Schema({
     decks: [{type: Schema.Types.ObjectId, ref: "deck"}],
     activity: [{type: Schema.Types.ObjectId, ref: "activity"}],
     joinCode: String
-});
+}, {timestamps: true});
 
 export default mongoose.model("group", Group);

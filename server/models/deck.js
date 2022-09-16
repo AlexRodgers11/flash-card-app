@@ -6,7 +6,6 @@ const Deck = new Schema({
     name: String,
     publiclyAvailable: Boolean,
     creator: {type: Schema.Types.ObjectId, ref: "user"},
-    dateCreated: Date, 
     cards: [{type: Schema.Types.ObjectId, ref: "card"}],
     permissions: {
         view: [{type: Schema.Types.ObjectId, ref: "user"}],
@@ -14,6 +13,6 @@ const Deck = new Schema({
         copy: Boolean,
         suggest: Boolean
     }
-});
+}, {timestamps: true});
 
 export default mongoose.model("deck", Deck);

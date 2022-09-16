@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const Activity = new Schema({
-    date: Date,
     actor: {type: Schema.Types.ObjectId, ref: "user"},
     type: String,//addCard, addDeck, editDeck, deleteDeck, join
     content: String,

@@ -17,7 +17,8 @@ const User = new Schema({
     groups: [{type: Schema.Types.ObjectId, ref: "group"}],
     attempts: [{type: Schema.Types.ObjectId, ref: "attempt"}],
     messages: [{type: Schema.Types.ObjectId, ref: "message"}],
-    notifications: [{type: Schema.Types.ObjectId, ref: "notification"}]
+    notifications: [{type: Schema.Types.ObjectId, ref: "notification"}],
+    adminOf: [{type: Schema.Types.ObjectId, ref: "group"}]
 }, {timestamps: true});
 
 export default mongoose.model("user", User);

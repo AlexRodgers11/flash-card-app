@@ -8,7 +8,7 @@ const Activity = new Schema({
     content: String,
     groupTarget: {type: Schema.Types.ObjectId, ref: "group"},
     deckTarget: {type: Schema.Types.ObjectId, ref: "deck"}
-});
+}, {timestamps: true});
 
 export default mongoose.model("activity", Activity);
 

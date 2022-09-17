@@ -109,7 +109,13 @@ deckRouter.delete("/:deckId", (req, res, next) => {
                                             res.status(500).send("There was an error with your request");
                                             throw err;
                                         } else {
-                                            res.status(200).send(req.deck._id);
+                                            User.findByIdAndUpdate(req.deck.creator, {$pull: {decks: req.deck._id}}, (err, user) => {
+                                                if(err) {
+                                                    console.error(err);
+                                                    throw err;
+                                                }
+                                                res.status(200).send(req.deck._id);
+                                            });
                                         }
                                     });
                                 })

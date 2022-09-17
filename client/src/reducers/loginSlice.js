@@ -124,6 +124,8 @@ export const loginSlice = createSlice({
             state.decks = action.payload.decks;
             state.groups = action.payload.groups;
             state.attempts = action.payload.attempts;
+            state.messages.received = action.payload.messages.received;
+            state.messages.sent = action.payload.messages.sent;
         });
         builder.addCase(login.fulfilled, (state, action) => {
             state.token = action.payload.token;

@@ -59,7 +59,7 @@ deckRouter.get("/:deckId", (req, res, next) => {
                     name: req.deck.name,
                     public: req.deck.public,
                     creator: user.login.username,
-                    dateCreated: req.deck.dateCreated,
+                    createdAt: req.deck.createdAt,
                     cardCount: req.deck.cards.length,
                     permissions: req.deck.permissions
                 };

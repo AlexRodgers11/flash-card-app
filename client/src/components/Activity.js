@@ -18,7 +18,6 @@ function Activity(props) {
         let activityType = type;
         switch(activityType) {
             case 'create-group':
-                console.log('group create reached')
                 return (
                     <div>
                         <p>{date}</p>
@@ -42,7 +41,7 @@ function Activity(props) {
             axios.get(`${baseURL}/activities/${props.activityId}`)
                 .then((response) => {
                     setType(response.data.type);
-                    setDate(response.data.date);
+                    setDate(response.data.createdAt);
                     setActor(response.data.actor);
                     setContent(response.data.content);
                     setGroupTarget(response.data.groupTarget?.name);

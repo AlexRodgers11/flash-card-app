@@ -22,7 +22,7 @@ function DeckTile(props) {
     <div onClick={handleViewDeck} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
         <h4>{deckData.name}</h4>
         <p>{deckData.creator}</p>
-        <p>{deckData.dateCreated}</p>
+        <p>{deckData.createdAt}</p>
         <p>{deckData.public}</p>
         <p>{deckData.cardCount}</p>
         {/* <button type="button" value={props.deckId} onClick={handleViewDeck}>View</button> */}

@@ -11,9 +11,13 @@ const initialState = {
     name: {},
     email: "",
     photo: "",
-    decks: "",
+    decks: [],
     groups: "",
-    attempts: ""
+    attempts: "",
+    messages: {
+        sent: [],
+        received: [], 
+    }
 }
 
 export const login = createAsyncThunk("login/login", async({usernameOrEmail, password}) => {
@@ -100,6 +104,14 @@ export const loginSlice = createSlice({
         setGroups: (state, action) => {
             state.groups = action.payload;
         },
+        addDeckToUser: (state, action) => {
+            console.log("in addDeckToUser");
+            console.log(action.payload);
+            state.decks = [...state.decks, action.payload] ;
+        },
+        addMessage: (state, action) => {
+            state.messages[action.payload.direction].push(action.payload.message);
+        },
         logout: (state) => initialState
     },
     extraReducers: (builder) => {
@@ -130,5 +142,5 @@ export const loginSlice = createSlice({
     }
 });
 
-export const { logout, setGroups } = loginSlice.actions;
+export const { addDeckToUser, addMessage, logout, setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

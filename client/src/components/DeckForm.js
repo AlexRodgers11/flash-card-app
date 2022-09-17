@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { addDeck } from '../reducers/decksSlice';
+import { addDeckToUser } from '../reducers/loginSlice';
 
 const baseURL = 'http://localhost:8000';
 
@@ -28,9 +29,9 @@ function DeckForm() {
 		clearPrivacy();
 		axios.post(`${baseURL}/users/${userId}/decks`, newDeck)
 			.then((response) => {
-				let deckId = response.data;
-				dispatch(addDeck({deckId}));
-				navigate(`/decks/${deckId}`);
+				dispatch(addDeckToUser({_id: response.data._id, name: response.data.name}));
+				dispatch(addDeck({deckId: response.data._id}));
+				navigate(`/decks/${response.data._id}`);
 			})
 			.catch(err => console.error(err));
 

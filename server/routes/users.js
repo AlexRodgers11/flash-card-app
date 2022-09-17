@@ -83,6 +83,7 @@ userRouter.delete("/:userId", (req, res, next) => {
                 })
                 // .then((err, matchedCount, modifiedCount, upsertedId) => {
                 //     //all arguments passed to .then() are undefined
+                
                 //     console.log(`Matched count: ${matchedCount}`);
                 //     console.log(`Modified count: ${modifiedCount}`);
                 //     console.log(`Upserted id: ${upsertedId}`);
@@ -154,14 +155,13 @@ userRouter.post("/:userId/decks", (req, res, next) => {
         name: req.body.deckName,
         public: req.body.public,
         creator: req.body.creator,
-        dateCreated: req.body.dateCreated
     });
     newDeck.save((err, deck) => {
         User.findByIdAndUpdate(req.user._id, {$push: {decks: deck}}, (err, user) => {
             if(err) {
                 res.status(500).send("There was an error with your request");
             } else {
-                res.status(200).send(newDeck._id);
+                res.status(200).send({_id: newDeck._id, name: newDeck.name});
             }
         });
     });

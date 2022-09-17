@@ -9,6 +9,7 @@ import Modal from './Modal';
 import useToggle from '../hooks/useToggle';
 import axios from 'axios';
 import { addDeck } from '../reducers/decksSlice';
+import { addMessage } from '../reducers/loginSlice';
 
 const baseURL = 'http://localhost:8000';
 
@@ -26,11 +27,11 @@ function Group() {
     let activityIds = useSelector((state) => state.group.activity);
     
     const chooseDeck = evt => {
-        axios.get(`${baseURL}/decks/${evt.target.id}`)
+        if(administrators.includes(userId)) {
+            axios.get(`${baseURL}/decks/${evt.target.id}`)
             .then((response) => {
                 axios.post(`${baseURL}/groups/${groupId}/decks`, response.data)
                     .then((res) => {
-                        console.log(res);
                         dispatch(addActivity({activityId: res.data.newActivity}));
                         dispatch(addDeck({deckId: res.data.newDeck}));
                         toggleShowModal();
@@ -38,7 +39,22 @@ function Group() {
                     .catch(err => console.error(err));
             })
             .catch(err => console.error(err));
-        
+        } else {
+            let message = {
+                type: "add-deck-request",
+                sendingUser: userId,
+                targetDeck: evt.target.id
+            }
+            axios.post(`${baseURL}/groups/${groupId}/messages/admin`, message)
+                .then((response) => {
+                    console.log(response.data);
+                    dispatch(addMessage({message: response.data._id, direction: 'sent'}));
+                    toggleShowModal();
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
     }
 
     const goToCreateNew = () => {
@@ -46,7 +62,6 @@ function Group() {
     }
 
     useEffect(() => {
-        //if a group hasn't already been stored, or if the stored groupId is different than the one passed to Group as a route parameter
         if(!storedGroupId || storedGroupId !== groupId) {
             dispatch(fetchGroupData(groupId));
         }
@@ -60,7 +75,7 @@ function Group() {
             <h3>Activity:</h3>
             <ActivityList activityIds={activityIds}/>
             <GroupMemberList groupMemberIds={groupMemberIds} />
-            {!administrators.includes(userId) ? null : <button onClick={toggleShowModal}>Add Deck</button>}
+            <button onClick={toggleShowModal}>{!administrators.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
             {!showModal ?
                 null
                 :

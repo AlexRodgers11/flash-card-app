@@ -4,6 +4,7 @@ import Deck from "../models/deck.js";
 const groupRouter = express.Router();
 
 import Group from "../models/group.js";
+import Message from "../models/message.js";
 import User from "../models/user.js";
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
@@ -84,7 +85,6 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
     newDeck.name = req.body.name;
     newDeck.publiclyAvailable = req.body.publiclyAvailable || false;
     newDeck.creator = req.body.creator;
-    newDeck.dateCreated = Date.now();
     newDeck.cards = req.body.cards;
     newDeck.permissions = req.body.permissions;
     newDeck.save((err, deck) => {
@@ -94,7 +94,6 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
             throw err;
         } else {
             let newActivity = new Activity();
-            newActivity.date = Date.now();
             newActivity.actor = req.body.creator;
             newActivity.type = "add-deck";
             newActivity.groupTarget = req.group._id;
@@ -121,6 +120,32 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
             });
         }
     }); 
+});
+
+groupRouter.post("/:groupId/messages/admin", (req, res, next) => {
+    let newMessage = new Message();
+    newMessage.type = req.body.type;
+    newMessage.sendingUser = req.body.sendingUser;
+    newMessage.targetDeck = req.body.targetDeck;
+    newMessage.save((newMessageSaveError, message) => {
+        if(newMessageSaveError) {
+            console.error(newMessageSaveError);
+            throw newMessageSaveError;
+        }
+        User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': message}})
+            .then(() => {
+                User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': message}})
+                    .then(() => {
+                        res.send(message);
+                    })
+                    .catch(sendingUserError => {
+                        console.error(sendingUserError)
+                    });
+            })
+            .catch(receivingUsersError => {
+                console.error(receivingUsersError);
+            });
+    });
 });
 
 groupRouter.delete("/:groupId", (req, res, next) => {

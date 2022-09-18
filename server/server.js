@@ -26,6 +26,7 @@ import { Strategy as LocalStrategy } from "passport-local";
 import jwt from "jwt-simple";
 import { ExtractJwt } from "passport-jwt";
 import { Strategy as JwtStrategy } from  "passport-jwt";
+import messageRouter from "./routes/message.js";
 
 
 mongoose.connect("mongodb://localhost/flash-card-app", {
@@ -128,7 +129,8 @@ app.use("/categories", categoryRouter);
 app.use("/cards", cardRouter);
 app.use("/decks", deckRouter);
 app.use("/groups", groupRouter);
-app.use("/login", loginRouter)
+app.use("/login", loginRouter);
+app.use("/messages", messageRouter);
 app.use("/users", userRouter);
 
 router.get("/test", (req, res, next) => {

@@ -127,6 +127,7 @@ groupRouter.post("/:groupId/messages/admin", (req, res, next) => {
     newMessage.type = req.body.type;
     newMessage.sendingUser = req.body.sendingUser;
     newMessage.targetDeck = req.body.targetDeck;
+    newMessage.targetGroup = req.body.targetGroup;
     newMessage.save((newMessageSaveError, message) => {
         if(newMessageSaveError) {
             console.error(newMessageSaveError);

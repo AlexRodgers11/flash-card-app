@@ -43,6 +43,7 @@ function Group() {
             let message = {
                 type: "add-deck-request",
                 sendingUser: userId,
+                targetGroup: groupId,
                 targetDeck: evt.target.id
             }
             axios.post(`${baseURL}/groups/${groupId}/messages/admin`, message)

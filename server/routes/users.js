@@ -220,6 +220,16 @@ userRouter.post("/:userId/notifications", (req, res, next) => {
     });
 });
 
+userRouter.put("/:userId/notifications", (req, res, next) => {
+    Notification.updateMany({_id: {$in: req.user.notifications}}, {$set: {read: true}})
+        //may not need to send anything back here, may need to send back certain number of notifications
+        .then(res.status(200).send())
+        .catch(err => {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        });
+});
+
 userRouter.post("/:userId/attempts", (req, res, next) => {
     let newAttempt = new Attempt(req.body);
     newAttempt.save((err, attempt) => {

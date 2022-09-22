@@ -196,6 +196,34 @@ userRouter.post("/:userId/messages", (req, res, next) => {
     });
 });
 
+userRouter.delete("/:userId/messages/:messageId", (req, res, next) => {
+    Message.findByIdAndDelete(req.params.messageId)
+        .then(message => {
+            if(req.user.messages.sent.findIndex(message._id) > -1) {
+                User.findByIdAndUpdate(req.user._id, {$pull: {'messages.sent': message._id}})
+                    .then(res.status(200).send(message))
+                    .catch(sentDeleteErr => {
+                        res.status(500).send("There was an error with your request");
+                        throw sentDeleteErr;
+                    })
+            } else if(req.user.messages.received.findIndex(message._id) > -1) {
+                User.findByIdAndUpdate(req.user._id, {$pull: {'messages.received': message._id}})
+                    .then(res.status(200).send(message))
+                    .catch(receivedDeleteErr => {
+                        res.status(500).send("There was an error with your request");
+                        throw receivedDeleteErr;
+                    })
+            } else {
+                res.status(404).send("Message not found in user's messages");
+            }
+            
+        })
+        .catch(messageDeleteErr => {
+            res.status(500).send("There was an error with your request");
+            throw messageDeleteErr;
+        });
+});
+
 userRouter.post("/:userId/notifications", (req, res, next) => {
     let newNotification = new Notification();
     newNotification.type = req.body.type;

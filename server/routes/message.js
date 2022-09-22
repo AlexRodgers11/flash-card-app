@@ -58,4 +58,14 @@ messageRouter.get("/:messageId", (req, res, next) => {
     }); 
 });
 
+messageRouter.put('/:messageId', (req, res, next) => {
+    Message.findByIdAndUpdate(req.message._id, req.body, {new: true}, (err, message) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        }
+        res.status(200).send(message);
+    });
+});
+
 export default messageRouter;

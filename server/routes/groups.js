@@ -81,45 +81,95 @@ groupRouter.get("/:groupId/decks", (req, res, next) => {
 });
 
 groupRouter.post("/:groupId/decks", (req, res, next) => {
-    let newDeck = new Deck()
-    newDeck.name = req.body.name;
-    newDeck.publiclyAvailable = req.body.publiclyAvailable || false;
-    newDeck.creator = req.body.creator;
-    newDeck.cards = req.body.cards;
-    newDeck.permissions = req.body.permissions;
-    newDeck.save((err, deck) => {
-        if(err) {
-            console.error(err);
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } else {
-            let newActivity = new Activity();
-            newActivity.actor = req.body.creator;
-            newActivity.type = "add-deck";
-            newActivity.groupTarget = req.group._id;
-            newActivity.deckTarget = deck._id
-            newActivity.save((err, activity) => {
-                if(err) {
-                    res.status(500).send("There was an error with your request");
-                    throw err;
-                } else {
-                    console.log({activity});
-                    console.log({deck});
-                        Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
-                    .then(() => {
-                        res.status(200).send({
-                            newDeck: deck._id,
-                            newActivity: activity._id
-                        });
-                    })
-                    .catch(err => {
+    if(req.query.accepted) {
+        Deck.findById(req.body.idOfDeckToCopy)
+            .then(foundDeck => {
+                let deckCopy = new Deck();
+                deckCopy.name = foundDeck.name;
+                deckCopy.publiclyAvailable = foundDeck.publiclyAvailable || false;
+                deckCopy.creator = foundDeck.creator;
+                deckCopy.cards = foundDeck.cards;
+                deckCopy.permissions = foundDeck.permissions;
+                deckCopy.save((err, deck) => {
+                    if(err) {
                         console.error(err);
                         res.status(500).send("There was an error with your request");
-                    })
-                }
-            });
-        }
-    }); 
+                        throw err;
+                    } else {
+                        let newActivity = new Activity();
+                        newActivity.actor = req.body.creator;
+                        newActivity.type = "add-deck";
+                        newActivity.groupTarget = req.group._id;
+                        newActivity.deckTarget = deck._id
+                        newActivity.save((err, activity) => {
+                            if(err) {
+                                res.status(500).send("There was an error with your request");
+                                throw err;
+                            } else {
+                                console.log({activity});
+                                console.log({deck});
+                                    Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
+                                .then(() => {
+                                    res.status(200).send({
+                                        newDeck: deck._id,
+                                        newActivity: activity._id
+                                    });
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                    res.status(500).send("There was an error with your request");
+                                })
+                            }
+                        });
+                    }
+                }); 
+            })
+            .catch(error => {
+                console.error(error);
+                throw error;
+            })
+    } else {
+        let newDeck = new Deck()
+        newDeck.name = req.body.name;
+        newDeck.publiclyAvailable = req.body.publiclyAvailable || false;
+        newDeck.creator = req.body.creator;
+        newDeck.cards = req.body.cards;
+        newDeck.permissions = req.body.permissions;
+        newDeck.save((err, deck) => {
+            if(err) {
+                console.error(err);
+                res.status(500).send("There was an error with your request");
+                throw err;
+            } else {
+                let newActivity = new Activity();
+                newActivity.actor = req.body.creator;
+                newActivity.type = "add-deck";
+                newActivity.groupTarget = req.group._id;
+                newActivity.deckTarget = deck._id
+                newActivity.save((err, activity) => {
+                    if(err) {
+                        res.status(500).send("There was an error with your request");
+                        throw err;
+                    } else {
+                        console.log({activity});
+                        console.log({deck});
+                            Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
+                        .then(() => {
+                            res.status(200).send({
+                                newDeck: deck._id,
+                                newActivity: activity._id
+                            });
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            res.status(500).send("There was an error with your request");
+                        })
+                    }
+                });
+            }
+        }); 
+    }
+    
 });
 
 groupRouter.post("/:groupId/messages/admin", (req, res, next) => {

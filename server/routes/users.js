@@ -5,6 +5,8 @@ import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import Attempt from "../models/attempt.js";
+import Message from "../models/message.js";
+import Notification from '../models/notification';
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
@@ -164,6 +166,33 @@ userRouter.post("/:userId/decks", (req, res, next) => {
                 res.status(200).send({_id: newDeck._id, name: newDeck.name});
             }
         });
+    });
+});
+
+userRouter.post("/:userId/messages", (req, res, next) => {
+    let newMessage = new Message();
+    newMessage.type = req.body.type;
+    newMessage.sendingUser = req.body.sendingUser;
+    newMessage.targetDeck = req.body.targetDeck;
+    newMessage.targetGroup = req.body.targetGroup;
+    newMessage.save((messageSaveErr, message) => {
+        if(messageSaveErr) {
+            res.status(500).send("There was an error with your request");
+            throw messageSaveErr;
+        }
+        User.findByIdAndUpdate(req.user._id, {$push: {'messages.received': message}})
+            .then(() => {
+                User.findByIdAndUpdate(message.sendingUser, {$push: {'messages.sent': message}})
+                    .then(res.status(200).send(message))
+                    .catch(senderUpdateErr => {
+                        res.status(500).send("There was an error with your request");
+                        throw(senderUpdateErr);
+                    });
+            })
+            .catch(receivingUserErr => {
+                res.status(500).send("There was an error with your request");
+                throw receivingUserErr;
+            });
     });
 });
 

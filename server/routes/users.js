@@ -196,6 +196,30 @@ userRouter.post("/:userId/messages", (req, res, next) => {
     });
 });
 
+userRouter.post("/:userId/notifications", (req, res, next) => {
+    let newNotification = new Notification();
+    newNotification.type = req.body.type;
+    newNotification.content = req.body.content;
+    newNotification.actor = req.body.actor;
+    newNotification.groupTarget = req.body.groupTarget;
+    newNotification.deckTarget = req.body.deckTarget;
+    newNotification.cardTarget = req.body.cardTarget;
+    newNotification.save((notificationSaveErr, notification) => {
+        if(notificationSaveErr) {
+            res.status(500).send("There was an error with your request");
+            throw notificationSaveErr;
+        }
+        User.findByIdAndUpdate(req.user._id, {$push: {notifications: notification}})
+            .then(notification => {
+                res.status(200).send(notification);
+            })
+            .catch(userUpdateErr => {
+                res.status(500).send("There was an error with your request");
+                throw userUpdateErr;
+            });
+    });
+});
+
 userRouter.post("/:userId/attempts", (req, res, next) => {
     let newAttempt = new Attempt(req.body);
     newAttempt.save((err, attempt) => {

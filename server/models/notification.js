@@ -1,6 +1,8 @@
-import mongoose, { Schema, Schema, Schema } from "mongoose";
+import mongoose from "mongoose";
 
-const Schema = mongoose.Schema({
+const Schema = mongoose.Schema;
+
+const Notification = new Schema({
     type: String,//deck added to group, group notifications, 
     content: String,
     read: Boolean,
@@ -10,3 +12,4 @@ const Schema = mongoose.Schema({
     cardTarget: {type: Schema.Types.ObjectId, ref: "card"}
 }, {timestamps: true});
 
+export default mongoose.model('notification', Notification);

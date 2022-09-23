@@ -6,7 +6,7 @@ import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import Attempt from "../models/attempt.js";
 import Message from "../models/message.js";
-import Notification from '../models/notification';
+import Notification from '../models/notification.js';
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {

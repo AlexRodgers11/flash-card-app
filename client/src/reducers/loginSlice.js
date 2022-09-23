@@ -17,7 +17,8 @@ const initialState = {
     messages: {
         sent: [],
         received: [], 
-    }
+    },
+    notifications: []
 }
 
 export const login = createAsyncThunk("login/login", async({usernameOrEmail, password}) => {
@@ -34,6 +35,17 @@ export const login = createAsyncThunk("login/login", async({usernameOrEmail, pas
             email: response.data.email
         }
     } catch (err) {
+        return err;
+    }
+});
+
+export const markNotificationsAsRead = createAsyncThunk("login/markNotificationsAsRead", async() => {
+    console.log("in mark notifications as read");
+    try {
+        const response = await axios.put(`${baseURL}/users/notifications`, {});
+        return response.data.notifications;
+    } catch (err) {
+        console.error(err);
         return err;
     }
 });
@@ -126,10 +138,14 @@ export const loginSlice = createSlice({
             state.attempts = action.payload.attempts;
             state.messages.received = action.payload.messages.received;
             state.messages.sent = action.payload.messages.sent;
+            state.notifications = action.payload.notifications;
         });
         builder.addCase(login.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId
+        });
+        builder.addCase(markNotificationsAsRead, (state, action) => {
+            state.notifications = action.payload;
         });
         builder.addCase(signUp.fulfilled, (state, action) => {
             state.token = action.payload.token;

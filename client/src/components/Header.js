@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { NavLink } from 'react-router-dom';
-import useToggle from '../hooks/useToggle';
 import { logout } from '../reducers/loginSlice';
 import Message from './Message';
 import MessageList from './MessageList';
 import Modal from './Modal';
+import NotificationList from './NotificationList';
 
 function Header() {
-    const [showModal, toggleShowModal] = useToggle(false);
-    const [modalContent, setModalContent] = useState('inbox');
+    const [modalContent, setModalContent] = useState('');
     const [messageId, setMessageId]  = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const username = useSelector((state) => state.login.username);
+    const notifications = useSelector((state) => state.login.notifications);
     
     const expandMessage = (id) => {
         setModalContent('message');
@@ -26,8 +26,7 @@ function Header() {
     }
 
     const handleHideModal = () => {
-        toggleShowModal();
-        setModalContent('inbox');
+        setModalContent('');
         setMessageId('');
     }
     
@@ -41,15 +40,18 @@ function Header() {
         setMessageId(id);
     }
 
-
+    const handleButtonClick = (evt) => {
+        setModalContent(evt.target.dataset.source);
+    }
+    
     return (
         <div style={{display: "flex", justifyContent: "space-between", padding: ".5em 2em"}}>            
             <div>
                 {username ? 
                     <>
                         <strong>{username}</strong>
-                        <button>N</button>
-                        <button onClick={toggleShowModal}>M</button>
+                        <button data-source="notifications" onClick={handleButtonClick}>N:{notifications.slice(0, 100).filter(notification => !notification.read).length}</button>
+                        <button data-source="inbox" onClick={handleButtonClick}>M</button>
                     </>
                     : 
                     null
@@ -71,7 +73,7 @@ function Header() {
                 }
                 
             </div>            
-            {!showModal ?
+            {!modalContent ?
                 null
                 :
                 <Modal hideModal={handleHideModal}>
@@ -81,7 +83,10 @@ function Header() {
                         modalContent === 'deck' ? 
                             <p>Deck Info will go here</p>
                             :
-                            <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId}/></div>
+                            modalContent === 'notification' ?
+                                <div><NotificationList hideModal={handleHideModal} /></div>
+                                :
+                                <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId}/></div>
                     }
                 </Modal>
             }

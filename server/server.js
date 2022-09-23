@@ -14,11 +14,13 @@ const port = process.env.port || 8000;
 const router = express.Router();
 
 import activityRouter from "./routes/activity.js";
-import categoryRouter from "./routes/categories.js";
 import cardRouter from "./routes/cards.js";
+import categoryRouter from "./routes/categories.js";
 import deckRouter from "./routes/decks.js";
 import groupRouter from "./routes/groups.js";
 import loginRouter, { requireSignIn } from "./routes/login.js";
+import messageRouter from "./routes/message.js";
+import notificationRouter from "./routes/notification.js";
 import userRouter from "./routes/users.js"
 
 import passport from "passport";
@@ -26,8 +28,6 @@ import { Strategy as LocalStrategy } from "passport-local";
 import jwt from "jwt-simple";
 import { ExtractJwt } from "passport-jwt";
 import { Strategy as JwtStrategy } from  "passport-jwt";
-import messageRouter from "./routes/message.js";
-
 
 mongoose.connect("mongodb://localhost/flash-card-app", {
     //use MongoDB's new connection string parser instead of the old deprecated one
@@ -125,12 +125,13 @@ app.use(passport.initialize());
 // });
 
 app.use("/activities", activityRouter);
-app.use("/categories", categoryRouter);
 app.use("/cards", cardRouter);
+app.use("/categories", categoryRouter);
 app.use("/decks", deckRouter);
 app.use("/groups", groupRouter);
 app.use("/login", loginRouter);
 app.use("/messages", messageRouter);
+app.use("/notifications", notificationRouter);
 app.use("/users", userRouter);
 
 router.get("/test", (req, res, next) => {

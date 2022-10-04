@@ -83,7 +83,7 @@ function Header() {
                         modalContent === 'deck' ? 
                             <p>Deck Info will go here</p>
                             :
-                            modalContent === 'notification' ?
+                            modalContent === 'notifications' ?
                                 <div><NotificationList hideModal={handleHideModal} /></div>
                                 :
                                 <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId}/></div>

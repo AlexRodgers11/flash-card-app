@@ -232,6 +232,7 @@ userRouter.post("/:userId/notifications", (req, res, next) => {
     newNotification.groupTarget = req.body.groupTarget;
     newNotification.deckTarget = req.body.deckTarget;
     newNotification.cardTarget = req.body.cardTarget;
+    newNotification.read = req.body.read;
     newNotification.save((notificationSaveErr, notification) => {
         if(notificationSaveErr) {
             res.status(500).send("There was an error with your request");

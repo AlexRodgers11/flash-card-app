@@ -23,7 +23,7 @@ function Notification(props) {
 		props.hideModal();
 		switch(notification.type) {
 			case 'deck-approved':
-				navigate(`/groups/${notification.groupTarget}`);
+				navigate(`/groups/${notification.groupTarget._id}`);
 				break;
 			default:
 				break;
@@ -33,7 +33,7 @@ function Notification(props) {
 	const renderNotification = () => {
 		switch(notification.type) {
 			case 'deck-approved':
-				return <p onClick={handleClick}>{notification.actor.username} approved your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
+				return <p onClick={handleClick}>{notification.actor.login.username} approved your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
 			default:
 				return null
 		}

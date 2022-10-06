@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+import { addDeck } from '../reducers/decksSlice';
+import { addActivity } from '../reducers/groupSlice';
 
 const baseURL = 'http://localhost:8000';
 
 function Message(props) {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const userId = useSelector((state) => state.login.userId);
 	const [messageType, setMessageType] = useState('');
 	const [sender, setSender] = useState({});
 	const [receiver, setReceiver] = useState({});
@@ -14,6 +19,32 @@ function Message(props) {
 	const [content, setContent] = useState('');
 	const [read, setRead] = useState(false);
 
+	const acceptDeck = () => {
+		axios.post(`${baseURL}/groups/${receiver._id}/decks?accepted=true`, {idOfDeckToCopy: target._id})//see if adding userId here worked
+			.then((deckPostResponse) => {
+				let notification = {
+					type: 'deck-approved',
+					read: false,
+					actor: userId,
+					groupTarget: receiver._id,
+					deckTarget: target._id
+				}
+				axios.post(`${baseURL}/users/${sender._id}/notifications`, notification)
+				 .then(() => {
+					props.hideModal();
+					//adds deck to decks slice of store, which is only desired if user is on Group page, could try to conditionally call this based on location or refactor how deckList is handled in store
+					dispatch(addDeck(deckPostResponse.data.newDeck));
+					dispatch(addActivity(deckPostResponse.data.newActivity));
+				 })
+				 .catch(notificationErr => {
+					console.error(notificationErr);
+				 });
+			})
+			.catch(deckAddErr => {
+				console.error(deckAddErr);
+			});
+	}
+	
 	const expandMessage = () => {
 		props.expandMessage(props.messageId);
 	}
@@ -28,7 +59,7 @@ function Message(props) {
 						{props.fullView ? 
 							<div>
 								<p><span>{sender.login.username}</span> would like to add deck: {target.name} to <span>{receiver.name}</span></p>
-								<button>Accept</button><button>Decline</button><button onClick={reviewDeck}>View</button>
+								<button onClick={acceptDeck}>Accept</button><button>Decline</button><button onClick={reviewDeck}>View</button>
 								
 							</div>
 							:
@@ -78,6 +109,7 @@ function Message(props) {
 }
 
 Message.propTypes = {
+	hideModal: PropTypes.func,
     messageId: PropTypes.string,
 	expandMessage: PropTypes.func
 }

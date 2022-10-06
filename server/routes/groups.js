@@ -92,7 +92,7 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
                 deckCopy.cards = foundDeck.cards;
                 deckCopy.permissions = foundDeck.permissions;
                 let cardsCopy = [];
-                for(let i = 0; i < foundDeck.cards; i++) {
+                for(let i = 0; i < foundDeck.cards.length; i++) {
                     cardsCopy.push(new Promise((resolve, reject) => {
                         Card.findById(foundDeck.cards[i], (cardFindErr, foundCard) => {
                             if(cardFindErr) {
@@ -113,6 +113,7 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
                                 numberIncorrect: 0
                             }
                             newCard.save((cardSaveErr, card) => {
+                                console.log("card copy saved");
                                 if(cardSaveErr) {
                                     res.status(500).send("There was an error with your request");
                                     throw cardSaveErr;
@@ -123,6 +124,7 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
                     }));
                 }
                 Promise.all(cardsCopy).then(cards => {
+                    console.log("all cards coppied over");
                     deckCopy.cards = cards;
                     deckCopy.save((err, deck) => {
                         if(err) {

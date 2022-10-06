@@ -240,13 +240,38 @@ groupRouter.post("/:groupId/messages/admin", (req, res, next) => {
     });
 });
 
-groupRouter.delete("/:groupId", (req, res, next) => {
+groupRouter.Pe("/:groupId", (req, res, next) => {
     Group.findByIdAndDelete(req.group._id, (err, group) => {
         if(err) {
             res.status(500).send("There was an error with your request");
             throw err
         }
         else {
+            Deck.deleteMany({_id: {$in: req.group.decks}}, (err, deckDeleteResponse) => {
+                if(err) {
+                    res.status(500).send("There was an error deleting group's decks");
+                    throw err;
+                }
+                //change activity to activities
+                Activity.deleteMany({_id: {$in: req.group.activity}}, (err, activityDeleteResponse) => {
+                    if(err) {
+                        res.status(500).send("There was an error deleting group's activities")
+                        throw err;
+                    }
+                    User.updateMany({_id: {$in: req.group.members}}, {$pull: {groups: req.group._id}}, (err, memberDeleteResponse) => {
+                        if(err) {
+                            res.status(500).send("There was an error removing the group from its member's groups arrays");
+                            throw err;
+                        }
+                        User.updateMany({_id: {$in: req.group.administrators}}, {$pull: {adminOf: req.group._id}}, (err, adminDeleteResponse) => {
+                            if(err) {
+                                res.status(500).send("There was an error removing the group from its administrators' adminOf arrays");
+                                throw err;
+                            }
+                        });
+                    });
+                });
+            })
             res.status(200).send(group);
         }
     });

@@ -1,8 +1,9 @@
 import express from "express";
-import Activity from "../models/activity.js";
-import Deck from "../models/deck.js";
 const groupRouter = express.Router();
 
+import Activity from "../models/activity.js";
+import Card from "../models/card.js";
+import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import Message from "../models/message.js";
 import User from "../models/user.js";
@@ -90,39 +91,77 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
                 deckCopy.creator = foundDeck.creator;
                 deckCopy.cards = foundDeck.cards;
                 deckCopy.permissions = foundDeck.permissions;
-                deckCopy.save((err, deck) => {
-                    if(err) {
-                        console.error(err);
-                        res.status(500).send("There was an error with your request");
-                        throw err;
-                    } else {
-                        let newActivity = new Activity();
-                        newActivity.actor = req.body.creator;
-                        newActivity.type = "add-deck";
-                        newActivity.groupTarget = req.group._id;
-                        newActivity.deckTarget = deck._id
-                        newActivity.save((err, activity) => {
-                            if(err) {
+                let cardsCopy = [];
+                for(let i = 0; i < foundDeck.cards; i++) {
+                    cardsCopy.push(new Promise((resolve, reject) => {
+                        Card.findById(foundDeck.cards[i], (cardFindErr, foundCard) => {
+                            if(cardFindErr) {
                                 res.status(500).send("There was an error with your request");
                                 throw err;
-                            } else {
-                                console.log({activity});
-                                console.log({deck});
-                                    Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
-                                .then(() => {
-                                    res.status(200).send({
-                                        newDeck: deck._id,
-                                        newActivity: activity._id
-                                    });
-                                })
-                                .catch(err => {
-                                    console.error(err);
-                                    res.status(500).send("There was an error with your request");
-                                })
                             }
+                            let newCard = new Card();
+                            newCard.creator = foundCard.creator;
+                            newCard.type = foundCard.type;
+                            newCard.question = foundCard.question;
+                            newCard.correctAnswer = foundCard.correctAnswer;
+                            newCard.wrongAnswerOne = foundCard.wrongAnswerOne;
+                            newCard.wrongAnswerTwo = foundCard.wrongAnswerTwo;
+                            newCard.wrongAnswerThree = foundCard.wrongAnswerThree;
+                            newCard.hint = foundCard.hint;
+                            newCard.stats = {
+                                numberCorrect: 0,
+                                numberIncorrect: 0
+                            }
+                            newCard.save((cardSaveErr, card) => {
+                                if(cardSaveErr) {
+                                    res.status(500).send("There was an error with your request");
+                                    throw cardSaveErr;
+                                }
+                                resolve(card);
+                            });
                         });
-                    }
-                }); 
+                    }));
+                }
+                Promise.all(cardsCopy).then(cards => {
+                    deckCopy.cards = cards;
+                    deckCopy.save((err, deck) => {
+                        if(err) {
+                            res.status(500).send("There was an error with your request");
+                            throw err;
+                        } else {
+                            let newActivity = new Activity();
+                            // newActivity.actor = req.body.actor;
+                            newActivity.actor = deck.creator;
+                            newActivity.type = "add-deck";
+                            newActivity.groupTarget = req.group._id;
+                            newActivity.deckTarget = deck._id
+                            newActivity.save((err, activity) => {
+                                if(err) {
+                                    res.status(500).send("There was an error with your request");
+                                    throw err;
+                                } else {
+                                    console.log({activity});
+                                    console.log({deck});
+                                        Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
+                                    .then(() => {
+                                        res.status(200).send({
+                                            newDeck: deck._id,
+                                            newActivity: activity._id
+                                        });
+                                    })
+                                    .catch(err => {
+                                        console.error(err);
+                                        res.status(500).send("There was an error with your request");
+                                    })
+                                }
+                            });
+                        }
+                    }); 
+                })
+                .catch(copyCardsPromiseErr => {
+                    res.status(500).send("There was an error with your request");
+                    throw copyCardsPromiseErr;
+                });
             })
             .catch(error => {
                 console.error(error);

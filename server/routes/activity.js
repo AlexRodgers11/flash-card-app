@@ -31,4 +31,14 @@ activityRouter.get("/:activityId", (req, res, next) => {
         });
 });
 
+activityRouter.delete("/:activityId", (req, res, next) => {
+    Activity.findByIdAndDelete(req.activity._id, (err, activity) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } 
+        res.status(200).send("Activity deleted");
+    });
+});
+
 export default activityRouter;

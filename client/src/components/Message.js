@@ -18,9 +18,12 @@ function Message(props) {
 	const [target, setTarget] = useState({});
 	const [content, setContent] = useState('');
 	const [read, setRead] = useState(false);
+	const [deckAcceptanceStatus, setDeckAcceptanceStatus] = useState('');
+	const [cardAcceptanceStatus, setCardAcceptanceStatus] = useState('');
 
 	const acceptDeck = () => {
-		axios.post(`${baseURL}/groups/${receiver._id}/decks?accepted=true`, {idOfDeckToCopy: target._id})//see if adding userId here worked
+		if(deckAcceptanceStatus !== 'pending') {
+			axios.post(`${baseURL}/groups/${receiver._id}/decks?accepted=true`, {idOfDeckToCopy: target._id})
 			.then((deckPostResponse) => {
 				let notification = {
 					type: 'deck-approved',
@@ -43,6 +46,10 @@ function Message(props) {
 			.catch(deckAddErr => {
 				console.error(deckAddErr);
 			});
+		} else {
+			alert(`This deck has already been ${deckAcceptanceStatus}`);//need to change acceptance status in this function
+		}
+		
 	}
 	
 	const expandMessage = () => {
@@ -53,7 +60,7 @@ function Message(props) {
 		switch(messageType) {
 			case '':
 				return null;
-			case 'add-deck-request':
+			case 'DeckSubmission':
 				return (
 						<>
 						{props.fullView ? 
@@ -85,7 +92,8 @@ function Message(props) {
 			axios.get(`${baseURL}/messages/${props.messageId}`)
 				.then((response) => {
 					let message = response.data;
-					setMessageType(message.type);
+					// setMessageType(message.type);
+					setMessageType(message.__t);
 					let s = message.sendingUser || message.sendingGroup;
 					setSender(s);
 					let r = message.targetGroup;
@@ -95,7 +103,12 @@ function Message(props) {
 					if(message.content) {
 						setContent(message.content);
 					}
-					setRead(message.read);
+					// setRead(message.read);
+					if(message.read.includes(userId)) {
+						setRead(true);
+					} else {
+						setRead(false);
+					}
 				})
 				.catch(err => {
 					console.log(err);

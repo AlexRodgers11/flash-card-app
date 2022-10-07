@@ -5,7 +5,7 @@ import Activity from "../models/activity.js";
 import Card from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
-import Message from "../models/message.js";
+import { DeckSubmission } from "../models/message.js";
 import User from "../models/user.js";
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
@@ -214,8 +214,8 @@ groupRouter.post("/:groupId/decks", (req, res, next) => {
 });
 
 groupRouter.post("/:groupId/messages/admin", (req, res, next) => {
-    let newMessage = new Message();
-    newMessage.type = req.body.type;
+    let newMessage = new DeckSubmission();
+    newMessage.acceptanceStatus = 'pending';
     newMessage.sendingUser = req.body.sendingUser;
     newMessage.targetDeck = req.body.targetDeck;
     newMessage.targetGroup = req.body.targetGroup;

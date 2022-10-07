@@ -2,16 +2,27 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const Message = new Schema({
-    type: String,
+const MessageSchema = new Schema({
     sendingUser: {type: Schema.Types.ObjectId, ref: "user"},
-    sendingGroup: {type: Schema.Types.ObjectId, ref: "group"},
-    // receivingUser: {type: Schema.Types.ObjectId, ref: "user"},
-    targetDeck: {type: Schema.Types.ObjectId, ref: "deck"},
-    targetCard: {type: Schema.Types.ObjectId, ref: "card"},
-    targetGroup: {type: Schema.Types.ObjectId, ref: "group"},
-    message: String,
-    read: Boolean
+    read: [{type: Schema.Types.ObjectId, ref: "user"}]
 }, {timestamps: true});
 
-export default mongoose.model("message", Message);
+//I think all the model strings should be capitalized
+const Message = mongoose.model('Message', MessageSchema);
+
+const DirectMessage = Message.discriminator("DirectMessage", new Schema({
+    message: String,     
+}));
+
+const DeckSubmission = Message.discriminator("DeckSubmission", new Schema({
+    acceptanceStatus: String,
+    targetDeck: {type: Schema.Types.ObjectId, ref: "deck"},
+    targetGroup: {type: Schema.Types.ObjectId, ref: "group"},
+}));
+
+const CardSubmission = Message.discriminator("CardSubmission", new Schema({
+    acceptanceStatus: String,
+    targetDeck: {type: Schema.Types.ObjectId, ref: "deck"},
+}));
+
+export { Message, DirectMessage, DeckSubmission, CardSubmission};

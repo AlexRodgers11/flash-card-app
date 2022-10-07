@@ -1,6 +1,6 @@
 import express from "express";
 const messageRouter = express.Router();
-import Message from "../models/message.js";
+import { Message } from "../models/message.js";
 
 
 messageRouter.param("messageId", (req, res, next, messageId) => {
@@ -24,8 +24,8 @@ messageRouter.get("/:messageId", (req, res, next) => {
             console.error(err);
             throw err;
         }
-        switch(message.type) {
-            case 'add-deck-request':
+        switch(message.__t) {
+            case 'DeckSubmission':
                 message.populate(
                     [
                         {

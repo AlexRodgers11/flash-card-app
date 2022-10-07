@@ -240,7 +240,7 @@ groupRouter.post("/:groupId/messages/admin", (req, res, next) => {
     });
 });
 
-groupRouter.Pe("/:groupId", (req, res, next) => {
+groupRouter.delete("/:groupId", (req, res, next) => {
     Group.findByIdAndDelete(req.group._id, (err, group) => {
         if(err) {
             res.status(500).send("There was an error with your request");

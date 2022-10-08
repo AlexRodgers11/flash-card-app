@@ -1,6 +1,6 @@
 import express from "express";
 const messageRouter = express.Router();
-import { Message } from "../models/message.js";
+import { DeckSubmission, DirectMessage, Message } from "../models/message.js";
 
 
 messageRouter.param("messageId", (req, res, next, messageId) => {
@@ -59,13 +59,29 @@ messageRouter.get("/:messageId", (req, res, next) => {
 });
 
 messageRouter.put('/:messageId', (req, res, next) => {
-    Message.findByIdAndUpdate(req.message._id, {$push: {read: req.body.user}}, {new: true}, (err, message) => {
+    const updateObj = {...(req.body.user && {$push: {read: req.body.user}}), ...(req.body.acceptanceStatus && {$set: {acceptanceStatus: req.body.acceptanceStatus}})}
+    
+    const options = {new: true};
+
+    const callback = (err, message) => {
         if(err) {
             res.status(500).send("There was an error with your request");
             throw err;
         }
         res.status(200).send(message);
-    });
+    }
+    
+    switch(req.body.messageType) {
+        case 'DeckSubmission':
+            DeckSubmission.findByIdAndUpdate(req.message._id, updateObj, options, callback);
+            break;
+        case 'DirectMessage':
+            DirectMessage.findByIdAndUpdate(req.message._id, updateObj, options, callback);
+            break;
+        default:
+            Message.findByIdAndUpdate(req.message._id, updateObj, options, callback);
+            break;
+    }    
 });
 
 export default messageRouter;

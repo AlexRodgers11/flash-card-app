@@ -124,6 +124,14 @@ export const loginSlice = createSlice({
         addMessage: (state, action) => {
             state.messages[action.payload.direction].push(action.payload.message);
         },
+        editMessage: (state, action) => {
+            state.messages.map(message => {
+                if(message._id === action.payload._id) {
+                    return action.payload;
+                }
+                return message;
+            });
+        },
         logout: (state) => initialState
     },
     extraReducers: (builder) => {
@@ -160,5 +168,5 @@ export const loginSlice = createSlice({
     }
 });
 
-export const { addDeckToUser, addMessage, logout, setGroups } = loginSlice.actions;
+export const { addDeckToUser, addMessage, editMessage, logout, setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

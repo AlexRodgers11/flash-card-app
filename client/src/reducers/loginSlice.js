@@ -125,9 +125,9 @@ export const loginSlice = createSlice({
             state.messages[action.payload.direction].push(action.payload.message);
         },
         editMessage: (state, action) => {
-            state.messages.map(message => {
-                if(message._id === action.payload._id) {
-                    return action.payload;
+            state.messages[action.payload.direction].map(message => {
+                if(message._id === action.payload.message._id) {
+                    return action.payload.message;
                 }
                 return message;
             });

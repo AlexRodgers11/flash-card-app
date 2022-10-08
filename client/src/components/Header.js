@@ -20,6 +20,11 @@ function Header() {
         setModalContent('message');
         setMessageId(id);
     }
+
+    const closeMessage = () => {
+        setModalContent('inbox');
+        setMessageId('');
+    }
     
     const handleClick = evt => {
         navigate(`/${evt.target.value}`);
@@ -86,7 +91,10 @@ function Header() {
                             modalContent === 'notifications' ?
                                 <div><NotificationList hideModal={handleHideModal} /></div>
                                 :
-                                <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId}/></div>
+                                <>
+                                    <button onClick={closeMessage}>Back to Inbox</button>
+                                    <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId}/></div>
+                                </>
                     }
                 </Modal>
             }

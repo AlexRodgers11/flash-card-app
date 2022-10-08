@@ -22,7 +22,7 @@ function Message(props) {
 	const [acceptanceStatus, setAcceptanceStatus] = useState('');
 
 	const acceptDeck = () => {
-		if(deckAcceptanceStatus !== 'pending') {
+		if(acceptanceStatus === 'pending') {
 			axios.post(`${baseURL}/groups/${receiver._id}/decks?accepted=true`, {idOfDeckToCopy: target._id})
 			.then((deckPostResponse) => {
 				let notification = {

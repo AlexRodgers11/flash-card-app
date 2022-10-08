@@ -21,30 +21,38 @@ function Message(props) {
 	const [read, setRead] = useState(false);
 	const [acceptanceStatus, setAcceptanceStatus] = useState('');
 
+	//may need to change this to just accept so card acceptance is same, and then choose route conditionally
 	const acceptDeck = () => {
 		if(acceptanceStatus === 'pending') {
-			axios.post(`${baseURL}/groups/${receiver._id}/decks?accepted=true`, {idOfDeckToCopy: target._id})
-			.then((deckPostResponse) => {
-				let notification = {
-					type: 'deck-approved',
-					read: false,
-					actor: userId,
-					groupTarget: receiver._id,
-					deckTarget: target._id
-				}
-				axios.post(`${baseURL}/users/${sender._id}/notifications`, notification)
-				 .then(() => {
-					props.hideModal();
-					//adds deck to decks slice of store, which is only desired if user is on Group page, could try to conditionally call this based on location or refactor how deckList is handled in store
-					dispatch(addDeck(deckPostResponse.data.newDeck));
-					dispatch(addActivity(deckPostResponse.data.newActivity));
-				 })
-				 .catch(notificationErr => {
-					console.error(notificationErr);
-				 });
+			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'accepted', messageType: 'DeckSubmission'})
+			.catch(err => {
+				console.error(err)
 			})
-			.catch(deckAddErr => {
-				console.error(deckAddErr);
+			.then(acceptanceResponse => {
+				axios.post(`${baseURL}/groups/${receiver._id}/decks?accepted=true`, {idOfDeckToCopy: target._id})
+				.then((deckPostResponse) => {
+					let notification = {
+						type: 'deck-approved',
+						read: false,
+						actor: userId,
+						groupTarget: receiver._id,
+						deckTarget: target._id
+					}
+					axios.post(`${baseURL}/users/${sender._id}/notifications`, notification)
+					.then(() => {
+						props.hideModal();
+						//adds deck to decks slice of store, which is only desired if user is on Group page, could try to conditionally call this based on location or refactor how deckList is handled in store
+						dispatch(addDeck(deckPostResponse.data.newDeck));
+						dispatch(addActivity(deckPostResponse.data.newActivity));
+						dispatch(editMessage({direction: 'sent', message:acceptanceResponse.data}));
+					})
+					.catch(notificationErr => {
+						console.error(notificationErr);
+					});
+				})
+				.catch(deckAddErr => {
+					console.error(deckAddErr);
+				});
 			});
 		} else {
 			alert(`This deck has already been ${acceptanceStatus}`);//need to change acceptance status in this function
@@ -58,7 +66,7 @@ function Message(props) {
 		axios.put(`${baseURL}/messages/${props.messageId}`, {user: userId})
 			.then(response => {
 				console.log(response.data);
-				dispatch(editMessage(response.data));
+				dispatch(editMessage({direction: 'sent', message: response.data}));
 			})
 			.catch(err => {
 				console.error(err);
@@ -108,11 +116,11 @@ function Message(props) {
 					let r = message.targetGroup;
 					setReceiver(r);
 					let t = message.targetDeck || message.targetCard || message.targetGroup;
-					setTarget(t);					
+					setTarget(t);				
+					//may not need conditional here	
 					if(message.content) {
 						setContent(message.content);
 					}
-					// setRead(message.read);
 					if(message.read.includes(userId)) {
 						setRead(true);
 					} else {

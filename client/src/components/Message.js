@@ -19,8 +19,7 @@ function Message(props) {
 	const [target, setTarget] = useState({});
 	const [content, setContent] = useState('');
 	const [read, setRead] = useState(false);
-	const [deckAcceptanceStatus, setDeckAcceptanceStatus] = useState('');
-	const [cardAcceptanceStatus, setCardAcceptanceStatus] = useState('');
+	const [acceptanceStatus, setAcceptanceStatus] = useState('');
 
 	const acceptDeck = () => {
 		if(deckAcceptanceStatus !== 'pending') {
@@ -48,7 +47,7 @@ function Message(props) {
 				console.error(deckAddErr);
 			});
 		} else {
-			alert(`This deck has already been ${deckAcceptanceStatus}`);//need to change acceptance status in this function
+			alert(`This deck has already been ${acceptanceStatus}`);//need to change acceptance status in this function
 		}
 		
 	}
@@ -118,6 +117,9 @@ function Message(props) {
 						setRead(true);
 					} else {
 						setRead(false);
+					}
+					if(message.acceptanceStatus) {
+						setAcceptanceStatus(message.acceptanceStatus);
 					}
 				})
 				.catch(err => {

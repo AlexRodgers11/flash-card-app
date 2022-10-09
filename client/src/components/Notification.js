@@ -34,6 +34,8 @@ function Notification(props) {
 		switch(notification.type) {
 			case 'deck-approved':
 				return <p onClick={handleClick}>{notification.actor.login.username} approved your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
+			case 'deck-denied':
+				return <p onClick={handleClick}>{notification.actor.login.username} denied your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
 			default:
 				return null
 		}

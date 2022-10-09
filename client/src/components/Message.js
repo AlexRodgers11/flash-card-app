@@ -22,6 +22,7 @@ function Message(props) {
 	const [acceptanceStatus, setAcceptanceStatus] = useState('');
 
 	//may need to change this to just accept so card acceptance is same, and then choose route conditionally
+
 	const acceptDeck = () => {
 		if(acceptanceStatus === 'pending') {
 			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'accepted', messageType: 'DeckSubmission'})
@@ -57,7 +58,34 @@ function Message(props) {
 		} else {
 			alert(`This deck has already been ${acceptanceStatus}`);//need to change acceptance status in this function
 		}
-		
+	}
+
+	const denyDeck = () => {
+		if(acceptanceStatus === 'pending') {
+			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'denied', messageType: 'DeckSubmission'})
+			.catch(err => {
+				console.error(err)
+			})
+			.then(acceptanceResponse => {
+				let notification = {
+					type: 'deck-denied',
+					read: false,
+					actor: userId,
+					groupTarget: receiver._id,
+					deckTarget: target._id
+				}
+				axios.post(`${baseURL}/users/${sender._id}/notifications`, notification)
+					.then(() => {
+						props.hideModal();
+						dispatch(editMessage({direction: 'sent', message:acceptanceResponse.data}));
+					})
+					.catch(notificationErr => {
+						console.error(notificationErr);
+					});
+			});
+		} else {
+			alert(`This deck has already been ${acceptanceStatus}`);//need to change acceptance status in this function
+		}
 	}
 	
 	const expandMessage = () => {
@@ -83,7 +111,7 @@ function Message(props) {
 						{props.fullView ? 
 							<div>
 								<p><span>{sender.login.username}</span> would like to add deck: {target.name} to <span>{receiver.name}</span></p>
-								<button onClick={acceptDeck}>Accept</button><button>Decline</button><button onClick={reviewDeck}>View</button>
+								<button onClick={acceptDeck}>Accept</button><button onClick={denyDeck}>Decline</button><button onClick={reviewDeck}>View</button>
 								
 							</div>
 							:

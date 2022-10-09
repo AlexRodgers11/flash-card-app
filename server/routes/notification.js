@@ -50,6 +50,31 @@ notificationRouter.get("/:notificationId", (req, res, next) => {
                     throw deckApprovalPopulationError;
                 });
                 break; 
+            case 'deck-denied':
+                notification.populate(
+                    [
+                        {
+                            path: 'actor',
+                            select: 'login.username name.first name.last'
+                        },
+                        {
+                            path: 'groupTarget',
+                            select: 'name'
+                        },
+                        {
+                            path: 'deckTarget',
+                            select: 'name'
+                        }
+                    ]
+                )
+                .then(notification => {
+                    res.status(200).send(notification);
+                })
+                .catch(deckApprovalPopulationError => {
+                    res.status(500).send("There was an error with your request");
+                    throw deckApprovalPopulationError;
+                });
+                break;
             default:
                 res.status(500).send("There was an error with your request");
                 break;

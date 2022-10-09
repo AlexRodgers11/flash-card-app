@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router'
-import { addActivity, fetchGroupData } from '../reducers/groupSlice';
+import { useNavigate, useParams } from 'react-router';
+import useFormInput from '../hooks/useFormInput';
+import { addActivity, fetchGroupData, updateJoinCode } from '../reducers/groupSlice';
 import DeckList from './DeckList';
 import ActivityList from './ActivityList';
 import GroupMemberList from './GroupMemberList';
@@ -11,20 +12,29 @@ import axios from 'axios';
 import { addDeck } from '../reducers/decksSlice';
 import { addMessage } from '../reducers/loginSlice';
 
+
 const baseURL = 'http://localhost:8000';
 
 function Group() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    let { groupId } = useParams();
+    const { groupId } = useParams();
     const [showModal, toggleShowModal] = useToggle(false);
-    let userId = useSelector((state) => state.login.userId);
-    let decks = useSelector((state) => state.login.decks);
-    let storedGroupId = useSelector((state) => state.group.groupId);
-    let groupName = useSelector((state) => state.group.name);
-    let groupMemberIds = useSelector((state) => state.group.memberIds);
-    let administrators = useSelector((state) => state.group.administrators);
-    let activityIds = useSelector((state) => state.group.activity);
+    const userId = useSelector((state) => state.login.userId);
+    const decks = useSelector((state) => state.login.decks);
+    const storedGroupId = useSelector((state) => state.group.groupId);
+    const groupName = useSelector((state) => state.group.name);
+    const groupMemberIds = useSelector((state) => state.group.memberIds);
+    const administrators = useSelector((state) => state.group.administrators);
+    const activityIds = useSelector((state) => state.group.activity);
+    const joinCode = useSelector((state) => state.group.joinCode);
+    const [joinCodeEditMode, toggleJoinCodeEditMode] = useToggle(false);
+    const [joinCodeInputValue, clearJoinCodeInputValue, handleChangeJoinCodeInputValue, setJoinCodeInputValue] = useFormInput("");
+    
+    const cancelJoinCodeChange = () => {
+        toggleJoinCodeEditMode();
+        clearJoinCodeInputValue();
+    }
     
     const chooseDeck = evt => {
         if(administrators.includes(userId)) {
@@ -48,7 +58,6 @@ function Group() {
             }
             axios.post(`${baseURL}/groups/${groupId}/messages/admin`, message)
                 .then((response) => {
-                    console.log(response.data);
                     dispatch(addMessage({message: response.data._id, direction: 'sent'}));
                     toggleShowModal();
                 })
@@ -62,6 +71,12 @@ function Group() {
         navigate(`/users/${userId}/decks/new`);
     }
 
+    const handleSaveJoinCode = () => {
+        toggleJoinCodeEditMode();
+        dispatch(updateJoinCode({groupId, code: joinCodeInputValue}));
+        clearJoinCodeInputValue();
+    }
+
     useEffect(() => {
         if(!storedGroupId || storedGroupId !== groupId) {
             dispatch(fetchGroupData(groupId));
@@ -71,6 +86,20 @@ function Group() {
     return (
         <div>
             <p>{groupName}</p>
+            {!administrators.includes(userId) ? 
+                null
+                :
+                <p>Join code:
+                    {joinCodeEditMode ? 
+                        <form onSubmit={handleSaveJoinCode}><input onChange={handleChangeJoinCodeInputValue} value={joinCodeInputValue} /><button type="submit">Save</button><button onClick={cancelJoinCodeChange}>Cancel</button></form>
+                        :
+                        joinCode ? 
+                            <><span> {joinCode} </span><button onClick={toggleJoinCodeEditMode}>Change</button></> 
+                            : 
+                            <button onClick={toggleJoinCodeEditMode}>Set Join Code</button>
+                    }
+                </p>
+            }
             <h3>Administrators:</h3>
             <GroupMemberList groupMemberIds={administrators} />
             <h3>Activity:</h3>

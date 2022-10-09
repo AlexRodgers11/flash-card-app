@@ -278,7 +278,7 @@ groupRouter.delete("/:groupId", (req, res, next) => {
 });
 
 groupRouter.put("/:groupId", (req, res, next) => {
-    Group.findByIdAndUpdate(req.group._id, req.body, (err, group) => {
+    Group.findByIdAndUpdate(req.group._id, req.body, {new:true}, (err, group) => {
         if(err) {
             res.status(500).send("There was an error with your request");
             throw err;

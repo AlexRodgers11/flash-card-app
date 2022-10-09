@@ -10,8 +10,9 @@ const MessageSchema = new Schema({
 //I think all the model strings should be capitalized
 const Message = mongoose.model('Message', MessageSchema);
 
-const DirectMessage = Message.discriminator("DirectMessage", new Schema({
-    message: String,     
+const CardSubmission = Message.discriminator("CardSubmission", new Schema({
+    acceptanceStatus: String,
+    targetDeck: {type: Schema.Types.ObjectId, ref: "deck"},
 }));
 
 const DeckSubmission = Message.discriminator("DeckSubmission", new Schema({
@@ -20,9 +21,13 @@ const DeckSubmission = Message.discriminator("DeckSubmission", new Schema({
     targetGroup: {type: Schema.Types.ObjectId, ref: "group"},
 }));
 
-const CardSubmission = Message.discriminator("CardSubmission", new Schema({
-    acceptanceStatus: String,
-    targetDeck: {type: Schema.Types.ObjectId, ref: "deck"},
+const DirectMessage = Message.discriminator("DirectMessage", new Schema({
+    message: String,     
 }));
 
-export { Message, DirectMessage, DeckSubmission, CardSubmission};
+const JoinRequest = Message.discriminator("JoinRequest", new Schema({
+    acceptanceStatus: String,
+    targetGroup: {type: Schema.Types.ObjectId, ref: "group"}
+}));
+
+export { CardSubmission, DeckSubmission, DirectMessage, JoinRequest, Message };

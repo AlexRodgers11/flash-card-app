@@ -30,6 +30,7 @@ function Group() {
     const joinCode = useSelector((state) => state.group.joinCode);
     const [joinCodeEditMode, toggleJoinCodeEditMode] = useToggle(false);
     const [joinCodeInputValue, clearJoinCodeInputValue, handleChangeJoinCodeInputValue, setJoinCodeInputValue] = useFormInput("");
+
     
     const cancelJoinCodeChange = () => {
         toggleJoinCodeEditMode();
@@ -79,9 +80,9 @@ function Group() {
 
     useEffect(() => {
         if(!storedGroupId || storedGroupId !== groupId) {
-            dispatch(fetchGroupData(groupId));
+            dispatch(fetchGroupData({groupId, userId}));
         }
-    }, [storedGroupId, groupId, dispatch]);
+    }, [dispatch, groupId, storedGroupId, userId]);
 
     return (
         <div>

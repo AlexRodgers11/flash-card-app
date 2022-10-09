@@ -13,9 +13,9 @@ const initialState = {
     joinCode: ""
 };
 
-export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async (groupId) => {
+export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({groupId, userId}) => {
     try {
-        const response = await axios.get(`${baseURL}/groups/${groupId}`);
+        const response = await axios.get(`${baseURL}/groups/${groupId}?requestingUser=${userId}`);
         return {
             groupId: response.data._id,
             name: response.data.name,

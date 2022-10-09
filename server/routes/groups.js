@@ -71,7 +71,10 @@ groupRouter.get("/:groupId", (req, res, next) => {
             memberCount: req.group.members.length,
             deckCount: req.group.decks.length
         }
-    } else {
+    } else if(req.query.requestingUser) {
+        if(!req.group.administrators.includes(req.query.requestingUser)) {
+            req.group.joinCode = '';
+        }
         response = req.group;
     }
     res.status(200).send(response);

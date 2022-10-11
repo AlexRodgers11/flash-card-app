@@ -89,7 +89,7 @@ groupRouter.get("/:groupId/decks", (req, res, next) => {
 });
 
 groupRouter.post("/:groupId/decks", (req, res, next) => {
-    if(req.query.accepted) {
+    if(req.query.approved) {
         Deck.findById(req.body.idOfDeckToCopy)
             .then(foundDeck => {
                 let deckCopy = new Deck();
@@ -309,7 +309,7 @@ groupRouter.post("/:groupId/members", (req, res, next) => {
                         res.status(500).send("There was an error with your request");
                         throw err;
                     } else {
-                        res.status(200).send(user);
+                        res.status(200).send(user._id);
                     }
                 });
             }

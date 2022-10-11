@@ -25,12 +25,12 @@ function Message(props) {
 
 	const acceptDeck = () => {
 		if(acceptanceStatus === 'pending') {
-			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'accepted', messageType: 'DeckSubmission'})
+			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'approved', messageType: 'DeckSubmission'})
 			.catch(err => {
 				console.error(err)
 			})
 			.then(acceptanceResponse => {
-				axios.post(`${baseURL}/groups/${receiver._id}/decks?accepted=true`, {idOfDeckToCopy: target._id})
+				axios.post(`${baseURL}/groups/${receiver._id}/decks?approved=true`, {idOfDeckToCopy: target._id})
 				.then((deckPostResponse) => {
 					let notification = {
 						type: 'DeckDecision',

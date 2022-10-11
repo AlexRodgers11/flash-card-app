@@ -38,7 +38,7 @@ function Group() {
     }
     
     const chooseDeck = evt => {
-        if(administrators.includes(userId)) {
+        if(administrators?.includes(userId)) {
             axios.get(`${baseURL}/decks/${evt.target.id}`)
             .then((response) => {
                 axios.post(`${baseURL}/groups/${groupId}/decks`, response.data)
@@ -52,7 +52,7 @@ function Group() {
             .catch(err => console.error(err));
         } else {
             let message = {
-                type: "add-deck-request",
+                requestType: "DeckSubmission",
                 sendingUser: userId,
                 targetGroup: groupId,
                 targetDeck: evt.target.id
@@ -78,45 +78,72 @@ function Group() {
         clearJoinCodeInputValue();
     }
 
+    const sendJoinRequest = () => {
+        const message = {
+            requestType: "JoinRequest",
+            sendingUser: userId,
+            targetGroup: groupId
+        }
+        axios.post(`${baseURL}/groups/${groupId}/messages/admin`, message)
+            .then(response => {
+                dispatch(addMessage({message: response.data._id, direction: 'sent'}));
+                //eventually need to make group able to be private (or maybe be private by default. If private, instead of routing to Group show modal stating group is private, with optional join button, if group allows join requests)
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+
     useEffect(() => {
         if(!storedGroupId || storedGroupId !== groupId) {
             dispatch(fetchGroupData({groupId, userId}));
         }
     }, [dispatch, groupId, storedGroupId, userId]);
 
-    return (
-        <div>
-            <p>{groupName}</p>
-            {!administrators.includes(userId) ? 
-                null
-                :
-                <p>Join code:
-                    {joinCodeEditMode ? 
-                        <form onSubmit={handleSaveJoinCode}><input onChange={handleChangeJoinCodeInputValue} value={joinCodeInputValue} /><button type="submit">Save</button><button onClick={cancelJoinCodeChange}>Cancel</button></form>
-                        :
-                        joinCode ? 
-                            <><span> {joinCode} </span><button onClick={toggleJoinCodeEditMode}>Change</button></> 
-                            : 
-                            <button onClick={toggleJoinCodeEditMode}>Set Join Code</button>
-                    }
-                </p>
-            }
-            <h3>Administrators:</h3>
-            <GroupMemberList groupMemberIds={administrators} />
-            <h3>Activity:</h3>
-            <ActivityList activityIds={activityIds}/>
-            <GroupMemberList groupMemberIds={groupMemberIds} />
-            <button onClick={toggleShowModal}>{!administrators.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
-            {!showModal ?
-                null
-                :
-                <Modal hideModal={toggleShowModal}>
-                    {decks.map(deck => <span key={deck._id} id={deck._id} onClick={chooseDeck}>{deck.name}</span>)}<button onClick={goToCreateNew}>Create new deck</button>
-                </Modal>
-            }
-            <DeckList listType="group" listId={groupId} />
-        </div>
-  )
+    if(groupMemberIds?.includes(userId)) {
+        return (
+            <div>
+                <p>{groupName}</p>
+                {!administrators?.includes(userId) ? 
+                    <button onClick={sendJoinRequest}>Request to Join Group</button>
+                    :
+                    <p>Join code:
+                        {joinCodeEditMode ? 
+                            <form onSubmit={handleSaveJoinCode}><input onChange={handleChangeJoinCodeInputValue} value={joinCodeInputValue} /><button type="submit">Save</button><button onClick={cancelJoinCodeChange}>Cancel</button></form>
+                            :
+                            joinCode ? 
+                                <><span> {joinCode} </span><button onClick={toggleJoinCodeEditMode}>Change</button></> 
+                                : 
+                                <button onClick={toggleJoinCodeEditMode}>Set Join Code</button>
+                        }
+                    </p>
+                }
+                <h3>Administrators:</h3>
+                <GroupMemberList groupMemberIds={administrators} />
+                <h3>Activity:</h3>
+                <ActivityList activityIds={activityIds}/>
+                <GroupMemberList groupMemberIds={groupMemberIds} />
+                <button onClick={toggleShowModal}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
+                {!showModal ?
+                    null
+                    :
+                    <Modal hideModal={toggleShowModal}>
+                        {decks.map(deck => <span key={deck._id} id={deck._id} onClick={chooseDeck}>{deck.name}</span>)}<button onClick={goToCreateNew}>Create new deck</button>
+                    </Modal>
+                }
+                <DeckList listType="group" listId={groupId} />
+            </div>
+      )
+    } else {
+        return (
+            <div>
+                <p>This group is Private</p>
+                <button onClick={sendJoinRequest}>Request to Join Group</button>
+            </div>
+        )
+    }
+
+    
 }
 
 export default Group

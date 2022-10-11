@@ -13,6 +13,7 @@ const initialState = {
     joinCode: ""
 };
 
+//possibly add private property to group (classroom would default to private)
 export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({groupId, userId}) => {
     try {
         const response = await axios.get(`${baseURL}/groups/${groupId}?requestingUser=${userId}`);
@@ -55,8 +56,10 @@ export const groupSlice = createSlice({
     initialState,
     reducers: {
         addActivity: (state, action) => {
-            console.log(action);
             state.activity = [...state.activity, action.payload.activityId];
+        },
+        addMember: (state, action) => {
+            state.memberIds = [...state.memberIds, action.payload.user._id];
         }
     },
     extraReducers: (builder) => {
@@ -76,6 +79,6 @@ export const groupSlice = createSlice({
     }
 });
 
-export const { addActivity } = groupSlice.actions;
+export const { addActivity, addMember } = groupSlice.actions;
 
 export default groupSlice.reducer;

@@ -21,9 +21,14 @@ function Notification(props) {
 	const handleClick = () => {
 		//make sure hiding Modal and thus destroying component chain won't short circuit navigation call if using React 18's concurrency
 		props.hideModal();
-		switch(notification.type) {
-			case 'deck-approved':
-				navigate(`/groups/${notification.groupTarget._id}`);
+		// switch(notification.type) {
+		switch(notification.__t) {
+			// case 'deck-approved':
+			case 'DeckSubmission':
+				// if(notification.decision === 'accepted') {
+				if(notification.decision === 'approved') {
+					navigate(`/groups/${notification.groupTarget._id}`);
+				}
 				break;
 			default:
 				break;
@@ -31,11 +36,14 @@ function Notification(props) {
 	}
 	
 	const renderNotification = () => {
-		switch(notification.type) {
-			case 'deck-approved':
-				return <p onClick={handleClick}>{notification.actor.login.username} approved your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
-			case 'deck-denied':
-				return <p onClick={handleClick}>{notification.actor.login.username} denied your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
+		// switch(notification.type) {
+		switch(notification.__t) {
+			case 'DeckDecision':
+				return <p onClick={handleClick}>{notification.actor.login.username} {notification.decision} your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
+			// case 'deck-approved':
+			// 	return <p onClick={handleClick}>{notification.actor.login.username} approved your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
+			// case 'deck-denied':
+			// 	return <p onClick={handleClick}>{notification.actor.login.username} denied your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
 			default:
 				return null
 		}

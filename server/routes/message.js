@@ -1,6 +1,6 @@
 import express from "express";
 const messageRouter = express.Router();
-import { DeckSubmission, DirectMessage, Message } from "../models/message.js";
+import { DeckSubmission, DirectMessage, JoinRequest, Message } from "../models/message.js";
 
 
 messageRouter.param("messageId", (req, res, next, messageId) => {
@@ -78,6 +78,8 @@ messageRouter.put('/:messageId', (req, res, next) => {
         case 'DirectMessage':
             DirectMessage.findByIdAndUpdate(req.message._id, updateObj, options, callback);
             break;
+        case 'JoinRequest':
+            JoinRequest.findByIdAndUpdate(req.message._id, updateObj, options, callback);
         default:
             Message.findByIdAndUpdate(req.message._id, updateObj, options, callback);
             break;

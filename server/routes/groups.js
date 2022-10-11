@@ -295,8 +295,8 @@ groupRouter.put("/:groupId", (req, res, next) => {
     });
 });
 
-groupRouter.post("/:groupId", (req, res, next) => {
-    User.findById(req.body._id, (err, user) => {
+groupRouter.post("/:groupId/members", (req, res, next) => {
+    User.findById(req.body.user, (err, user) => {
         if(err) {
             res.status(500).send("There was an error with your request");
             throw err;

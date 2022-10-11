@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDeck } from '../reducers/decksSlice';
-import { addActivity } from '../reducers/groupSlice';
+import { addActivity, addMember } from '../reducers/groupSlice';
 import { editMessage } from '../reducers/loginSlice';
 
 const baseURL = 'http://localhost:8000';
@@ -87,6 +87,72 @@ function Message(props) {
 			});
 		} else {
 			alert(`This deck has already been ${acceptanceStatus}`);//need to change acceptance status in this function
+		}
+	}
+
+	const acceptJoinRequest = () => {
+		if(acceptanceStatus === 'pending') {
+			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'approved', messageType: 'JoinRequest'})
+			.catch(err => {
+				console.error(err);
+			})
+			.then(acceptanceResponse => {
+				axios.post(`${baseURL}/groups/${receiver._id}/members`, {user: sender._id})
+				.catch(addMemberErr => {
+					console.error(addMemberErr);
+				})
+				.then(memberPostResponse => {
+					let notification = {
+						type: 'JoinDecision', 
+						decision: 'approved',
+						read: false,
+						actor: userId,
+						groupTarget: receiver._id,
+					}
+					axios.post(`${baseURL}/users/${sender._id}/notifications`, notification)
+					.catch(notificationPostErr => {
+						console.error(notificationPostErr);
+					})
+					.then(() => {
+						dispatch(editMessage({direction: 'sent', message: acceptanceResponse.data}));
+						dispatch(addMember(memberPostResponse.data));
+					});
+				})
+				.catch(notificationErr => {
+					console.error(notificationErr);
+				})
+			})
+		}
+	}
+	
+	const denyJoinRequest = () => {
+		if(acceptanceStatus === 'pending') {
+			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'denied', messageType: 'JoinRequest'})
+			.catch(err => {
+				console.error(err);
+			})
+			.then(acceptanceResponse => {
+				let notification = {
+					type: 'JoinDecision', 
+					decision: 'denied',
+					read: false,
+					actor: userId,
+					groupTarget: receiver._id,
+					
+				}
+				axios.post(`${baseURL}/users/${sender._id}/notifications`, notification)
+					.catch(notificationPostErr => {
+						console.error(notificationPostErr);
+					})
+					.then(() => {
+						dispatch(editMessage({direction: 'sent', message: acceptanceResponse.data}));
+					});
+			})
+			.catch(notificationErr => {
+				console.error(notificationErr);
+			})
+		} else {
+			alert(`User's request to join has already been ${acceptanceStatus}`);
 		}
 	}
 	

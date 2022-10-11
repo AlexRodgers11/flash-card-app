@@ -5,7 +5,7 @@ import Activity from "../models/activity.js";
 import Card from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
-import { DeckSubmission } from "../models/message.js";
+import { DeckSubmission, JoinRequest } from "../models/message.js";
 import User from "../models/user.js";
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
@@ -74,8 +74,12 @@ groupRouter.get("/:groupId", (req, res, next) => {
     } else if(req.query.requestingUser) {
         if(!req.group.administrators.includes(req.query.requestingUser)) {
             req.group.joinCode = '';
+        } else if(!req.group.members.includes(req.query.requestingUser)) {
+            res.status(401).send("Unauthorized: Only members of this group may view its page");
         }
         response = req.group;
+    } else {
+        res.status(401).send("Unauthorized: Only members of this group may view its page");
     }
     res.status(200).send(response);
 });

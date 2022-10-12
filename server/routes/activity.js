@@ -7,13 +7,11 @@ activityRouter.param("activityId", (req, res, next, activityId) => {
     Activity.findById(activityId, (err, activity) => {
         if(err) {
             res.status(500).send("There was an error with your request");
+        } else if(!activity) {
+            res.status(404).send("Activity not found");
         } else {
-            if(!activity) {
-                res.status(404).send("Activity not found");
-            } else {
-                req.activity = activity;
-                next();
-            }
+            req.activity = activity;
+            next();
         }
     });
 });
@@ -28,6 +26,7 @@ activityRouter.get("/:activityId", (req, res, next) => {
         })
         .catch(err => {
             res.status(500).send("There was an error with your request");
+            throw err;
         });
 });
 
@@ -37,7 +36,7 @@ activityRouter.delete("/:activityId", (req, res, next) => {
             res.status(500).send("There was an error with your request");
             throw err;
         } 
-        res.status(200).send("Activity deleted");
+        res.status(200).send(`Activity ${activity._id}`);
     });
 });
 

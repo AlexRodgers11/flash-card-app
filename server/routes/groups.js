@@ -93,7 +93,7 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
             let foundDeck = await Deck.findById(req.body.idOfDeckToCopy);
             let deckCopy = new Deck();
             deckCopy.name = foundDeck.name;
-            deckCopy.publiclyAvailable = foundDeck.publiclyAvailable || false;
+            deckCopy.publiclyAvailable = false;
             deckCopy.creator = foundDeck.creator;
             deckCopy.cards = foundDeck.cards;
             deckCopy.permissions = foundDeck.permissions;
@@ -143,7 +143,7 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
             newActivity.deckTarget = deck._id;
             const activity = await newActivity.save();
 
-            await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
+            await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activities: activity._id}})
             res.status(200).send({
                 newDeck: deck._id,
                 newActivity: activity._id
@@ -169,7 +169,7 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
             newActivity.groupTarget = req.group._id;
             newActivity.deckTarget = deck._id
             const activity = await newActivity.save();
-            await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}});
+            await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activities: activity._id}});
             res.status(200).send({
                 newDeck: deck._id,
                 newActivity: activity._id
@@ -404,7 +404,7 @@ groupRouter.delete("/:groupId", async (req, res, next) => {
     try {
         const group = await Group.findByIdAndDelete(req.group._id);
         await Deck.deleteMany({_id: {$in: req.group.decks}});
-        await Activity.deleteMany({_id: {$in: req.group.activity}});
+        await Activity.deleteMany({_id: {$in: req.group.activities}});
         await User.updateMany({_id: {$in: req.group.members}}, {$pull: {groups: req.group._id}});
         await User.updateMany({_id: {$in: req.group.administrators}}, {$pull: {adminOf: req.group._id}});
         res.status(200).send(group);

@@ -9,7 +9,7 @@ const initialState = {
     memberIds: [],
     creator: "",
     administrators: [],
-    activity: [],
+    activities: [],
     joinCode: ""
 };
 
@@ -23,7 +23,7 @@ export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({g
             creator: response.data.creator,
             administrators: response.data.administrators,
             memberIds: [...response.data.members],
-            activity: response.data.activity,
+            activities: response.data.activities,
             joinCode: response.data.joinCode
         }
     } catch (err) {
@@ -56,7 +56,7 @@ export const groupSlice = createSlice({
     initialState,
     reducers: {
         addActivity: (state, action) => {
-            state.activity = [...state.activity, action.payload.activityId];
+            state.activities = [...state.activities, action.payload.activityId];
         },
         addMember: (state, action) => {
             state.memberIds = [...state.memberIds, action.payload.user._id];
@@ -69,7 +69,7 @@ export const groupSlice = createSlice({
             state.memberIds = action.payload.memberIds;
             state.creator = action.payload.creator;
             state.administrators = action.payload.administrators;
-            state.activity = action.payload.activity;
+            state.activities = action.payload.activities;
             state.joinCode = action.payload.joinCode;
         });
         builder.addCase(updateJoinCode.fulfilled, (state, action) => {

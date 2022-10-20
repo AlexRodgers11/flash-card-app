@@ -26,7 +26,7 @@ function Group() {
     const groupName = useSelector((state) => state.group.name);
     const groupMemberIds = useSelector((state) => state.group.memberIds);
     const administrators = useSelector((state) => state.group.administrators);
-    const activityIds = useSelector((state) => state.group.activity);
+    const activityIds = useSelector((state) => state.group.activities);
     const joinCode = useSelector((state) => state.group.joinCode);
     const [joinCodeEditMode, toggleJoinCodeEditMode] = useToggle(false);
     const [joinCodeInputValue, clearJoinCodeInputValue, handleChangeJoinCodeInputValue, setJoinCodeInputValue] = useFormInput("");

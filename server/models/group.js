@@ -8,7 +8,7 @@ const Group = new Schema({
     administrators: [{type: Schema.Types.ObjectId, ref: "user"}],
     members: [{type: Schema.Types.ObjectId, ref: "user"}],
     decks: [{type: Schema.Types.ObjectId, ref: "deck"}],
-    activity: [{type: Schema.Types.ObjectId, ref: "activity"}],
+    activities: [{type: Schema.Types.ObjectId, ref: "activity"}],
     joinCode: String
 }, {timestamps: true});
 

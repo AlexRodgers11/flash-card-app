@@ -350,7 +350,7 @@ userRouter.post("/:userId/attempts", async (req, res, next) => {
     try {
         const newAttempt = new Attempt(req.body);
         const attempt = await newAttempt.save();
-        await User.findByIdAndDelete(req.user._id, {$push: {attempts: attempt}});
+        await User.findByIdAndUpdate(req.user._id, {$push: {attempts: attempt}});
         res.status(200).send(attempt);
     } catch (err) {
         res.status(500).send("There was an error with your request");

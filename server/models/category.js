@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const Category = new Schema({
     name: String,
-    decks: [{type: Schema.Types.ObjectId, ref: "deck"}]
+    decks: [{type: Schema.Types.ObjectId, ref: "Deck"}]
 }, {timestamps: true});
 
-export default mongoose.model("category", Category);
+export default mongoose.model("Category", Category);

@@ -13,15 +13,15 @@ const User = new Schema({
     },
     email: String,
     photo: String,
-    decks: [{type: Schema.Types.ObjectId, ref: "deck"}],
-    groups: [{type: Schema.Types.ObjectId, ref: "group"}],
-    attempts: [{type: Schema.Types.ObjectId, ref: "attempt"}],
+    decks: [{type: Schema.Types.ObjectId, ref: "Deck"}],
+    groups: [{type: Schema.Types.ObjectId, ref: "Group"}],
+    attempts: [{type: Schema.Types.ObjectId, ref: "Attempt"}],
     messages: {
-        sent: [{type: Schema.Types.ObjectId, ref: "message"}],
-        received: [{type: Schema.Types.ObjectId, ref: "message"}]
+        sent: [{type: Schema.Types.ObjectId, ref: "Message"}],
+        received: [{type: Schema.Types.ObjectId, ref: "Message"}]
     },
-    notifications: [{type: Schema.Types.ObjectId, ref: "notification"}],
-    adminOf: [{type: Schema.Types.ObjectId, ref: "group"}]
+    notifications: [{type: Schema.Types.ObjectId, ref: "Notification"}],
+    adminOf: [{type: Schema.Types.ObjectId, ref: "Group"}]
 }, {timestamps: true});
 
-export default mongoose.model("user", User);
+export default mongoose.model("User", User);

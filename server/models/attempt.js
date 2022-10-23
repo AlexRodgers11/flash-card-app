@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const Attempt = new Schema({
-    user: {type: Schema.Types.ObjectId, ref: "user"},
-    deck: {type: Schema.Types.ObjectId, ref: "deck"},
+    user: {type: Schema.Types.ObjectId, ref: "User"},
+    deck: {type: Schema.Types.ObjectId, ref: "Deck"},
     datePracticed: Date,
     cards: [{
         cardId: String,
@@ -12,5 +12,5 @@ const Attempt = new Schema({
     }]
 }, {timestamps: true});
 
-const attemptModel = mongoose.model("attempt", Attempt);
+const attemptModel = mongoose.model("Attempt", Attempt);
 export default attemptModel;

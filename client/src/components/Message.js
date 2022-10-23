@@ -206,7 +206,8 @@ function Message(props) {
 				.then((response) => {
 					let message = response.data;
 					// setMessageType(message.type);
-					setMessageType(message.__t);
+					// setMessageType(message.__t);
+					setMessageType(message.message);
 					let s = message.sendingUser || message.sendingGroup;
 					setSender(s);
 					let r = message.targetGroup;

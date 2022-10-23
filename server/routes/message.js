@@ -24,9 +24,10 @@ messageRouter.get("/:messageId", (req, res, next) => {
             console.error(err);
             throw err;
         }
-        switch(message.__t) {
+        // switch(message.__t) {
+        switch(message.message) {
             case 'DeckSubmission':
-                message.populate(
+            message.populate(
                     [
                         {
                             path: 'sendingUser',

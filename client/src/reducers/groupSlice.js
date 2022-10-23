@@ -56,7 +56,9 @@ export const groupSlice = createSlice({
     initialState,
     reducers: {
         addActivity: (state, action) => {
-            state.activities = [...state.activities, action.payload.activityId];
+            if(action.payload.groupId === state.groupId) {
+                state.activities = [...state.activities, action.payload.activityId];
+            }
         },
         addMember: (state, action) => {
             state.memberIds = [...state.memberIds, action.payload.user._id];

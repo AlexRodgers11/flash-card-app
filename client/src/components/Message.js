@@ -13,6 +13,7 @@ function Message(props) {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const userId = useSelector((state) => state.login.userId);
+	const deckListType = useSelector((state) => state.decks.listType);
 	const [messageType, setMessageType] = useState('');
 	const [sender, setSender] = useState({});
 	const [receiver, setReceiver] = useState({});
@@ -43,9 +44,11 @@ function Message(props) {
 					axios.post(`${baseURL}/users/${sender._id}/notifications`, notification)
 					.then(() => {
 						props.hideModal();
-						//adds deck to decks slice of store, which is only desired if user is on Group page, could try to conditionally call this based on location or refactor how deckList is handled in store
-						dispatch(addDeck(deckPostResponse.data.newDeck));
-						dispatch(addActivity(deckPostResponse.data.newActivity));
+						if(deckListType === 'group') {
+							dispatch(addDeck({deckId: deckPostResponse.data.newDeck}));
+							dispatch(addActivity({activityId: deckPostResponse.data.newActivity, groupId: receiver._id}));
+						} 
+						
 						dispatch(editMessage({direction: 'sent', message:acceptanceResponse.data}));
 					})
 					.catch(notificationErr => {

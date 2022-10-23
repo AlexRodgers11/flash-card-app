@@ -3,7 +3,7 @@ const deckRouter = express.Router();
 import mongoose from "mongoose";
 
 import Attempt from "../models/attempt.js";
-import Card from "../models/card.js";
+import { FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import Category from "../models/category.js";
@@ -173,7 +173,22 @@ deckRouter.put("/:deckId", (req, res, next) => {
 });
 
 deckRouter.post("/:deckId/cards", async (req, res, next) => {
-    let newCard = new Card(req.body);
+    let cardType = req.body.cardType;
+    delete req.body.cardType;
+    let newCard;
+    switch(cardType) {
+        case "FlashCard":
+            newCard = new FlashCard(req.body);
+            break;
+        case "TrueFalseCard":
+            newCard = new TrueFalseCard(req.body);
+            break;
+        case "MultipleChoiceCard":
+            newCard = new MultipleChoiceCard(req.body);
+            break;
+        default:
+            res.status(500).send("Invalid card type selected");
+    }
     try {
         const card = await newCard.save();
         await Deck.findByIdAndUpdate(req.deck._id, {$push: {cards: card}});

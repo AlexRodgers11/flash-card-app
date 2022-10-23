@@ -23,7 +23,7 @@ function Card(props) {
                 <h3>Question: {cardData.question}</h3>
                 <p>Hint: {cardData.hint || 'No hint given'}</p>
                 <p>Correct Answer: {cardData.correctAnswer}</p>
-                {cardData.type !== 'multiple-choice' ?
+                {cardData.cardType !== 'multiple-choice' ?
                     null
                     :
                     <>

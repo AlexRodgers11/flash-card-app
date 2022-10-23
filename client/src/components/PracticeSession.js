@@ -12,11 +12,11 @@ const baseURL = 'http://localhost:8000';
 
 const createCard = (type, idx, func) => {
     switch(type) {
-        case 'flash': 
+        case 'FlashCard': 
             return <FlashCard answerCard={func} cardIndex={idx}/>
-        case 'true-false':
+        case 'TrueFalseCard':
             return <TrueFalseCard answerCard={func} cardIndex={idx}/>
-        case 'multiple-choice':
+        case 'MultipleChoiceCard':
             return <MultipleChoiceCard answerCard={func} cardIndex={idx}/>
         default:
             console.error("createCard function passed an invalid argument");
@@ -105,8 +105,8 @@ function PracticeSession() {
     return (
         <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
             <div style={{border: "1px solid black", marginTop:"5em", width: "30em", height:"40em"}}>
-                {practiceSet[attempts.length]?.type ? 
-                    createCard(practiceSet[attempts.length].type, attempts.length, handleAnswerCard) 
+                {practiceSet[attempts.length]?.cardType ? 
+                    createCard(practiceSet[attempts.length].cardType, attempts.length, handleAnswerCard) 
                     : 
                     <div>
                         {attempts.filter(attempt => !attempt.answeredCorrectly).length ? 

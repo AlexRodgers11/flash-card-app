@@ -7,7 +7,7 @@ const baseURL = 'http://localhost:8000';
 
 function CardForm(props) {
 	const [isLoaded, setIsLoaded] = useState(false);
-	const [type, clearType, handleChangeType, setType] = useFormInput("")
+	const [cardType, clearCardType, handleChangeCardType, setCardType] = useFormInput("")
 	const [question, clearQuestion, handleChangeQuestion, setQuestion] = useFormInput("");
 	const [hint, clearHint, handleChangeHint, setHint] = useFormInput("");
 	const [correctAnswer, clearCorrectAnswer, handleChangeCorrectAnswer, setCorrectAnswer] = useFormInput("");
@@ -18,7 +18,7 @@ function CardForm(props) {
 	const handleSubmit = evt => {
 		evt.preventDefault();
 		let card = {
-			type, 
+			cardType, 
 			question,
 			correctAnswer,
 			wrongAnswerOne,
@@ -26,7 +26,7 @@ function CardForm(props) {
 			wrongAnswerThree,
 			hint
 		}
-		clearType();
+		clearCardType();
 		clearQuestion();
 		clearHint();
 		clearCorrectAnswer();
@@ -42,13 +42,13 @@ function CardForm(props) {
 			axios.get(`${baseURL}/cards/${props.cardId}`)
 				.then((response) => {
 					let card = response.data;
-					setType(card.type);
+					setCardType(card.cardType);
 					setQuestion(card.question);
 					setCorrectAnswer(card.correctAnswer);
-					if(card.type !== "flash") {
+					if(card.cardType !== "FlashCard") {
 						setWrongAnswerOne(card.wrongAnswerOne);
 					}
-					if(card.type === "multiple-choice") {
+					if(card.cardType === "MultipleChoiceCard") {
 						setWrongAnswerTwo(card.wrongAnswerTwo);
 						setWrongAnswerThree(card.wrongAnswerThree);
 					}
@@ -63,7 +63,7 @@ function CardForm(props) {
 		} else {
 			console.log("final else condition met");
 		}
-	}, [isLoaded, props.cardId, setCorrectAnswer, setHint, setIsLoaded, setQuestion, setType, setWrongAnswerOne, setWrongAnswerThree, setWrongAnswerTwo]);
+	}, [isLoaded, props.cardId, setCorrectAnswer, setHint, setIsLoaded, setQuestion, setCardType, setWrongAnswerOne, setWrongAnswerThree, setWrongAnswerTwo]);
   
 	return (
 		<div>
@@ -74,11 +74,11 @@ function CardForm(props) {
 					<div>
 
 						<label htmlFor="type">Card Type: </label>
-                        <select id="type" name="type" value={type} onChange={handleChangeType}>
+                        <select id="type" name="type" value={cardType} onChange={handleChangeCardType}>
                             <option selected value={null}></option>
-                            <option value="flash">Flash Card</option>
-                            <option value="multiple-choice">Multiple Choice</option>
-                            <option value="true-false">True/False</option>
+                            <option value="FlashCard">Flash Card</option>
+                            <option value="MultipleChoiceCard">Multiple Choice</option>
+                            <option value="TrueFalseCard">True/False</option>
                         </select>
 					</div>
 					<div>
@@ -90,7 +90,7 @@ function CardForm(props) {
 						<textarea type='text' name='hint' id='hint' value={hint} onChange={handleChangeHint}/>
 					</div>
 					<div>
-						{type === 'true-false' ? 
+						{cardType === 'TrueFalseCard' ? 
 							<>
 								<label htmlFor="true-false-options">Answer</label>
 								<div id="true-false-options">
@@ -115,12 +115,12 @@ function CardForm(props) {
 							</>
 							:
 							<>
-								<label htmlFor="correct-answer">{type === 'multiple-choice' ? 'Correct ' : ''}Answer</label>
+								<label htmlFor="correct-answer">{cardType === 'MultipleChoiceCard' ? 'Correct ' : ''}Answer</label>
 								<textarea id="correct-answer" name="correct-answer" value={correctAnswer} onChange={handleChangeCorrectAnswer} />
 							</>
 						} 
 					</div>
-					{type !== 'multiple-choice' ?
+					{cardType !== 'MultipleChoiceCard' ?
 						null
 						:
 						<div>

@@ -1,7 +1,7 @@
 import express from "express";
 const cardRouter = express.Router();
 
-import Card from "../models/card.js";
+import { Card } from "../models/card.js";
 import Deck from "../models/deck.js";
 
 cardRouter.param("cardId", (req, res, next, cardId) => {

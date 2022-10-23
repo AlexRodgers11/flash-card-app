@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-// const Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 // const Card = new Schema({
 //     creator: {type: Schema.Types.ObjectId, ref: "user"},
@@ -19,10 +19,12 @@ import mongoose from "mongoose";
 
 // export default mongoose.model("card", Card);
 
-const Schema = mongoose.Schema;
+// const Schema = mongoose.Schema;
 
-const Card = new Schema({
-    creator: {type: Schema.Types.ObjectId, ref: "user"},
+const options = { discriminatorKey: 'cardType'}
+
+const CardSchema = new Schema({
+    creator: {type: Schema.Types.ObjectId, ref: "User"},
     // type: String,
     question: String,
     correctAnswer: String,
@@ -31,21 +33,23 @@ const Card = new Schema({
         numberCorrect: Number,
         numberIncorrect: Number
     }
-}, {discriminatorKey: "card-type"});
+}, {discriminatorKey: "cardType", timestamps: true});
 
-const FlashCard = new Card.discriminator("FlashCard", new Schema({
+const Card = mongoose.model("Card", CardSchema);
 
-}));
+const FlashCard = Card.discriminator("FlashCard", new Schema({
 
-const MultipleChoiceCard = new Card.discriminator("MultipleChoiceCard", new Schema({
+}, options));
+
+const MultipleChoiceCard = Card.discriminator("MultipleChoiceCard", new Schema({
     wrongAnswerOne: String,
     wrongAnswerTwo: String,
     wrongAnswerThree: String,
-}), {discriminatorKey: "card-type"});
+}), options);
 
-const TrueFalseCard = new Card.discriminator("TrueFalseCard", new Schema({
+const TrueFalseCard = Card.discriminator("TrueFalseCard", new Schema({
     wrongAnswerOne: String
-}));
+}, options));
 
 export { Card, FlashCard, MultipleChoiceCard, TrueFalseCard };
 

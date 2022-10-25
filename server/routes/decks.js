@@ -58,7 +58,7 @@ deckRouter.get("/:deckId", (req, res, next) => {
             } 
             let response = {
                 name: req.deck.name,
-                public: req.deck.public,
+                publiclyAvailable: req.deck.publiclyAvailable,
                 creator: user.login.username,
                 createdAt: req.deck.createdAt,
                 cardCount: req.deck.cards.length,

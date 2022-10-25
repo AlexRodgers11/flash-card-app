@@ -9,7 +9,7 @@ import Deck from "./models/deck.js";
 import Group from "./models/group.js";
 import User from "./models/user.js";
 import Activity from "./models/activity.js";
-import getRandomCardType from "./utils.js";
+import getRandomCardType, { generateJoinCode } from "./utils.js";
 const port = process.env.port || 8000;
 const router = express.Router();
 

@@ -38,8 +38,9 @@ export const updateGroup = createAsyncThunk("group/updateGroup", async({groupId,
         const response = await axios.put(`${baseURL}/groups/${groupId}`, groupUpdates);
         let stateUpdateObj = {};
         for(const key in groupUpdates) {
-            if(response.data.hasOwnProperty(key));
+            if(response.data.hasOwnProperty(key)) {
             stateUpdateObj[key] = response.data[key];
+            }
         }
         return stateUpdateObj;
     } catch (err) {

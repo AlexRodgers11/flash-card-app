@@ -30,7 +30,7 @@ import { ExtractJwt } from "passport-jwt";
 import { Strategy as JwtStrategy } from  "passport-jwt";
 import group from "./models/group.js";
 
-mongoose.connect("mongodb://localhost/flash-card-app-two", {
+mongoose.connect("mongodb://localhost/flash-card-app-three", {
 // mongoose.connect("mongodb://WOLVES-DEN:27017,WOLVES-DEN:27018,WOLVES-DEN:27019/flash-card?replicaSet=rs", {
     //use MongoDB's new connection string parser instead of the old deprecated one
     useNewUrlParser: true,
@@ -184,7 +184,8 @@ router.get("/seed-database", async(req, res, next) => {
                 let newGroup = new Group();
                 newGroup.name = faker.random.word() + Math.ceil(Math.random() * 100);
                 newGroup.decks = [];
-                newGroup.joinCode = Math.random() > .5 ? faker.random.word() : ''
+                newGroup.allowJoinWithCode = Math.random() > .5;
+                newGroup.joinCode = newGroup.allowJoinWithCode ? generateJoinCode() : '';
                 users.forEach(user => {
                     if(Math.random() > .993) {
                         newGroup.members.push(user._id);

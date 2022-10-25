@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addCard, deleteCard, editDeckName, editPubliclyAvailable, fetchDeck } from '../reducers/deckSlice';
+import { addCard, deleteCard, updateDeck, fetchDeck } from '../reducers/deckSlice';
 import { useNavigate, useParams } from 'react-router';
 import Card from './Card';
 import Modal from './Modal';
@@ -87,13 +87,7 @@ function Deck() {
     }
     
     const handleChangePubliclyAvailable = evt => {
-        let editedPubliclyAvailable = evt.target.value === "true";
-        axios.put(`${baseURL}/decks/${deckId}`, {public: editedPubliclyAvailable})
-            .then((response) => {
-                console.log(response.data);
-                dispatch(editPubliclyAvailable({publiclyAvailable: response.data.public}));
-            })
-            .catch(err => console.error(err));
+        dispatch(updateDeck({deckId, deckUpdates: {publiclyAvailable: !publiclyAvailable}}));
     }
     
     const handleToggleNameEditMode = () => {
@@ -112,7 +106,7 @@ function Deck() {
     const saveDeckNameChange = evt => {
         axios.put(`${baseURL}/decks/${deckId}`, {name: editedName})
             .then((response) => {
-                dispatch(editDeckName({name: response.data.name}));
+                dispatch(updateDeck({deckId, deckUpdates: {name: response.data.name}}));
                 clearEditedName();
                 toggleNameEditMode();
             })

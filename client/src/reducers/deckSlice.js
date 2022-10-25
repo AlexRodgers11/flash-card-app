@@ -30,6 +30,19 @@ export const fetchDeck = createAsyncThunk("deck/fetchDeck", async (deckId) => {
     }
 });
 
+export const updateDeck = createAsyncThunk("deck/updateDeck", async ({deckId, deckUpdates}) => {
+    try {
+        const response = await axios.put(`${baseURL}/decks/${deckId}`, deckUpdates);
+        const stateUpdateObj = {};
+        for(const key in deckUpdates) {
+            if(response.data.hasOwnProperty(key)) {
+                stateUpdateObj[key] = response.data[key];
+            }
+        }
+        return stateUpdateObj;
+    } catch (err) {}
+});
+
 export const deckSlice = createSlice({
     name: "deck",
     initialState,
@@ -39,12 +52,6 @@ export const deckSlice = createSlice({
         },
         deleteCard: (state, action) => {
             state.cards = state.cards.filter(cardId => cardId !== action.payload.cardId);
-        },
-        editDeckName: (state, action) => {
-            state.name = action.payload.name
-        },
-        editPubliclyAvailable: (state, action) => {
-            state.publiclyAvailable = action.payload.publiclyAvailable;
         }
     },
     extraReducers: (builder) => {
@@ -59,8 +66,15 @@ export const deckSlice = createSlice({
             state.permissions.copy = action.payload.permissions.copy;
             state.permissions.suggest = action.payload.permissions.suggest;
         });
+        builder.addCase(updateDeck.fulfilled, (state, action) => {
+            for(const key in action.payload) {
+                if(initialState.hasOwnProperty(key)) {
+                    state[key] = action.payload[key];
+                }
+            }
+        });
     }
 });
 
-export const { addCard, deleteCard, editDeckName, editPubliclyAvailable } = deckSlice.actions;
+export const { addCard, deleteCard } = deckSlice.actions;
 export default deckSlice.reducer;

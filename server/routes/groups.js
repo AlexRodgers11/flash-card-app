@@ -72,7 +72,7 @@ groupRouter.get("/:groupId", (req, res, next) => {
         }
     } else if(req.query.requestingUser) {
         if(!req.group.administrators.includes(req.query.requestingUser)) {
-            req.group.joinCode = '';
+            req.group.joinCode = 'only admins can view join codes';
         } else if(!req.group.members.includes(req.query.requestingUser)) {
             res.status(401).send("Unauthorized: Only members of this group may view its page");
         }
@@ -564,7 +564,7 @@ groupRouter.put("/:groupId", (req, res, next) => {
 
 groupRouter.post("/:groupId/members", async (req, res, next) => {
     try {
-        const user = await User.findById(req.body.user);
+        const user = await User.findById(req.body.userId);
         await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}});
         res.status(200).send(user._id);
     } catch (err) {

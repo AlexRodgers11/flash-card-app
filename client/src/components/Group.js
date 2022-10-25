@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
-import { addActivity, fetchGroupData, updateJoinCode } from '../reducers/groupSlice';
+import { addActivity, addMember, fetchGroupData, updateGroup } from '../reducers/groupSlice';
 import DeckList from './DeckList';
 import ActivityList from './ActivityList';
 import GroupMemberList from './GroupMemberList';
@@ -11,6 +11,7 @@ import useToggle from '../hooks/useToggle';
 import axios from 'axios';
 import { addDeck } from '../reducers/decksSlice';
 import { addMessage } from '../reducers/loginSlice';
+import { generateJoinCode } from '../utils';
 
 
 const baseURL = 'http://localhost:8000';
@@ -27,9 +28,11 @@ function Group() {
     const groupMemberIds = useSelector((state) => state.group.memberIds);
     const administrators = useSelector((state) => state.group.administrators);
     const activityIds = useSelector((state) => state.group.activities);
+    const allowJoinWithCode = useSelector((state) => state.group.allowJoinWithCode);
     const joinCode = useSelector((state) => state.group.joinCode);
     const [joinCodeEditMode, toggleJoinCodeEditMode] = useToggle(false);
-    const [joinCodeInputValue, clearJoinCodeInputValue, handleChangeJoinCodeInputValue, setJoinCodeInputValue] = useFormInput("");
+    const [joinCodeVisible, toggleJoinCodeVisible] = useToggle(false);
+    const [userEnteredJoinCode, clearUserEnteredJoinCode, handleChangeUserEnteredJoinCode, setUserEnteredJoinCode] = useFormInput("");
 
     
     const cancelJoinCodeChange = () => {
@@ -68,14 +71,33 @@ function Group() {
         }
     }
 
+    const getNewJoinCode = () => {
+        const newJoinCode = !allowJoinWithCode ? "" : generateJoinCode();
+        dispatch(updateGroup({groupId, groupUpdates: {joinCode: newJoinCode}}));
+    }
+
     const goToCreateNew = () => {
         navigate(`/users/${userId}/decks/new`);
     }
 
-    const handleSaveJoinCode = () => {
+    const handleChangeJoinCodeAcceptance = () => {
+        const newJoinCode = allowJoinWithCode ? "" : generateJoinCode();
+        dispatch(updateGroup({groupId, groupUpdates: {allowJoinWithCode: !allowJoinWithCode, joinCode: newJoinCode}}));
+        if(joinCodeVisible) {
+            toggleJoinCodeVisible();
+        }
+    }
+
+
+    const hideJoinCode = () => {
+        toggleJoinCodeVisible();
+        if(joinCodeEditMode) {
         toggleJoinCodeEditMode();
-        dispatch(updateJoinCode({groupId, code: joinCodeInputValue}));
-        clearJoinCodeInputValue();
+        }
+    }
+    
+    const showJoinCode = () => {
+        toggleJoinCodeVisible();
     }
 
     const sendJoinRequest = () => {
@@ -105,18 +127,33 @@ function Group() {
             <div>
                 <p>{groupName}</p>
                 {!administrators?.includes(userId) ? 
-                    <button onClick={sendJoinRequest}>Request to Join Group</button>
+                    null
                     :
-                    <p>Join code:
-                        {joinCodeEditMode ? 
-                            <form onSubmit={handleSaveJoinCode}><input onChange={handleChangeJoinCodeInputValue} value={joinCodeInputValue} /><button type="submit">Save</button><button onClick={cancelJoinCodeChange}>Cancel</button></form>
+                    <>
+                        <div>
+                            <label htmlFor="join-code-options">Allow People to Join with a Code</label>
+                            <div id="join-code-options">
+                                <label htmlFor="do-allow-join-code">Yes</label>
+                                <input id="do-allow-join-code" type="radio" name="allow-join-code" value="true" checked={allowJoinWithCode} onChange={handleChangeJoinCodeAcceptance} />
+                                <label htmlFor="do-not-allow-join-code">No</label>
+                                <input id="do-not-allow-join-code" type="radio" name="allow-join-code" value="true" checked={!allowJoinWithCode} onChange={handleChangeJoinCodeAcceptance}/>
+                            </div>
+                        </div>
+                        {!allowJoinWithCode ?
+                            null
                             :
-                            joinCode ? 
-                                <><span> {joinCode} </span><button onClick={toggleJoinCodeEditMode}>Change</button></> 
+                            <>
+                                {!joinCodeVisible ? 
+                                    <button onClick={showJoinCode}>Show Group Join Code</button>
                                 : 
-                                <button onClick={toggleJoinCodeEditMode}>Set Join Code</button>
+                                    <div>
+                                        <p>Join Code: {joinCode} <button onClick={getNewJoinCode}>Get New Code</button></p>
+                                        <button onClick={hideJoinCode}>Hide Join Code</button>
+                                    </div>
                         }
-                    </p>
+                            </>
+                        }                    
+                    </>
                 }
                 <h3>Administrators:</h3>
                 <GroupMemberList groupMemberIds={administrators} />

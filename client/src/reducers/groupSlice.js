@@ -31,25 +31,19 @@ export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({g
     }
 });
 
-export const updateJoinCode = createAsyncThunk("group/updateJoinCode", async({groupId, code}) => {
-    console.log({groupId});
-    console.log({code})
+export const updateGroup = createAsyncThunk("group/updateGroup", async({groupId, groupUpdates}) => {
     try {
-        const response = await axios.put(`${baseURL}/groups/${groupId}`, {joinCode: code});
-        return response.data.joinCode;
+        const response = await axios.put(`${baseURL}/groups/${groupId}`, groupUpdates);
+        let stateUpdateObj = {};
+        for(const key in groupUpdates) {
+            if(response.data.hasOwnProperty(key));
+            stateUpdateObj[key] = response.data[key];
+        }
+        return stateUpdateObj;
     } catch (err) {
         return err;
     }
 });
-
-// export const updateGroup = createAsyncThunk("group/updateGroup", async(groupId, groupUpdates) => {
-//     try {
-//         const response = axios.put(`${baseURL}/groups/${groupId}`, groupUpdates);
-//         return response.data;
-//     } catch (err) {
-//         return err;
-//     }
-// });
 
 export const groupSlice = createSlice({
     name: "group", 
@@ -74,9 +68,12 @@ export const groupSlice = createSlice({
             state.activities = action.payload.activities;
             state.joinCode = action.payload.joinCode;
         });
-        builder.addCase(updateJoinCode.fulfilled, (state, action) => {
-            console.log({joinCode: action.payload});
-            state.joinCode = action.payload;
+        builder.addCase(updateGroup.fulfilled, (state, action) => {
+            for(const key in action.payload) {
+                if(initialState.hasOwnProperty(key)) {
+                    state[key] = action.payload[key];
+                }
+            }
         });
     }
 });

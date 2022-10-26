@@ -14,7 +14,18 @@ const initialState = {
     joinCode: ""
 };
 
-//possibly add private property to group (classroom would default to private)
+export const addMember = createAsyncThunk("group/addMember", async({groupId, userId}) => {
+    try {
+        const response = await axios.post(`${baseURL}/groups/${groupId}/members`, {userId});
+        return {
+            memberId: response.data,
+        }
+    } catch (err) {
+        console.error(err);
+        return err;
+    }
+});
+
 export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({groupId, userId}) => {
     try {
         const response = await axios.get(`${baseURL}/groups/${groupId}?requestingUser=${userId}`);
@@ -49,7 +60,7 @@ export const updateGroup = createAsyncThunk("group/updateGroup", async({groupId,
         let stateUpdateObj = {};
         for(const key in groupUpdates) {
             if(response.data.hasOwnProperty(key)) {
-            stateUpdateObj[key] = response.data[key];
+                stateUpdateObj[key] = response.data[key];
             }
         }
         return stateUpdateObj;
@@ -66,12 +77,12 @@ export const groupSlice = createSlice({
             if(action.payload.groupId === state.groupId) {
                 state.activities = [...state.activities, action.payload.activityId];
             }
-        },
-        addMember: (state, action) => {
-            state.memberIds = [...state.memberIds, action.payload.user._id];
         }
     },
     extraReducers: (builder) => {
+        builder.addCase(addMember.fulfilled, (state, action) => {
+            state.memberIds = [...state.memberIds, action.payload.memberId];
+        });
         builder.addCase(fetchGroupData.fulfilled, (state, action) => {
             state.groupId = action.payload.groupId;
             state.name = action.payload.name;
@@ -95,6 +106,6 @@ export const groupSlice = createSlice({
     }
 });
 
-export const { addActivity, addMember } = groupSlice.actions;
+export const { addActivity } = groupSlice.actions;
 
 export default groupSlice.reducer;

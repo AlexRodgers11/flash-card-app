@@ -12,7 +12,7 @@ const initialState = {
     email: "",
     photo: "",
     decks: [],
-    groups: "",
+    groups: [],
     attempts: "",
     messages: {
         sent: [],
@@ -90,23 +90,32 @@ export const setIdentificationData = createAsyncThunk("login/setIdentificationDa
 export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserData", async (userId) => {
     try {
         const response = await axios.get(`${baseURL}/users/${userId}`);
+        //need better protection here
         delete response.data.login.password;
         return response.data;
-        // return {
-        //     username: response.login.username,
-        //     name: {
-        //         first: response.name.first,
-        //         last: response.name.last
-        //     },
-        //     email: response.email,
-        //     photo: response.photo,
-        //     decks: response.decks,
-        //     groups: response.groups,
-        //     attempts: response.attempts
-        // }
     } catch (err) {
         return err;
     }
+});
+
+export const addGroup = createAsyncThunk("login/addGroup", async({userId, groupId}) => {
+    try {
+        const response = await axios.post(`${baseURL}/users/${userId}/groups`);
+        return response.data;
+    } catch (err) {}    
+});
+
+export const updateUser = createAsyncThunk("login/updateUser", async ({userId, userUpdates}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/users/${userId}`, userUpdates);
+        const stateUpdateObj = {};
+        for(const key in userUpdates) {
+            if(response.data.hasOwnProperty(key)) {
+                stateUpdateObj[key] = response.data[key];
+            }
+        }
+        return stateUpdateObj;
+    } catch (err) {}
 });
 
 export const loginSlice = createSlice({
@@ -148,6 +157,9 @@ export const loginSlice = createSlice({
             state.messages.sent = action.payload.messages.sent;
             state.notifications = action.payload.notifications;
         });
+        builder.addCase(addGroup.fulfilled, (state, action) => {
+            state.groups = [...state.groups, action.payload];
+        });
         builder.addCase(login.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId
@@ -164,6 +176,13 @@ export const loginSlice = createSlice({
             state.username = action.payload.username;
             state.name = action.payload.name;
             state.photo = action.payload.photo;
+        });
+        builder.addCase(updateUser.fulfilled, (state, action) => {
+            for(const key in action.payload) {
+                if(state.hasOwnProperty(key)) {
+                    state[key] = action.payload[key];
+                }
+            }
         });
     }
 });

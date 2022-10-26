@@ -9,7 +9,7 @@ import Deck from "./models/deck.js";
 import Group from "./models/group.js";
 import User from "./models/user.js";
 import Activity from "./models/activity.js";
-import getRandomCardType, { generateJoinCode } from "./utils.js";
+import getRandomCardType, { generateJoinCode, getRandomJoinOptions } from "./utils.js";
 const port = process.env.port || 8000;
 const router = express.Router();
 
@@ -184,8 +184,12 @@ router.get("/seed-database", async(req, res, next) => {
                 let newGroup = new Group();
                 newGroup.name = faker.random.word() + Math.ceil(Math.random() * 100);
                 newGroup.decks = [];
-                newGroup.allowJoinWithCode = Math.random() > .5;
-                newGroup.joinCode = newGroup.allowJoinWithCode ? generateJoinCode() : '';
+                let joinMethodPicker = Math.random();
+                // newGroup.allowJoinWithCode = joinMethodPicker >= .66666 || joinMethodPicker < .33333;
+                // newGroup.joinCode = newGroup.allowJoinWithCode ? generateJoinCode() : '';
+                // newGroup.allowJoinRequests = joinMethodPicker < .66666;
+                newGroup.joinOptions = getRandomJoinOptions();
+                newGroup.joinCode = newGroup.joinOptions === "code" || newGroup.joinOptions === "code-and-request" ? generateJoinCode() : "";
                 users.forEach(user => {
                     if(Math.random() > .993) {
                         newGroup.members.push(user._id);

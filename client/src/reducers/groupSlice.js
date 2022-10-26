@@ -10,7 +10,7 @@ const initialState = {
     creator: "",
     administrators: [],
     activities: [],
-    allowJoinWithCode: false,
+    joinOptions: "",
     joinCode: ""
 };
 
@@ -25,10 +25,20 @@ export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({g
             administrators: response.data.administrators,
             memberIds: [...response.data.members],
             activities: response.data.activities,
-            joinCode: response.data.joinCode,
-            allowJoinWithCode: response.data.allowJoinWithCode
+            joinOptions: response.data.joinOptions,
+            joinCode: response.data.joinCode
         }
     } catch (err) {
+        return err;
+    }
+});
+
+export const fetchGroupJoinOptions = createAsyncThunk("group/fetchGroupJoinOptions", async({groupId}) => {
+    try {
+        const response = await axios.get(`${baseURL}/groups/${groupId}/join-options`);
+        return response;
+    } catch (err) {
+        console.error(err);
         return err;
     }
 });
@@ -69,8 +79,11 @@ export const groupSlice = createSlice({
             state.creator = action.payload.creator;
             state.administrators = action.payload.administrators;
             state.activities = action.payload.activities;
-            state.allowJoinWithCode = action.payload.allowJoinWithCode;
+            state.joinOptions = action.payload.joinOptions;
             state.joinCode = action.payload.joinCode;
+        });
+        builder.addCase(fetchGroupJoinOptions.fulfilled, (state, action) => {
+            state.joinOptions = action.payload.joinOptions;
         });
         builder.addCase(updateGroup.fulfilled, (state, action) => {
             for(const key in action.payload) {

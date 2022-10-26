@@ -17,5 +17,17 @@ const getRandomCardType = num => {
         return "flash"
     }
 }
+export const getRandomJoinOptions = () => {
+    let num = Math.random();
+    if(num <= .25) {
+        return "invite";
+    } else if(num <= .5) {
+        return "request";
+    } else if(num <= .75) {
+        return "code";
+    } else {
+        return "code-and-request"
+    }
+}
 
 export default getRandomCardType;

@@ -83,6 +83,12 @@ groupRouter.get("/:groupId", (req, res, next) => {
     res.status(200).send(response);
 });
 
+groupRouter.get("/:groupId/join-options", (req, res, next) => {
+    res.status(200).send({
+        joinOptions: req.group.joinOptions
+    })
+});
+
 groupRouter.get("/:groupId/decks", (req, res, next) => {
     res.status(200).send(JSON.stringify(req.group.decks));
 });

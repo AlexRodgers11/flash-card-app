@@ -346,6 +346,22 @@ userRouter.put("/:userId/notifications", (req, res, next) => {
         });
 });
 
+userRouter.patch("/:userId", async (req, res, next) => {
+    let patchObj = {...req.body};
+    if(patchObj.login.username) {
+        patchObj.login.password = req.user.login.password;
+    }
+    console.log({patchObj});
+    try {
+        const user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
+        // delete user.login.password;
+        res.status(200).send(user);
+    } catch (err) {
+        res.status(500).send("There was an error with your request");
+        throw(err);
+    }
+});
+
 userRouter.post("/:userId/attempts", async (req, res, next) => {
     try {
         const newAttempt = new Attempt(req.body);

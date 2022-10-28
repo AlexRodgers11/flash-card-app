@@ -418,20 +418,10 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
     
 // });
 
-groupRouter.post("/:groupId/messages/admin", async (req, res, next) => {
+
+groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next) => {
     try {
-        if(req.body.requestType === 'DeckSubmission') {
-            let newMessage = new DeckSubmission();
-            newMessage.acceptanceStatus = 'pending';
-            newMessage.sendingUser = req.body.sendingUser;
-            newMessage.targetDeck = req.body.targetDeck;
-            newMessage.targetGroup = req.body.targetGroup;
-            let message = await newMessage.save();
-            await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': message}});
-            await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': message}});
-            res.status(200).send(message);
-        } else if(req.body.requestType === 'JoinRequest') {
-            let newMessage = new JoinRequest();
+        let newMessage = new JoinRequest();
             newMessage.acceptanceStatus = 'pending';
             newMessage.sendingUser = req.body.sendingUser;
             newMessage.targetGroup = req.body.targetGroup;
@@ -439,72 +429,28 @@ groupRouter.post("/:groupId/messages/admin", async (req, res, next) => {
 
             await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': message}});
             await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': message}});
-            res.status(200).send(message);
-        } else {}
+            res.status(200).send(message._id);
+    } catch(err) {
+        res.status(500).send("There was an error sending the join request to the group admins");
+    }
+});
+
+groupRouter.post("/:groupId/messages/admin/deck-submission", async (req, res, next) => {
+    try {
+        let newMessage = new DeckSubmission();
+        newMessage.acceptanceStatus = 'pending';
+        newMessage.sendingUser = req.body.sendingUser;
+        newMessage.targetDeck = req.body.targetDeck;
+        newMessage.targetGroup = req.body.targetGroup;
+        let message = await newMessage.save();
+        await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': message}});
+        await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': message}});
+        res.status(200).send(message);
     } catch (err) {
         res.status(500).send("There was an error updating receiving admins received messages");
         throw err;
     }
-    
 });
-
-// groupRouter.post("/:groupId/messages/admin", (req, res, next) => {
-//     if(req.body.requestType === 'DeckSubmission') {
-//         let newMessage = new DeckSubmission();
-//         newMessage.acceptanceStatus = 'pending';
-//         newMessage.sendingUser = req.body.sendingUser;
-//         newMessage.targetDeck = req.body.targetDeck;
-//         newMessage.targetGroup = req.body.targetGroup;
-//         newMessage.save((newMessageSaveError, message) => {
-//             if(newMessageSaveError) {
-//                 res.status(500).send("There was an error saving the new message");
-//                 throw newMessageSaveError;
-//             }
-//             User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': message}})
-//                 .then(() => {
-//                     User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': message}})
-//                         .then(() => {
-//                             res.send(message);
-//                         })
-//                         .catch(sendingUserError => {
-//                             res.status(500).send("There was an error sending user's sent messages")
-//                             throw sendingUserError;
-//                         });
-//                 })
-//                 .catch(receivingUsersError => {
-//                     res.status(500).send("There was an error updating receiving admins received messages");
-//                     throw receivingUsersError;
-//                 });
-//         });
-//     } else if(req.body.requestType === 'JoinRequest') {
-//         let newMessage = new JoinRequest();
-//         newMessage.acceptanceStatus = 'pending';
-//         newMessage.sendingUser = req.body.sendingUser;
-//         newMessage.targetGroup = req.body.targetGroup;
-//         newMessage.save((err, message) => {
-//             if(err) {
-//                 res.status(500).send("There was an error with your requests");
-//                 throw err;
-                
-//             }
-//             User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': message}})
-//                 .then(() => {
-//                     User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': message}})
-//                         .then(() => {
-//                             res.send(message);
-//                         })
-//                         .catch(sendingUserError => {
-//                             res.status(500).send("There was an error sending user's sent messages")
-//                             throw sendingUserError;
-//                         });
-//                 })
-//                 .catch(receivingUsersError => {
-//                     res.status(500).send("There was an error updating receiving admins received messages");
-//                     throw receivingUsersError;
-//                 });            
-//         });
-//     } else {}
-// });
 
 groupRouter.delete("/:groupId", async (req, res, next) => {
     try {
@@ -568,14 +514,34 @@ groupRouter.put("/:groupId", (req, res, next) => {
     });
 });
 
-groupRouter.post("/:groupId/members", async (req, res, next) => {
+// groupRouter.post("/:groupId/members", async (req, res, next) => {
+//     try {
+//         const user = await User.findById(req.body.userId);
+//         await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}});
+//         res.status(200).send(user._id);
+//     } catch (err) {
+//         res.status(500).send("There was an error with your request");
+//         throw err;
+//     }
+// });
+
+groupRouter.post("/:groupId/members/join-code", async(req, res, next) => {
+    console.log("join-code route hit");
+    console.log({group: req.group});
     try {
         const user = await User.findById(req.body.userId);
-        await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}});
-        res.status(200).send(user._id);
+        console.log({user});
+        if(user && req.body.joinCode === req.group.joinCode) {
+            console.log("join codes match");
+            const updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}}, {new: true});
+            await User.findByIdAndUpdate(req.body.userId, {$addToSet: {groups: updatedGroup._id}});
+            //create new notification here to send to all members of the group
+            res.status(200).send(updatedGroup._id);
+        } else {
+            res.status(404).send("Invalid join code");
+        }
     } catch (err) {
         res.status(500).send("There was an error with your request");
-        throw err;
     }
 });
 

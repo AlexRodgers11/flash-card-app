@@ -54,7 +54,7 @@ function Group() {
                 targetGroup: groupId,
                 targetDeck: evt.target.id
             }
-            axios.post(`${baseURL}/groups/${groupId}/messages/admin`, message)
+            axios.post(`${baseURL}/groups/${groupId}/messages/admin/deck-submission`, message)
                 .then((response) => {
                     dispatch(addMessage({message: response.data._id, direction: 'sent'}));
                     toggleShowModal();

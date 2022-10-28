@@ -60,7 +60,7 @@ messageRouter.get("/:messageId", (req, res, next) => {
 });
 
 messageRouter.put('/:messageId', (req, res, next) => {
-    const updateObj = {...(req.body.user && {$push: {read: req.body.user}}), ...(req.body.acceptanceStatus && {$set: {acceptanceStatus: req.body.acceptanceStatus}})}
+    const updateObj = {...(req.body.user && {$addToSet: {read: req.body.user}}), ...(req.body.acceptanceStatus && {$set: {acceptanceStatus: req.body.acceptanceStatus}})}
     
     const options = {new: true};
 
@@ -81,6 +81,7 @@ messageRouter.put('/:messageId', (req, res, next) => {
             break;
         case 'JoinRequest':
             JoinRequest.findByIdAndUpdate(req.message._id, updateObj, options, callback);
+            break;
         default:
             Message.findByIdAndUpdate(req.message._id, updateObj, options, callback);
             break;

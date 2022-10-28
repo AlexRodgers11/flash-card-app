@@ -17,7 +17,7 @@ function RegisterIdentificationForm() {
     const handleSubmit = evt => {
         evt.preventDefault();
         console.log("about to dispatch register identification action");
-        dispatch(updateUser({userId, userUpdates: {login: {username: username}, name: {firstName: firstName, lastName: lastName}, photo}}));
+        dispatch(updateUser({userId, userUpdates: {login: {username: username}, name: {first: firstName, last: lastName}, photo}}));
         navigate("/register/join-groups");
         clearUsername();
         clearFirstName();

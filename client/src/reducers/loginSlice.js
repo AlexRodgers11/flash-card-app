@@ -7,7 +7,9 @@ const baseURL = "http://localhost:8000";
 const initialState = {
     token: "",
     userId: "",
+    login: {
     username: "",
+    },
     name: {},
     email: "",
     photo: "",
@@ -145,8 +147,8 @@ export const loginSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchLoggedInUserData.fulfilled, (state, action) => {
-            // state.userId = action.payload._id;
-            state.username = action.payload.login.username;
+            state.userId = action.payload._id;
+            state.login.username = action.payload.login.username;
             state.name = action.payload.name;
             state.email = action.payload.email;
             state.photo = action.payload.photo;

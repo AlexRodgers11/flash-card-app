@@ -13,7 +13,7 @@ function Header() {
     const [messageId, setMessageId]  = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const username = useSelector((state) => state.login.username);
+    const username = useSelector((state) => state.login.login.username);
     const notifications = useSelector((state) => state.login.notifications);
     
     const expandMessage = (id) => {

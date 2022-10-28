@@ -28,8 +28,8 @@ userRouter.get("/:userId", (req, res, next) => {
         let partialData = {
             firstName: req.user.name.first,
             lastName: req.user.name.last,
-            username: req.user.login.username,
-            password: req.user.login.password, /////////////////////////delete this once testing is done
+            login: req.user.login,
+            // password: req.user.login.password, /////////////////////////delete this once testing is done
             email: req.user.email,
             photo: req.user.photo,
         }
@@ -354,8 +354,13 @@ userRouter.patch("/:userId", async (req, res, next) => {
     console.log({patchObj});
     try {
         const user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
-        // delete user.login.password;
-        res.status(200).send(user);
+        let responseData = user;
+        // why doesn't this delete the password
+        // delete responseData.login.password;
+        // console.log({responseData});
+        responseData.login = {username: user.login.username};
+        console.log({responseData});
+        res.status(200).send(responseData);
     } catch (err) {
         res.status(500).send("There was an error with your request");
         throw(err);

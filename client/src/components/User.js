@@ -26,7 +26,7 @@ function User() {
         <div>
             {loaded ? 
                 <div>
-                    <h1>{userData.login.username}</h1>
+                    <h1>{userData.login?.username}</h1>
                     <p>{userData.login.password}</p>
                     <p>{userData.photo}</p>
                     <p>{userData.email}</p>

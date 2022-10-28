@@ -16,7 +16,7 @@ function Dashboard() {
     return (
         <div>
             <div>
-                <h1>{user.username}</h1>
+                <h1>{user.login.username}</h1>
                 <p>{user.photo}</p>
                 <p>{user.email}</p>
                 <h1>Decks:</h1>

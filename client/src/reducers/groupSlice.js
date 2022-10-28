@@ -47,7 +47,7 @@ export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({g
 export const fetchGroupJoinOptions = createAsyncThunk("group/fetchGroupJoinOptions", async({groupId}) => {
     try {
         const response = await axios.get(`${baseURL}/groups/${groupId}/join-options`);
-        return response;
+        return response.data;
     } catch (err) {
         console.error(err);
         return err;

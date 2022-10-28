@@ -30,7 +30,7 @@ import { ExtractJwt } from "passport-jwt";
 import { Strategy as JwtStrategy } from  "passport-jwt";
 import group from "./models/group.js";
 
-mongoose.connect("mongodb://localhost/flash-card-app-three", {
+mongoose.connect("mongodb://localhost/flash-card-app-four", {
 // mongoose.connect("mongodb://WOLVES-DEN:27017,WOLVES-DEN:27018,WOLVES-DEN:27019/flash-card?replicaSet=rs", {
     //use MongoDB's new connection string parser instead of the old deprecated one
     useNewUrlParser: true,
@@ -153,7 +153,7 @@ router.get("/seed-database", async(req, res, next) => {
     try {
         console.log("Creating users");
         const userPromises = [];
-        while (userPromises.length < 5000) {
+        while (userPromises.length < 4000) {
             userPromises.push(new Promise((userResolve, userReject) => {
                 let newUser = new User();
                 newUser.login.username = faker.random.word() + faker.random.word();
@@ -179,7 +179,7 @@ router.get("/seed-database", async(req, res, next) => {
 
         console.log("Creating groups");
         const groupPromises = [];
-        while(groupPromises.length < 1500) {
+        while(groupPromises.length < 1000) {
             groupPromises.push(new Promise((groupResolve, groupReject) => {
                 let newGroup = new Group();
                 newGroup.name = faker.random.word() + Math.ceil(Math.random() * 100);
@@ -276,7 +276,8 @@ router.get("/seed-database", async(req, res, next) => {
         console.log("Creating decks");
         const deckPromises = [];
         // let randomDeckNumber = 5000 + Math.ceil(Math.random() * 10000);
-        let randomDeckNumber = 45000;
+        // let randomDeckNumber = 45000;
+        let randomDeckNumber = 30000;
 
         while(deckPromises.length < randomDeckNumber) {
             deckPromises.push(new Promise((deckResolve, deckReject) => {
@@ -323,7 +324,7 @@ router.get("/seed-database", async(req, res, next) => {
             // console.log("Categories updated");
 
             //create cards for each deck
-            let randomCardNumber = 3 + Math.ceil(Math.random() * 27);
+            let randomCardNumber = 3 + Math.ceil(Math.random() * 15);
             const cardPromises = [];
             // console.log("creating cards");
             while(cardPromises.length < randomCardNumber) {

@@ -10,7 +10,10 @@ const initialState = {
     login: {
         username: "",
     },
-    name: {},
+    name: {
+        first: "",
+        last: ""
+    },
     email: "",
     photo: "",
     decks: [],

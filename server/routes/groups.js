@@ -7,6 +7,7 @@ import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/ca
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import { DeckSubmission, JoinRequest } from "../models/message.js";
+import { JoinDecision } from "../models/notification.js";
 import User from "../models/user.js";
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
@@ -542,6 +543,32 @@ groupRouter.post("/:groupId/members/join-code", async(req, res, next) => {
         }
     } catch (err) {
         res.status(500).send("There was an error with your request");
+    }
+});
+
+groupRouter.post("/:groupId/members/request", async(req, res, next) => {
+    console.log("request route hit");
+    try {
+        if(req.group.administrators.includes(req.body.adminId)) {
+            const user = await User.findById(req.body.newMember);
+            await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}}, {new: true});
+            await User.findByIdAndUpdate(user._id, {$addToSet: {groups: req.group._id}});
+            res.status(200).send(user._id);
+            // let newNotification = new JoinDecision({
+            //     decision: "approved", 
+            //     groupTarget: req.group._id
+            // });
+            // newNotification.save((err, savedNotification) => {
+            //     User.findByIdAndUpdate(user._id, {$push: {notifications: savedNotification}});
+            //     res.status(200).send("Member successfully added");
+            // })
+        } else {
+            res.status(400).send("You are not authorized to add a member to this group");
+        }
+        
+    } catch (err) {
+        res.status(500).send("There was an error with your request");
+        throw err;
     }
 });
 

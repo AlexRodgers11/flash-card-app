@@ -66,7 +66,7 @@ function Header() {
                 {!username ? 
                     <>
                         <button value="login" onClick={handleClick}>Login</button>
-                        <button value="register/signup" onClick={handleClick}>Sign Up</button>
+                        <button value="register/credentials" onClick={handleClick}>Sign Up</button>
                     </>
                     :
                     <>

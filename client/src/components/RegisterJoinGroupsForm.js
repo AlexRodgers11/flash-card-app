@@ -81,6 +81,12 @@ function RegisterJoinGroupsForm() {
         });
     }
 
+    useEffect(() => {
+        if(!userId) {
+            navigate("/");
+        }
+    }, [navigate, userId]);
+
     const displayJoinOptions = () => {
         switch(groupJoinOptions) {
             case "invite":

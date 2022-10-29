@@ -17,7 +17,8 @@ function RegisterCredentialsForm() {
         evt.preventDefault();
         if(password === verifyPassword) {
             console.log("about to dispatch register action");
-            dispatch(signUp({email, password}));
+            dispatch(signUp({email, password}))
+            .then(() => {navigate("/register/identification")});
             clearEmail();
         } else {
             
@@ -35,12 +36,6 @@ function RegisterCredentialsForm() {
             setShowVerifyPassword(false);
         }
     }, [password, showVerifyPassword]);
-
-    useEffect(() => {
-        if(userId) {
-            navigate("/register/identification");
-        }
-    });
 
     return (
         <div>

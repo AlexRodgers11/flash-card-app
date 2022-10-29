@@ -12,24 +12,30 @@ function RegisterIdentificationForm() {
     const [lastName, clearLastName, setLastName] = useFormInput('');
     const [photo, clearPhoto, setPhoto] = useFormInput('');
     const userId = useSelector((state) => state.login.userId);
+    const name = useSelector((state) => state.login.name);
 
     const handleSubmit = evt => {
         evt.preventDefault();
         console.log("about to dispatch register identification action");
-        dispatch(updateUser({userId, userUpdates: {login: {username: username}, name: {first: firstName, last: lastName}, photo}}));
-        navigate("/register/join-groups");
-        clearUsername();
-        clearFirstName();
-        clearLastName();
-        clearPhoto();
+        dispatch(updateUser({userId, userUpdates: {login: {username: username}, name: {first: firstName, last: lastName}, photo}}))
+        .then(() => {
+            console.log("action complete, about to go to join groups");
+            navigate("/register/join-groups");
+            clearUsername();
+            clearFirstName();
+            clearLastName();
+            clearPhoto();
+        });
     }
 
-    // useEffect(() => {
-    //     // if(user.name.first) {
-    //     if(userId) {
-    //         console.log("would redirect from here");
-    //     }
-    // }, [userId]);
+    useEffect(() => {
+        if(!userId) {
+            navigate("/");
+        }
+        if(name?.first) {
+            navigate("/dashboard");
+        }
+    }, [name, navigate, userId]);
 
     return (
         <div>

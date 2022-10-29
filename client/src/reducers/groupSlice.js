@@ -14,17 +14,17 @@ const initialState = {
     joinCode: ""
 };
 
-export const addMember = createAsyncThunk("group/addMember", async({groupId, userId}) => {
-    try {
-        const response = await axios.post(`${baseURL}/groups/${groupId}/members`, {userId});
-        return {
-            memberId: response.data,
-        }
-    } catch (err) {
-        console.error(err);
-        return err;
-    }
-});
+// export const addMember = createAsyncThunk("group/addMember", async({groupId, userId}) => {
+//     try {
+//         const response = await axios.post(`${baseURL}/groups/${groupId}/members`, {userId});
+//         return {
+//             memberId: response.data,
+//         }
+//     } catch (err) {
+//         console.error(err);
+//         return err;
+//     }
+// });
 
 export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({groupId, userId}) => {
     try {
@@ -77,12 +77,17 @@ export const groupSlice = createSlice({
             if(action.payload.groupId === state.groupId) {
                 state.activities = [...state.activities, action.payload.activityId];
             }
+        },
+        addMember: (state, action) => {
+            if(action.payload.groupId === state.groupId) {
+                state.memberIds = [...state.memberIds, action.payload.userId];
+            }
         }
     },
     extraReducers: (builder) => {
-        builder.addCase(addMember.fulfilled, (state, action) => {
-            state.memberIds = [...state.memberIds, action.payload.memberId];
-        });
+        // builder.addCase(addMember.fulfilled, (state, action) => {
+        //     state.memberIds = [...state.memberIds, action.payload.memberId];
+        // });
         builder.addCase(fetchGroupData.fulfilled, (state, action) => {
             state.groupId = action.payload.groupId;
             state.name = action.payload.name;
@@ -106,6 +111,6 @@ export const groupSlice = createSlice({
     }
 });
 
-export const { addActivity } = groupSlice.actions;
+export const { addActivity, addMember } = groupSlice.actions;
 
 export default groupSlice.reducer;

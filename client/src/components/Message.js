@@ -93,14 +93,14 @@ function Message(props) {
 		}
 	}
 
-	const acceptJoinRequest = () => {
+	const acceptUser = () => {
 		if(acceptanceStatus === 'pending') {
 			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'approved', messageType: 'JoinRequest'})
 			.catch(err => {
 				console.error(err);
 			})
 			.then(acceptanceResponse => {
-				axios.post(`${baseURL}/groups/${receiver._id}/members`, {user: sender._id})
+				axios.post(`${baseURL}/groups/${receiver._id}/members/request`, {newMember: sender._id, adminId: userId})
 				.catch(addMemberErr => {
 					console.error(addMemberErr);
 				})
@@ -117,18 +117,24 @@ function Message(props) {
 						console.error(notificationPostErr);
 					})
 					.then(() => {
+						props.hideModal();
+						if(deckListType === 'group') {
+							dispatch(addMember({groupId: receiver._id, userId: memberPostResponse.data}));
+							//add logic to add activity here, probably refactor activity to use discriminators first
+						} 
 						dispatch(editMessage({direction: 'sent', message: acceptanceResponse.data}));
-						dispatch(addMember(memberPostResponse.data));
 					});
 				})
 				.catch(notificationErr => {
 					console.error(notificationErr);
 				})
 			})
+		} else {
+			alert("User has already been added to the group");
 		}
 	}
 	
-	const denyJoinRequest = () => {
+	const denyUser = () => {
 		if(acceptanceStatus === 'pending') {
 			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'denied', messageType: 'JoinRequest'})
 			.catch(err => {
@@ -148,6 +154,7 @@ function Message(props) {
 						console.error(notificationPostErr);
 					})
 					.then(() => {
+						props.hideModal();
 						dispatch(editMessage({direction: 'sent', message: acceptanceResponse.data}));
 					});
 			})
@@ -164,7 +171,6 @@ function Message(props) {
 		//send PUT request to add user to read array for the message (in case others received same message)
 		axios.put(`${baseURL}/messages/${props.messageId}`, {user: userId})
 			.then(response => {
-				console.log(response.data);
 				dispatch(editMessage({direction: 'sent', message: response.data}));
 			})
 			.catch(err => {
@@ -182,7 +188,7 @@ function Message(props) {
 						{props.fullView ? 
 							<div>
 								<p><span>{sender.login.username}</span> would like to add deck: {target.name} to <span>{receiver.name}</span></p>
-								<button onClick={acceptDeck}>Accept</button><button onClick={denyDeck}>Decline</button><button onClick={reviewDeck}>View</button>
+								{userId !== sender._id && <><button onClick={acceptDeck}>Accept</button><button onClick={denyDeck}>Decline</button><button onClick={reviewDeck}>View</button></>}
 								
 							</div>
 							:
@@ -214,9 +220,15 @@ function Message(props) {
 		}
 	}
 
+
 	const reviewDeck = () => {
 		props.hideModal();
 		navigate(`decks/${target._id}?review=true`);
+	}
+
+	const reviewUser = () => {
+		props.hideModal();
+		navigate(`users/${sender._id}?review=true`);
 	}
 
 	useEffect(() => {

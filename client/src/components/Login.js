@@ -10,7 +10,8 @@ function Login() {
     const [usernameOrEmail, clearUsernameOrEmail, setUsernameOrEmail] = useFormInput('');
     const [password, clearPassword, setPassword] = useFormInput('');
     const userId = useSelector((state) => state.login.userId);
-    const foundUser = useSelector((state) => state.login.username);
+    // const foundUser = useSelector((state) => state.login.username);
+    const foundUser = useSelector((state) => state.login.login);
 
     const handleSubmit = evt => {
         evt.preventDefault();
@@ -26,7 +27,7 @@ function Login() {
     }, [userId, dispatch]);
 
     useEffect(() => {
-        if(foundUser) {
+        if(foundUser.username) {
             navigate(`/dashboard`);
         }
     }, [foundUser, navigate]);

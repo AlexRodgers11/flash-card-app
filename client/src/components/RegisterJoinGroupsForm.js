@@ -1,25 +1,32 @@
 import axios from 'axios';
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import { setGroups } from '../reducers/loginSlice';
+import useFormInput from '../hooks/useFormInput';
+import { fetchGroupJoinOptions } from '../reducers/groupSlice';
+import { sendJoinRequest, submitJoinCode } from '../reducers/loginSlice';
+import Modal from './Modal';
 
 function RegisterJoinGroupsForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [selectedGroups, setSelectedGroups] = useState([]);
+    const userId = useSelector((state) => state.login.userId);
     const [foundGroups, setFoundGroups] = useState([]);
     const [searchField, setSearchField] = useState("");
     const [displayNoResults, setDisplayNoResults] = useState(false);
-
-    const addGroup = evt => {
-        if(selectedGroups.indexOf(foundGroups[evt.target.value]) === -1) {
-            setSelectedGroups(groups => [...groups, foundGroups[evt.target.value]]);
-        } else {
-            alert("you've already added this group");
-        }
-    }
+    const [joinAttemptType, setJoinAttemptType] = useState("");
+    const groupJoinOptions = useSelector((state) => state.group.joinOptions);
+    const [modalContent, setModalContent] = useState("");
+    const [userEnteredJoinCode, clearUserEnteredJoinCode, handleChangeUserEnteredJoinCode, setUserEnteredJoinCode] = useFormInput("");
+    const [selectedGroupId, setSelectedGroupId] = useState("");
     
+    const continueSearching = () => {
+        if(userEnteredJoinCode) {
+            clearUserEnteredJoinCode();
+        }
+        setModalContent("");
+    }
+
     const handleSubmit = evt => {
         evt.preventDefault();
         if(!foundGroups.length) {
@@ -27,12 +34,8 @@ function RegisterJoinGroupsForm() {
         }
     }
 
-    const saveGroups = () => {
-        dispatch(setGroups(selectedGroups.map(group => group._id)));
-    }
-
-    const skip = () => {
-        navigate("/register");
+    const goToNextForm = () => {
+        navigate("/dashboard");
     }
 
     const handleSearchInputChange = evt => {
@@ -43,9 +46,97 @@ function RegisterJoinGroupsForm() {
         setSearchField(evt.target.value);
     }
     
+    const selectGroup = (evt) => {
+        dispatch(fetchGroupJoinOptions({groupId: evt.target.dataset.id}));
+        setModalContent("join-options");
+        setSelectedGroupId(evt.target.dataset.id);
+    }
+
+    const joinGroup = (evt) => {
+        evt.preventDefault();
+        dispatch(submitJoinCode({userId, groupId: selectedGroupId, joinCode: userEnteredJoinCode}))
+        .then(result => {
+            //is if statement necessary- does this actually work it or will it always allow join?
+            if(result.meta.requestStatus === "fulfilled") {
+                setModalContent("success");
+                setJoinAttemptType("code");
+            }
+        })
+        .catch(err => {
+            setModalContent("");
+            console.error(err);
+        });
+    }
+
+    const sendRequestToJoin = () => {
+        dispatch(sendJoinRequest({userId, groupId: selectedGroupId}))
+        .then(result => {
+            if(result.meta.requestStatus === "fulfilled") {
+                setModalContent("success");
+                setJoinAttemptType("request");
+            }
+        })
+        .catch(err => {
+            setModalContent("");
+            console.error(err);
+        });
+    }
+
+    const displayJoinOptions = () => {
+        switch(groupJoinOptions) {
+            case "invite":
+                return (
+                    <>
+                        <p>A user can only become a member of this group by receiving an invite</p>
+                        <button onClick={continueSearching}>Search for More Groups</button>
+                        <button onClick={goToNextForm}>Add groups later</button>
+                    </>
+                );
+            case "request": 
+                return (
+                    <>
+                        <p>To join this group you must submit a request to its administrators</p>
+                        <button data-joinType="request" onClick={sendRequestToJoin}>Request to Join</button>
+                        <button onClick={continueSearching}>Cancel</button>
+                    </>
+                )
+            case "code":
+                return (
+                    <>
+                        <form data-joinType="code" onSubmit={joinGroup}>
+                            <label htmlFor="join-code-entry-one">Enter the group's code to join</label>
+                            <input type="text" id="join-code-entry-one" name="join-code-entry-one" onChange={handleChangeUserEnteredJoinCode} value={userEnteredJoinCode} />
+                            <button type="submit" onClick={joinGroup}>Submit</button>
+                            <button onClick={continueSearching}>Cancel</button>
+                        </form>
+                    </>
+                )
+            case "code-and-request":
+                return (
+                    <>
+                        <p>To join this group you can either enter the group's join code or send a request to its administrators</p>
+                        <form data-joinType="code" onSubmit={joinGroup}>
+                            <label htmlFor="join-code-entry-two">Enter the group's code to join</label>
+                            <input id="join-code-entry-two" name="join-code-entry-two" type="text" onChange={handleChangeUserEnteredJoinCode} value={userEnteredJoinCode} />
+                            <button type="submit" onClick={joinGroup}>Submit</button>
+                        </form>
+                        <button data-joinType="request" onClick={sendRequestToJoin}>Send Request to Join</button>
+                        <button onClick={continueSearching}>Cancel</button>
+                    </>
+                );
+            default: 
+                return (
+                    <>
+                        <p>An error occurred</p>
+                        <button onClick={continueSearching}>Search for More Groups</button>
+                        <button onClick={goToNextForm}>Add groups later</button>
+                    </>
+                )
+        }
+    }
+    
     useEffect(() => {
         if(searchField.length >= 3) {
-            // console.log("should be sending request");
             const baseURL = "http://localhost:8000";
             axios.get(`${baseURL}/groups?search=${searchField}`)
                 .then((response) => setFoundGroups(response.data))
@@ -60,14 +151,29 @@ function RegisterJoinGroupsForm() {
             <form onSubmit={handleSubmit}>
                 <label htmlFor="searchField">Search for groups to join</label>
                 <input type="text" name="searchField" id="searchField" value={searchField} onChange={handleSearchInputChange} />
-                {displayNoResults && <p>No groups found</p>}
                 <button type="submit">Search</button>
             </form>
-            {foundGroups.map((group, idx) => <button key={group._id} value={idx} onClick={addGroup}>{group.name}</button>)}
-            {selectedGroups.length > 0 && <h1>Send join requests to these groups</h1>}
-            {selectedGroups.map(group => <span key={group._id}>{group.name}</span>)}
-            <button onClick={saveGroups}>Submit</button>
-            <button onClick={skip}>Skip for now</button>
+            {displayNoResults && <p>No groups found</p>}
+            {/* need to make sure groups already member of or have sent request to don't show up here */}
+            {foundGroups.map((group) => <button data-id={group._id} key={group._id} onClick={selectGroup}>{group.name}</button>)}
+            <button onClick={goToNextForm}>{joinAttemptType ? 'Continue Registration' : 'Skip for now'}</button>
+            {!modalContent ? 
+                null
+                :
+                <Modal hideModal={continueSearching}>
+                    {modalContent === "join-options" ? 
+                        <div>
+                            {displayJoinOptions()}
+                        </div>
+                        :
+                        <div>
+                            <p>Success! {joinAttemptType === "code" ? "You are now a member of this group" : "Your request has been sent to the group's administrators"}</p>
+                            <button onClick={continueSearching}>Search for more groups</button>
+                            <button onClick={goToNextForm}>Continue Registration</button>
+                        </div>
+                    }
+                </Modal>
+            }
         </div>
     )
 }

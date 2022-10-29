@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
-import { setIdentificationData, updateUser } from '../reducers/loginSlice';
-// import { register } from '../reducers/loginSlice';
+import { updateUser } from '../reducers/loginSlice';
 
 function RegisterIdentificationForm() {
     const dispatch = useDispatch();

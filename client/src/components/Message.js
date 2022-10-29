@@ -193,6 +193,22 @@ function Message(props) {
 						}
 						</>
 				);
+			case 'JoinRequest':
+				return (
+					<>
+					{props.fullView ? 
+						<div>
+							<p><span>{sender.login.username}</span> would like to join: {target.name}</p>
+							{userId !== sender._id && <><button onClick={acceptUser}>Accept</button><button onClick={denyUser}>Decline</button><button onClick={reviewUser}>View</button></>}
+						</div>
+						:
+						<div>
+							<p onClick={expandMessage}><span>{read ? 'Read': 'Unread'}:</span><span>{sender.login.username}</span> would like to to join<span>{receiver.name}</span></p>
+							<hr />
+						</div>
+					}
+					</>
+			);
 			default:
 				return null;
 		}

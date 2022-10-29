@@ -8,7 +8,7 @@ const initialState = {
     token: "",
     userId: "",
     login: {
-    username: "",
+        username: "",
     },
     name: {},
     email: "",
@@ -107,6 +107,26 @@ export const addGroup = createAsyncThunk("login/addGroup", async({userId, groupI
     } catch (err) {}    
 });
 
+export const sendJoinRequest = createAsyncThunk("login/sendJoinRequest", async({userId, groupId}) => {
+    try {
+        const response = await axios.post(`${baseURL}/groups/${groupId}/messages/admin/join-request`, {sendingUser: userId, targetGroup: groupId});
+        return response.data._id;
+    } catch(err) {
+        console.error(err);
+        return err;
+    }
+});
+
+export const submitJoinCode = createAsyncThunk("login/submitJoinCode", async({userId, groupId, joinCode}) => {
+    try {
+         const response = await axios.post(`${baseURL}/groups/${groupId}/members/join-code`, {userId, groupId, joinCode});
+         return response.data;
+    } catch(err) {
+        console.error(err);
+        return err;
+    }
+});
+
 export const updateUser = createAsyncThunk("login/updateUser", async ({userId, userUpdates}) => {
     try {
         const response = await axios.patch(`${baseURL}/users/${userId}`, userUpdates);
@@ -174,13 +194,20 @@ export const loginSlice = createSlice({
             state.userId = action.payload.userId;
             state.email = action.payload.email;
         });
+        builder.addCase(sendJoinRequest.fulfilled, (state, action) => {
+            state.messages.sent = [...state.messages.sent, action.payload];
+        });
         builder.addCase(setIdentificationData.fulfilled, (state, action) => {
             state.username = action.payload.username;
             state.name = action.payload.name;
             state.photo = action.payload.photo;
         });
+        builder.addCase(submitJoinCode.fulfilled, (state, action) => {
+            state.groups = [...state.groups, action.payload];
+        });
         builder.addCase(updateUser.fulfilled, (state, action) => {
             for(const key in action.payload) {
+                console.log({key});
                 if(state.hasOwnProperty(key)) {
                     state[key] = action.payload[key];
                 }

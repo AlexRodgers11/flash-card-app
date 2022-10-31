@@ -33,7 +33,7 @@ function RegisterJoinGroupsForm() {
         }
     }
 
-    const goToNextForm = () => {
+    const goToDashboard = () => {
         navigate("/dashboard");
     }
 
@@ -94,7 +94,7 @@ function RegisterJoinGroupsForm() {
                     <>
                         <p>A user can only become a member of this group by receiving an invite</p>
                         <button onClick={continueSearching}>Search for More Groups</button>
-                        <button onClick={goToNextForm}>Add groups later</button>
+                        <button onClick={goToDashboard}>Add groups later</button>
                     </>
                 );
             case "request": 
@@ -134,7 +134,7 @@ function RegisterJoinGroupsForm() {
                     <>
                         <p>An error occurred</p>
                         <button onClick={continueSearching}>Search for More Groups</button>
-                        <button onClick={goToNextForm}>Add groups later</button>
+                        <button onClick={goToDashboard}>Add groups later</button>
                     </>
                 )
         }
@@ -163,7 +163,7 @@ function RegisterJoinGroupsForm() {
                 {displayNoResults && <p>No groups found</p>}
                 {/* need to make sure groups already member of or have sent request to don't show up here */}
                 {foundGroups.map((group) => <button data-id={group._id} key={group._id} onClick={selectGroup}>{group.name}</button>)}
-                <button onClick={goToNextForm}>{joinAttemptType ? 'Continue Registration' : 'Skip for now'}</button>
+                <button onClick={goToDashboard}>{joinAttemptType ? 'Continue Registration' : 'Skip for now'}</button>
                 </>
                 :
                 <>
@@ -175,7 +175,7 @@ function RegisterJoinGroupsForm() {
                     <div>
                         <p>Success! {joinAttemptType === "code" ? "You are now a member of this group" : "Your request has been sent to the group's administrators"}</p>
                         <button onClick={continueSearching}>Search for more groups</button>
-                        <button onClick={goToNextForm}>Done</button>
+                        <button onClick={goToDashboard}>Done</button>
                     </div>
                 }
                 </>

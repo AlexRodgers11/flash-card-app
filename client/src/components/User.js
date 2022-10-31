@@ -29,7 +29,7 @@ function User() {
                     <h1>{userData.login?.username}</h1>
                     <p>{userData.login.password}</p>
                     <p>{userData.photo}</p>
-                    <p>{userData.email}</p>
+                    <p>{userData.login.email}</p>
                     <DeckList listType="user" listId={userId} />
                 </div>
                 :

@@ -350,6 +350,7 @@ userRouter.patch("/:userId", async (req, res, next) => {
     let patchObj = {...req.body};
     if(patchObj.login.username) {
         patchObj.login.password = req.user.login.password;
+        patchObj.login.email = req.user.login.email;
     }
     console.log({patchObj});
     try {

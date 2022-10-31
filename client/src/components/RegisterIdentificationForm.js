@@ -13,11 +13,12 @@ function RegisterIdentificationForm() {
     const [photo, clearPhoto, setPhoto] = useFormInput('');
     const userId = useSelector((state) => state.login.userId);
     const name = useSelector((state) => state.login.name);
+    const email = useSelector((state) => state.login.email);
 
     const handleSubmit = evt => {
         evt.preventDefault();
         console.log("about to dispatch register identification action");
-        dispatch(updateUser({userId, userUpdates: {login: {username: username}, name: {first: firstName, last: lastName}, photo}}))
+        dispatch(updateUser({userId, userUpdates: {login: {username: username, email: email}, name: {first: firstName, last: lastName}, photo}}))
         .then(() => {
             console.log("action complete, about to go to join groups");
             navigate("/register/join-groups");

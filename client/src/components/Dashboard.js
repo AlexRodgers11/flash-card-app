@@ -28,7 +28,7 @@ function Dashboard() {
             <div>
                 <h1>{user.login.username}</h1>
                 <p>{user.photo}</p>
-                <p>{user.email}</p>
+                <p>{user.login.email}</p>
                 <h1>Decks:</h1>
                 <button onClick={goToNewDeckForm}>Create New Deck</button>
                 <DeckList listType="user" listId={user.userId} />

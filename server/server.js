@@ -161,7 +161,7 @@ router.get("/seed-database", async(req, res, next) => {
                 let names = faker.name.findName().split(" ");
                 newUser.name.first = names[0];
                 newUser.name.last = names[1];
-                newUser.email = faker.internet.email();
+                newUser.login.email = faker.internet.email();
                 newUser.photo = faker.image.people();
                 newUser.save((err, savedUser) => {
                     if(err) {

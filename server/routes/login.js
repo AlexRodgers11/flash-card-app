@@ -60,8 +60,7 @@ passport.use(
             passwordField: "password"
         },
         (email, password, done) => {
-        console.log("finding user");
-        const newUser = new User({login: {password: password}, email: email});
+        const newUser = new User({login: {email: email, password: password}});
         newUser.save((err, user) => {
             if(err) {
                 return done(null, false);

@@ -5,13 +5,13 @@ const Schema = mongoose.Schema;
 const User = new Schema({
     login: {
         username: String,
-        password: String
+        password: String,
+        email: String
     },
     name: {
         first: String,
         last: String
     },
-    email: String,
     photo: String,
     decks: [{type: Schema.Types.ObjectId, ref: "Deck"}],
     groups: [{type: Schema.Types.ObjectId, ref: "Group"}],

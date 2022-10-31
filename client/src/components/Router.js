@@ -22,10 +22,10 @@ function Router() {
             <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
             <Route exact path="/dashboard" element={<Dashboard />} />
             <Route path="/" element={<LandingPage />}>
-                <Route path="login" element={<Modal><Login /></Modal>} />
-                <Route path="register/credentials" element={<Modal><RegisterCredentialsForm /></Modal>} />
-                <Route path="register/identification" element={<Modal><RegisterIdentificationForm /></Modal>} />
-                <Route path="register/join-groups" element={<Modal><RegisterJoinGroupsForm /></Modal>} />
+                <Route path="login" element={<Login />} />
+                <Route path="register/credentials" element={<RegisterCredentialsForm />} />
+                <Route path="register/identification" element={<RegisterIdentificationForm />} />
+                <Route path="register/join-groups" element={<RegisterJoinGroupsForm />} />
             </Route>
         </Routes>
     )

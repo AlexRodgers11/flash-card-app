@@ -33,7 +33,7 @@ passport.use(
             $and: [
                 {$or: [
                     {"login.username": usernameOrEmail},
-                    {"email": usernameOrEmail}
+                    {"login.email": usernameOrEmail}
                 ]},
                 {"login.password": password}
             ]

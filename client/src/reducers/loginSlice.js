@@ -113,7 +113,7 @@ export const addGroup = createAsyncThunk("login/addGroup", async({userId, groupI
 export const sendJoinRequest = createAsyncThunk("login/sendJoinRequest", async({userId, groupId}) => {
     try {
         const response = await axios.post(`${baseURL}/groups/${groupId}/messages/admin/join-request`, {sendingUser: userId, targetGroup: groupId});
-        return response.data._id;
+        return response.data;
     } catch(err) {
         console.error(err);
         return err;

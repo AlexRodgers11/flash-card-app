@@ -39,7 +39,7 @@ function Dashboard() {
                     null
                     :
                     <Modal hideModal={toggleGroupSearchModal}>
-                        <RegisterJoinGroupsForm />
+                        <RegisterJoinGroupsForm hideModal={toggleGroupSearchModal}/>
                     </Modal>
                 }
             </div>            

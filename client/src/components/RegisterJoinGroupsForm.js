@@ -6,7 +6,7 @@ import useFormInput from '../hooks/useFormInput';
 import { fetchGroupJoinOptions } from '../reducers/groupSlice';
 import { sendJoinRequest, submitJoinCode } from '../reducers/loginSlice';
 
-function RegisterJoinGroupsForm() {
+function RegisterJoinGroupsForm(props) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const userId = useSelector((state) => state.login.userId);
@@ -163,7 +163,7 @@ function RegisterJoinGroupsForm() {
                 {displayNoResults && <p>No groups found</p>}
                 {/* need to make sure groups already member of or have sent request to don't show up here */}
                 {foundGroups.map((group) => <button data-id={group._id} key={group._id} onClick={selectGroup}>{group.name}</button>)}
-                <button onClick={goToDashboard}>{joinAttemptType ? 'Continue Registration' : 'Skip for now'}</button>
+                <button onClick={props.hideModal ? props.hideModal : goToDashboard}>{joinAttemptType || props.hideModal ? props.hideModal ? 'Done' : 'Finish Registration' : 'Skip for now'}</button>
                 </>
                 :
                 <>
@@ -175,7 +175,7 @@ function RegisterJoinGroupsForm() {
                     <div>
                         <p>Success! {joinAttemptType === "code" ? "You are now a member of this group" : "Your request has been sent to the group's administrators"}</p>
                         <button onClick={continueSearching}>Search for more groups</button>
-                        <button onClick={goToDashboard}>Done</button>
+                        <button onClick={props.hideModal ? props.hideModal : goToDashboard}>Done</button>
                     </div>
                 }
                 </>

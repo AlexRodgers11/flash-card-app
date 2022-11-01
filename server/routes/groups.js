@@ -23,29 +23,13 @@ groupRouter.param("groupId", (req, res, next, groupId) => {
     });
 });
 
-groupRouter.get("/", (req, res, next) => {
-    if(req.query.search) {
-        // console.log(req.query.search);
-        const regex = new RegExp(req.query.search, 'i');
-        Group.find({name: {$regex: regex}}, (err, groups) => {
-            if(err) {
-                res.status(500).send("There was an error with your request");
-                throw err;
-            } else {
-                res.status(200).send(groups);
-            }
-        });
-    } else {
-        Group.find({}, (err, groups) => {
-            if(err) {
-                res.status(500).send("There was an error with your request");
-                throw err;
-            } else {
-                res.status(200).send(groups);
-            }
-        });
-    }
-    
+groupRouter.get("/search", async (req, res, next) => {
+    const regex = new RegExp(req.query.entry, 'i');
+    const user = await User.findById(req.query.id, "groups messages.sent");
+    let populatedUser = await user.populate("messages.sent");
+    let groups = await Group.find({name: {$regex: regex}});
+    let filteredGroups = groups.filter(group => !populatedUser.groups.includes(group._id) && !populatedUser.messages.sent.map(message => message.targetGroup.toString()).includes(group._id.toString()));
+    res.status(200).send(filteredGroups);
 });
 
 groupRouter.post("/", (req, res, next) => {

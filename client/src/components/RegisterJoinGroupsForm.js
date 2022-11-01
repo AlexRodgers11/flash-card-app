@@ -143,7 +143,7 @@ function RegisterJoinGroupsForm() {
     useEffect(() => {
         if(searchField.length >= 3) {
             const baseURL = "http://localhost:8000";
-            axios.get(`${baseURL}/groups?search=${searchField}`)
+            axios.get(`${baseURL}/groups/search?entry=${searchField}&id=${userId}`)
                 .then((response) => setFoundGroups(response.data))
                 .catch(err => console.log(err));
         } else {

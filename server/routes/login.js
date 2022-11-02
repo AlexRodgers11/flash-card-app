@@ -5,6 +5,7 @@ import { Strategy, ExtractJwt } from "passport-jwt";
 import { Strategy as LocalStrategy } from "passport-local";
 import jwt from "jwt-simple";
 import User from "../models/user.js";
+import { generateCode } from "../utils.js";
 
 // const jwtOptions = {
 //     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -60,7 +61,16 @@ passport.use(
             passwordField: "password"
         },
         (email, password, done) => {
-        const newUser = new User({login: {email: email, password: password}});
+        const newUser = new User(
+            {
+                login: {email: email, password: password},
+                verification: {
+                    code: generateCode(6),
+                    codeExpDate: Date.now() + (1000 * 60 * 60 * 24),
+                    verified: false
+                }
+            }
+        );
         newUser.save((err, user) => {
             if(err) {
                 return done(null, false);

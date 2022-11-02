@@ -8,6 +8,7 @@ import Attempt from "../models/attempt.js";
 import { Message } from "../models/message.js";
 // import Notification from '../models/notification.js';
 import { Notification } from '../models/notification.js';
+import { generateCode } from "../utils.js";
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
@@ -59,16 +60,17 @@ userRouter.get("/:userId/groups", (req, res, next) => {
     });
 });
 
-userRouter.post("/", (req, res, next) => {
-    let newUser = new User(req.body);
-    newUser.save((err, user) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
+userRouter.patch("/:userId/verification", async (req, res, next) => {
+    if(Date.now() < req.user.verification.codeExpDate) {
+        if(req.user.verification.code === req.body.code) {
+            await User.findByIdAndUpdate(req.user._id, {"verification.verified": true});
+            res.status(200).send({verificationResponse: "verified"});
         } else {
-            res.status(200).send(user)
+            res.status(401).send({verificationResponse: "invalid"})
         }
-    });
+    } else {
+        res.status(401).send({verificationResponse: "expired"});
+    }
 });
 
 userRouter.delete("/:userId", async (req, res, next) => {

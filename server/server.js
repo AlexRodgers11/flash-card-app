@@ -163,6 +163,12 @@ router.get("/seed-database", async(req, res, next) => {
                 newUser.name.last = names[1];
                 newUser.login.email = faker.internet.email();
                 newUser.photo = faker.image.people();
+                newUser.verification = {
+                    code: generateCode(6),
+                    // codeExpDate: Math.round(Date.now() / 1000 + 30 * 24 * 60 * 60),
+                    codeExpDate: Date.now() + (100 * 60 * 60 * 24 * 3),
+                    verified: true
+                };
                 newUser.save((err, savedUser) => {
                     if(err) {
                         userReject(err);

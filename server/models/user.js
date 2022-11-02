@@ -21,7 +21,12 @@ const User = new Schema({
         received: [{type: Schema.Types.ObjectId, ref: "Message"}]
     },
     notifications: [{type: Schema.Types.ObjectId, ref: "Notification"}],
-    adminOf: [{type: Schema.Types.ObjectId, ref: "Group"}]
+    adminOf: [{type: Schema.Types.ObjectId, ref: "Group"}],
+    verification: {
+        code: String,
+        codeExpDate: Date,
+        verified: Boolean
+    }
 }, {timestamps: true});
 
 export default mongoose.model("User", User);

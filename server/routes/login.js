@@ -21,6 +21,43 @@ import { generateCode } from "../utils.js";
 
 // const requireJwt = passport.authenticate("loginWithJwt", {session: false});
 
+import {createTransport} from "nodemailer";
+
+const main = async (email, code) => {
+    let transporter = createTransport({
+        host: "smtp-relay.sendinblue.com",
+        port: 587,
+        secure: false,
+        auth: {
+            user: "skyewulff@outlook.com",
+            pass: "gMyXOLU91RF7aYmC"
+        }
+    });
+
+        await transporter.sendMail({
+        from: '"FlashCardApp" <flashcardapp@example.com>',
+        to: `${email}`,
+        subject: "Verify your email",
+        text: "Test code",
+        html: (
+            `<html>
+                <body>
+                    <p>Enter this code in the website to verify your account:</p>
+                    <h1>${code}</h1>
+                </body>
+            </html>`
+        )
+        // (`<html>
+        //     <body>
+        //         <form action="/test" method="POST" >
+        //             <h3>Click to verify your email"</h3>
+        //             <button type="submit">Verify My Email</button>
+        //         </form>
+        //     </body>
+        // </html>`)
+    });
+}
+
 passport.use(
     "login",
     new LocalStrategy(
@@ -61,23 +98,26 @@ passport.use(
             passwordField: "password"
         },
         (email, password, done) => {
-        const newUser = new User(
-            {
-                login: {email: email, password: password},
-                verification: {
-                    code: generateCode(6),
-                    codeExpDate: Date.now() + (1000 * 60 * 60 * 24),
-                    verified: false
+            let code = generateCode(6);
+            main(email, code);
+
+            const newUser = new User(
+                {
+                    login: {email: email, password: password},
+                    verification: {
+                        code: code,
+                        codeExpDate: Date.now() + (1000 * 60 * 60 * 24),
+                        verified: false
+                    }
                 }
-            }
-        );
-        newUser.save((err, user) => {
-            if(err) {
-                return done(null, false);
-            } else {
-                return done(null, user)
-            }
-        });
+            );
+            newUser.save((err, user) => {
+                if(err) {
+                    return done(null, false);
+                } else {
+                    return done(null, user)
+                }
+            });
     })
 );
 

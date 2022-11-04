@@ -24,6 +24,16 @@ userRouter.param("userId", (req, res, next, userId) => {
     });
 });
 
+userRouter.get("/emails", async (req, res, next) => {
+    console.log("Req.query.email", req.query.email);
+    if(req.query.email) {
+        let user = await User.findOne({"login.email": req.query.email});
+        res.status(200).send({emailAvailable: !user});
+    } else {
+        res.status(400).send("No email submitted");
+    }
+});
+
 userRouter.get("/:userId", (req, res, next) => {
     if(req.query.partial) {
         let partialData = {

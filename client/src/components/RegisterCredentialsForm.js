@@ -16,6 +16,7 @@ function RegisterCredentialsForm() {
     const [verificationResponse, setVerificationResponse] = useState("");
     const [showVerifyPassword, setShowVerifyPassword] = useState(false);
     const [verifyPassword, clearVerifyPassword, setVerifyPassword] = useFormInput('');
+    const [errorMessage, setErrorMessage] = useState("");
     const userId = useSelector((state) => state.login.userId);
 
     const checkValidationCode = async (evt) => {
@@ -53,17 +54,19 @@ function RegisterCredentialsForm() {
             );
         }
     }    
-    const handleSubmit = evt => {
+    const handleSubmit = async (evt) => {
         evt.preventDefault();
         if(password === verifyPassword) {
-            console.log("about to dispatch register action");
-            dispatch(signUp({email, password}))
-            .then(() => {
+            let response = await axios.get(`${baseURL}/users/emails?email=${email}`);
+            if(response.data.emailAvailable) {
+                dispatch(signUp({email, password}));
                 setAwaitingVerification(true);
-                clearEmail();
-                clearPassword();
-                clearVerifyPassword();
-            });
+            } else {
+                setErrorMessage("An account with this email already exists");
+            }
+            clearEmail();
+            clearPassword();
+            clearVerifyPassword();
         } else {
             clearPassword();
             clearVerifyPassword();
@@ -100,6 +103,7 @@ function RegisterCredentialsForm() {
                         null
                     }
                     <button type="submit">Submit</button>
+                    {(errorMessage && (!email.length && !password.length)) && <p>{errorMessage}</p>}
                 </form>
                 :
                 <form onSubmit={checkValidationCode}>

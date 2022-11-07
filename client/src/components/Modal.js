@@ -7,7 +7,7 @@ function Modal(props) {
 		<div className='Modal_active'>
 			<div className='Modal_backdrop' onClick={props.hideModal}></div>
 			<div className='Modal_content'>
-				<p className='Modal_close' onClick={props.hideModal}>X</p>
+				<p className='Modal_close' onClick={props.hideModal}>{props.hideModal && "X"}</p>
 				{props.children}
 			</div>
 		</div>

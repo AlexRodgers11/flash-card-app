@@ -10,7 +10,7 @@ function RegisterIdentificationForm() {
     const [username, clearUsername, setUsername] = useFormInput('');
     const [firstName, clearFirstName, setFirstName] = useFormInput('');
     const [lastName, clearLastName, setLastName] = useFormInput('');
-    const [photo, clearPhoto, setPhoto] = useFormInput('');
+    const [photo, setPhoto] = useState();
     const userId = useSelector((state) => state.login.userId);
     const name = useSelector((state) => state.login.name);
     const email = useSelector((state) => state.login.email);
@@ -25,9 +25,15 @@ function RegisterIdentificationForm() {
             clearUsername();
             clearFirstName();
             clearLastName();
-            clearPhoto();
+            setPhoto();
         });
     }
+
+    const handlePhotoChange = (evt) => {
+        const file = evt.target.files[0];
+        console.log({file})
+        setPhoto(file);
+    }    
 
     useEffect(() => {
         if(!userId) {
@@ -55,7 +61,7 @@ function RegisterIdentificationForm() {
                 </div>
                 <div>
                     <label htmlFor="photo">Photo (optional)</label>
-                    <input type="text" id="photo" name="photo" value={photo} onChange={setPhoto} />
+                    <input type="file" accept="image/*" id="photo" name="photo" onChange={handlePhotoChange} />
                 </div>
                 <button type="submit">Submit</button>
             </form>

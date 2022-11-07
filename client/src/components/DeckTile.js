@@ -13,7 +13,7 @@ function DeckTile(props) {
     }
 
     useEffect(() => {
-        axios.get(`${baseURL}/decks/${props.deckId}?tile=true`)
+        axios.get(`${baseURL}/decks/${props.deckId}/tile`)
             .then((response) => setDeckData(response.data))
             .catch((err) => console.log(err));
     }, [props.deckId]);

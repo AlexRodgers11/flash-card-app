@@ -49,26 +49,27 @@ deckRouter.post("/", (req, res, next) => {
     });
 });
 
-deckRouter.get("/:deckId", (req, res, next) => {
-    if(req.query.tile) {
-        User.findById(req.deck.creator, (err, user) => {
-            if(err) {
-                res.status(500).send("There was an error with your request");
-                throw err;
-            } 
-            let response = {
-                name: req.deck.name,
-                publiclyAvailable: req.deck.publiclyAvailable,
-                creator: user.login.username,
-                createdAt: req.deck.createdAt,
-                cardCount: req.deck.cards.length,
-                permissions: req.deck.permissions
-            };
-            res.status(200).send(JSON.stringify(response));
-            
-        });
-    } else if(req.query.practice) {
-        Deck.findById(req.deck._id)
+deckRouter.get("/:deckId/tile", (req, res, next) => {
+    User.findById(req.deck.creator, (err, user) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } 
+        let response = {
+            name: req.deck.name,
+            publiclyAvailable: req.deck.publiclyAvailable,
+            creator: user.login.username,
+            createdAt: req.deck.createdAt,
+            cardCount: req.deck.cards.length,
+            permissions: req.deck.permissions
+        };
+        res.status(200).send(JSON.stringify(response));
+        
+    });
+});
+
+deckRouter.get("/:deckId/practice", (req, res, next) => {
+    Deck.findById(req.deck._id)
             .populate({
                 path: "cards"
             })
@@ -76,9 +77,10 @@ deckRouter.get("/:deckId", (req, res, next) => {
                 throw err;
             })
             .then(deck => res.status(200).send(deck));
-    } else {
-        res.status(200).send(req.deck);
-    }
+});
+
+deckRouter.get("/:deckId", (req, res, next) => {
+    res.status(200).send(req.deck);
 });
 
 deckRouter.delete("/:deckId", async (req, res, next) => {

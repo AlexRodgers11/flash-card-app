@@ -9,7 +9,7 @@ function UserTile(props) {
 
     useEffect(() => {
         const baseURL = 'http://localhost:8000';
-        axios.get(`${baseURL}/users/${props.memberId}?partial=true`)
+        axios.get(`${baseURL}/users/${props.memberId}/tile`)
             .then((response) => setUserData(response.data));
     }, [props.memberId]);
 

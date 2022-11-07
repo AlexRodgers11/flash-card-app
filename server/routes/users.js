@@ -37,28 +37,29 @@ userRouter.get("/emails", async (req, res, next) => {
     }
 });
 
-userRouter.get("/:userId/tile", (req, res, next) => {
+userRouter.get("/:userId/tile", async (req, res, next) => {
     let partialData = {
         firstName: req.user.name.first,
         lastName: req.user.name.last,
         login: req.user.login,
         // password: req.user.login.password, /////////////////////////delete this once testing is done
         email: req.user.email,
-        photo: req.user.photo,
+        photo: await getObjectSignedUrl(req.user.photo),
     }
     res.status(200).send(partialData);
 });
 
-userRouter.get("/:userId", (req, res, next) => {
-    User.findById(req.user._id)
-        .populate('decks', 'name')
-        .then((user) => {
-            res.status(200).send(user);          
-        })
-        .catch(err => {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        });
+userRouter.get("/:userId", async (req, res, next) => {
+    try {
+        let userData = await User.findById(req.user._id);
+        userData = await userData.populate("decks", "name");
+        userData.photo = await getObjectSignedUrl(req.user.photo);
+        res.status(200).send(userData);          
+
+    } catch (err) {
+        res.status(500).send("There was an error with your request");
+        throw err;
+    }
 });
 
 userRouter.get("/:userId/groups", (req, res, next) => {

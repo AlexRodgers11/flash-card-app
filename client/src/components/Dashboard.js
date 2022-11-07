@@ -27,7 +27,7 @@ function Dashboard() {
         <div>
             <div>
                 <h1>{user.login.username}</h1>
-                <p>{user.photo}</p>
+                <img src={user.photo} />
                 <p>{user.login.email}</p>
                 <h1>Decks:</h1>
                 <button onClick={goToNewDeckForm}>Create New Deck</button>

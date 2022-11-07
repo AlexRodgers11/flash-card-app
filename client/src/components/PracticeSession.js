@@ -86,20 +86,21 @@ function PracticeSession() {
         
     }
 
-    const handleGoToUserPage = () => {
+    const handleGoToUserPage = async () => {
         if(!retryStatus) {
-            axios.post(`${baseURL}/users/${userId}/attempts`, {
-                user: userId,
-                deck: deckId,
-                datePracticed: new Date().toString(),
-                cards: [...attempts]
-            })
-            .then(() => {
-                dispatch(endPractice);
-                navigate(`/dashboard`);
-            })
-            .catch(err => console.error(err));
-        }    
+            try {
+                await axios.post(`${baseURL}/users/${userId}/attempts`, {
+                    user: userId,
+                    deck: deckId,
+                    datePracticed: new Date().toString(),
+                    cards: [...attempts]
+                });
+            } catch (err) {
+                console.error(err)
+            }
+        } 
+        dispatch(endPractice);
+        navigate(`/dashboard`);
     }
 
     return (

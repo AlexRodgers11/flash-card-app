@@ -8,6 +8,7 @@ import Login from './Login';
 import Modal from './Modal';
 import PracticeSession from './PracticeSession';
 import RegisterCredentialsForm from './RegisterCredentialsForm';
+import RegisterEmailVerificationForm from './RegisterEmailVerification';
 import RegisterIdentificationForm from './RegisterIdentificationForm';
 import RegisterJoinGroupsForm from './RegisterJoinGroupsForm';
 import User from './User';
@@ -24,6 +25,7 @@ function Router() {
             <Route path="/" element={<LandingPage />}>
                 <Route path="login" element={<Login />} />
                 <Route path="register/credentials" element={<RegisterCredentialsForm />} />
+                <Route path="register/email-verification" element={<RegisterEmailVerificationForm />} />
                 <Route path="register/identification" element={<RegisterIdentificationForm />} />
                 <Route path="register/join-groups" element={<RegisterJoinGroupsForm />} />
             </Route>

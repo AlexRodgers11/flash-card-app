@@ -5,7 +5,7 @@ import Modal from './Modal';
 function LandingPage() {
 	const location = useLocation();
 	const navigate = useNavigate();
-	
+		
 	const goBackToHome = () => {
 		navigate("/");
 	};
@@ -13,7 +13,7 @@ function LandingPage() {
 	return (
 		<div>
 			<h1>Welcome!</h1>
-				{location.pathname !== "/" && <Modal hideModal={goBackToHome}><Outlet /></Modal>}
+				{location.pathname !== "/" && <Modal hideModal={location.pathname === "/register/credentials" ? goBackToHome : null}><Outlet /></Modal>}
 		</div>
 	)
 }

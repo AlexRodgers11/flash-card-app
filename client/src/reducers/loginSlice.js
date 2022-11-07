@@ -132,7 +132,13 @@ export const submitJoinCode = createAsyncThunk("login/submitJoinCode", async({us
 
 export const updateUser = createAsyncThunk("login/updateUser", async ({userId, userUpdates}) => {
     try {
-        const response = await axios.patch(`${baseURL}/users/${userId}`, userUpdates);
+        const formData = new FormData();
+        formData.append("email", userUpdates.login.email || "");
+        formData.append("username", userUpdates.login.username);
+        formData.append("first", userUpdates.name.first);
+        formData.append("last", userUpdates.name.last);
+        formData.append("photo", userUpdates.photo);
+        const response = await axios.patch(`${baseURL}/users/${userId}`, formData, { headers: {"Content-Type": "multipart/form-data"}});
         const stateUpdateObj = {};
         for(const key in userUpdates) {
             if(response.data.hasOwnProperty(key)) {

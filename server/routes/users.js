@@ -8,7 +8,10 @@ import Attempt from "../models/attempt.js";
 import { Message } from "../models/message.js";
 // import Notification from '../models/notification.js';
 import { Notification } from '../models/notification.js';
-import { generateCode } from "../utils.js";
+import { generateCode, generateRandomFileName } from "../utils.js";
+
+import multer from "multer";
+import { getObjectSignedUrl, uploadFile } from "../s3.js";
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
@@ -358,21 +361,67 @@ userRouter.put("/:userId/notifications", (req, res, next) => {
         });
 });
 
-userRouter.patch("/:userId", async (req, res, next) => {
-    let patchObj = {...req.body};
-    if(patchObj.login.username) {
-        patchObj.login.password = req.user.login.password;
-        patchObj.login.email = req.user.login.email;
+const fileFilter = (req, file, callback) => {
+    if(file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+        callback(null, true);
+    } else {
+        callback(new Error("Only jpeg and png file types may be submitted"), false);
     }
+};
+
+//figure out how to handle errors for fileSize, etc
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5
+    },
+    fileFilter: fileFilter
+});
+
+userRouter.patch("/:userId", upload.single("photo"), async (req, res, next) => {
+    const patchObj = {};
+    
+    if(req.file) {
+        const file = req.file;
+        let photoName;
+        if(req.user.photo) {
+            photoName = req.user.photo;
+        } else {
+            photoName = generateRandomFileName();
+            patchObj.photo = photoName;
+        }
+        await uploadFile(file.buffer, photoName, file.mimetype)
+    }
+    
+    if(req.body.first || req.body.last) {
+        patchObj.name = {
+            first: req.body.first ? req.body.first : req.user.name.first ? req.user.name.first : "",
+            last: req.body.last ? req.body.last : req.user.name.last ? req.user.name.last : "",
+        }
+    }
+    
+    if((req.body.username || req.body.password) || req.body.email) {
+        if(req.body.email) {
+            console.log("nothing counts as something")
+        }
+        patchObj.login = {
+            username: req.body.username ? req.body.username : req.user.login.username ? req.user.login.username : "",
+            password: req.body.password ? req.body.password : req.user.login.password ? req.user.login.password : "",
+            email: req.body.email ? req.body.email : req.user.login.email ? req.user.login.email : ""
+        }
+    }
+
     console.log({patchObj});
     try {
         const user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
         let responseData = user;
         // why doesn't this delete the password
         // delete responseData.login.password;
-        // console.log({responseData});
+
         responseData.login = {username: user.login.username};
-        console.log({responseData});
+        let photoUrl = await getObjectSignedUrl(user.photo);
+        responseData.photo = photoUrl;
         res.status(200).send(responseData);
     } catch (err) {
         res.status(500).send("There was an error with your request");

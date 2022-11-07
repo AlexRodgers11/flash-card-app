@@ -26,11 +26,11 @@ import {createTransport} from "nodemailer";
 const main = async (email, code) => {
     let transporter = createTransport({
         host: "smtp-relay.sendinblue.com",
-        port: 587,
+        port: process.env.SEND_IN_BLUE_PORT,
         secure: false,
         auth: {
-            user: "skyewulff@outlook.com",
-            pass: "gMyXOLU91RF7aYmC"
+            user: process.env.SEND_IN_BLUE_USER,
+            pass: process.env.SEND_IN_BLUE_PASSWORD
         }
     });
 
@@ -132,7 +132,7 @@ const tokenForUser = user => {
         //expire after 2 hours
         exp: Math.round(Date.now() / 1000 + 2 * 60 * 60)
     },
-    "theblackswordsman");
+    process.env.TOKEN_KEY);
 }
 
 loginRouter.post("/", requireSignIn, (req, res, next) => {

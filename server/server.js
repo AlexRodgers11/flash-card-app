@@ -30,6 +30,9 @@ import { ExtractJwt } from "passport-jwt";
 import { Strategy as JwtStrategy } from  "passport-jwt";
 import group from "./models/group.js";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 mongoose.connect("mongodb://localhost/flash-card-app-four", {
 // mongoose.connect("mongodb://WOLVES-DEN:27017,WOLVES-DEN:27018,WOLVES-DEN:27019/flash-card?replicaSet=rs", {
     //use MongoDB's new connection string parser instead of the old deprecated one

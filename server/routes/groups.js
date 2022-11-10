@@ -32,21 +32,6 @@ groupRouter.get("/search", async (req, res, next) => {
     res.status(200).send(filteredGroups);
 });
 
-groupRouter.post("/", (req, res, next) => {
-    if(!req.body.name) {
-        return res.status(400).send("All groups must have a name");
-    } else {
-        let newGroup = new Group();
-        newGroup.name = req.body.name;
-        newGroup.save()
-            .catch(err => {
-                res.status(500).send("Add group failed");
-                throw err
-            })
-            .then(res.status(200).send(newGroup));
-    }
-});
-
 groupRouter.get("/:groupId", (req, res, next) => {
     let response;
     if(req.query.tile) {

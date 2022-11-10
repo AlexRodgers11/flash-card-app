@@ -190,6 +190,19 @@ userRouter.post("/:userId/notifications", async (req, res, next) => {
 
 });
 
+userRouter.post("/:userId/groups", async (req, res, next) => {
+    console.log("body:", req.body);
+    try {
+        let newGroup = new Group(req.body);
+        await newGroup.save();
+        const updatedUser = await User.findByIdAndUpdate(req.user._id, {$push: {groups: newGroup._id, adminOf: newGroup._id}});
+        res.status(200).send(newGroup._id);
+    } catch (err) {
+        res.status(500).send(err.message);
+        console.error(err);
+    }
+});
+
 userRouter.put("/:userId/notifications", (req, res, next) => {
     Notification.updateMany({_id: {$in: req.user.notifications}}, {$set: {read: true}})
         //may not need to send anything back here, may need to send back certain number of notifications

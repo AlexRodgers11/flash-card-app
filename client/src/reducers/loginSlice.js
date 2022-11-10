@@ -103,9 +103,9 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
     }
 });
 
-export const addGroup = createAsyncThunk("login/addGroup", async({userId, groupId}) => {
+export const addGroup = createAsyncThunk("login/addGroup", async({creator, name}) => {
     try {
-        const response = await axios.post(`${baseURL}/users/${userId}/groups`);
+        const response = await axios.post(`${baseURL}/users/${creator}/groups`, {creator, name, administrators: [creator], members: [creator]});
         return response.data;
     } catch (err) {}    
 });

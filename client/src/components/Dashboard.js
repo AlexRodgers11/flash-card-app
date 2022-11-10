@@ -1,8 +1,8 @@
-//needs to have user's decks, groupsimport axios from 'axios';
-import React from 'react'
-import { useSelector } from 'react-redux';
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
-import useToggle from '../hooks/useToggle';
+import useFormInput from '../hooks/useFormInput';
+import { addGroup } from '../reducers/loginSlice';
 import DeckList from './DeckList';
 import GroupList from './GroupList';
 import Modal from './Modal';
@@ -10,17 +10,47 @@ import RegisterJoinGroupsForm from './RegisterJoinGroupsForm';
 
 function Dashboard() {
     const user = useSelector((state) => state.login);
-    const [showGroupSearchModal, toggleGroupSearchModal] = useToggle(false);
+    const [groupName, clearGroupNameChange, handleGroupNameChange] = useFormInput("");
+    const [modalContent, setModalContent] = useState("");
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     
+    const createNewGroup = (evt) => {
+        evt.preventDefault();
+        dispatch(addGroup({creator: user.userId, name: groupName}))
+            .then(response => {
+                clearGroupNameChange();
+                setModalContent("");
+                navigate(`/groups/${response.payload}`);
+            });
+    }
+
+    const selectForm = (evt) => {
+        setModalContent(evt.target.dataset.form);
+    }
+
+    const displayModalContent = () => {
+        if(modalContent === "join") {
+            return <RegisterJoinGroupsForm hideModal={hideModal}/>
+        } else if (modalContent === "create") {
+            return (
+                <form onSubmit={createNewGroup}>
+                    <label htmlFor="group-name">Group Name</label>
+                    <input type="text" id="group-name" name="group-name" value={groupName} onChange={handleGroupNameChange} />
+                    <button type="submit">Create</button>
+                </form>
+            )
+        } else {
+            return 
+        }
+    }
+
     const goToNewDeckForm = () => {
         navigate(`/users/${user.userId}/decks/new`);
     }
 
-    const searchGroups = () => {
-        if(!showGroupSearchModal) {
-            toggleGroupSearchModal();
-        }
+    const hideModal = () => {
+        setModalContent("");
     }
 
     return (
@@ -33,13 +63,14 @@ function Dashboard() {
                 <button onClick={goToNewDeckForm}>Create New Deck</button>
                 <DeckList listType="user" listId={user.userId} />
                 <h1>Groups:</h1>
-                <button onClick={searchGroups}>Search for Groups to Join</button>
+                <button data-form="join" onClick={selectForm}>Search for Groups to Join</button>
+                <button data-form="create" onClick={selectForm}>Create New Group</button>
                 <GroupList groupIds={user.groups} />
-                {!showGroupSearchModal ?
+                {!modalContent ?
                     null
                     :
-                    <Modal hideModal={toggleGroupSearchModal}>
-                        <RegisterJoinGroupsForm hideModal={toggleGroupSearchModal}/>
+                    <Modal hideModal={hideModal}>
+                        {displayModalContent()}
                     </Modal>
                 }
             </div>            

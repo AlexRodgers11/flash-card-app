@@ -403,6 +403,35 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
     
 // });
 
+groupRouter.patch("/:groupId/admins", async (req, res, next) => {
+    if(req.group.administrators.includes(req.body.adminId)) {
+        try {
+            let user = await User.findById(req.body.userId);
+            if(user && req.group.members.includes(user._id)) {
+                let updatedUser;
+                if(req.body.action === "add") {
+                    //need to create notification here eventually
+                    await Group.findByIdAndUpdate(req.group._id, {$push: {administrators: user._id}});
+                    updatedUser = await User.findByIdAndUpdate(user._id, {$push: {adminOf: req.group._id}});
+                } else if(req.body.action === "remove") {
+                    //need to create notification here eventually
+                    await Group.findByIdAndUpdate(req.group._id, {$pull: {administrators: user._id}});
+                    updatedUser = await User.findByIdAndUpdate(user._id, {$pull: {adminOf: req.group._id}});
+                } else {
+                    res.status(500).send("There was an error with your request");
+                }
+                res.status(200).send(updatedUser._id);
+            } else {
+                res.status(404).send("User not found in selected group");
+            }
+        } catch (err) {
+            res.status(500).send(err.message);
+            throw err;
+        }
+    } else {
+        res.status(403).send("Only authorized users can designate adminstrator authority");
+    }
+});
 
 groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next) => {
     try {

@@ -54,6 +54,16 @@ export const fetchGroupJoinOptions = createAsyncThunk("group/fetchGroupJoinOptio
     }
 });
 
+export const removeMember = createAsyncThunk("group/removeMember", async({groupId, memberToRemoveId, requesterId}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/groups/${groupId}/members`, {memberToRemoveId, requesterId});
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return err;
+    }
+});
+
 export const updateGroup = createAsyncThunk("group/updateGroup", async({groupId, groupUpdates}) => {
     try {
         const response = await axios.put(`${baseURL}/groups/${groupId}`, groupUpdates);
@@ -107,6 +117,10 @@ export const groupSlice = createSlice({
                     state[key] = action.payload[key];
                 }
             }
+        });
+        builder.addCase(removeMember.fulfilled, (state, action) => {
+            state.memberIds = state.memberIds.filter(id => id !== action.payload);
+            state.administrators = state.administrators.filter(id => id !== action.payload);
         });
     }
 });

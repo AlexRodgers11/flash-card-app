@@ -172,6 +172,9 @@ export const loginSlice = createSlice({
                 return message;
             });
         },
+        leaveGroup: (state, action) => {
+            state.groups = state.groups.filter(id => id !== action.payload.groupId);
+        },
         logout: (state) => initialState
     },
     extraReducers: (builder) => {
@@ -225,5 +228,5 @@ export const loginSlice = createSlice({
     }
 });
 
-export const { addDeckToUser, addMessage, editMessage, logout, setGroups } = loginSlice.actions;
+export const { addDeckToUser, addMessage, editMessage, leaveGroup, logout, setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

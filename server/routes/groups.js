@@ -388,6 +388,29 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
     
 // });
 
+//Patch? Delete? If Patch should I use the same route for adding and removing members and do logic to decide whether to push or pull in update obj?
+groupRouter.patch("/:groupId/members", async (req, res, next) => {
+    //necessary to do this check since it would take Postman or something to send a request with a member Id not in the group?
+    if(req.group.members.includes(req.body.memberToRemoveId)) {
+        //Is this truly secure? Admin ids are exposed in devtools...
+        //also, may need to split this into two ifs so notification can be sent if an admin removes a group member
+        if(req.group.members.includes(req.body.requesterId) || req.group.administrators.includes(req.body.requesterId)) {
+            try {
+                await Group.findByIdAndUpdate(req.group._id, {$pull: {members: req.body.memberToRemoveId, administrators: req.body.memberToRemoveId}});
+                const updatedUser = await User.findByIdAndUpdate(req.body.memberToRemoveId, {$pull: {groups: req.group._id, adminOf: req.group._id}});
+                res.status(200).send(updatedUser._id);
+            } catch (err) {
+                res.status(500).send(err.message);
+                throw err;
+            }
+        } else {
+            res.status(403).send("You do not have the authority to remove this member");
+        }
+    } else {
+        res.status(404).send("Cannot remove member because member not found");
+    }
+});
+
 groupRouter.patch("/:groupId/admins", async (req, res, next) => {
     if(req.group.administrators.includes(req.body.adminId)) {
         try {

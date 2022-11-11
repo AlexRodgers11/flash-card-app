@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
-import { addActivity, addMember, fetchGroupData, updateGroup } from '../reducers/groupSlice';
+import { addActivity, addMember, fetchGroupData, removeMember, updateGroup } from '../reducers/groupSlice';
 import DeckList from './DeckList';
 import ActivityList from './ActivityList';
 import GroupMemberList from './GroupMemberList';
@@ -10,7 +10,7 @@ import Modal from './Modal';
 import useToggle from '../hooks/useToggle';
 import axios from 'axios';
 import { addDeck } from '../reducers/decksSlice';
-import { addMessage } from '../reducers/loginSlice';
+import { addMessage, leaveGroup } from '../reducers/loginSlice';
 import { generateJoinCode } from '../utils';
 
 
@@ -20,7 +20,7 @@ function Group() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { groupId } = useParams();
-    const [showModal, toggleShowModal] = useToggle(false);
+    const [modalContent, setModalContent] = useState("");
     const userId = useSelector((state) => state.login.userId);
     const decks = useSelector((state) => state.login.decks);
     const storedGroupId = useSelector((state) => state.group.groupId);
@@ -32,7 +32,6 @@ function Group() {
     const joinCode = useSelector((state) => state.group.joinCode);
     const [joinCodeVisible, toggleJoinCodeVisible] = useToggle(false);
     const [userEnteredJoinCode, clearUserEnteredJoinCode, handleChangeUserEnteredJoinCode, setUserEnteredJoinCode] = useFormInput("");
-
     
     const chooseDeck = evt => {
         if(administrators?.includes(userId)) {
@@ -42,7 +41,7 @@ function Group() {
                     .then((res) => {
                         dispatch(addActivity({activityId: res.data.newActivity}));
                         dispatch(addDeck({deckId: res.data.newDeck}));
-                        toggleShowModal();
+                        setModalContent("");
                     })
                     .catch(err => console.error(err));
             })
@@ -57,11 +56,31 @@ function Group() {
             axios.post(`${baseURL}/groups/${groupId}/messages/admin/deck-submission`, message)
                 .then((response) => {
                     dispatch(addMessage({message: response.data._id, direction: 'sent'}));
-                    toggleShowModal();
+                    setModalContent("");
                 })
                 .catch(err => {
                     console.error(err);
                 });
+        }
+    }
+
+    const displayModalContent = () => {
+        switch(modalContent) {
+            case "add-deck":
+                return (
+                    <div>
+                        {decks.map(deck => <span key={deck._id} id={deck._id} onClick={chooseDeck}>{deck.name}</span>)}<button onClick={goToCreateNew}>Create new deck</button>
+                    </div>
+                );
+            case "leave-group-confirmation":
+                return (
+                    <div>
+                        <p>Are you sure you want to leave {groupName}?</p>
+                        <button onClick={handleLeaveGroup}>Yes, leave</button><button onClick={hideModal}>Cancel</button>
+                    </div>
+                )
+            default:
+                return;
         }
     }
 
@@ -93,6 +112,18 @@ function Group() {
         }
     }
 
+    const handleLeaveGroup = () => {
+        dispatch(removeMember({groupId, memberToRemoveId: userId, requesterId: userId}))
+            .then((action) => {
+                dispatch(leaveGroup({groupId}));
+                navigate("/dashboard");
+            });
+    }
+
+    const handleSelectModalContent = (evt) => {
+        setModalContent(evt.target.dataset.modalcontent);
+    }
+
     const handleSubmitUserEnteredJoinCode = (evt) => {
         evt.preventDefault();
         if(userEnteredJoinCode === joinCode) {
@@ -101,6 +132,10 @@ function Group() {
             //add logic here to count missed attempts within certain window, or maybe handle on backend
             clearUserEnteredJoinCode();
         }
+    }
+
+    const hideModal = () => {
+        setModalContent("");
     }
 
     const sendJoinRequest = () => {
@@ -158,20 +193,22 @@ function Group() {
                         }                    
                     </>
                 }
+                <button data-modalcontent="leave-group-confirmation" onClick={handleSelectModalContent}>Leave Group</button>
                 <h3>Administrators:</h3>
                 <GroupMemberList groupMemberIds={administrators} />
                 <h3>Activity:</h3>
                 <ActivityList activityIds={activityIds}/>
                 <GroupMemberList groupMemberIds={groupMemberIds} />
-                <button onClick={toggleShowModal}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
-                {!showModal ?
+                <button data-modalcontent="add-deck" onClick={handleSelectModalContent}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
+
+                <DeckList listType="group" listId={groupId} />
+                {!modalContent ?
                     null
                     :
-                    <Modal hideModal={toggleShowModal}>
-                        {decks.map(deck => <span key={deck._id} id={deck._id} onClick={chooseDeck}>{deck.name}</span>)}<button onClick={goToCreateNew}>Create new deck</button>
+                    <Modal hideModal={hideModal}>
+                        {displayModalContent()}
                     </Modal>
                 }
-                <DeckList listType="group" listId={groupId} />
             </div>
       )
     } else {

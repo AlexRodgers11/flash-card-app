@@ -414,14 +414,14 @@ groupRouter.patch("/:groupId/members", async (req, res, next) => {
 groupRouter.patch("/:groupId/admins", async (req, res, next) => {
     if(req.group.administrators.includes(req.body.adminId)) {
         try {
-            let user = await User.findById(req.body.userId);
+            let user = await User.findById(req.body.memberId);
             if(user && req.group.members.includes(user._id)) {
                 let updatedUser;
-                if(req.body.action === "add") {
-                    //need to create notification here eventually
+                if(req.body.action === "grant") {
+                    //need to create notification here eventually and possibly an activity
                     await Group.findByIdAndUpdate(req.group._id, {$push: {administrators: user._id}});
                     updatedUser = await User.findByIdAndUpdate(user._id, {$push: {adminOf: req.group._id}});
-                } else if(req.body.action === "remove") {
+                } else if(req.body.action === "revoke") {
                     //need to create notification here eventually
                     await Group.findByIdAndUpdate(req.group._id, {$pull: {administrators: user._id}});
                     updatedUser = await User.findByIdAndUpdate(user._id, {$pull: {adminOf: req.group._id}});

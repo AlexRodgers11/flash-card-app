@@ -56,6 +56,26 @@ export const fetchGroupJoinOptions = createAsyncThunk("group/fetchGroupJoinOptio
     }
 });
 
+export const grantAdminAuthority = createAsyncThunk("group/grantAdminAuthority", async ({groupId, memberToAuthorizeId, requesterId}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/groups/${groupId}/admins`, {groupId, memberId: memberToAuthorizeId, adminId: requesterId, action: "grant"});
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return err;
+    }
+});
+
+export const revokeAdminAuthority = createAsyncThunk("group/revokeAdminAuthority", async ({groupId, memberToDeauthorizeId, requesterId}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/groups/${groupId}/admins`, {groupId, memberId: memberToDeauthorizeId, adminId: requesterId, action: "revoke"});
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return err;
+    }
+});
+
 export const removeMember = createAsyncThunk("group/removeMember", async({groupId, memberToRemoveId, requesterId}) => {
     try {
         const response = await axios.patch(`${baseURL}/groups/${groupId}/members`, {memberToRemoveId, requesterId});
@@ -105,6 +125,7 @@ export const groupSlice = createSlice({
             state.name = action.payload.name;
             state.memberIds = action.payload.memberIds;
             state.creator = action.payload.creator;
+            state.headAdmin = action.payload.headAdmin;
             state.administrators = action.payload.administrators;
             state.activities = action.payload.activities;
             state.joinOptions = action.payload.joinOptions;
@@ -112,6 +133,16 @@ export const groupSlice = createSlice({
         });
         builder.addCase(fetchGroupJoinOptions.fulfilled, (state, action) => {
             state.joinOptions = action.payload.joinOptions;
+        });
+        builder.addCase(grantAdminAuthority.fulfilled, (state, action) => {
+            state.administrators = [...state.administrators, action.payload];
+        });
+        builder.addCase(revokeAdminAuthority.fulfilled, (state, action) => {
+            console.log({payload: action.payload});
+            console.log(state.administrators.includes(action.payload));
+            console.log(state.administrators.length);
+            state.administrators = state.administrators.filter(adminId => adminId !== action.payload);
+            console.log(state.administrators.length);
         });
         builder.addCase(updateGroup.fulfilled, (state, action) => {
             for(const key in action.payload) {

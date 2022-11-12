@@ -12,6 +12,7 @@ import axios from 'axios';
 import { addDeck } from '../reducers/decksSlice';
 import { addMessage, leaveGroup } from '../reducers/loginSlice';
 import { generateJoinCode } from '../utils';
+import UserTile from './UserTile';
 
 
 const baseURL = 'http://localhost:8000';
@@ -21,11 +22,13 @@ function Group() {
     const navigate = useNavigate();
     const { groupId } = useParams();
     const [modalContent, setModalContent] = useState("");
+    const [editMode, toggleEditMode] = useToggle(false);
     const userId = useSelector((state) => state.login.userId);
     const decks = useSelector((state) => state.login.decks);
     const storedGroupId = useSelector((state) => state.group.groupId);
     const groupName = useSelector((state) => state.group.name);
     const groupMemberIds = useSelector((state) => state.group.memberIds);
+    const headAdmin = useSelector((state) => state.group.headAdmin);
     const administrators = useSelector((state) => state.group.administrators);
     const activityIds = useSelector((state) => state.group.activities);
     const joinOptions = useSelector((state) => state.group.joinOptions);
@@ -78,7 +81,7 @@ function Group() {
                         <p>Are you sure you want to leave {groupName}?</p>
                         <button onClick={handleLeaveGroup}>Yes, leave</button><button onClick={hideModal}>Cancel</button>
                     </div>
-                )
+                );
             default:
                 return;
         }
@@ -155,7 +158,7 @@ function Group() {
     }
 
     useEffect(() => {
-        if(!storedGroupId || storedGroupId !== groupId) {
+        if(!storedGroupId || (storedGroupId !== groupId)) {
             dispatch(fetchGroupData({groupId, userId}));    
         }
     }, [dispatch, groupId, storedGroupId, userId]);
@@ -193,12 +196,16 @@ function Group() {
                         }                    
                     </>
                 }
+                <h3>Head Admin</h3>
+                <UserTile memberId={administrators[0]} />
+                {administrators?.includes(userId) && <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit Membership"}</button>}
                 <button data-modalcontent="leave-group-confirmation" onClick={handleSelectModalContent}>Leave Group</button>
                 <h3>Administrators:</h3>
-                <GroupMemberList groupMemberIds={administrators} />
+                <GroupMemberList editMode={userId === administrators[0] && editMode} listType="admins" groupMemberIds={administrators.slice(1, administrators.length)} />
                 <h3>Activity:</h3>
                 <ActivityList activityIds={activityIds}/>
-                <GroupMemberList groupMemberIds={groupMemberIds} />
+                <h3>Members:</h3>
+                <GroupMemberList editMode={administrators.includes(userId) && editMode} listType="members" groupMemberIds={groupMemberIds} />
                 <button data-modalcontent="add-deck" onClick={handleSelectModalContent}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
 
                 <DeckList listType="group" listId={groupId} />

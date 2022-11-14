@@ -10,7 +10,7 @@ import Modal from './Modal';
 import useToggle from '../hooks/useToggle';
 import axios from 'axios';
 import { addDeck } from '../reducers/decksSlice';
-import { addMessage, leaveGroup } from '../reducers/loginSlice';
+import { addMessage, removeGroup } from '../reducers/loginSlice';
 import { generateJoinCode } from '../utils';
 import UserTile from './UserTile';
 
@@ -114,7 +114,7 @@ function Group() {
     const handleLeaveGroup = () => {
         dispatch(removeMember({groupId, memberToRemoveId: userId, requesterId: userId}))
             .then((action) => {
-                dispatch(leaveGroup({groupId}));
+                dispatch(removeGroup({groupId}));
                 navigate("/dashboard");
             });
     }

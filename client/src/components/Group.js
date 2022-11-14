@@ -38,17 +38,13 @@ function Group() {
     
     const chooseDeck = evt => {
         if(administrators?.includes(userId)) {
-            axios.get(`${baseURL}/decks/${evt.target.id}`)
-            .then((response) => {
-                axios.post(`${baseURL}/groups/${groupId}/decks`, response.data)
+            axios.post(`${baseURL}/groups/${groupId}/decks`, {idOfDeckToCopy: evt.target.dataset.id})
                     .then((res) => {
                         dispatch(addActivity({activityId: res.data.newActivity}));
                         dispatch(addDeck({deckId: res.data.newDeck}));
                         setModalContent("");
                     })
                     .catch(err => console.error(err));
-            })
-            .catch(err => console.error(err));
         } else {
             let message = {
                 requestType: "DeckSubmission",
@@ -72,7 +68,7 @@ function Group() {
             case "add-deck":
                 return (
                     <div>
-                        {decks.map(deck => <span key={deck._id} id={deck._id} onClick={chooseDeck}>{deck.name}</span>)}<button onClick={goToCreateNew}>Create new deck</button>
+                        {decks.map(deck => <span data-id={deck._id} key={deck._id} id={deck._id} onClick={chooseDeck}>{deck.name}</span>)}<button onClick={goToCreateNew}>Create new deck</button>
                     </div>
                 );
             case "leave-group-confirmation":

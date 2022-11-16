@@ -30,6 +30,13 @@
   border-radius: 1em;
   padding: 1em;
   padding-top: 0;
+  overflow: scroll;
+  max-height: 70%;
+  scrollbar-width: none;
+}
+
+.Modal_content::-webkit-scrollbar {
+  display: none;
 }
 
 .Modal_close {

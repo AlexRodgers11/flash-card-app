@@ -27,6 +27,17 @@ const initialState = {
 //     }
 // });
 
+export const deleteGroup = createAsyncThunk("group/deleteGroup", async ({groupId, requesterId}) => {
+    try {
+        //maybe create separate admin auth token and send that instead of id
+        const response = await axios.delete(`${baseURL}/groups/${groupId}?requestingUser=${requesterId}`);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return err;
+    }
+});
+
 export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({groupId, userId}) => {
     try {
         const response = await axios.get(`${baseURL}/groups/${groupId}?requestingUser=${userId}`);
@@ -130,6 +141,17 @@ export const groupSlice = createSlice({
             state.activities = action.payload.activities;
             state.joinOptions = action.payload.joinOptions;
             state.joinCode = action.payload.joinCode;
+        });
+        builder.addCase(deleteGroup.fulfilled, (state) => {
+            state.groupId = "";
+            state.name = "";
+            state.memberIds = [];
+            state.creator = "";
+            state.headAdmin = "";
+            state.administrators = [];
+            state.activities = [];
+            state.joinOptions = "invite";
+            state.joinCode = undefined;
         });
         builder.addCase(fetchGroupJoinOptions.fulfilled, (state, action) => {
             state.joinOptions = action.payload.joinOptions;

@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react'
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
-import { addActivity, addMember, fetchGroupData, removeMember, updateGroup } from '../reducers/groupSlice';
+import { addActivity, addMember, deleteGroup, fetchGroupData, removeMember, updateGroup } from '../reducers/groupSlice';
 import DeckList from './DeckList';
 import ActivityList from './ActivityList';
 import GroupMemberList from './GroupMemberList';
 import Modal from './Modal';
 import useToggle from '../hooks/useToggle';
 import axios from 'axios';
-import { addDeck } from '../reducers/decksSlice';
+import { addDeck, fetchDecksOfUser } from '../reducers/decksSlice';
 import { addMessage, removeGroup } from '../reducers/loginSlice';
 import { generateJoinCode } from '../utils';
 import UserTile from './UserTile';
@@ -25,6 +25,7 @@ function Group() {
     const [editMode, toggleEditMode] = useToggle(false);
     const userId = useSelector((state) => state.login.userId);
     const decks = useSelector((state) => state.login.decks);
+    const [groupDeletionInProgress, toggleGroupDeletionInProgress] = useToggle(false);
     const storedGroupId = useSelector((state) => state.group.groupId);
     const groupName = useSelector((state) => state.group.name);
     const groupMemberIds = useSelector((state) => state.group.memberIds);
@@ -35,16 +36,17 @@ function Group() {
     const joinCode = useSelector((state) => state.group.joinCode);
     const [joinCodeVisible, toggleJoinCodeVisible] = useToggle(false);
     const [userEnteredJoinCode, clearUserEnteredJoinCode, handleChangeUserEnteredJoinCode, setUserEnteredJoinCode] = useFormInput("");
+    const [deleteConfirmation, clearDeleteConfirmation, handleChangeDeleteConfirmation] = useFormInput("");
     
     const chooseDeck = evt => {
         if(administrators?.includes(userId)) {
             axios.post(`${baseURL}/groups/${groupId}/decks`, {idOfDeckToCopy: evt.target.dataset.id})
-                    .then((res) => {
-                        dispatch(addActivity({activityId: res.data.newActivity}));
-                        dispatch(addDeck({deckId: res.data.newDeck}));
-                        setModalContent("");
-                    })
-                    .catch(err => console.error(err));
+                .then((res) => {
+                    dispatch(addActivity({activityId: res.data.newActivity}));
+                    dispatch(addDeck({deckId: res.data.newDeck}));
+                    setModalContent("");
+                })
+                .catch(err => console.error(err));
         } else {
             let message = {
                 requestType: "DeckSubmission",
@@ -78,6 +80,22 @@ function Group() {
                         <button onClick={handleLeaveGroup}>Yes, leave</button><button onClick={hideModal}>Cancel</button>
                     </div>
                 );
+            case "delete-group-options":
+                return (
+                    <div>
+                        <p>Are you sure you want to delete the group instead of giving control to another member?</p>
+                        <button data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Yes, Delete</button>
+                        <button data-modalcontent="group-control-designation" onClick={handleSelectModalContent}>No, Pick A Member to Give Control To</button>
+                    </div>
+                )
+            case "delete-group-confirmation":
+                return (
+                    <form onSubmit={handleDeleteGroup}>
+                        <label htmlFor="confirm-delete-group">Type the group's name to delete. This action cannot be undone.</label>
+                        <input id="confirm-delete-group" name="confirm-delete-group" type="text" onChange={handleChangeDeleteConfirmation} value={deleteConfirmation} />
+                        {deleteConfirmation === groupName && <button type="submit">Delete</button>}
+                    </form>
+                )
             default:
                 return;
         }
@@ -92,6 +110,16 @@ function Group() {
         navigate(`/users/${userId}/decks/new`);
     }
 
+    const handleDeleteGroup = (evt) => {
+        evt.preventDefault();
+        toggleGroupDeletionInProgress();
+        batch(() => {
+            dispatch(deleteGroup({groupId, requesterId: userId}));
+            dispatch(removeGroup({groupId}));
+            dispatch(fetchDecksOfUser(userId));
+        })
+    }
+    
     const handleChangeJoinOptions = (evt) => {
         let newJoinCode;
         if(evt.target.value === "code" || evt.target.value === "code-and-request") {
@@ -155,9 +183,19 @@ function Group() {
 
     useEffect(() => {
         if(!storedGroupId || (storedGroupId !== groupId)) {
-            dispatch(fetchGroupData({groupId, userId}));    
+            if(groupDeletionInProgress) {
+                //possibly add setTimeout and loading spinner
+                navigate("/dashboard");
+            } else {
+                dispatch(fetchGroupData({groupId, userId})); 
+            }
+               
         }
-    }, [dispatch, groupId, storedGroupId, userId]);
+    }, [dispatch, groupId, groupDeletionInProgress, navigate, storedGroupId, userId]);
+
+    if(groupDeletionInProgress) {
+        return (<p>Deleting Group</p>)
+    }
 
     if(groupMemberIds?.includes(userId)) {
         return (
@@ -194,8 +232,9 @@ function Group() {
                 }
                 <h3>Head Admin</h3>
                 <UserTile memberId={administrators[0]} />
-                {administrators?.includes(userId) && <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit Membership"}</button>}
+                {administrators?.includes(userId) && <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>}
                 <button data-modalcontent="leave-group-confirmation" onClick={handleSelectModalContent}>Leave Group</button>
+                {(editMode && userId === headAdmin) && <button data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Delete Group</button>}
                 <h3>Administrators:</h3>
                 <GroupMemberList editMode={userId === administrators[0] && editMode} listType="admins" groupMemberIds={administrators.slice(1, administrators.length)} />
                 <h3>Activity:</h3>
@@ -203,7 +242,6 @@ function Group() {
                 <h3>Members:</h3>
                 <GroupMemberList editMode={administrators.includes(userId) && editMode} listType="members" groupMemberIds={groupMemberIds} />
                 <button data-modalcontent="add-deck" onClick={handleSelectModalContent}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
-
                 <DeckList listType="group" listId={groupId} />
                 {!modalContent ?
                     null

@@ -544,13 +544,27 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", async (req, res, ne
 
 groupRouter.delete("/:groupId", async (req, res, next) => {
     try {
-        const group = await Group.findByIdAndDelete(req.group._id);
-        await Deck.deleteMany({_id: {$in: req.group.decks}});
-        await Activity.deleteMany({_id: {$in: req.group.activities}});
-        await User.updateMany({_id: {$in: req.group.members}}, {$pull: {groups: req.group._id}});
-        await User.updateMany({_id: {$in: req.group.administrators}}, {$pull: {adminOf: req.group._id}});
-        res.status(200).send(group);
+        if(req.query.requestingUser === req.group.administrators[0].toString()) {
+            const group = await Group.findByIdAndDelete(req.group._id);
+
+            for (let i = 0; i < req.group.decks.length; i++) {
+                let deck = await Deck.findById(req.group.decks[i]);
+                await Card.deleteMany({_id: {$in: deck.cards}});
+            }
+            await Deck.deleteMany({_id: {$in: req.group.decks}});
+
+            await Activity.deleteMany({_id: {$in: req.group.activities}});
+
+            await User.updateMany({_id: {$in: req.group.members}}, {$pull: {groups: req.group._id}});
+
+            await User.updateMany({_id: {$in: req.group.administrators}}, {$pull: {adminOf: req.group._id}});
+
+            res.status(200).send(group);
+        } else {
+            res.status(403).send("Only the head administrator of a group may delete the group");
+        }
     } catch (err) {
+        console.error(err);
         res.status(500).send("There was an error with your request");
         throw err
     }

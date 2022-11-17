@@ -9,6 +9,7 @@ import Group from "../models/group.js";
 import { DeckSubmission, JoinRequest } from "../models/message.js";
 import { JoinDecision } from "../models/notification.js";
 import User from "../models/user.js";
+import { swapIndexes } from "../utils.js";
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
     Group.findById(groupId, (err, group) => {
@@ -455,6 +456,31 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
 //     }
     
 // });
+
+groupRouter.patch("/:groupId/head-admin", async (req, res, next) => {
+    try {
+        let newAdminIdx = req.group.administrators.indexOf(req.body.newAdminId);
+        let newAdministrators = req.group.administrators.slice();
+        let prevAdmin = req.group.administrators[0];
+        if(newAdminIdx > 0) {
+            swapIndexes(newAdministrators, 0, newAdminIdx);
+            newAdministrators.splice(newAdminIdx, 1);
+        } else {
+            newAdministrators.shift();
+            newAdministrators.unshift(req.body.newAdminId);
+        }
+        await User.findByIdAndUpdate(req.body.newAdminId, {$push: {adminOf: req.group._id}});
+        await User.findByIdAndUpdate(prevAdmin, {$pull: {adminOf: req.group._id, groups: req.group._id}});
+        let updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$set: {administrators: newAdministrators}, $pull: {members: prevAdmin}},  {new: true});
+        res.status(200).send({
+            administrators: updatedGroup.administrators,
+            members: updatedGroup.members
+        });
+    } catch (err) {
+        res.status(500).send(err.message);
+        throw err;
+    }
+});
 
 //Patch? Delete? If Patch should I use the same route for adding and removing members and do logic to decide whether to push or pull in update obj?
 groupRouter.patch("/:groupId/members", async (req, res, next) => {

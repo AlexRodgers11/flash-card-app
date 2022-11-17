@@ -37,6 +37,16 @@ userRouter.get("/emails", async (req, res, next) => {
     }
 });
 
+userRouter.get("/:userId/identification", async (req, res, next) => {
+    let partialData = {
+        firstName: req.user.name.first,
+        lastName: req.user.name.last,
+        username: req.user.login.username,
+        photo: await getObjectSignedUrl(req.user.photo)
+    }
+    res.status(200).send(partialData);
+});
+
 userRouter.get("/:userId/tile", async (req, res, next) => {
     let partialData = {
         firstName: req.user.name.first,

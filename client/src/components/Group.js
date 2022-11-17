@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
-import { addActivity, addMember, deleteGroup, fetchGroupData, removeMember, updateGroup } from '../reducers/groupSlice';
+import { addActivity, addMember, deleteGroup, fetchGroupData, removeMember, replaceHeadAdmin, updateGroup } from '../reducers/groupSlice';
 import DeckList from './DeckList';
 import ActivityList from './ActivityList';
 import GroupMemberList from './GroupMemberList';
@@ -13,6 +13,7 @@ import { addDeck, fetchDecksOfUser } from '../reducers/decksSlice';
 import { addMessage, removeGroup } from '../reducers/loginSlice';
 import { generateJoinCode } from '../utils';
 import UserTile from './UserTile';
+import GroupMemberOption from './GroupMemberOption';
 
 
 const baseURL = 'http://localhost:8000';
@@ -64,7 +65,7 @@ function Group() {
                 });
         }
     }
-
+    
     const displayModalContent = () => {
         switch(modalContent) {
             case "add-deck":
@@ -77,7 +78,32 @@ function Group() {
                 return (
                     <div>
                         <p>Are you sure you want to leave {groupName}?</p>
-                        <button onClick={handleLeaveGroup}>Yes, leave</button><button onClick={hideModal}>Cancel</button>
+                        <button onClick={handleLeaveGroup}>Yes, leave</button>
+                        <button onClick={hideModal}>Cancel</button>
+                    </div>
+                );
+            case "group-control-designation": 
+                return (
+                    <div>
+                        {groupMemberIds.slice(1).map(memberId => <p data-memberid={memberId} onClick={handleSelectNewHeadAdmin}><GroupMemberOption memberId={memberId} /></p>)}
+                    </div>
+                )
+            case "head-admin-leave-group-confirmation":
+                return (
+                    <div>
+                        {groupMemberIds.length > 1 ? 
+                            <>
+                            <p>Are you sure you want to leave {groupName}? You will need to select a member of the group to be a new Head Administrator</p>
+                            <button data-modalcontent="group-control-designation" onClick={handleSelectModalContent}>Yes, choose a member</button>
+                            <button data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Delete Group Instead</button>
+                            </>
+                            :
+                            <>
+                            <p>Since there are no other members leaving the group will cause the group to be deleted</p>
+                            <button data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Leave and Delete Group</button>
+                            </>
+                        }
+                        <button onClick={hideModal}>Cancel</button>
                     </div>
                 );
             case "delete-group-options":
@@ -86,6 +112,7 @@ function Group() {
                         <p>Are you sure you want to delete the group instead of giving control to another member?</p>
                         <button data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Yes, Delete</button>
                         <button data-modalcontent="group-control-designation" onClick={handleSelectModalContent}>No, Pick A Member to Give Control To</button>
+                        <button onClick={hideModal}>Cancel</button>
                     </div>
                 )
             case "delete-group-confirmation":
@@ -151,6 +178,15 @@ function Group() {
         setModalContent(evt.target.dataset.modalcontent);
     }
 
+    const handleSelectNewHeadAdmin = (evt) => {
+        evt.preventDefault();
+        batch(() => {
+            dispatch(replaceHeadAdmin({groupId, newAdminId: evt.currentTarget.dataset.memberid}));
+            dispatch(removeGroup({groupId}));
+        });
+        navigate("/dashboard");
+    }
+    
     const handleSubmitUserEnteredJoinCode = (evt) => {
         evt.preventDefault();
         if(userEnteredJoinCode === joinCode) {
@@ -233,8 +269,8 @@ function Group() {
                 <h3>Head Admin</h3>
                 <UserTile memberId={administrators[0]} />
                 {administrators?.includes(userId) && <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>}
-                <button data-modalcontent="leave-group-confirmation" onClick={handleSelectModalContent}>Leave Group</button>
-                {(editMode && userId === headAdmin) && <button data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Delete Group</button>}
+                <button data-modalcontent={userId === headAdmin ? "head-admin-leave-group-confirmation" : "leave-group-confirmation"} onClick={handleSelectModalContent}>Leave Group</button>
+                {(editMode && userId === headAdmin) && <button data-modalcontent={groupMemberIds.length > 1 ? "delete-group-options" : "delete-group-confirmation"} onClick={handleSelectModalContent}>Delete Group</button>}
                 <h3>Administrators:</h3>
                 <GroupMemberList editMode={userId === administrators[0] && editMode} listType="admins" groupMemberIds={administrators.slice(1, administrators.length)} />
                 <h3>Activity:</h3>

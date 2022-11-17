@@ -10,14 +10,18 @@ function Login() {
     const [usernameOrEmail, clearUsernameOrEmail, setUsernameOrEmail] = useFormInput('');
     const [password, clearPassword, setPassword] = useFormInput('');
     const userId = useSelector((state) => state.login.userId);
-    // const foundUser = useSelector((state) => state.login.username);
-    const foundUser = useSelector((state) => state.login.login);
 
     const handleSubmit = evt => {
         evt.preventDefault();
-        dispatch(login({usernameOrEmail, password}));
-        clearPassword();
-        clearUsernameOrEmail();
+        dispatch(login({usernameOrEmail, password}))
+            .then(action => {
+                console.log({payload: action.payload});
+                if(action.payload.userId) {
+                    navigate("/dashboard");
+                }
+                clearPassword();
+                clearUsernameOrEmail();
+            });
     }
 
     useEffect(() => {
@@ -25,12 +29,6 @@ function Login() {
             dispatch(fetchLoggedInUserData(userId));
         }
     }, [userId, dispatch]);
-
-    useEffect(() => {
-        if(foundUser.username) {
-            navigate(`/dashboard`);
-        }
-    }, [foundUser, navigate]);
 
     return (
         <div>

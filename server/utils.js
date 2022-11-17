@@ -32,6 +32,10 @@ export const getRandomJoinOptions = () => {
     }
 }
 
+export const swapIndexes = (arr, idx1, idx2) => {
+    [arr[idx1], arr[idx2]] = [arr[idx2], arr[idx1]];
+}
+
 export default getRandomCardType;
 
 export const generateRandomFileName = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");

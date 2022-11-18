@@ -163,7 +163,7 @@ deckRouter.delete("/:deckId", async (req, res, next) => {
 //         });
 // });
 
-deckRouter.put("/:deckId", (req, res, next) => {
+deckRouter.patch("/:deckId", (req, res, next) => {
     Deck.findByIdAndUpdate(req.deck._id, req.body, {new: true}, (err, deck) => {
         if(err) {
             res.status(500).send("There was an error with your request");

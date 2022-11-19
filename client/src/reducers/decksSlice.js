@@ -9,7 +9,17 @@ const initialState = {
     deckIds: []
 };
 
+export const deleteDeck = createAsyncThunk("decks/deleteDeck", async (deckId) => {
+    try {
+        const response = await axios.delete(`${baseURL}/decks/${deckId}`);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 export const fetchDecksOfUser = createAsyncThunk("decks/fetchDecksOfUser", async (userId) => {
+    
     console.log("in fetchDecksOfUser");
     console.log(baseURL + "/users/" + userId + "/decks");
     try {
@@ -56,13 +66,13 @@ export const decksSlice = createSlice({
     reducers: {
         addDeck: (state, action) => {
             state.deckIds = [...state.deckIds, action.payload.deckId]
-        },
-        deleteDeck: (state, action) => {
-            state.deckIds = state.deckIds.filter(id => id !== action.payload.deckId);
         }
     },
     //for async requests
     extraReducers: (builder) => {
+        builder.addCase(deleteDeck.fulfilled, (state, action) => {
+            state.deckIds = state.deckIds.filter(id => id !== action.payload);
+        });
         builder.addCase(fetchDecksOfUser.fulfilled, (state, action) => {
             state.listType = action.payload.listType;
             state.listId = action.payload.listId;
@@ -82,5 +92,5 @@ export const decksSlice = createSlice({
 
 });
 
-export const { addDeck, deleteDeck } = decksSlice.actions;
+export const { addDeck } = decksSlice.actions;
 export default decksSlice.reducer;

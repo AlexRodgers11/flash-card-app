@@ -19,6 +19,25 @@ const initialState = {
 
 }
 
+export const addCard = createAsyncThunk("deck/addCard", async ({newCard, deckId}) => {
+    try {
+        const response = await axios.post(`${baseURL}/decks/${deckId}/cards`, newCard);
+        return response.data
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+export const deleteCard = createAsyncThunk("deck/deleteCard", async ({cardToDeleteId}) => {
+    //possibly move delete route to deck to match card add route
+    try {
+        const response = await axios.delete(`${baseURL}/cards/${cardToDeleteId}`);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 export const fetchDeck = createAsyncThunk("deck/fetchDeck", async (deckId) => {
     try {
         const response = await axios.get(`${baseURL}/decks/${deckId}`);
@@ -47,14 +66,17 @@ export const deckSlice = createSlice({
     name: "deck",
     initialState,
     reducers: {
-        addCard: (state, action) => {
-            state.cards = [...state.cards, action.payload.cardId];
-        },
-        deleteCard: (state, action) => {
-            state.cards = state.cards.filter(cardId => cardId !== action.payload.cardId);
+        resetDeck: (state) => {
+            state = initialState;
         }
     },
     extraReducers: (builder) => {
+        builder.addCase(addCard.fulfilled, (state, action) => {
+            state.cards = [...state.cards, action.payload]
+        });
+        builder.addCase(deleteCard.fulfilled, (state, action) => {
+            state.cards = state.cards.filter(cardId => cardId !== action.payload);
+        });
         builder.addCase(fetchDeck.fulfilled, (state, action) => {
             state.deckId = action.payload._id;
             state.name = action.payload.name;
@@ -76,5 +98,5 @@ export const deckSlice = createSlice({
     }
 });
 
-export const { addCard, deleteCard } = deckSlice.actions;
+export const { resetDeck } = deckSlice.actions;
 export default deckSlice.reducer;

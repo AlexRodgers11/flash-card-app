@@ -37,29 +37,11 @@ cardRouter.delete("/:cardId", async (req, res, next) => {
     try {
         const card = await Card.findByIdAndDelete(req.card._id);
         const deck = await Deck.findOneAndUpdate({cards: card._id}, {$pull: {cards: card._id}});
-        res.status(200).send({card: card, deck: deck});
+        res.status(200).send(card._id);
     } catch (err) {
         res.status(500).send("There was an error with your request");
         throw err;
     }
 });
-
-// cardRouter.delete("/:cardId", (req, res, next) => {
-//     Card.findByIdAndDelete(req.card._id, (err, card) => {
-//         if(err) {
-//             res.status(500).send("There was an error with your request");
-//             throw err;
-//         } else {
-//             Deck.findOneAndUpdate({cards: card._id}, {$pull: {cards: card._id}}, (err, deck) => {
-//                 if(err) {
-//                     res.status(500).send("There was an error with your request");
-//                     throw err;
-//                 } else {
-//                     res.status(200).send({card: card, deck: deck});
-//                 }
-//             });
-//         }
-//     });
-// });
 
 export default cardRouter;

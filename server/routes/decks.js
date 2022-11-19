@@ -3,7 +3,7 @@ const deckRouter = express.Router();
 import mongoose from "mongoose";
 
 import Attempt from "../models/attempt.js";
-import { FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
+import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import Category from "../models/category.js";
@@ -89,9 +89,9 @@ deckRouter.delete("/:deckId", async (req, res, next) => {
         await Category.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}});
         await User.findByIdAndUpdate(req.deck.creator, {$pull: {decks: req.deck._id}});
         await Attempt.deleteMany({deck: req.deck._id});
-        await Deck.findByIdAndDelete(req.deck._id);//make sure middle arg not necessary
+        const deck = await Deck.findByIdAndDelete(req.deck._id);
         await Card.deleteMany({_id: {$in: req.deck.cards}});
-        res.status(200).send(req.deck._id);
+        res.status(200).send(deck._id);
     } catch (err) {
         res.status(500).send("There was an error with your request");
         throw err;
@@ -119,49 +119,6 @@ deckRouter.delete("/:deckId", async (req, res, next) => {
 //     }
 // });
 
-// deckRouter.delete("/:deckId", (req, res, next) => {
-//     Deck.findByIdAndDelete(req.deck._id)
-//         .catch(err => {
-//             res.status(500).send("There was an error with your request");
-//             throw err;
-//         })
-//         .then(() => {
-//             Card.deleteMany({_id: {$in: req.deck.cards}})
-//                 .catch(err => {
-//                     res.status(500).send("There was an error with your request");
-//                     throw err;
-//                 })
-//                 .then(() => {
-//                     Group.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}})
-//                         .catch(err => {
-//                             res.status(500).send("There was an error with your request");
-//                             throw err;
-//                         })
-//                         .then(() => {
-//                             Attempt.deleteMany({deck: req.deck._id})
-//                                 .catch(err => {
-//                                     res.status(500).send("There was an error with your request");
-//                                 })
-//                                 .then(() => {
-//                                     Category.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}}, (err, categories) => {
-//                                         if(err) {
-//                                             res.status(500).send("There was an error with your request");
-//                                             throw err;
-//                                         } else {
-//                                             User.findByIdAndUpdate(req.deck.creator, {$pull: {decks: req.deck._id}}, (err, user) => {
-//                                                 if(err) {
-//                                                     console.error(err);
-//                                                     throw err;
-//                                                 }
-//                                                 res.status(200).send(req.deck._id);
-//                                             });
-//                                         }
-//                                     });
-//                                 })
-//                         })
-//                 })
-//         });
-// });
 
 deckRouter.patch("/:deckId", (req, res, next) => {
     Deck.findByIdAndUpdate(req.deck._id, req.body, {new: true}, (err, deck) => {
@@ -194,30 +151,11 @@ deckRouter.post("/:deckId/cards", async (req, res, next) => {
     try {
         const card = await newCard.save();
         await Deck.findByIdAndUpdate(req.deck._id, {$push: {cards: card}});
-        res.status(200).send(card);
+        res.status(200).send(card._id);
     } catch (err) {
         res.status(500).send("There was an error with your request");
         throw err;
     }
 });
-
-// deckRouter.post("/:deckId/cards", (req, res, next) => {
-//     let newCard = new Card(req.body);
-//     newCard.save((err, card) => {
-//         if(err) {
-//             res.status(500).send("There was an error with your request");
-//             throw err;
-//         } else {
-//             Deck.findByIdAndUpdate(req.deck._id, {$push: {cards: card}}, (err, deck) => {
-//                 if(err) {
-//                     res.status(500).send("There was an error with your request");
-//                     throw err;
-//                 } else {
-//                     res.status(200).send(card);
-//                 }
-//             });
-//         }
-//     });
-// });
 
 export default deckRouter;

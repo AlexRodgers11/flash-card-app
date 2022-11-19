@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { addCard, deleteCard, updateDeck, fetchDeck } from '../reducers/deckSlice';
 import { useNavigate, useParams } from 'react-router';
-import Card from './Card';
-import Modal from './Modal';
-import useToggle from '../hooks/useToggle';
 import axios from 'axios';
-import { deleteDeck } from '../reducers/decksSlice';
-import CardForm from './CardForm';
 import useFormInput from '../hooks/useFormInput';
+import { addCard, deleteCard, updateDeck, fetchDeck, resetDeck } from '../reducers/deckSlice';
+import { deleteDeck } from '../reducers/decksSlice';
+import useToggle from '../hooks/useToggle';
+import Card from './Card';
+import CardForm from './CardForm';
+import Modal from './Modal';
 
 const baseURL = 'http://localhost:8000';
 
@@ -21,67 +21,81 @@ function Deck() {
     const creator = useSelector((state) => state.deck.creator);
     const cards = useSelector((state) => state.deck.cards);
     const permissions = useSelector((state) => state.deck.permissions);
-    const [editId, setEditId] = useState('');
-    const [deleteId, setDeleteId] = useState('');
-    const [viewId, setViewId] = useState('');
-    const [addMode, toggleAddMode] = useToggle(false);
     const [editMode, toggleEditMode] = useToggle(false);
-    const [deleteDeckInitiated, toggleDeleteDeckInitiated] = useToggle(false);
     
     const { deckId } = useParams();
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const initiateDeleteDeck = () => {
-        toggleDeleteDeckInitiated();
+    const [modalContent, setModalContent] = useState("");
+    const [selectedCardId, setSelectedCardId] = useState("");
+    
+    const displayModalContent = () => {
+        switch(modalContent) {
+            case "edit-card":
+                return <CardForm cardId={selectedCardId} submit={handleSaveCardChanges}/>
+            case "add-card":
+                return <CardForm submit={handleAddCard} />
+            case "delete-card":
+                return (
+                    <div>
+                        <h3>Are you sure you want to delete this card? This action cannot be undone.</h3>
+                        <button onClick={() => setModalContent("")}>Cancel</button><button onClick={confirmDeleteCard}>Delete</button>
+                    </div>
+                );
+            case "delete-deck-confirmation":
+                return (
+                    <div>
+                        <h3>Are you sure you want to delete this deck? This action cannot be undone.</h3>
+                        <button onClick={hideModal}>Cancel</button>
+                        <button onClick={confirmDeleteDeck}>Delete</button>
+                    </div>
+                );
+            case "view-card":
+                return <Card cardId={selectedCardId} displayMode={true}/>
+            default:
+                return;
+        }
     }
 
-    const cancelDeleteDeck = () => {
-        toggleDeleteDeckInitiated();
-    };
+    const handleSelectModalContent = (evt) =>  {
+        setModalContent(evt.target.dataset.action);
+        if(evt.target.dataset.card_id) {
+            setSelectedCardId(evt.target.dataset.card_id);
+        }
+    }
 
     const confirmDeleteDeck = () => {
-        axios.delete(`${baseURL}/decks/${deckId}`)
+        dispatch(deleteDeck(deckId))
             .then(() => {
-                dispatch(deleteDeck({deckId}));
                 navigate("/dashboard");
-            })
-            .catch(err => {
-                console.error(err);
-            })
+                dispatch(resetDeck());
+            });
     };
 
-    const initiateDeleteCard = (evt) => {
-        setDeleteId(evt.target.dataset.cardid);
-    }
-
-    const cancelDeleteCard = () => {
-        setDeleteId('');
-    }
-
     const confirmDeleteCard = () => {
-        axios.delete(`${baseURL}/cards/${deleteId}`)
-            .then(() => {
-                dispatch(deleteCard({cardId: deleteId}));
-                setDeleteId('');
-            })
-            .catch(err => console.error(err));
+        dispatch(deleteCard({cardToDeleteId: selectedCardId}));
+        hideModal();
     }
 
     const handleAddCard = (newCard) => {
-        axios.post(`${baseURL}/decks/${deckId}/cards`, newCard)
-            .then((response) => {
-                dispatch(addCard({cardId: response.data._id}));
-                toggleAddMode();
-            })
-            .catch(err => console.error(err));
+        dispatch(addCard({newCard, deckId}));
+        hideModal();
     }
 
+    const hideModal = () => {
+        setModalContent("");
+        if(selectedCardId) {
+            setSelectedCardId("");
+        }
+    }
+
+    //worth putting in a reducer? Store state remains unchanged b/c the id stays the same. Really just need to update database and rerender
     const handleSaveCardChanges = (editedCard) => {
-        axios.put(`${baseURL}/cards/${editId}`, editedCard)
+        axios.put(`${baseURL}/cards/${selectedCardId}`, editedCard)
 			.then(response => {
-                setEditId('');
+                hideModal();
             })
 			.catch(err => console.error(err));
     }
@@ -94,27 +108,11 @@ function Deck() {
         setEditedName(name);
         toggleNameEditMode();
     }
-    
-    const openCardEditor = evt => {
-        setEditId(evt.target.id);
-    }
-
-    const closeCardEditor = () => {
-        setEditId("");
-    }
 
     const saveDeckNameChange = evt => {
-        axios.put(`${baseURL}/decks/${deckId}`, {name: editedName})
-            .then((response) => {
-                dispatch(updateDeck({deckId, deckUpdates: {name: response.data.name}}));
-                clearEditedName();
-                toggleNameEditMode();
-            })
-            .catch(err => console.error(err));
-    }
-
-    const viewCard = (evt) => {
-        setViewId(evt.target.dataset.cardid);
+        dispatch(updateDeck({deckId, deckUpdates: {name: editedName}}));
+        clearEditedName();
+        toggleNameEditMode();
     }
 
     useEffect(() => {
@@ -126,18 +124,7 @@ function Deck() {
     return (
         <div className="Deck" >
             <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>
-            {editMode && <button onClick={initiateDeleteDeck}>Delete</button>}
-            {!deleteDeckInitiated ?
-                null
-                :
-                <Modal hideModal={cancelDeleteDeck}>
-                    <div>
-                        <h3>Are you sure you want to delete this deck? This action cannot be undone.</h3>
-                        <button onClick={cancelDeleteDeck}>Cancel</button>
-                        <button onClick={confirmDeleteDeck}>Delete</button>
-                    </div>
-                </Modal>
-            }
+            {editMode && <button data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete</button>}
             {!nameEditMode ? 
                 <h1>{name}<span onClick={handleToggleNameEditMode}> Edit</span></h1> 
                 : 
@@ -168,51 +155,25 @@ function Deck() {
                 />
             </div>
             <h2>Cards</h2>
-            <button onClick={toggleAddMode}>Add Card</button>
+            <button data-action="add-card" onClick={handleSelectModalContent}>Add Card</button>
             {cards.map(card => 
                 (<div key={card}>
                     {!editMode ? 
                         null
                         :
                         <div>
-                            <span id={card} onClick={openCardEditor}>E</span>
-                            <span data-cardid={card} onClick={initiateDeleteCard}>D</span>
+                            <span data-card_id={card} data-action="edit-card" onClick={handleSelectModalContent}>Edit </span>
+                            <span data-card_id={card} data-action="delete-card" onClick={handleSelectModalContent}>Delete </span>
                         </div>
                     }
                     <div>
-                        <span data-cardid={card} onClick={viewCard}>[V] </span>
+                        <span data-card_id={card} data-action="view-card" onClick={handleSelectModalContent}>View </span>
                         <Card cardId={card} />
                     </div>
                 </div>))}
-            {!editId ? 
-                null
-                :
-                <Modal hideModal={closeCardEditor}>
-                    <CardForm cardId={editId}  submit={handleSaveCardChanges}/>
-                </Modal>
-            }
-            {!addMode ?
-                null
-                :
-                <Modal hideModal={toggleAddMode}>
-                    <CardForm submit={handleAddCard} />
-                </Modal>
-            }
-            {!deleteId ? 
-                null
-                :
-                <Modal hideModal={cancelDeleteCard}>
-                    <div>
-                        <h3>Are you sure you want to delete this card? This action cannot be undone.</h3>
-                        <button onClick={cancelDeleteCard}>Cancel</button><button onClick={confirmDeleteCard}>Delete</button>
-                    </div>
-                </Modal>
-            }
-            {!viewId ? 
-                null
-                :
-                <Modal hideModal={() => setViewId('')}>
-                    <Card cardId={viewId} displayMode={true}/>
+            {modalContent && 
+                <Modal hideModal={hideModal}>
+                    {displayModalContent()}
                 </Modal>
             }
         </div>

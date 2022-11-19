@@ -148,7 +148,7 @@ router.get("/seed-database", async(req, res, next) => {
     try {
         console.log("Creating users");
         const userPromises = [];
-        while (userPromises.length < 4000) {
+        while (userPromises.length < 3000) {
             userPromises.push(new Promise((userResolve, userReject) => {
                 let newUser = new User();
                 newUser.login.username = faker.random.word() + faker.random.word();
@@ -180,7 +180,7 @@ router.get("/seed-database", async(req, res, next) => {
 
         console.log("Creating groups");
         const groupPromises = [];
-        while(groupPromises.length < 1000) {
+        while(groupPromises.length < 750) {
             groupPromises.push(new Promise((groupResolve, groupReject) => {
                 let newGroup = new Group();
                 newGroup.name = faker.random.word() + Math.ceil(Math.random() * 100);
@@ -244,7 +244,7 @@ router.get("/seed-database", async(req, res, next) => {
 
         console.log("Creating categories");
         const categoryPromises = [];
-        while(categoryPromises.length < 75) {
+        while(categoryPromises.length < 50) {
             categoryPromises.push(new Promise((categoryResolve, categoryReject) => {
                 let newCategory = new Category();
                 newCategory.name = faker.hacker.noun() + faker.hacker.adjective() + faker.hacker.verb();
@@ -311,7 +311,7 @@ router.get("/seed-database", async(req, res, next) => {
             // console.log("Categories updated");
 
             //create cards for each deck
-            let randomCardNumber = 3 + Math.ceil(Math.random() * 15);
+            let randomCardNumber = 2 + Math.ceil(Math.random() * 11);
             const cardPromises = [];
             // console.log("creating cards");
             while(cardPromises.length < randomCardNumber) {
@@ -414,7 +414,7 @@ router.get("/seed-database", async(req, res, next) => {
         const finishedUsers = await User.find();
         for(let i = 0; i < finishedUsers.length; i++) {
             if(finishedUsers[i].decks.length) {
-                const randomAttemptNumber = Math.floor(Math.random() * 10);
+                const randomAttemptNumber = Math.floor(Math.random() * 7);
                 const attemptPromises = [];
                 while(attemptPromises.length < randomAttemptNumber) {
                     //while attempts' length is less than the randomly determined attempt number, fill it with promises that will resolve to fullfilled attempts
@@ -463,7 +463,10 @@ router.get("/seed-database", async(req, res, next) => {
                     }));
                 }
                 const attempts =  await Promise.all(attemptPromises);
-                User.findByIdAndUpdate(users[i]._id, {$push: {attempts: {$each: attempts}}});
+                await User.findByIdAndUpdate(users[i]._id, {$push: {attempts: {$each: attempts}}});
+                if(i === users.length - 1) {
+                    console.log("done");
+                }
             }
         }
 

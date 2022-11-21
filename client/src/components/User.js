@@ -9,10 +9,10 @@ function User() {
     const [userData, setUserData] = useState({});
     const [loaded, toggleLoaded] = useToggle(false);
     
+    const baseURL = 'http://localhost:8000';
 
     useEffect(() => {
         if(!loaded) {
-            const baseURL = 'http://localhost:8000';
             axios.get(`${baseURL}/users/${userId}`)
                 .then((response) => {
                     setUserData(response.data);

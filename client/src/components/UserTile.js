@@ -12,9 +12,10 @@ function UserTile(props) {
     const loggedInUserId = useSelector((state) => state.login.userId);
     const [userData, setUserData] = useState({});
     const headAdmin = useSelector((state) => state.group.headAdmin);
+    
+    const baseURL = 'http://localhost:8000';
 
     useEffect(() => {
-        const baseURL = 'http://localhost:8000';
         axios.get(`${baseURL}/users/${props.memberId}/tile`)
             .then((response) => setUserData(response.data));
     }, [props.memberId]);

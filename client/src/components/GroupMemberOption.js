@@ -1,9 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
+const baseURL = 'http://localhost:8000';
+
 function GroupMemberOption(props) {
     const [memberData, setMemberData] = useState();
-    const baseURL = 'http://localhost:8000';
 
     useEffect(() => {
         if(!memberData?.firstName) {

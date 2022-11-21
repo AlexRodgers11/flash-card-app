@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router';
 import PropTypes from 'prop-types';
 import axios from "axios";
 
+const baseURL = 'http://localhost:8000';
+
 function GroupTile(props) {
-    const baseURL = 'http://localhost:8000';
     const [groupData, setGroupData] = useState({});
     const navigate = useNavigate();
     const handleViewGroup = (evt) => {

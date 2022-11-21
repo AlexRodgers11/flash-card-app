@@ -337,4 +337,23 @@ userRouter.delete("/:userId/decks/:deckId/attempts", async (req, res, next) => {
     }
 });
 
+userRouter.get("/:userId/attempts", async (req, res, next) => {
+    try {
+        const populatedUser = await req.user
+        .populate({
+            path: "attempts",
+            populate: {
+                path: "deck",
+                select: "name"
+            },
+            select: "datePracticed accuracyRate"
+        })
+        // .populate({path: "deck", select: "name"})
+        // .populate("attempts", "deck.name datePracticed accuracyRate");
+        res.status(200).send(populatedUser.attempts);
+    } catch(err) {
+        res.status(err.status || 500).send(err.message || "There was an error with your request");
+    }
+});
+
 export default userRouter;

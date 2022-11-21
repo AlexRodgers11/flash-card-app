@@ -14,6 +14,7 @@ function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const username = useSelector((state) => state.login.login.username);
+    const profilePic = useSelector((state) => state.login.photo);
     const notifications = useSelector((state) => state.login.notifications);
     
     const expandMessage = (id) => {
@@ -50,10 +51,11 @@ function Header() {
     }
     
     return (
-        <div style={{display: "flex", justifyContent: "space-between", padding: ".5em 2em"}}>            
+        <div style={{display: "flex", height: "4em", justifyContent: "space-between", padding: ".5em 2em"}}>            
             <div>
                 {username ? 
                     <>
+                        <img alt={username} src={profilePic} style={{height: "70%"}}/>
                         <strong>{username}</strong>
                         <button data-source="notifications" onClick={handleButtonClick}>N:{notifications.slice(0, 100).filter(notification => !notification.read).length}</button>
                         <button data-source="inbox" onClick={handleButtonClick}>M</button>

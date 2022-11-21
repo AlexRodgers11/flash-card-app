@@ -6,6 +6,7 @@ const Deck = new Schema({
     name: String,
     publiclyAvailable: Boolean,
     creator: {type: Schema.Types.ObjectId, ref: "User"},
+    attempts: [{type: Schema.Types.ObjectId, ref: "Attempts"}],
     cards: [{type: Schema.Types.ObjectId, ref: "Card"}],
     permissions: {
         view: [{type: Schema.Types.ObjectId, ref: "User"}],

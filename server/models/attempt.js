@@ -3,12 +3,15 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const Attempt = new Schema({
-    user: {type: Schema.Types.ObjectId, ref: "User"},
     deck: {type: Schema.Types.ObjectId, ref: "Deck"},
     datePracticed: Date,
+    accuracyRate: Number,
     cards: [{
         cardId: String,
-        answeredCorrectly: Boolean
+        question: String,
+        correctAnswer: String,
+        answeredCorrectly: Boolean,
+        wrongAnswerSelected: String
     }]
 }, {timestamps: true});
 

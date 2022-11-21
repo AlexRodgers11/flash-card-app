@@ -36,8 +36,7 @@ export const login = createAsyncThunk("login/login", async({usernameOrEmail, pas
         });
         return {
             token: response.data.token,
-            userId: response.data.userId,
-            email: response.data.email
+            userId: response.data.userId
         }
     } catch (err) {
         return err;
@@ -182,7 +181,7 @@ export const loginSlice = createSlice({
             state.userId = action.payload._id;
             state.login.username = action.payload.login.username;
             state.name = action.payload.name;
-            state.email = action.payload.email;
+            state.email = action.payload.login.email;
             state.photo = action.payload.photo;
             state.decks = action.payload.decks;
             state.groups = action.payload.groups;
@@ -196,7 +195,7 @@ export const loginSlice = createSlice({
         });
         builder.addCase(login.fulfilled, (state, action) => {
             state.token = action.payload.token;
-            state.userId = action.payload.userId
+            state.userId = action.payload.userId;
         });
         builder.addCase(markNotificationsAsRead, (state, action) => {
             state.notifications = action.payload;

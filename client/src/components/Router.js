@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import BrowseDecks from './BrowseDecks';
 import Dashboard from './Dashboard';
 import Deck from './Deck';
 import DeckForm from './DeckForm';
@@ -17,6 +18,7 @@ function Router() {
     return (
         <Routes>
             <Route exact path="/groups/:groupId" element={<Group />} />
+            <Route exact path="/decks/public" element={<BrowseDecks />}/>
             <Route exact path="/decks/:deckId" element={<Deck />} />
             <Route exact path="/users/:userId/decks/new" element={<DeckForm />} />
             <Route exact path="/users/:userId" element={<User />} />

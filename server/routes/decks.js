@@ -25,7 +25,6 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
     });
 });
 
-//come back and add logic to only send a certain number at a time and load more on scroll down
 deckRouter.get("/", async (req, res, next) => {
     try {
         if(req.query.categoryId) {
@@ -37,8 +36,8 @@ deckRouter.get("/", async (req, res, next) => {
                 res.status(200).send(category.decks.map(deck => deck._id));
             }
         } else {
-            let decks = await Deck.find({}, "name");
-            res.status(200).send(decks);
+            let decks = await Deck.find({}, "_id").limit(100);
+            res.status(200).send(decks.map(deck => deck._id));
         }
     } catch (err) {
         res.status(500).send("There was an error with your request");

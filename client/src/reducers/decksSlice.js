@@ -60,6 +60,23 @@ export const fetchDecksOfGroup = createAsyncThunk("decks/fetchDecksOfGroup", asy
     }
 });
 
+export const fetchPublicDecks = createAsyncThunk("decks/fetchPublicDecks", async ({searchString, categoryId, sort}) => {
+    let queryString = new URLSearchParams({searchString, categoryId, sort}).toString();
+    if(queryString.length > 0) {
+        queryString = "?" + queryString;
+    }
+    try {
+        const response = await axios.get(`${baseURL}/decks${queryString}`);
+        return {
+            listType: "all",
+            listId: "",
+            deckIds: [...response.data]
+        }
+    } catch(err) {
+        console.error(err.message);
+    }
+});
+
 export const decksSlice = createSlice({
     name: "decks",
     initialState,
@@ -68,7 +85,6 @@ export const decksSlice = createSlice({
             state.deckIds = [...state.deckIds, action.payload.deckId]
         }
     },
-    //for async requests
     extraReducers: (builder) => {
         builder.addCase(deleteDeck.fulfilled, (state, action) => {
             state.deckIds = state.deckIds.filter(id => id !== action.payload);
@@ -84,6 +100,11 @@ export const decksSlice = createSlice({
             state.deckIds = action.payload.deckIds;
         });
         builder.addCase(fetchDecksOfGroup.fulfilled, (state, action) => {
+            state.listType = action.payload.listType;
+            state.listId = action.payload.listId;
+            state.deckIds = action.payload.deckIds;
+        });
+        builder.addCase(fetchPublicDecks.fulfilled, (state, action) => {
             state.listType = action.payload.listType;
             state.listId = action.payload.listId;
             state.deckIds = action.payload.deckIds;

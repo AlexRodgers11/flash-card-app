@@ -276,13 +276,16 @@ router.get("/seed-database", async(req, res, next) => {
         while(deckPromises.length < randomDeckNumber) {
             deckPromises.push(new Promise((deckResolve, deckReject) => {
                 let newDeck = new Deck();
+                newDeck.categories = [];
+                for(let i = 0; i < categories.length; i++) {
+                    if(Math.random() < 0.06) {
+                        newDeck.categories.push(categories[i]._id);
+                    }
+                }
                     newDeck.name = faker.hacker.adjective();
                     newDeck.publiclyAvailable = Math.random() > .7 ? true : false;
                     let randomNum = Math.floor(Math.random() * users.length);
-                    // console.log(`user array length: ${users.length}`);
-                    // console.log(randomNum);
-                    // console.log(users[randomNum]);
-                    // let randomUserId = users[Math.floor(Math.random() * users.length)]._id;
+
                     let randomUserId = users[randomNum]._id;
                     // console.log({randomUserId});
                     newDeck.creator = randomUserId;
@@ -297,6 +300,11 @@ router.get("/seed-database", async(req, res, next) => {
             }));
         }
         let decks = await Promise.all(deckPromises);
+        for(let i = 0; i < decks.length; i++) {
+            for(let j = 0; j < decks[i].categories.length; j++) {
+                await Category.findByIdAndUpdate(decks[i].categories[j]._id, {$push: {decks: decks[i]}});
+            }
+        }
         console.log("Done creating decks");
         
         console.log("Adding decks to users' decks arrays and decks to categories and adding cards to decks");

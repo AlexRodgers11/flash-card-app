@@ -1,6 +1,7 @@
 import express from "express";
 const deckRouter = express.Router();
 import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 
 import Attempt from "../models/attempt.js";
 import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
@@ -8,7 +9,6 @@ import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import Category from "../models/category.js";
 import User from "../models/user.js";
-
 
 deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
@@ -26,15 +26,24 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
 });
 
 //come back and add logic to only send a certain number at a time and load more on scroll down
-deckRouter.get("/", (req, res, next) => {
-    Deck.find({}, (err, decks) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
+deckRouter.get("/", async (req, res, next) => {
+    try {
+        if(req.query.categoryId) {
+            let category = await Category.findById(req.query.categoryId, "decks").populate("decks", "name");
+            if(req.query.searchString) {
+                let filteredDecks = category.decks.filter(deck => deck.name.toLowerCase().includes(req.query.searchString.toLowerCase()));
+                res.status(200).send(filteredDecks);
+            } else {
+                res.status(200).send(category.decks.map(deck => deck._id));
+            }
         } else {
+            let decks = await Deck.find({}, "name");
             res.status(200).send(decks);
         }
-    });
+    } catch (err) {
+        res.status(500).send("There was an error with your request");
+        console.error(err.message || "There was an error with your request");
+    }   
 });
 
 deckRouter.post("/", (req, res, next) => {

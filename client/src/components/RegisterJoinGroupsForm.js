@@ -40,7 +40,6 @@ function RegisterJoinGroupsForm(props) {
     }
 
     const handleSearchInputChange = evt => {
-        console.dir(evt);
         if(displayNoResults) {
             setDisplayNoResults(false);
         }

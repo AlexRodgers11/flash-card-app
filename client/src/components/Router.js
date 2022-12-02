@@ -13,6 +13,8 @@ import RegisterEmailVerificationForm from './RegisterEmailVerification';
 import RegisterIdentificationForm from './RegisterIdentificationForm';
 import RegisterJoinGroupsForm from './RegisterJoinGroupsForm';
 import User from './User';
+import UserDecksPage from './UserDecksPage';
+import UserGroupsPage from './UserGroupsPage';
 
 function Router() {
     return (
@@ -21,6 +23,8 @@ function Router() {
             <Route exact path="/decks/public" element={<BrowseDecks />}/>
             <Route exact path="/decks/:deckId" element={<Deck />} />
             <Route exact path="/users/:userId/decks/new" element={<DeckForm />} />
+            <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
+            <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
             <Route exact path="/users/:userId" element={<User />} />
             <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
             <Route exact path="/dashboard" element={<Dashboard />} />

@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import PracticeLaunchPage from './PracticeLaunchPage';
 import BrowseDecks from './BrowseDecks';
 import Dashboard from './Dashboard';
 import Deck from './Deck';
@@ -25,6 +26,7 @@ function Router() {
             <Route exact path="/users/:userId/decks/new" element={<DeckForm />} />
             <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
             <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
+            <Route exact path="/users/:userId/practice" element={<PracticeLaunchPage />} />
             <Route exact path="/users/:userId" element={<User />} />
             <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
             <Route exact path="/dashboard" element={<Dashboard />} />

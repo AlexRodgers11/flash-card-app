@@ -1,10 +1,11 @@
 import React from "react";
+import BrowseControlBar from "./BrowseControlBar";
 import DeckList from "./DeckList";
 
 function BrowseDecks() {
     return (
         <div>
-            <div>This will be a search/filter bar</div>
+            <BrowseControlBar />
             <DeckList listType="all" />
         </div>
     )

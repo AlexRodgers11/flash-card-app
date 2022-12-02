@@ -28,15 +28,21 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
 deckRouter.get("/", async (req, res, next) => {
     try {
         if(req.query.categoryId) {
-            let category = await Category.findById(req.query.categoryId, "decks").populate("decks", "name");
+            console.log({categoryId: req.query.categoryId});
             if(req.query.searchString) {
+                console.log("this may take a while");
+                let category = await Category.findById(req.query.categoryId, "decks").populate("decks", "name").limit(100);
                 let filteredDecks = category.decks.filter(deck => deck.name.toLowerCase().includes(req.query.searchString.toLowerCase()));
                 res.status(200).send(filteredDecks);
             } else {
+                console.log("this should be fast");
+                let category = await Category.findById(req.query.categoryId, "decks").limit(100);
                 res.status(200).send(category.decks.map(deck => deck._id));
             }
         } else {
-            let decks = await Deck.find({}, "_id").limit(100);
+            let regExp = new RegExp(req.query.searchString, "i");            
+            console.log({regExp});
+            const decks = await Deck.find({name: {$regex: regExp}}, "_id").limit(100);
             res.status(200).send(decks.map(deck => deck._id));
         }
     } catch (err) {
@@ -66,7 +72,8 @@ deckRouter.get("/:deckId/tile", (req, res, next) => {
         let response = {
             name: req.deck.name,
             publiclyAvailable: req.deck.publiclyAvailable,
-            creator: user.login.username,
+            creatorId: user._id,
+            creatorName: user.login.username,
             createdAt: req.deck.createdAt,
             cardCount: req.deck.cards.length,
             permissions: req.deck.permissions

@@ -121,11 +121,11 @@ export const sendJoinRequest = createAsyncThunk("login/sendJoinRequest", async({
 
 export const submitJoinCode = createAsyncThunk("login/submitJoinCode", async({userId, groupId, joinCode}) => {
     try {
-         const response = await axios.post(`${baseURL}/groups/${groupId}/members/join-code`, {userId, groupId, joinCode});
-         return response.data;
+        const response = await axios.post(`${baseURL}/groups/${groupId}/members/join-code`, {userId, groupId, joinCode});
+        return response.data;
     } catch(err) {
         console.error(err);
-        return err;
+        return undefined;
     }
 });
 
@@ -214,7 +214,8 @@ export const loginSlice = createSlice({
             state.photo = action.payload.photo;
         });
         builder.addCase(submitJoinCode.fulfilled, (state, action) => {
-            state.groups = [...state.groups, action.payload];
+            //okay to just only change state conditionally? Is that better than triggering rerender if allowed?
+            state.groups = action.payload ? [...state.groups, action.payload] : [...state.groups];
         });
         builder.addCase(updateUser.fulfilled, (state, action) => {
             for(const key in action.payload) {

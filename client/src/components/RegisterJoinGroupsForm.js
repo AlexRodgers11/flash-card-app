@@ -56,10 +56,12 @@ function RegisterJoinGroupsForm(props) {
         evt.preventDefault();
         dispatch(submitJoinCode({userId, groupId: selectedGroupId, joinCode: userEnteredJoinCode}))
         .then(result => {
-            //is if statement necessary- does this actually work it or will it always allow join?
-            if(result.meta.requestStatus === "fulfilled") {
+            if(result.payload) {
                 setContent("success");
                 setJoinAttemptType("code");
+            } else {
+                setContent("failure");
+                setUserEnteredJoinCode("");
             }
         })
         .catch(err => {
@@ -103,6 +105,7 @@ function RegisterJoinGroupsForm(props) {
                     <>
                         <p>To join this group you must submit a request to its administrators</p>
                         <button data-joinType="request" onClick={sendRequestToJoin}>Request to Join</button>
+                        {content === "failure" && <p style={{color: "red", fontSize: "1.1em", fontWeight: "600"}}>Incorrect code entered</p>}
                         <button onClick={continueSearching}>Cancel</button>
                     </>
                 )
@@ -125,6 +128,7 @@ function RegisterJoinGroupsForm(props) {
                             <label htmlFor="join-code-entry-two">Enter the group's code to join</label>
                             <input id="join-code-entry-two" name="join-code-entry-two" type="text" onChange={handleChangeUserEnteredJoinCode} value={userEnteredJoinCode} />
                             <button type="submit" onClick={joinGroup}>Submit</button>
+                            {content === "failure" && <p style={{color: "red", fontSize: "1.1em", fontWeight: "600"}}>Incorrect code entered</p>}
                         </form>
                         <button data-joinType="request" onClick={sendRequestToJoin}>Send Request to Join</button>
                         <button onClick={continueSearching}>Cancel</button>
@@ -172,11 +176,17 @@ function RegisterJoinGroupsForm(props) {
                         {displayJoinOptions()}
                     </div>
                     :
-                    <div>
-                        <p>Success! {joinAttemptType === "code" ? "You are now a member of this group" : "Your request has been sent to the group's administrators"}</p>
-                        <button onClick={continueSearching}>Search for more groups</button>
-                        <button onClick={props.hideModal ? props.hideModal : goToDashboard}>Done</button>
-                    </div>
+                    content === "success" ? 
+                        <div>
+                            <p>Success! {joinAttemptType === "code" ? "You are now a member of this group" : "Your request has been sent to the group's administrators"}</p>
+                            <button onClick={continueSearching}>Search for more groups</button>
+                            <button onClick={props.hideModal ? props.hideModal : goToDashboard}>Done</button>
+                        </div>
+                        :
+                        <div>
+                            {displayJoinOptions()}
+                        </div>
+                    
                 }
                 </>
             }

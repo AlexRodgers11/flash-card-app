@@ -8,8 +8,17 @@ const baseURL = 'http://localhost:8000';
 function DeckTile(props) {
     const [deckData, setDeckData] = useState({});
     const navigate = useNavigate();
+    
     const handleViewDeck = () => {
         navigate(`/decks/${props.deckId}`)
+    }
+
+    const handleViewOnEnter = (evt) => {
+        console.log(evt);
+        console.log(evt.keyCode);
+        if(evt.keyCode === 13) {
+            navigate(`/decks/${props.deckId}`);
+        }
     }
 
     useEffect(() => {
@@ -19,7 +28,7 @@ function DeckTile(props) {
     }, [props.deckId]);
   
     return (
-    <div onClick={handleViewDeck} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
+    <div tabIndex={0} onKeyDown={handleViewOnEnter} onClick={handleViewDeck} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
         <h4>{deckData.name}</h4>
         <p>{deckData.creator}</p>
         <p>{deckData.createdAt}</p>

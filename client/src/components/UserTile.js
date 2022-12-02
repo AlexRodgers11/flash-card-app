@@ -40,8 +40,14 @@ function UserTile(props) {
         //need to make notification
     }
 
+    const handleViewOnEnter = (evt) => {
+        if(evt.keyCode === 13) {
+            navigate(`/users/${props.memberId}`);        
+        }
+    }
+
     return (
-        <div onClick={props.editMode ? null : viewUser} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
+        <div tabIndex={0} role="button" onKeyDown={props.editMode ? null : handleViewOnEnter} onClick={props.editMode ? null : viewUser} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
             {(props.editMode && loggedInUserId !== props.memberId) &&
                 <div>
                     {(((props.listType==="members") && props.memberId !== headAdmin) && (loggedInUserId === headAdmin || !props.isAdmin)) && <button onClick={handleRemoveMember}>Remove</button>}

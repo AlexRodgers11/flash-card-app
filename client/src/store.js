@@ -1,4 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import attemptReducer from "./reducers/attemptsSlice";
 import deckReducer from "./reducers/deckSlice";
 import decksReducer from "./reducers/decksSlice";
 import groupReducer from "./reducers/groupSlice";
@@ -7,6 +8,7 @@ import practiceSessionReducer from "./reducers/practiceSessionSlice";
 
 const combinedReducer = combineReducers(
     {
+        attempts: attemptReducer,
         deck: deckReducer,
         decks: decksReducer,
         group: groupReducer,

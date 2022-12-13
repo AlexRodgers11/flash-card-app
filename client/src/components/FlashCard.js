@@ -10,7 +10,7 @@ function FlashCard() {
 	const dispatch = useDispatch();
 
 	const submitAnswer = (evt) => {
-		let answeredCorrectly = evt.target.dataset.answeredcorrectly ? true : false;  
+		let answeredCorrectly = evt.target.dataset.answeredcorrectly === "true" ? true : false;  
 		setTimeout(() => {
 			dispatch(addCardAttempt({answeredCorrectly, cardId: activeCard._id}));
 		}, 1000);
@@ -41,8 +41,8 @@ function FlashCard() {
 					<div>{activeCard.correctAnswer}</div>
 					<div>
 						<h3>Did you answer correctly?</h3>
-						<button data-answeredcorrectly={true} onClick={submitAnswer}>Yes</button>
-						<button data-answeredcorrectly={false} onClick={submitAnswer}>No</button>
+						<button data-answeredcorrectly="true" onClick={submitAnswer}>Yes</button>
+						<button data-answeredcorrectly="false" onClick={submitAnswer}>No</button>
 					</div>
 				</>
 			}

@@ -5,6 +5,7 @@ import { shuffleArray } from "../utils";
 const baseURL = "http://localhost:8000";
 
 const initialState = {
+    practicedSinceAttemptsPulled: false,
     cards: [],
     activeCard: {
         type: "",
@@ -116,11 +117,14 @@ export const practiceSessionSlice = createSlice({
         },
         answerCard: (state) => {
             state.cardAnswered = true;
+        },
+        resetPracticedSinceAttemptsPulled: (state) => {
+            state.practicedSinceAttemptsPulled = false;
         }
     },
     extraReducers: (builder) => {
-        builder.addCase(endPractice.fulfilled, (state) => {
-            state = initialState;
+        builder.addCase(endPractice.fulfilled, () => {
+            return {...initialState, practicedSinceAttemptsPulled: true};
         });
         builder.addCase(fetchDeck.fulfilled, (state, action) => {
             state.cards = action.payload.cards;
@@ -141,6 +145,7 @@ export const practiceSessionSlice = createSlice({
             state.stats.numberCorrect = 0;
             state.stats.numberWrong = 0;
             state.retryStatus = false;
+            state.practicedSinceAttemptsPulled = true;
         });
         builder.addCase(retryMissedCards.fulfilled, (state) => {
             let shuffledCards = shuffleArray(state.cards.filter(card => state.missedCards.includes(card._id)));
@@ -151,9 +156,10 @@ export const practiceSessionSlice = createSlice({
             state.stats.numberCorrect = 0;
             state.stats.numberWrong = 0;
             state.retryStatus = true;
+            state.practicedSinceAttemptsPulled = true;
         });
     }
 });
 
-export const { addCardAttempt, answerCard } = practiceSessionSlice.actions;
+export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled } = practiceSessionSlice.actions;
 export default practiceSessionSlice.reducer;

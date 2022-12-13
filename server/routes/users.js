@@ -1,6 +1,7 @@
 import express from "express";
 const userRouter = express.Router();
 
+import CardAttempt from "../models/cardAttempt.js";
 import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
@@ -293,12 +294,36 @@ userRouter.patch("/:userId", upload.single("photo"), async (req, res, next) => {
 
 userRouter.post("/:userId/attempts", async (req, res, next) => {
     try {
-        const newAttempt = new Attempt(req.body);
+        const cardAttempts = [];
+        for(let i = 0; i < req.body.cardAttempts?.length; i++) {
+            const attemptData = req.body.cardAttempts[i];
+
+            const newCardAttempt = new CardAttempt({
+                datePracticed: attemptData.datePracticed,
+                cardType: attemptData.cardType,
+                question: attemptData.question,
+                correctAnswer: attemptData.correctAnswer,
+                answeredCorrectly: attemptData.answeredCorrectly,
+                wrongAnswerSelected: attemptData.wrongAnswerSelected
+            });
+            const savedCardAttempt = await newCardAttempt.save();
+            
+            await Card.findByIdAndUpdate(attemptData.cardId, {$push: {attempts: savedCardAttempt}});
+            cardAttempts.push(savedCardAttempt._id);
+        }
+        console.log({cardAttempts});
+        const newAttempt = new Attempt({
+            deck: req.body.deck,
+            datePracticed: req.body.datePracticed,
+            accuracyRate: req.body.accuracyRate,
+            cards: cardAttempts
+        });
         const attempt = await newAttempt.save();
         await User.findByIdAndUpdate(req.user._id, {$push: {attempts: attempt}});
+        await Deck.findByIdAndUpdate(req.body.deck, {$push: {attempts: attempt}});
         res.status(200).send(attempt);
     } catch (err) {
-        res.status(500).send("There was an error with your request");
+        res.status(500).send(err.message);
         throw err;
     }
 });
@@ -337,23 +362,8 @@ userRouter.delete("/:userId/decks/:deckId/attempts", async (req, res, next) => {
     }
 });
 
-userRouter.get("/:userId/attempts", async (req, res, next) => {
-    try {
-        const populatedUser = await req.user
-        .populate({
-            path: "attempts",
-            populate: {
-                path: "deck",
-                select: "name"
-            },
-            select: "datePracticed accuracyRate"
-        })
-        // .populate({path: "deck", select: "name"})
-        // .populate("attempts", "deck.name datePracticed accuracyRate");
-        res.status(200).send(populatedUser.attempts);
-    } catch(err) {
-        res.status(err.status || 500).send(err.message || "There was an error with your request");
-    }
+userRouter.get("/:userId/attempts", (req, res, next) => {
+    res.status(200).send(req.user.attempts);
 });
 
 export default userRouter;

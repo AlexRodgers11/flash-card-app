@@ -6,13 +6,7 @@ const Attempt = new Schema({
     deck: {type: Schema.Types.ObjectId, ref: "Deck"},
     datePracticed: Date,
     accuracyRate: Number,
-    cards: [{
-        cardId: String,
-        question: String,
-        correctAnswer: String,
-        answeredCorrectly: Boolean,
-        wrongAnswerSelected: String
-    }]
+    cards: [{type: Schema.Types.ObjectId, ref: "CardAttempt"}]
 }, {timestamps: true});
 
 const attemptModel = mongoose.model("Attempt", Attempt);

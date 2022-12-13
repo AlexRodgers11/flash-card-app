@@ -9,7 +9,7 @@ import Deck from "./models/deck.js";
 import Group from "./models/group.js";
 import User from "./models/user.js";
 import Activity from "./models/activity.js";
-import getRandomCardType, { generateCode, getRandomJoinOptions } from "./utils.js";
+import CardAttempt from "./models/cardAttempt.js";
 const port = process.env.port || 8000;
 const router = express.Router();
 
@@ -32,9 +32,10 @@ import { Strategy as JwtStrategy } from  "passport-jwt";
 import group from "./models/group.js";
 
 import dotenv from "dotenv";
+import cardAttemptRouter from "./routes/cardAttempt.js";
 dotenv.config();
 
-mongoose.connect("mongodb://localhost/flash-card-app-four", {
+mongoose.connect("mongodb://localhost/flash-card-app-five", {
 // mongoose.connect("mongodb://WOLVES-DEN:27017,WOLVES-DEN:27018,WOLVES-DEN:27019/flash-card?replicaSet=rs", {
     //use MongoDB's new connection string parser instead of the old deprecated one
     useNewUrlParser: true,
@@ -132,6 +133,7 @@ app.use(passport.initialize());
 
 app.use("/activities", activityRouter);
 app.use("/attempts", attemptRouter);
+app.use("/card-attempts", cardAttemptRouter);
 app.use("/cards", cardRouter);
 app.use("/categories", categoryRouter);
 app.use("/decks", deckRouter);
@@ -405,10 +407,6 @@ router.get("/seed-database", async(req, res, next) => {
                         newCard.correctAnswer = decks[j].cards.correctAnswer;
                         newCard.creator = decks[j].cards.creator;
                         newCard.hint = decks[j].cards.hint;
-                        newCard.stats = {
-                            numberCorrect: 0,
-                            numberIncorred: 0
-                        }
                         await newCard.save();
                         groupDeckCards.push(newCard);
                         decks.splice(j, 1);
@@ -475,18 +473,19 @@ router.get("/seed-database", async(req, res, next) => {
                                 if(answeredCorrectly) {
                                     numCorrect++;
                                 }
-                                let cardAttempt = {
-                                    cardId: fullCard._id,
+                                let cardAttempt = new CardAttempt({
+                                    cardType: fullCard.cardtype,
                                     question: fullCard.question,
                                     correctAnswer: fullCard.correctAnswer,
-                                    //ternary works as argument
                                     answeredCorrectly,
                                     wrongAnswerSelected: answeredCorrectly ? "" : foundCard.cardType === "FlashCard" ? "" : foundCard.cardType === "TrueFalseCard" ? fullCard.wrongAnswerOne : [fullCard.wrongAnswerOne, fullCard.wrongAnswerTwo, fullCard.wrongAnswerTwo][Math.floor(Math.random() * 3)]
-                                    //decide what else to put in a card attempt (and if to remove card quetsion)
-                                            }
+
+                                });
+                                await cardAttempt.save();
+                                await Card.findByIdAndUpdate(fullCard._id, {$push: {attempts: cardAttempt}});
                                 attempt.cards.push(cardAttempt);
                                     }
-                            attempt.accuracyRate = Math.round((numCorrect / deck.cards.length) * 100) / 100;
+                            attempt.accuracyRate = Math.round((numCorrect / deck.cards.length) * 100);
                             const newAttempt = await attempt.save();
                             // await User.findByIdAndUpdate(users[i]._id, {$push: {attempts: newAttempt}});
                             attemptResolve(newAttempt);

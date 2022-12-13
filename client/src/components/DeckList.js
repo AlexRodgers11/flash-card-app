@@ -33,7 +33,7 @@ export default function DeckList(props) {
 
     return (
         <div>
-            {deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
+            {props.listType === listType && deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
         </div>
     )
 }

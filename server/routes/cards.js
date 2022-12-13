@@ -44,4 +44,23 @@ cardRouter.delete("/:cardId", async (req, res, next) => {
     }
 });
 
+cardRouter.get("/:cardId/tile-stats", async (req, res, next) => {
+    try {
+        let populatedCard = await req.card.populate("attempts", "createdAt answeredCorrectly");
+        const responseObj = {
+            cardQuestion: req.card.question,
+            dateLastPracticed: populatedCard.attempts[0]?.createdAt || "Not practiced yet",
+            attemptCount: populatedCard.attempts.length,
+            accuracyRate: populatedCard.attempts.length > 0 ? Math.round(populatedCard.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / populatedCard.attempts.length) : undefined
+        }
+        res.status(200).send(responseObj);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+cardRouter.get("/:cardId/attempts", (req, res, next) => {
+    res.status(200).send(req.card.attempts);
+});
+
 export default cardRouter;

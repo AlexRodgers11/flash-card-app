@@ -7,12 +7,12 @@ import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import Attempt from "../models/attempt.js";
 import { Message } from "../models/message.js";
-// import Notification from '../models/notification.js';
 import { Notification } from '../models/notification.js';
 import { generateCode, generateRandomFileName } from "../utils.js";
 
 import multer from "multer";
 import { getObjectSignedUrl, uploadFile } from "../s3.js";
+import { Card } from "../models/card.js";
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
@@ -127,6 +127,16 @@ userRouter.put("/:userId", (req, res, next) => {
 
 userRouter.get("/:userId/decks", (req, res, next) => {
     res.status(200).send(JSON.stringify(req.user.decks));
+});
+
+//possibly rename route so it's clear that the name of the decks is being sent back too, that it's really an array of decks of cards rather than an array of cards
+userRouter.get("/:userId/cards", async (req, res, next) => {
+    try {
+        const populatedUser = await req.user.populate("decks", "name cards -_id");
+        res.status(200).send(populatedUser.decks);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
 userRouter.post("/:userId/decks", async (req, res, next) => {
@@ -307,7 +317,7 @@ userRouter.post("/:userId/attempts", async (req, res, next) => {
                 wrongAnswerSelected: attemptData.wrongAnswerSelected
             });
             const savedCardAttempt = await newCardAttempt.save();
-            
+
             await Card.findByIdAndUpdate(attemptData.cardId, {$push: {attempts: savedCardAttempt}});
             cardAttempts.push(savedCardAttempt._id);
         }

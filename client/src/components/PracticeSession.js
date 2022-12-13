@@ -50,7 +50,7 @@ function PracticeSession() {
 
     const handlePracticeDeckAgain = () => {
             const cardAttempts = store.getState().practiceSession.cardAttempts;
-            dispatch(practiceDeckAgain({deckId, userId, retryStatus, cardAttempts}));
+            dispatch(practiceDeckAgain({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100}));
     }
 
     // const handleRetryMissedCards = () => {
@@ -76,7 +76,7 @@ function PracticeSession() {
     
     const handleRetryMissedCards = () => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
-        dispatch(retryMissedCards({deckId, userId, retryStatus, cardAttempts}));
+        dispatch(retryMissedCards({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100}));
     }
 
     // const handleGoToUserPage = async () => {
@@ -96,11 +96,15 @@ function PracticeSession() {
     //     navigate(`/dashboard`);
     // }
 
-    const handleGoToUserPage = () => {
+    const navigateAway = (evt) => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
-        dispatch(endPractice({deckId, userId, retryStatus, cardAttempts}))
+        dispatch(endPractice({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100}))
             .then(() => {
-                navigate("/dashboard");
+                if(evt.target.value === "dashboard") {
+                    navigate("/dashboard");
+                } else {
+                    navigate(`/users/${userId}/practice`);
+                }
             });
     }
 
@@ -117,7 +121,8 @@ function PracticeSession() {
                             null
                         }
                         <button onClick={handlePracticeDeckAgain}>Practice Deck Again</button>
-                        <button onClick={handleGoToUserPage}>Back to Decks</button>
+                        <button value="practice" onClick={navigateAway}>Select Another Deck</button>
+                        <button value="dashboard" onClick={navigateAway}>Home</button>
                     </div>
                 }
             </div>

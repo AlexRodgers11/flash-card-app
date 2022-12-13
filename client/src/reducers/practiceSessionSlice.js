@@ -52,37 +52,38 @@ export const fetchDeck = createAsyncThunk("practiceSession/fetchDeck", async(dec
     }
 });
 
-const saveAttempts = async (deckId, userId, cardAttempts) => {
+const saveAttempts = async (deckId, userId, cardAttempts, accuracyRate) => {
     console.log("saving attempts");
     try {
         await axios.post(`${baseURL}/users/${userId}/attempts`, {
             user: userId,
             deck: deckId,
-            datePracticed: new Date().toString(),
-            cards: cardAttempts
+            datePracticed: Date.now(),
+            cardAttempts: cardAttempts,
+            accuracyRate: accuracyRate
         });
     } catch (err) {
         console.error(err);
     }
 }
 
-export const practiceDeckAgain = createAsyncThunk("practiceSession/practiceDeckAgain", async ({deckId, userId, retryStatus, cardAttempts}) => {
+export const practiceDeckAgain = createAsyncThunk("practiceSession/practiceDeckAgain", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate}) => {
     if(!retryStatus) {
-        await saveAttempts(deckId, userId, cardAttempts)
+        await saveAttempts(deckId, userId, cardAttempts, accuracyRate)
     }
     return [];
 });
 
-export const retryMissedCards = createAsyncThunk("practiceSession/retryMissedCards", async ({deckId, userId, retryStatus, cardAttempts}) => {
+export const retryMissedCards = createAsyncThunk("practiceSession/retryMissedCards", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate}) => {
     if(!retryStatus) {
-        await saveAttempts(deckId, userId, cardAttempts);
+        await saveAttempts(deckId, userId, cardAttempts, accuracyRate);
     }
     return [];
 });
 
-export const endPractice = createAsyncThunk("practiceSession/endPractice", async ({deckId, userId, retryStatus, cardAttempts}) => {
+export const endPractice = createAsyncThunk("practiceSession/endPractice", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate}) => {
     if(!retryStatus) {
-        await saveAttempts(deckId, userId, cardAttempts);
+        await saveAttempts(deckId, userId, cardAttempts, accuracyRate);
     }
     return [];
 });
@@ -95,7 +96,12 @@ export const practiceSessionSlice = createSlice({
         addCardAttempt: (state, action) => {
             state.cardAttempts = [...state.cardAttempts, {
                 answeredCorrectly: action.payload.answeredCorrectly, 
-                cardId: action.payload.cardId
+                cardId: action.payload.cardId,
+                cardType: action.payload.cardType,
+                question: action.payload.question,
+                wrongAnswerSelected: action.payload.wrongAnswerSelected,
+                datePracticed: action.payload.datePracticed,
+                correctAnswer: action.payload.correctAnswer
             }];
             if(!action.payload.answeredCorrectly) {
                 state.missedCards = [...state.missedCards, action.payload.cardId];

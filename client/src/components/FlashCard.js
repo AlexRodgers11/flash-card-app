@@ -12,7 +12,15 @@ function FlashCard() {
 	const submitAnswer = (evt) => {
 		let answeredCorrectly = evt.target.dataset.answeredcorrectly === "true" ? true : false;  
 		setTimeout(() => {
-			dispatch(addCardAttempt({answeredCorrectly, cardId: activeCard._id}));
+			dispatch(addCardAttempt({
+				answeredCorrectly, 
+				cardId: activeCard._id,
+				correctAnswer: activeCard.correctAnswer,
+				wrongAnswerSelected: "",
+				question: activeCard.question,
+				cardType: "FlashCard",
+				datePracticed: Date.now()
+			}));
 		}, 1000);
 	}
 

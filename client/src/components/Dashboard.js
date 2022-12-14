@@ -74,7 +74,7 @@ function Dashboard() {
             <Link to={`/users/${user.userId}/decks/new`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Create a New Deck</div></Link>
             <Link to={`/users/${user.userId}/groups`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Your Groups</div></Link>
             <Link to={`/users/${user.userId}/practice`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Practice</div></Link>
-            <Link to={`/users/statistics`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Stats</div></Link>
+            <Link to={`/users/${user.userId}/statistics/sessions`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Stats</div></Link>
             {/* {!modalContent ?
                 null
                 :

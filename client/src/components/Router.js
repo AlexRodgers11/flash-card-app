@@ -16,6 +16,13 @@ import RegisterJoinGroupsForm from './RegisterJoinGroupsForm';
 import User from './User';
 import UserDecksPage from './UserDecksPage';
 import UserGroupsPage from './UserGroupsPage';
+import StatisticsPage from './StatisticsPage';
+import DeckStatsList from './DeckStatsList';
+import Sessions from './Sessions';
+import Attempt from './Attempt';
+import CardStatsList from './CardStatsList';
+import CardAttempt from './CardAttempt';
+import CardAttemptList from './CardAttemptList';
 
 function Router() {
     return (
@@ -27,6 +34,14 @@ function Router() {
             <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
             <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
             <Route exact path="/users/:userId/practice" element={<PracticeLaunchPage />} />
+            <Route exact path="/users/:userId/statistics/" element={<StatisticsPage />}>
+                <Route path="decks" element={<DeckStatsList />} />
+                <Route path="cards" element={<CardStatsList />} />
+                <Route path="sessions/decks/:deckId" element={<Sessions />} />
+                <Route path="cards/:cardId" element={<CardAttemptList />} />
+                <Route path="sessions/:sessionId" element={<Attempt />} />
+                <Route path="sessions" element={<Sessions allDecks={true}/>} />
+            </Route>
             <Route exact path="/users/:userId" element={<User />} />
             <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
             <Route exact path="/dashboard" element={<Dashboard />} />

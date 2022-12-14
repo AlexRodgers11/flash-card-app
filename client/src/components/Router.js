@@ -19,9 +19,8 @@ import UserGroupsPage from './UserGroupsPage';
 import StatisticsPage from './StatisticsPage';
 import DeckStatsList from './DeckStatsList';
 import Sessions from './Sessions';
-import Attempt from './Attempt';
+import DeckAttempt from './DeckAttempt';
 import CardStatsList from './CardStatsList';
-import CardAttempt from './CardAttempt';
 import CardAttemptList from './CardAttemptList';
 
 function Router() {
@@ -39,7 +38,7 @@ function Router() {
                 <Route path="cards" element={<CardStatsList />} />
                 <Route path="sessions/decks/:deckId" element={<Sessions />} />
                 <Route path="cards/:cardId" element={<CardAttemptList />} />
-                <Route path="sessions/:sessionId" element={<Attempt />} />
+                <Route path="sessions/:sessionId" element={<DeckAttempt />} />
                 <Route path="sessions" element={<Sessions allDecks={true}/>} />
             </Route>
             <Route exact path="/users/:userId" element={<User />} />

@@ -5,7 +5,7 @@ const baseURL = 'http://localhost:8000';
 
 const initialState = {
     attemptIdsOfUser: [],
-    attempt: {},
+    deckAttempt: {},
     selectedDeckId: "",
     attemptIdsOfDeck: [],
     selectedCardId: "",
@@ -41,7 +41,7 @@ export const fetchCardAttemptIds = createAsyncThunk("attempts/fetchCardAttemptId
     }
 });
 
-export const fetchAttemptData = createAsyncThunk("attempts/fetchAttemptData" , async ({attemptId}) => {
+export const fetchDeckAttemptData = createAsyncThunk("attempts/fetchDeckAttemptData" , async ({attemptId}) => {
     const response = await axios.get(`${baseURL}/attempts/${attemptId}`);
     return response.data;
 });
@@ -68,8 +68,8 @@ export const attemptsSlice = createSlice({
             state.attemptIdsOfDeck = action.payload.attempts;
             state.selectedDeckId = action.payload.deckId;
         });
-        builder.addCase(fetchAttemptData.fulfilled, (state, action) => {
-            state.attempt = action.payload;
+        builder.addCase(fetchDeckAttemptData.fulfilled, (state, action) => {
+            state.deckAttempt = action.payload;
         });
         builder.addCase(fetchStatsCardIds.fulfilled, (state, action) => {
             state.cardIds = action.payload;

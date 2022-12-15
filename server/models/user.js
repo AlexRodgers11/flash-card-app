@@ -15,7 +15,7 @@ const User = new Schema({
     photo: String,
     decks: [{type: Schema.Types.ObjectId, ref: "Deck"}],
     groups: [{type: Schema.Types.ObjectId, ref: "Group"}],
-    attempts: [{type: Schema.Types.ObjectId, ref: "Attempt"}],
+    deckAttempts: [{type: Schema.Types.ObjectId, ref: "DeckAttempt"}],
     messages: {
         sent: [{type: Schema.Types.ObjectId, ref: "Message"}],
         received: [{type: Schema.Types.ObjectId, ref: "Message"}]

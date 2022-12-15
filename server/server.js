@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import faker from "faker";
-import Attempt from "./models/attempt.js";
+import DeckAttempt from "./models/deckAttempt.js";
 import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "./models/card.js";
 import Category from "./models/category.js";
 import Deck from "./models/deck.js";
@@ -35,7 +35,7 @@ import dotenv from "dotenv";
 import cardAttemptRouter from "./routes/cardAttempt.js";
 dotenv.config();
 
-mongoose.connect("mongodb://localhost/flash-card-app-five", {
+mongoose.connect("mongodb://localhost/flash-card-app-four", {
 // mongoose.connect("mongodb://WOLVES-DEN:27017,WOLVES-DEN:27018,WOLVES-DEN:27019/flash-card?replicaSet=rs", {
     //use MongoDB's new connection string parser instead of the old deprecated one
     useNewUrlParser: true,
@@ -432,25 +432,25 @@ router.get("/seed-database", async(req, res, next) => {
             if(finishedUsers[i].decks.length) {
                 // const randomAttemptNumber = Math.floor(Math.random() * 7);
                 const randomAttemptNumber = Math.floor(Math.random() * 40);
-                const attemptPromises = [];
-                let currentDeckId;
-                while(attemptPromises.length < randomAttemptNumber) {
-                    //while attempts' length is less than the randomly determined attempt number, fill it with promises that will resolve to fullfilled attempts
-                    attemptPromises.push(new Promise((attemptResolve, attemptReject) => {
+                const deckAttemptPromises = [];
+                let currentDeckId;//probably delete this
+                while(deckAttemptPromises.length < randomAttemptNumber) {
+                    //while deckAttempts' length is less than the randomly determined attempt number, fill it with promises that will resolve to fullfilled attempts
+                    deckAttemptPromises.push(new Promise((deckAttemptResolve,deckAttemptReject) => {
                         //create a new attempt using the Attempt model
-                        let attempt = new Attempt();
-                        //for each attempt grab a random deck from the user's decks
+                        let deckAttempt = new DeckAttempt();
+                        //for each deckattempt grab a random deck from the user's decks
                         let currentDeckId = finishedUsers[i].decks[Math.floor(Math.random() * finishedUsers[i].decks.length)];
                         //find the randomly selected deck by its id
                         
                         // const discriminators = Card.discriminators;
 
                         Deck.findById(currentDeckId, async (err, deck) => {
-                            attempt.deck = deck._id;
+                            deckAttempt.deck = deck._id;
                             // let cards = [];
-                            attempt.datePracticed = Date.now();
+                            deckAttempt.datePracticed = Date.now();
                             let numCorrect = 0;
-                            attempt.cards = [];
+                            deckAttempt.cards = [];
                             for(let j = 0; j < deck.cards.length; j++) {
                                 let foundCard = await Card.findById(deck.cards[j]);
                                 let fullCard = {};
@@ -481,24 +481,24 @@ router.get("/seed-database", async(req, res, next) => {
                                     wrongAnswerSelected: answeredCorrectly ? "" : foundCard.cardType === "FlashCard" ? "" : foundCard.cardType === "TrueFalseCard" ? fullCard.wrongAnswerOne : [fullCard.wrongAnswerOne, fullCard.wrongAnswerTwo, fullCard.wrongAnswerTwo][Math.floor(Math.random() * 3)]
 
                                 });
-                                await cardAttempt.save();
+                                const savedCardAttempt = await cardAttempt.save();
                                 await Card.findByIdAndUpdate(fullCard._id, {$push: {attempts: cardAttempt}});
-                                attempt.cards.push(cardAttempt);
+                                deckAttempt.cards.push(savedCardAttempt);
                                     }
-                            attempt.accuracyRate = Math.round((numCorrect / deck.cards.length) * 100);
-                            const newAttempt = await attempt.save();
+                            deckAttempt.accuracyRate = Math.round((numCorrect / deck.cards.length) * 100);
+                            const savedDeckAttempt = await deckAttempt.save();
                             // await User.findByIdAndUpdate(users[i]._id, {$push: {attempts: newAttempt}});
-                            attemptResolve(newAttempt);
+                            deckAttemptResolve(savedDeckAttempt);
                         });
                     }));
                 }
 
 
 
-                const attempts =  await Promise.all(attemptPromises);
-                await User.findByIdAndUpdate(users[i]._id, {$push: {attempts: {$each: attempts}}});
-                for(let z = 0; z < attempts.length; z++) {
-                    await Deck.findByIdAndUpdate(attempts[z].deck, {$push: {attempts: attempts[z]}});
+                const deckAttempts =  await Promise.all(deckAttemptPromises);
+                await User.findByIdAndUpdate(users[i]._id, {$push: {deckAttempts: {$each: deckAttempts}}});
+                for(let z = 0; z < deckAttempts.length; z++) {
+                    await Deck.findByIdAndUpdate(deckAttempts[z].deck, {$push: {attempts: deckAttempts[z]}});
                 }
                 if(i === users.length - 1) {
                     console.log("done");

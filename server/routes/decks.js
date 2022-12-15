@@ -1,9 +1,7 @@
 import express from "express";
 const deckRouter = express.Router();
-import mongoose from "mongoose";
-import { ObjectId } from "mongodb";
 
-import Attempt from "../models/attempt.js";
+import DeckAttempt from "../models/deckAttempt.js";
 import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
@@ -84,6 +82,7 @@ deckRouter.get("/:deckId/tile", (req, res, next) => {
 });
 
 deckRouter.get("/:deckId/tile-stats", async (req, res, next) => {
+    console.log({deck: req.deck});
     try {
         let populatedDeck = await req.deck.populate("attempts", "datePracticed accuracyRate");
                 
@@ -120,7 +119,7 @@ deckRouter.delete("/:deckId", async (req, res, next) => {
         await Group.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}});
         await Category.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}});
         await User.findByIdAndUpdate(req.deck.creator, {$pull: {decks: req.deck._id}});
-        await Attempt.deleteMany({deck: req.deck._id});
+        await DeckAttempt.deleteMany({deck: req.deck._id});
         const deck = await Deck.findByIdAndDelete(req.deck._id);
         await Card.deleteMany({_id: {$in: req.deck.cards}});
         res.status(200).send(deck._id);

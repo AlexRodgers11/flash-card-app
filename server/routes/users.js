@@ -5,10 +5,10 @@ import CardAttempt from "../models/cardAttempt.js";
 import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
-import Attempt from "../models/attempt.js";
+import DeckAttempt from "../models/deckAttempt.js";
 import { Message } from "../models/message.js";
 import { Notification } from '../models/notification.js';
-import { generateCode, generateRandomFileName } from "../utils.js";
+import { generateRandomFileName } from "../utils.js";
 
 import multer from "multer";
 import { getObjectSignedUrl, uploadFile } from "../s3.js";
@@ -22,6 +22,7 @@ userRouter.param("userId", (req, res, next, userId) => {
         } else if(!user) {
             res.status(404).send("User not found");
         } else {
+            console.log({user});
             req.user = user;
             next();
         }
@@ -106,7 +107,7 @@ userRouter.delete("/:userId", async (req, res, next) => {
         await Deck.deleteMany({creator: userId});
         await Deck.updateMany({"permissions.view": userId}, {$pull: {"permissions.view": userId}});
         const deletedUser = await User.findByIdAndDelete(userId);
-        await Attempt.deleteMany({_id: {$in: deletedUser.attempts}});
+        await DeckAttempt.deleteMany({_id: {$in: deletedUser.deckAttempts}});
         res.status(200).send(userId);
     } catch (err) {
         res.status(500).send("There was an error with your request");
@@ -322,16 +323,16 @@ userRouter.post("/:userId/attempts", async (req, res, next) => {
             cardAttempts.push(savedCardAttempt._id);
         }
         console.log({cardAttempts});
-        const newAttempt = new Attempt({
+        const newDeckAttempt = new DeckAttempt({
             deck: req.body.deck,
             datePracticed: req.body.datePracticed,
             accuracyRate: req.body.accuracyRate,
             cards: cardAttempts
         });
-        const attempt = await newAttempt.save();
-        await User.findByIdAndUpdate(req.user._id, {$push: {attempts: attempt}});
-        await Deck.findByIdAndUpdate(req.body.deck, {$push: {attempts: attempt}});
-        res.status(200).send(attempt);
+        const savedDeckAttempt = await newDeckAttempt.save();
+        await User.findByIdAndUpdate(req.user._id, {$push: {deckAttempts: savedDeckAttempt}});
+        await Deck.findByIdAndUpdate(req.body.deck, {$push: {attempts: savedDeckAttempt}});
+        res.status(200).send(savedDeckAttempt);
     } catch (err) {
         res.status(500).send(err.message);
         throw err;
@@ -341,8 +342,8 @@ userRouter.post("/:userId/attempts", async (req, res, next) => {
 userRouter.delete("/:userId/attempts/:attemptId", async (req, res, next) => {
     const attemptId = req.params.attemptId;
     try {
-        await User.findByIdAndUpdate(req.user._id, {$pull: {attempts: attemptId}});
-        await Attempt.findByIdAndDelete(attemptId);
+        await User.findByIdAndUpdate(req.user._id, {$pull: {deckAttempts: attemptId}});
+        await DeckAttempt.findByIdAndDelete(attemptId);
         res.status(200).send(attemptId);
     } catch (err) {
         res.status(500).send("There was an error with your request");
@@ -352,8 +353,8 @@ userRouter.delete("/:userId/attempts/:attemptId", async (req, res, next) => {
 
 userRouter.delete("/:userId/attempts", async (req, res, next) => {
     try {
-        const deletedAttempts = await Attempt.deleteMany({_id: req.user.attempts});
-        await User.findByIdAndUpdate(req.user._id, {$set: {attempts: []}});
+        const deletedAttempts = await DeckAttempt.deleteMany({_id: req.user.deckAttempts});
+        await User.findByIdAndUpdate(req.user._id, {$set: {deckAttempts: []}});
         res.status(200).send(deletedAttempts.deletedCount);
     } catch (err) {
         res.status(500).send("There was an error with your request");
@@ -362,10 +363,10 @@ userRouter.delete("/:userId/attempts", async (req, res, next) => {
 
 userRouter.delete("/:userId/decks/:deckId/attempts", async (req, res, next) => {
     try {
-        const attempts = await Attempt.find({$and: [{_id: {$in: req.user.attempts}}, {deck: req.params.deckId}]});
-        let attemptIds = attempts.map(attempt => attempt._id);
-        await User.findByIdAndUpdate(req.user._id, {$pull: {attempts: {$in: attemptIds}}});
-        const deletedAttempts = await Attempt.deleteMany({_id: {$in: attemptIds}});
+        const deckAttempts = await DeckAttempt.find({$and: [{_id: {$in: req.user.deckAttempts}}, {deck: req.params.deckId}]});
+        let deckAttemptIds = deckAttempts.map(attempt => attempt._id);
+        await User.findByIdAndUpdate(req.user._id, {$pull: {deckAttempts: {$in: deckAttemptIds}}});
+        const deletedAttempts = await DeckAttempt.deleteMany({_id: {$in: deckAttemptIds}});
         res.status(200).send(deletedAttempts.deletedCount);
     } catch (err) {
         res.status(500).send("There was an error with your request");
@@ -373,7 +374,7 @@ userRouter.delete("/:userId/decks/:deckId/attempts", async (req, res, next) => {
 });
 
 userRouter.get("/:userId/attempts", (req, res, next) => {
-    res.status(200).send(req.user.attempts);
+    res.status(200).send(req.user.deckAttempts);
 });
 
 export default userRouter;

@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { logout } from '../reducers/loginSlice';
 import Message from './Message';
 import MessageList from './MessageList';
 import Modal from './Modal';
 import NotificationList from './NotificationList';
+import { HiOutlineUserCircle } from "react-icons/hi";
+import { IoMailSharp, IoNotificationsSharp } from "react-icons/io5";
+import styled from "styled-components";
 
 function Header() {
     const [modalContent, setModalContent] = useState('');
     const [messageId, setMessageId]  = useState('');
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const username = useSelector((state) => state.login.login.username);
+    const userId = useSelector((state) => state.login.userId);
     const profilePic = useSelector((state) => state.login.photo);
     const notifications = useSelector((state) => state.login.notifications);
+    const messages = useSelector((state) => state.login.messages.received);
+    // const messages = [1]
+    // const notifications = [2];
     
     const expandMessage = (id) => {
         setModalContent('message');
@@ -26,19 +31,10 @@ function Header() {
         setModalContent('inbox');
         setMessageId('');
     }
-    
-    const handleClick = evt => {
-        navigate(`/${evt.target.value}`);
-    }
 
     const handleHideModal = () => {
         setModalContent('');
         setMessageId('');
-    }
-    
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate("/login");
     }
     
     const handleSetModalContent = (type, id) => {
@@ -47,39 +43,49 @@ function Header() {
     }
 
     const handleButtonClick = (evt) => {
-        setModalContent(evt.target.dataset.source);
+        setModalContent(evt.currentTarget.dataset.source);
+    }
+
+    const handleLogout = () => {
+        dispatch(logout());
     }
     
     return (
-        <div style={{display: "flex", height: "4em", justifyContent: "space-between", padding: ".5em 2em"}}>            
-            <div>
-                {username ? 
-                    <>
-                        <img alt={username} src={profilePic} style={{height: "70%"}}/>
-                        <strong>{username}</strong>
-                        <button data-source="notifications" onClick={handleButtonClick}>N:{notifications.slice(0, 100).filter(notification => !notification.read).length}</button>
-                        <button data-source="inbox" onClick={handleButtonClick}>M</button>
-                    </>
-                    : 
-                    null
-                }
+        <nav className="navbar fixed-top navbar-light bg-light">
+            <div className="container-fluid">
+                <div style={{display: "flex"}}>
+                    <div className="navbar-brand"><Link to="/dashboard">Logo</Link></div>
+                    {/* Clicking the anchor tag resets state */}
+                    {/* <a className="navbar-brand" href={username ? "/dashboard" : "/"}>Logo</a> */}
+                    <form className="d-flex">
+                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                        <button className="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                </div>
+                <div style={{display: "flex", alignItems: "center"}}>
+                    {username && 
+                        <div data-source="inbox" onClick={handleButtonClick} style={{position: "relative", left: "1.5rem"}}>
+                            <IoMailSharp size="2.25em" />
+                            <div style={{visibility: messages.filter(message => message.read.includes(userId) === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".5rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{messages.filter(message => message.read.includes(userId) === false).length >= 10 ? "9+": messages.filter(message => message.read.includes(userId) === false).length}</div>
+                        </div>}
+                    {username && 
+                        <div data-source="notifications" onClick={handleButtonClick} style={{position: "relative", left: "1rem"}}>
+                            <IoNotificationsSharp size="2.25em" />
+                            <div style={{visibility: notifications.filter(notification => notification.read === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".85rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{notifications.filter(notification => notification.read === false).length >= 10 ? "9+": notifications.filter(notification => notification.read === false).length}</div>
+                        </div>}
+                    <li className="nav-item dropdown">
+                        <div tabIndex={0} className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {profilePic ? <img alt={username} src={profilePic} style={{border: "2px solid black", borderRadius: "50%", height: "3em", width: "3em"}}/> : <HiOutlineUserCircle color="black" size="3em" />}
+                        </div>
+                        <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a className="dropdown-item" onClick={username ? handleLogout : null} href={username ? "/" : "/login"}>{username ? "Log out" : "Login"}</a></li>
+                            {!username && <li><a className="dropdown-item" href="register/credentials">Sign Up</a></li>}
+                            <li><hr className="dropdown-divider" /></li>
+                            <li><a className="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                </div>
             </div>
-            <div>
-                {!username ? 
-                    <>
-                        <button value="login" onClick={handleClick}>Login</button>
-                        <button value="register/credentials" onClick={handleClick}>Sign Up</button>
-                    </>
-                    :
-                    <>
-                        <NavLink to="/dashboard">Home</NavLink>
-                        <NavLink to="/dashboard">Practice</NavLink>
-                        <NavLink to="/">Explore</NavLink>
-                        <button value="logout" onClick={handleLogout}>Logout</button>
-                    </>
-                }
-                
-            </div>            
             {!modalContent ?
                 null
                 :
@@ -100,7 +106,7 @@ function Header() {
                     }
                 </Modal>
             }
-        </div>
+        </nav>
   )
 }
 

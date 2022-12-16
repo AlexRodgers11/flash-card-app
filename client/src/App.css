@@ -5,6 +5,12 @@
   width: 100%;
 }
 
+a,
+a:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
 *::marker {
   content: none;
 }

@@ -10,7 +10,7 @@ function Notification(props) {
 	const [notification, setNotification] = useState({});
 
 	useEffect(() => {
-		if(!notification.type) {
+		if(!notification.notificationType) {
 			axios.get(`${baseURL}/notifications/${props.notificationId}`)
 				.then((response) => {
 					setNotification(response.data);
@@ -21,8 +21,7 @@ function Notification(props) {
 	const handleClick = () => {
 		//make sure hiding Modal and thus destroying component chain won't short circuit navigation call if using React 18's concurrency
 		props.hideModal();
-		// switch(notification.type) {
-		switch(notification.__t) {
+		switch(notification.notificationType) {
 			// case 'deck-approved':
 			case 'DeckSubmission':
 				// if(notification.decision === 'accepted') {
@@ -36,8 +35,7 @@ function Notification(props) {
 	}
 	
 	const renderNotification = () => {
-		// switch(notification.type) {
-		switch(notification.__t) {
+		switch(notification.notificationType) {
 			case 'DeckDecision':
 				return <p onClick={handleClick}>{notification.actor.login.username} {notification.decision} your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
 			// case 'deck-approved':

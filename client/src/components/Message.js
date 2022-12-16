@@ -34,7 +34,7 @@ function Message(props) {
 				axios.post(`${baseURL}/groups/${receiver._id}/decks?approved=true`, {idOfDeckToCopy: target._id})
 				.then((deckPostResponse) => {
 					let notification = {
-						type: 'DeckDecision',
+						notificationType: 'DeckDecision',
 						decision: 'approved',
 						read: false,
 						actor: userId,
@@ -72,7 +72,8 @@ function Message(props) {
 			})
 			.then(acceptanceResponse => {
 				let notification = {
-					type: 'DeckDecision',
+					// type: 'DeckDecision',
+					notificationType: 'DeckDecision',
 					decision: 'denied',
 					read: false,
 					actor: userId,
@@ -106,7 +107,7 @@ function Message(props) {
 				})
 				.then(memberPostResponse => {
 					let notification = {
-						type: 'JoinDecision', 
+						notificationType: 'JoinDecision', 
 						decision: 'approved',
 						read: false,
 						actor: userId,
@@ -142,7 +143,7 @@ function Message(props) {
 			})
 			.then(acceptanceResponse => {
 				let notification = {
-					type: 'JoinDecision', 
+					notificationType: 'JoinDecision', 
 					decision: 'denied',
 					read: false,
 					actor: userId,

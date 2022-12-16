@@ -25,33 +25,35 @@ import CardAttemptList from './CardAttemptList';
 
 function Router() {
     return (
-        <Routes>
-            <Route exact path="/groups/:groupId" element={<Group />} />
-            <Route exact path="/decks/public" element={<BrowseDecks />}/>
-            <Route exact path="/decks/:deckId" element={<Deck />} />
-            <Route exact path="/users/:userId/decks/new" element={<DeckForm />} />
-            <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
-            <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
-            <Route exact path="/users/:userId/practice" element={<PracticeLaunchPage />} />
-            <Route exact path="/users/:userId/statistics/" element={<StatisticsPage />}>
-                <Route path="decks" element={<DeckStatsList />} />
-                <Route path="cards" element={<CardStatsList />} />
-                <Route path="sessions/decks/:deckId" element={<Sessions />} />
-                <Route path="cards/:cardId" element={<CardAttemptList />} />
-                <Route path="sessions/:sessionId" element={<DeckAttempt />} />
-                <Route path="sessions" element={<Sessions allDecks={true}/>} />
-            </Route>
-            <Route exact path="/users/:userId" element={<User />} />
-            <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
-            <Route exact path="/dashboard" element={<Dashboard />} />
-            <Route path="/" element={<LandingPage />}>
-                <Route path="login" element={<Login />} />
-                <Route path="register/credentials" element={<RegisterCredentialsForm />} />
-                <Route path="register/email-verification" element={<RegisterEmailVerificationForm />} />
-                <Route path="register/identification" element={<RegisterIdentificationForm />} />
-                <Route path="register/join-groups" element={<RegisterJoinGroupsForm />} />
-            </Route>
-        </Routes>
+        <div style={{marginTop: "76px"}}>
+            <Routes>
+                <Route exact path="/groups/:groupId" element={<Group />} />
+                <Route exact path="/decks/public" element={<BrowseDecks />}/>
+                <Route exact path="/decks/:deckId" element={<Deck />} />
+                <Route exact path="/users/:userId/decks/new" element={<DeckForm />} />
+                <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
+                <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
+                <Route exact path="/users/:userId/practice" element={<PracticeLaunchPage />} />
+                <Route exact path="/users/:userId/statistics/" element={<StatisticsPage />}>
+                    <Route path="decks" element={<DeckStatsList />} />
+                    <Route path="cards" element={<CardStatsList />} />
+                    <Route path="sessions/decks/:deckId" element={<Sessions />} />
+                    <Route path="cards/:cardId" element={<CardAttemptList />} />
+                    <Route path="sessions/:sessionId" element={<DeckAttempt />} />
+                    <Route path="sessions" element={<Sessions allDecks={true}/>} />
+                </Route>
+                <Route exact path="/users/:userId" element={<User />} />
+                <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
+                <Route exact path="/dashboard" element={<Dashboard />} />
+                <Route path="/" element={<LandingPage />}>
+                    <Route path="login" element={<Login />} />
+                    <Route path="register/credentials" element={<RegisterCredentialsForm />} />
+                    <Route path="register/email-verification" element={<RegisterEmailVerificationForm />} />
+                    <Route path="register/identification" element={<RegisterIdentificationForm />} />
+                    <Route path="register/join-groups" element={<RegisterJoinGroupsForm />} />
+                </Route>
+            </Routes>
+        </div>
     )
 }
 

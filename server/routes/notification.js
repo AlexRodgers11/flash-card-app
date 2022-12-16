@@ -23,6 +23,7 @@ notificationRouter.get("/:notificationId", (req, res, next) => {
         //why didn't instantiating response here work- setting it inside the Notification callback didn't work, remains "test" outside the callback
         // let response = "test";
         Notification.findById(req.notification._id, async (err, notification) => {
+            let response;
             if(err) {
                 res.status(500).send(err.message);
                 throw err;

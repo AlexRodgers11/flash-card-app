@@ -63,11 +63,13 @@ userRouter.get("/:userId/tile", async (req, res, next) => {
 
 userRouter.get("/:userId", async (req, res, next) => {
     try {
-        let userData = await User.findById(req.user._id);
-        userData = await userData.populate("decks", "name");
+        let userData = await User.findById(req.user._id)
+            .populate("decks", "name")
+            .populate("messages.received", "read")
+            .populate("messages.sent", "read")
+            .populate("notifications", "read");
         userData.photo = await getObjectSignedUrl(req.user.photo);
         res.status(200).send(userData);          
-
     } catch (err) {
         res.status(500).send("There was an error with your request");
         throw err;

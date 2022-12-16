@@ -7,7 +7,7 @@ import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
 import { Message } from "../models/message.js";
-import { Notification } from '../models/notification.js';
+import { CardDecision, DeckDecision, JoinDecision, Notification } from '../models/notification.js';
 import { generateRandomFileName } from "../utils.js";
 
 import multer from "multer";
@@ -194,22 +194,28 @@ userRouter.delete("/:userId/messages/:messageId", async (req, res, next) => {
 
 userRouter.post("/:userId/notifications", async (req, res, next) => {
     try {
-        let newNotification = new Notification();
-        newNotification.type = req.body.type;
-        newNotification.content = req.body.content;
-        newNotification.actor = req.body.actor;
-        newNotification.groupTarget = req.body.groupTarget;
-        newNotification.deckTarget = req.body.deckTarget;
-        newNotification.cardTarget = req.body.cardTarget;
-        newNotification.read = req.body.read;
-        const notification = await newNotification.save();
-        await User.findByIdAndUpdate(req.user._id, {$push: {notifications: notification}});
-        res.status(200).send(notification);
+        let newNotification;
+        switch(req.body.notificationType) {
+            case CardDecision: 
+                newNotification = CardDecision(req.body);
+                break;
+            case "DeckDecision":
+                newNotification = DeckDecision(req.body);
+                break;
+            case "JoinDecision":
+                newNotification = JoinDecision(req.body);
+                break;
+            default: 
+                res.status(400).send("Invalid notification type");
+                break;
+        }
+        const savedNotification = await newNotification.save();
+        await User.findByIdAndUpdate(req.user._id, {$push: {notifications: savedNotification}});
+        res.status(200).send(savedNotification);
     } catch (err) {
-        res.status(500).send("There was an error with your request");
+        res.status(500).send(err.message);
         throw err;
     }
-
 });
 
 userRouter.post("/:userId/groups", async (req, res, next) => {

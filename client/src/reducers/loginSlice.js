@@ -43,17 +43,6 @@ export const login = createAsyncThunk("login/login", async({usernameOrEmail, pas
     }
 });
 
-export const markNotificationsAsRead = createAsyncThunk("login/markNotificationsAsRead", async() => {
-    console.log("in mark notifications as read");
-    try {
-        const response = await axios.put(`${baseURL}/users/notifications`, {});
-        return response.data.notifications;
-    } catch (err) {
-        console.error(err);
-        return err;
-    }
-});
-
 export const signUp = createAsyncThunk("login/signUp", async({email, password}) => {
     console.log("in login action");
     console.log({email, password});
@@ -99,6 +88,15 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
         return response.data;
     } catch (err) {
         return err;
+    }
+});
+
+export const markNotificationsAsRead = createAsyncThunk("login/markNotificationsAsRead", async({userId}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/users/${userId}/notifications/mark-as-read`, {});
+        return response.data;
+    } catch (err) {
+        console.error(err.message);
     }
 });
 
@@ -197,7 +195,7 @@ export const loginSlice = createSlice({
             state.token = action.payload.token;
             state.userId = action.payload.userId;
         });
-        builder.addCase(markNotificationsAsRead, (state, action) => {
+        builder.addCase(markNotificationsAsRead.fulfilled, (state, action) => {
             state.notifications = action.payload;
         });
         builder.addCase(signUp.fulfilled, (state, action) => {

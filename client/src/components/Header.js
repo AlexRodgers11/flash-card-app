@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { logout } from '../reducers/loginSlice';
+import { logout, markNotificationsAsRead } from '../reducers/loginSlice';
 import Message from './Message';
 import MessageList from './MessageList';
 import Modal from './Modal';
@@ -19,9 +19,7 @@ function Header() {
     const profilePic = useSelector((state) => state.login.photo);
     const notifications = useSelector((state) => state.login.notifications);
     const messages = useSelector((state) => state.login.messages.received);
-    // const messages = [1]
-    // const notifications = [2];
-    
+        
     const expandMessage = (id) => {
         setModalContent('message');
         setMessageId(id);
@@ -33,6 +31,9 @@ function Header() {
     }
 
     const handleHideModal = () => {
+        if(modalContent === "notifications") {
+            dispatch(markNotificationsAsRead({userId}));
+        }
         setModalContent('');
         setMessageId('');
     }

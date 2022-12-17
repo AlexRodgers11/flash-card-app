@@ -220,6 +220,20 @@ userRouter.post("/:userId/notifications", async (req, res, next) => {
     }
 });
 
+userRouter.patch("/:userId/notifications/mark-as-read", async (req, res, next) => {
+    try {
+        await Notification.updateMany({_id: {$in: req.user.notifications}}, {$set: {read: true}});
+        let user = await User.findById(req.user._id, "notifications")
+            .populate({
+                path: "notifications",
+                select: "read -notificationType"
+            })
+        res.status(200).send(user.notifications);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 userRouter.post("/:userId/groups", async (req, res, next) => {
     console.log("body:", req.body);
     try {

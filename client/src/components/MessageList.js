@@ -18,7 +18,7 @@ function MessageList(props) {
 				<button data-direction="received" onClick={selectDirection}>Received</button>
 				<button data-direction="sent" onClick={selectDirection}>Sent</button>
 			</div>
-			{messages[direction].map(message => <Message key={message._id} messageId={message._id} expandMessage={props.expandMessage}/>)}
+			{messages[direction].map(message => <Message key={message._id} direction={direction} messageId={message._id} expandMessage={props.expandMessage}/>)}
 		</div>
 	)
 }

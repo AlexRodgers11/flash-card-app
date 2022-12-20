@@ -91,6 +91,18 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
     }
 });
 
+export const markMessageAsRead = createAsyncThunk("login/markMessageAsRead", async ({messageId, readerId, direction}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/messages/${messageId}/add-to-read`, {readerId});
+        console.log("response received");
+        console.log({data: response.data});
+        console.log({direction});
+        return {...response.data, direction};
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 export const markNotificationsAsRead = createAsyncThunk("login/markNotificationsAsRead", async({userId}) => {
     try {
         const response = await axios.patch(`${baseURL}/users/${userId}/notifications/mark-as-read`, {});
@@ -194,6 +206,15 @@ export const loginSlice = createSlice({
         builder.addCase(login.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId;
+        });
+        builder.addCase(markMessageAsRead.fulfilled, (state, action) => {
+            console.log({payload: action.payload});
+            state.messages[action.payload.direction] = state.messages[action.payload.direction].map(message => {
+                if(message._id === action.payload.messageId) {
+                    return {...message, read: action.payload.read}
+                }
+                return message;
+            });
         });
         builder.addCase(markNotificationsAsRead.fulfilled, (state, action) => {
             state.notifications = action.payload;

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDeck } from '../reducers/decksSlice';
 import { addActivity, addMember } from '../reducers/groupSlice';
-import { editMessage } from '../reducers/loginSlice';
+import { editMessage, markMessageAsRead } from '../reducers/loginSlice';
 
 const baseURL = 'http://localhost:8000';
 
@@ -169,14 +169,9 @@ function Message(props) {
 	
 	const expandMessage = () => {
 		props.expandMessage(props.messageId);
-		//send PUT request to add user to read array for the message (in case others received same message)
-		axios.put(`${baseURL}/messages/${props.messageId}`, {user: userId})
-			.then(response => {
-				dispatch(editMessage({direction: 'sent', message: response.data}));
-			})
-			.catch(err => {
-				console.error(err);
-			});
+		if(!read) {
+			dispatch(markMessageAsRead({messageId: props.messageId, direction: props.direction, readerId: userId}));
+		}
 	}
 	
 	const renderMessage = () => {

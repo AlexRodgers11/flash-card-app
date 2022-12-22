@@ -103,6 +103,17 @@ export const markMessageAsRead = createAsyncThunk("login/markMessageAsRead", asy
     }
 });
 
+export const makeApprovalDecision = createAsyncThunk("login/makeApprovalDecision", async ({messageId, decision, comment, messageType, decidingUserId}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/messages/${messageId}`, {acceptanceStatus: decision, comment, messageType, decidingUserId});
+        return {
+            responseMessage: response.data.responseMessage,
+        } 
+    } catch(err) {
+        console.error(err.message);
+    }
+});
+
 export const markNotificationsAsRead = createAsyncThunk("login/markNotificationsAsRead", async({userId}) => {
     try {
         const response = await axios.patch(`${baseURL}/users/${userId}/notifications/mark-as-read`, {});
@@ -206,6 +217,9 @@ export const loginSlice = createSlice({
         builder.addCase(login.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId;
+        });
+        builder.addCase(makeApprovalDecision.fulfilled, (state, action) => {
+            state.messages.sent = [...state.messages.sent, action.payload.responseMessage];
         });
         builder.addCase(markMessageAsRead.fulfilled, (state, action) => {
             console.log({payload: action.payload});

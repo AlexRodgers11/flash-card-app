@@ -80,8 +80,14 @@ messageRouter.get("/:messageId", (req, res, next) => {
     }); 
 });
 
-messageRouter.put('/:messageId', (req, res, next) => {
-    const updateObj = {...(req.body.user && {$addToSet: {read: req.body.user}}), ...(req.body.acceptanceStatus && {$set: {acceptanceStatus: req.body.acceptanceStatus}})}
+messageRouter.patch('/:messageId/add-to-read', async (req, res, next) => {
+    try {
+        const updatedMessage = await Message.findByIdAndUpdate(req.message._id, {$addToSet: {read: req.body.readerId}}, {new: true});
+        res.status(200).send({messageId: updatedMessage._id, read: updatedMessage.read});
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
     
     const options = {new: true};
 

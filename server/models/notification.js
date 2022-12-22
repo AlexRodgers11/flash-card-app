@@ -20,20 +20,10 @@ const CardDecision = Notification.discriminator("CardDecision", new Schema({
     groupTarget: {type: Schema.Types.ObjectId, ref: "Group"}
 }, options));
 
-const DeckDecision = Notification.discriminator("DeckDecision", new Schema({
-    decision: String,
-    deckTarget: {type: Schema.Types.ObjectId, ref: "Deck"},
-    groupTarget: {type: Schema.Types.ObjectId, ref: "Group"}
-}, options));
-
 const JoinDecision = Notification.discriminator("JoinDecision", new Schema({
     decision: String,
     groupTarget: {type: Schema.Types.ObjectId, ref: "Group"}
 }, options));
 
 
-//maybe one model for each type, that encompasses both acceptance and declination
-
-export {CardDecision, DeckDecision, JoinDecision, Notification}
-
-// export default mongoose.model('notification', Notification);
+export {CardDecision, JoinDecision, Notification}

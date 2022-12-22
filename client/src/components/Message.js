@@ -21,6 +21,7 @@ function Message(props) {
 	const [content, setContent] = useState('');
 	const [read, setRead] = useState(false);
 	const [acceptanceStatus, setAcceptanceStatus] = useState('');
+	const [comment, clearComment, handleChangeComment, setComment] = useFormInput('');
 
 	//may need to change this to just accept so card acceptance is same, and then choose route conditionally
 
@@ -195,6 +196,22 @@ function Message(props) {
 						}
 						</>
 				);
+			case 'DeckDecision':
+				return (
+					<>
+					{props.fullView ? 
+						<div>
+							<p><span>{sender.login.username}</span> {acceptanceStatus} your request to add deck: {target.name} to <span>{receiver.name}</span></p>
+							{comment && <p>{sender.login.username} left this comment: "{comment}"</p>}
+						</div>
+						:
+						<div>
+							<p onClick={expandMessage}><span>{sender.login.username}</span> {acceptanceStatus} your request to add deck: {target.name} to <span>{receiver.name}</span></p>
+							<hr />
+						</div>
+					}
+					</>
+				);
 			case 'JoinRequest':
 				return (
 					<>
@@ -252,6 +269,9 @@ function Message(props) {
 					}
 					if(message.acceptanceStatus) {
 						setAcceptanceStatus(message.acceptanceStatus);
+					}
+					if(message.comment) {
+						setComment(message.comment);
 					}
 				})
 				.catch(err => {

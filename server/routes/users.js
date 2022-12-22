@@ -6,8 +6,7 @@ import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
-import { Message } from "../models/message.js";
-import { CardDecision, DeckDecision, JoinDecision, Notification } from '../models/notification.js';
+import { CardDecision, JoinDecision, Notification } from '../models/notification.js';
 import { generateRandomFileName } from "../utils.js";
 
 import multer from "multer";
@@ -22,7 +21,6 @@ userRouter.param("userId", (req, res, next, userId) => {
         } else if(!user) {
             res.status(404).send("User not found");
         } else {
-            console.log({user});
             req.user = user;
             next();
         }
@@ -200,9 +198,6 @@ userRouter.post("/:userId/notifications", async (req, res, next) => {
         switch(req.body.notificationType) {
             case CardDecision: 
                 newNotification = CardDecision(req.body);
-                break;
-            case "DeckDecision":
-                newNotification = DeckDecision(req.body);
                 break;
             case "JoinDecision":
                 newNotification = JoinDecision(req.body);

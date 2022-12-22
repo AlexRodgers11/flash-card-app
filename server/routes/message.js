@@ -51,6 +51,23 @@ messageRouter.get("/:messageId", (req, res, next) => {
                             throw err;
                         })
                 break;
+            case 'DeckDecision':
+                message.populate(
+                    [
+                        {
+                            path: 'sendingUser',
+                            select: 'login.username name.first name.last'
+                        },
+                        {
+                            path: 'targetDeck',
+                            select: 'name'
+                        },
+                        {
+                            path: 'targetGroup',
+                            select: 'name'
+                        }
+                    ]
+                )
             case "JoinRequest":
                 message.populate(
                     [

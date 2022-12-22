@@ -1,6 +1,6 @@
 import express from "express";
 const notificationRouter = express.Router();
-        import { DeckDecision, JoinDecision, Notification }  from "../models/notification.js";
+import { JoinDecision, Notification }  from "../models/notification.js";
 
 notificationRouter.param("notificationId", (req, res, next, notificationId) => {
     Notification.findById(notificationId, (err, notification) => {
@@ -20,8 +20,6 @@ notificationRouter.param("notificationId", (req, res, next, notificationId) => {
 
 notificationRouter.get("/:notificationId", (req, res, next) => {
     try {
-        //why didn't instantiating response here work- setting it inside the Notification callback didn't work, remains "test" outside the callback
-        // let response = "test";
         Notification.findById(req.notification._id, async (err, notification) => {
             let response;
             if(err) {
@@ -29,26 +27,6 @@ notificationRouter.get("/:notificationId", (req, res, next) => {
                 throw err;
             }
             switch(notification.notificationType) {
-                case 'DeckDecision':
-                    let foundDeckDecisionNotification = await DeckDecision.findById(notification._id);
-                    let populatedDeckDecisionNotification = await foundDeckDecisionNotification.populate(
-                        [
-                                    {
-                                        path: 'actor',
-                                        select: 'login.username name.first name.last'
-                                    },
-                                    {
-                                        path: 'groupTarget',
-                                        select: 'name'
-                                    },
-                                    {
-                                        path: 'deckTarget',
-                                        select: 'name'
-                                    }
-                                ]
-                    );
-                    response = populatedDeckDecisionNotification;
-                    break;
                 case 'JoinDecision':
                     let foundJoinDecisionNotification = await JoinDecision.findById(notification._id);
                     let populatedJoinDecisionNotification = await foundJoinDecisionNotification.populate(

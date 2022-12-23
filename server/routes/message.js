@@ -1,7 +1,9 @@
 import express from "express";
 const messageRouter = express.Router();
+import axios from "axios";
 import { DeckSubmission, DirectMessage, JoinRequest, Message } from "../models/message.js";
 
+const baseURL = 'http://localhost:8000';
 
 messageRouter.param("messageId", (req, res, next, messageId) => {
     Message.findById(messageId, (err, message) => {
@@ -105,31 +107,55 @@ messageRouter.patch('/:messageId/add-to-read', async (req, res, next) => {
         res.status(500).send(err.message);
     }
 });
+
+messageRouter.patch('/:messageId', async (req, res, next) => {
+    console.log({body: req.body});
+    const updateObj = {acceptanceStatus: req.body.acceptanceStatus};
     
     const options = {new: true};
-
-    const callback = (err, message) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        }
-        res.status(200).send(message);
-    }
     
-    switch(req.body.messageType) {
-        case 'DeckSubmission':
-            DeckSubmission.findByIdAndUpdate(req.message._id, updateObj, options, callback);
-            break;
-        case 'DirectMessage':
-            DirectMessage.findByIdAndUpdate(req.message._id, updateObj, options, callback);
-            break;
-        case 'JoinRequest':
-            JoinRequest.findByIdAndUpdate(req.message._id, updateObj, options, callback);
-            break;
-        default:
-            Message.findByIdAndUpdate(req.message._id, updateObj, options, callback);
-            break;
-    }    
+    try {
+        switch(req.body.messageType) {
+            case 'DeckSubmission':
+                const updatedDeckSubmissionMessage = await DeckSubmission.findByIdAndUpdate(req.message._id, updateObj, options);
+
+                const deckCopyResponse = await axios.post(`${baseURL}/groups/${updatedDeckSubmissionMessage.targetGroup}/decks?approved=true`, {idOfDeckToCopy: updatedDeckSubmissionMessage.targetDeck});
+
+
+                const responseMessage = await axios.post(`${baseURL}/users/${req.message.sendingUser}/messages`, {
+                    messageType: "DeckDecision",
+                    acceptanceStatus: req.body.acceptanceStatus,
+                    comment: req.body.comment,
+                    targetDeck: req.message.targetDeck,
+                    targetGroup: req.message.targetGroup,
+                    sendingUser: req.body.decidingUserId
+                });
+
+                res.status(200).send({
+                    newActivity: deckCopyResponse.data.newActivity,
+                    newDeck: deckCopyResponse.data.newDeck,
+                    responseMessage: {
+                        _id: responseMessage.data._id,
+                        read: [],
+                        message: responseMessage.data.message
+                    }
+                });
+                break;
+
+            case 'DirectMessage':
+                await DirectMessage.findByIdAndUpdate(req.message._id, updateObj, options);
+                break;
+            case 'JoinRequest':
+                await JoinRequest.findByIdAndUpdate(req.message._id, updateObj, options);
+                break;
+            default:
+                await Message.findByIdAndUpdate(req.message._id, updateObj, options);
+                break;
+        }    
+
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
 export default messageRouter;

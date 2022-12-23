@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDeck } from '../reducers/decksSlice';
 import { addActivity, addMember } from '../reducers/groupSlice';
-import { editMessage, markMessageAsRead } from '../reducers/loginSlice';
+import { editMessage, makeApprovalDecision, markMessageAsRead } from '../reducers/loginSlice';
+import useFormInput from '../hooks/useFormInput';
 
 const baseURL = 'http://localhost:8000';
 
@@ -26,40 +27,20 @@ function Message(props) {
 	//may need to change this to just accept so card acceptance is same, and then choose route conditionally
 
 	const acceptDeck = () => {
-		if(acceptanceStatus === 'pending') {
-			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'approved', messageType: 'DeckSubmission'})
-			.catch(err => {
-				console.error(err)
-			})
-			.then(acceptanceResponse => {
-				axios.post(`${baseURL}/groups/${receiver._id}/decks?approved=true`, {idOfDeckToCopy: target._id})
-				.then((deckPostResponse) => {
-					let notification = {
-						notificationType: 'DeckDecision',
-						decision: 'approved',
-						read: false,
-						actor: userId,
-						groupTarget: receiver._id,
-						deckTarget: target._id
+		console.log("acceptDeck running");
+		if(acceptanceStatus === "pending") {
+			//change this so that decision takes value of data property on the button so can use same function for accept/deny
+			dispatch(makeApprovalDecision({messageId: props.messageId, decision: "approved", comment, messageType, responseMessageType: "DeckDecision", decidingUserId: userId}))
+				.then((actionPayload) => {
+					console.log({actionPayload});
+					props.hideModal();//possibly better to go back to inbox instead
+					clearComment();
+					//if user is already on group page need this so that the page refreshes to show new deck and new activity
+					if(deckListType === 'group') {
+						dispatch(addDeck({deckId: actionPayload.newDeck}));
+						dispatch(addActivity({activityId: actionPayload.newActivity, groupId: receiver._id}));
 					}
-					axios.post(`${baseURL}/users/${sender._id}/notifications`, notification)
-					.then(() => {
-						props.hideModal();
-						if(deckListType === 'group') {
-							dispatch(addDeck({deckId: deckPostResponse.data.newDeck}));
-							dispatch(addActivity({activityId: deckPostResponse.data.newActivity, groupId: receiver._id}));
-						} 
-						
-						dispatch(editMessage({direction: 'sent', message:acceptanceResponse.data}));
-					})
-					.catch(notificationErr => {
-						console.error(notificationErr);
-					});
-				})
-				.catch(deckAddErr => {
-					console.error(deckAddErr);
-				});
-			});
+				});		
 		} else {
 			alert(`This deck has already been ${acceptanceStatus}`);//need to change acceptance status in this function
 		}
@@ -67,7 +48,7 @@ function Message(props) {
 
 	const denyDeck = () => {
 		if(acceptanceStatus === 'pending') {
-			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'denied', messageType: 'DeckSubmission'})
+			axios.patch(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'denied', messageType: 'DeckSubmission'})
 			.catch(err => {
 				console.error(err)
 			})
@@ -97,7 +78,7 @@ function Message(props) {
 
 	const acceptUser = () => {
 		if(acceptanceStatus === 'pending') {
-			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'approved', messageType: 'JoinRequest'})
+			axios.patch(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'approved', messageType: 'JoinRequest'})
 			.catch(err => {
 				console.error(err);
 			})
@@ -138,7 +119,7 @@ function Message(props) {
 	
 	const denyUser = () => {
 		if(acceptanceStatus === 'pending') {
-			axios.put(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'denied', messageType: 'JoinRequest'})
+			axios.patch(`${baseURL}/messages/${props.messageId}`, {acceptanceStatus: 'denied', messageType: 'JoinRequest'})
 			.catch(err => {
 				console.error(err);
 			})
@@ -252,6 +233,7 @@ function Message(props) {
 					// setMessageType(message.type);
 					// setMessageType(message.__t);
 					setMessageType(message.message);
+					// setMessageType(message.messageType);
 					let s = message.sendingUser || message.sendingGroup;
 					setSender(s);
 					let r = message.targetGroup;

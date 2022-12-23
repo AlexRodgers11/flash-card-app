@@ -6,6 +6,8 @@ import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
+import { DeckDecision, DeckSubmission, Message } from "../models/message.js";
+// import { CardDecision, DeckDecision, JoinDecision, Notification } from '../models/notification.js';
 import { CardDecision, JoinDecision, Notification } from '../models/notification.js';
 import { generateRandomFileName } from "../utils.js";
 
@@ -157,21 +159,52 @@ userRouter.post("/:userId/decks", async (req, res, next) => {
 });
 
 userRouter.post("/:userId/messages", async (req, res, next) => {
+    let newMessage;
     try {
-        let newMessage = new Message();
-        newMessage.type = req.body.type;
-        newMessage.sendingUser = req.body.sendingUser;
-        newMessage.targetDeck = req.body.targetDeck;
-        newMessage.targetGroup = req.body.targetGroup;
-        const message = await newMessage.save();
-        await User.findByIdAndUpdate(req.user._id, {$push: {'messages.received': message}});
-        await User.findByIdAndUpdate(message.sendingUser, {$push: {'messages.sent': message}});
-        res.status(200).send(message);
+        switch(req.body.messageType) {
+            case "DeckSubmission":
+                newMessage = new DeckSubmission({
+                    sendingUser: req.body.sendingUser,
+                    targetDeck: req.body.targetDeck,
+                    targetGroup: req.body.targetGroup
+                });
+                break;
+            case "DeckDecision":
+                newMessage = new DeckDecision({
+                    acceptanceStatus: req.body.acceptanceStatus,
+                    comment: req.body.comment,
+                    targetDeck: req.body.targetDeck,
+                    targetGroup: req.body.targetGroup,
+                    read: [],
+                    sendingUser: req.body.sendingUser
+                });
+                break;
+        }
+        const savedMessage = await newMessage.save();
+
+        await User.findByIdAndUpdate(req.user._id, {$push: {'messages.received': savedMessage}});
+        await User.findByIdAndUpdate(savedMessage.sendingUser, {$push: {'messages.sent': savedMessage}});
+        res.status(200).send(savedMessage);
     } catch (err) {
-        res.status(500).send("There was an error with your request");
-        throw receivingUserErr;
+        res.status(500).send(err.message);
     }
 });
+// userRouter.post("/:userId/messages", async (req, res, next) => {
+//     try {
+//         let newMessage = new Message();
+//         newMessage.type = req.body.type;
+//         newMessage.sendingUser = req.body.sendingUser;
+//         newMessage.targetDeck = req.body.targetDeck;
+//         newMessage.targetGroup = req.body.targetGroup;
+//         const message = await newMessage.save();
+//         await User.findByIdAndUpdate(req.user._id, {$push: {'messages.received': message}});
+//         await User.findByIdAndUpdate(message.sendingUser, {$push: {'messages.sent': message}});
+//         res.status(200).send(message);
+//     } catch (err) {
+//         res.status(500).send("There was an error with your request");
+//         throw receivingUserErr;
+//     }
+// });
 
 userRouter.delete("/:userId/messages/:messageId", async (req, res, next) => {
     try {

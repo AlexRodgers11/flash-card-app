@@ -11,7 +11,7 @@ const baseURL = 'http://localhost:8000';
 
 function DeckForm() {
   	const [nameInput, clearNameInput, handleNameInputChange] = useFormInput('');
-  	const [privacy, clearPrivacy, handlePrivacyChange] = useFormInput("false");
+  	const [publiclyAvailable, clearPubliclyAvailable, handlePubliclyAvailableChange] = useFormInput("false");
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	let { userId } = useParams();
@@ -21,12 +21,12 @@ function DeckForm() {
 		evt.preventDefault();
 		let newDeck = {
 			deckName: nameInput,
-			public: privacy === "true",
+			publiclyAvailable: publiclyAvailable === "true",
 			creator: userId,
 			dateCreated: new Date().toString()
 		}
 		clearNameInput();
-		clearPrivacy();
+		clearPubliclyAvailable();
 		axios.post(`${baseURL}/users/${userId}/decks`, newDeck)
 			.then((response) => {
 				dispatch(addDeckToUser({_id: response.data._id, name: response.data.name}));
@@ -50,9 +50,9 @@ function DeckForm() {
 					</div>
 					<div>
 						<label htmlFor="public">Public</label>
-						<input checked={privacy==="true"} type="radio" id="public" name="privacy" value="true" onChange={handlePrivacyChange} />
+						<input checked={publiclyAvailable==="true"} type="radio" id="public" name="publiclyAvailable" value="true" onChange={handlePubliclyAvailableChange} />
 						<label htmlFor="private">Private</label>
-						<input checked={privacy==="false"} type="radio" id="private" name="privacy" value="false" onChange={handlePrivacyChange} />
+						<input checked={publiclyAvailable==="false"} type="radio" id="private" name="publiclyAvailable" value="false" onChange={handlePubliclyAvailableChange} />
 					</div>
 					<div>
 						<button onClick={handleCancelCreateDeck}>Cancel</button>

@@ -1,15 +1,13 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router';
-import { endPractice, fetchDeck, practiceDeckAgain, retryMissedCards, saveAttempts } from '../reducers/practiceSessionSlice';
+import { endPractice, fetchDeck, practiceDeckAgain, retryMissedCards } from '../reducers/practiceSessionSlice';
 import FlashCard from "./FlashCard";
 import MultipleChoiceCard from "./MultipleChoiceCard";
 import TrueFalseCard from "./TrueFalseCard";
-import axios from "axios";
 import { store } from '../store';
 import { useRef } from 'react';
-
-const baseURL = 'http://localhost:8000';
+import styled from 'styled-components';
 
 const createCard = (type) => {
     switch(type) {
@@ -24,12 +22,43 @@ const createCard = (type) => {
     }
 }
 
+const CardWrapper = styled.div`
+    border: 1px solid black; 
+    width: 30em;
+    height: 35em
+`
+
+const PracticeSessionWrapper = styled.div`
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    width: 100%; 
+    height: 100%;
+`
+
+const StatsColumn = styled.div`
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center; 
+    border: 1px solid black;
+`
+
+const StatsRow = styled.div`
+    height: 5rem;
+`
+
+const StatsWrapper = styled.div`
+    margin-bottom: 5rem; 
+    max-width: 45rem;
+`
+
 function PracticeSession() {
     let { deckId, userId } = useParams();
     const activeCard = useSelector((state) => state.practiceSession.activeCard);
     const stats = useSelector((state) => state.practiceSession.stats);
     let retryStatus = useSelector((state) => state.practiceSession.retryStatus);
-    // let [retryStatus, toggleRetryStatus] = useToggle();
     let dispatch = useDispatch();
     let navigate = useNavigate();
 
@@ -42,59 +71,15 @@ function PracticeSession() {
         }
     }, [activeCard, deckId, dispatch])
 
-    // const handleAnswerCard = (answeredCorrectly, cardId) => {
-    // const handleAnswerCard = (answeredCorrectly) => {
-    //     console.log(`dispatching handle answer card with isCorrect value of ${answeredCorrectly}`);
-    //     dispatch(addCardAttempt({answeredCorrectly, cardIndex: attempts.length}));
-    // }
-
     const handlePracticeDeckAgain = () => {
             const cardAttempts = store.getState().practiceSession.cardAttempts;
             dispatch(practiceDeckAgain({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100}));
     }
-
-    // const handleRetryMissedCards = () => {
-    //     if(!retryStatus) {
-    //         console.log("adding session attempt to database");
-    //         axios.post(`${baseURL}/users/${userId}/attempts`, {
-    //             user: userId,
-    //             deck: deckId,
-    //             datePracticed: new Date().toString(),
-    //             cards: [...attempts]
-    //         })
-    //         .then(() => {
-    //             console.log("dispatching retryMissedCards after saving attempts");
-    //             dispatch(retryMissedCards());
-    //         })
-    //         .catch(err => console.error(err));  
-    //     } else {
-    //         console.log("dispatching retryMissedCards without saving practice attempts");
-    //         dispatch(retryMissedCards())
-    //     }
-        
-    // }
     
     const handleRetryMissedCards = () => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
         dispatch(retryMissedCards({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100}));
     }
-
-    // const handleGoToUserPage = async () => {
-    //     if(!retryStatus) {
-    //         try {
-    //             await axios.post(`${baseURL}/users/${userId}/attempts`, {
-    //                 user: userId,
-    //                 deck: deckId,
-    //                 datePracticed: new Date().toString(),
-    //                 cards: [...attempts]
-    //             });
-    //         } catch (err) {
-    //             console.error(err)
-    //         }
-    //     } 
-    //     dispatch(endPractice);
-    //     navigate(`/dashboard`);
-    // }
 
     const navigateAway = (evt) => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
@@ -109,8 +94,28 @@ function PracticeSession() {
     }
 
     return (
-        <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-            <div style={{border: "1px solid black", marginTop:"5em", width: "30em", height:"40em"}}>
+        <PracticeSessionWrapper>
+            <StatsWrapper className="container">
+                <StatsRow className="row">
+                    <StatsColumn className="col">
+                        <h3>Correct</h3>
+                        <p>55</p>
+                    </StatsColumn>
+                    <StatsColumn className="col">
+                        <h3>Incorrect</h3>
+                        <p>5</p>
+                    </StatsColumn>
+                    <StatsColumn className="col">
+                        <h3>Accuracy Rate</h3>
+                        <p>100%</p>
+                    </StatsColumn>
+                    <StatsColumn className="col">
+                        <h3>Cards Left</h3>
+                        <p>5</p>
+                    </StatsColumn>
+                </StatsRow>
+            </StatsWrapper>
+            <CardWrapper>
                 {activeCard?.cardType ? 
                     createCard(activeCard.cardType) 
                     : 
@@ -125,28 +130,9 @@ function PracticeSession() {
                         <button value="dashboard" onClick={navigateAway}>Home</button>
                     </div>
                 }
-            </div>
-        </div>
+            </CardWrapper>
+        </PracticeSessionWrapper>
     )
-
-    // return (
-    //     <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-    //         <div style={{border: "1px solid black", marginTop:"5em", width: "30em", height:"40em"}}>
-    //             {practiceSet[attempts.length]?.cardType ? 
-    //                 createCard(practiceSet[attempts.length].cardType, attempts.length, handleAnswerCard) 
-    //                 : 
-    //                 <div>
-    //                     {attempts.filter(attempt => !attempt.answeredCorrectly).length ? 
-    //                         <button onClick={handleRetryMissedCards}>Retry Missed Cards</button>
-    //                         :
-    //                         null
-    //                     }
-    //                     <button onClick={handlePracticeDeckAgain}>Practice Deck Again</button>
-    //                     <button onClick={handleGoToUserPage}>Back to Decks</button>
-    //                 </div>}
-    //         </div>
-    //     </div>
-    // )
 }
 
 export default PracticeSession

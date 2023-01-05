@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router';
-import { endPractice, fetchDeck, practiceDeckAgain, retryMissedCards } from '../reducers/practiceSessionSlice';
+import { endPractice, fetchDeck, practiceDeckAgain, resetSession, retryMissedCards } from '../reducers/practiceSessionSlice';
 import FlashCard from "./FlashCard";
 import MultipleChoiceCard from "./MultipleChoiceCard";
 import TrueFalseCard from "./TrueFalseCard";
@@ -59,6 +59,7 @@ function PracticeSession() {
     let { deckId, userId } = useParams();
     const activeCard = useSelector((state) => state.practiceSession.activeCard);
     const stats = useSelector((state) => state.practiceSession.stats);
+    const numCards = useSelector((state) => state.practiceSession.numCards);
     let retryStatus = useSelector((state) => state.practiceSession.retryStatus);
     let dispatch = useDispatch();
     let navigate = useNavigate();
@@ -71,6 +72,13 @@ function PracticeSession() {
             dispatch(fetchDeck(deckId));
         }
     }, [activeCard, deckId, dispatch])
+
+    useEffect(() => {
+        return () => {
+            console.log("reset")
+            dispatch(resetSession());
+        }
+    }, [dispatch]);
 
     const handlePracticeDeckAgain = () => {
             const cardAttempts = store.getState().practiceSession.cardAttempts;
@@ -100,19 +108,19 @@ function PracticeSession() {
                 <StatsRow className="row">
                     <StatsColumn className="col">
                         <h3>Correct</h3>
-                        <p>55</p>
+                        <p>{stats.numberCorrect || 0}</p>
                     </StatsColumn>
                     <StatsColumn className="col">
                         <h3>Incorrect</h3>
-                        <p>5</p>
+                        <p>{stats.numberWrong || 0}</p>
                     </StatsColumn>
                     <StatsColumn className="col">
                         <h3>Accuracy Rate</h3>
-                        <p>100%</p>
+                        <p>{stats.numberCorrect || stats.numberWrong ? stats.numberCorrect * 100 / (stats.numberCorrect + stats.numberWrong) + "%" : "%"}</p>
                     </StatsColumn>
                     <StatsColumn className="col">
                         <h3>Cards Left</h3>
-                        <p>5</p>
+                        <p>{numCards - (stats.numberCorrect + stats.numberWrong)}</p>
                     </StatsColumn>
                 </StatsRow>
             </StatsWrapper>

@@ -24,7 +24,8 @@ const initialState = {
     stats: {
         numberCorrect: 0,
         numberWrong: 0
-    }
+    },
+    numCards: 0
 }
 
 export const fetchDeck = createAsyncThunk("practiceSession/fetchDeck", async(deckId) => {
@@ -120,7 +121,8 @@ export const practiceSessionSlice = createSlice({
         },
         resetPracticedSinceAttemptsPulled: (state) => {
             state.practicedSinceAttemptsPulled = false;
-        }
+        },
+        resetSession: (state) => initialState
     },
     extraReducers: (builder) => {
         builder.addCase(endPractice.fulfilled, () => {
@@ -128,6 +130,7 @@ export const practiceSessionSlice = createSlice({
         });
         builder.addCase(fetchDeck.fulfilled, (state, action) => {
             state.cards = action.payload.cards;
+            state.numCards = action.payload.cards.length;
             state.practiceSet = action.payload.practiceSet;
             state.activeCard = action.payload.activeCard;
         });
@@ -138,6 +141,7 @@ export const practiceSessionSlice = createSlice({
                 }
                 return card;
             });
+            state.numCards = shuffledCards.length;
             state.activeCard = shuffledCards.pop();
             state.practiceSet = shuffledCards;
             state.missedCards = [];
@@ -149,6 +153,7 @@ export const practiceSessionSlice = createSlice({
         });
         builder.addCase(retryMissedCards.fulfilled, (state) => {
             let shuffledCards = shuffleArray(state.cards.filter(card => state.missedCards.includes(card._id)));
+            state.numCards = shuffledCards.length;
             state.activeCard = shuffledCards.pop();
             state.practiceSet = shuffledCards;
             state.missedCards = [];
@@ -161,5 +166,5 @@ export const practiceSessionSlice = createSlice({
     }
 });
 
-export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled } = practiceSessionSlice.actions;
+export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession } = practiceSessionSlice.actions;
 export default practiceSessionSlice.reducer;

@@ -31,7 +31,7 @@ const HeaderContainer = styled.div`
 
 const MainContainer = styled.div`
 	height: calc(100vh - 4.5rem); 
-	minHeight: 25rem
+	min-height: 25rem
 `
 
 const FooterContainer = styled.div`

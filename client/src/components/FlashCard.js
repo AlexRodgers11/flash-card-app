@@ -21,6 +21,7 @@ function FlashCard() {
 				cardType: "FlashCard",
 				datePracticed: Date.now()
 			}));
+			toggleAnswered();
 		}, 1000);
 	}
 

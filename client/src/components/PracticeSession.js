@@ -24,8 +24,9 @@ const createCard = (type) => {
 
 const CardWrapper = styled.div`
     border: 1px solid black; 
-    width: 30em;
-    height: 35em
+    width: 28em;
+    height: 32em;
+    min-height: 20em;
 `
 
 const PracticeSessionWrapper = styled.div`

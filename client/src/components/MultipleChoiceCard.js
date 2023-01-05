@@ -2,6 +2,67 @@ import React from 'react';
 import { useSelector } from 'react-redux'
 import useToggle from '../hooks/useToggle';
 import Answer from './Answer';
+import styled from 'styled-components';
+
+const MultipleChoiceCardWrapper = styled.div`
+	height: 100%;
+`
+
+const QuestionBox = styled.div`
+	height: 40%;
+	border-bottom: 1px solid black;
+`
+
+const QuestionWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+`
+
+// const HintBox = styled.div`
+// 	position: absolute;
+// 	& button {
+// 		margin: .5rem;
+// 	}
+// 	& p {
+// 		display: inline-block;
+// 		font-style: italic;
+// 		font-size: .75rem 	
+// 	}
+// `
+
+const HintBox = styled.div`
+	position: absolute;
+	width: 28rem;
+	text-align: left;
+	& button {
+		margin: .5rem;
+	}
+	& p {
+		display: inline-block;
+		margin-left: .5rem;
+		font-style: italic;
+		font-size: .75rem 	;
+		word-wrap: break-word;
+		overflow-wrap: break-word; 
+	}
+`
+
+const AnswerBox = styled.div`
+	height: 60%;
+`
+
+const AnswerWrapper = styled.div`
+	height: 25%;
+	border-bottom: .25px solid black;
+	&:first-child {
+		border-top: none;
+	}
+	&:last-child {
+		border-bottom: none
+	}
+`
 
 function MultipleChoiceCard() {
 	const answered = useSelector((state) => state.practiceSession.cardAnswered);
@@ -9,25 +70,27 @@ function MultipleChoiceCard() {
 	const [showHint, toggleShowHint] = useToggle(false);
 
 	return (
-		<div>
-			<div>
-				{activeCard?.hint && !answered ? 
-					<div>
-						<button onClick={toggleShowHint}>Hint</button>
-						{showHint ? <p>{activeCard?.hint}</p> : null}
-					</div>
-					:
-					null
-				}
-				<div>{activeCard?.question}</div>
-				<div className="MultipleChoiceCard_Answers">
-                    <div><Answer answer={activeCard.answers[0]} /></div>
-                    <div><Answer answer={activeCard.answers[1]} /></div>
-                    <div><Answer answer={activeCard.answers[2]} /></div>
-                    <div><Answer answer={activeCard.answers[3]} /></div>
-                </div>
-			</div>
-		</div>
+		<MultipleChoiceCardWrapper>
+			<QuestionBox>
+				<HintBox>
+					{activeCard?.hint && !answered ? 
+						<div>
+							<button onClick={toggleShowHint}>Hint</button>
+							{showHint ? <p>{activeCard?.hint}</p> : null}
+						</div>
+						:
+						null
+					}
+				</HintBox>
+				<QuestionWrapper>{activeCard?.question}</QuestionWrapper>
+			</QuestionBox>
+			<AnswerBox>
+				<AnswerWrapper><Answer answer={activeCard.answers[0]} /></AnswerWrapper>
+				<AnswerWrapper><Answer answer={activeCard.answers[1]} /></AnswerWrapper>
+				<AnswerWrapper><Answer answer={activeCard.answers[2]} /></AnswerWrapper>
+				<AnswerWrapper><Answer answer={activeCard.answers[3]} /></AnswerWrapper>
+			</AnswerBox>
+		</MultipleChoiceCardWrapper>
 	)
 }
 

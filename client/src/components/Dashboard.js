@@ -58,6 +58,11 @@ function Dashboard() {
     //     navigate(`/${evt.target.dataset.navigation_target}`);
     // }
 
+    const scrollToTop = () => {
+        console.log("should scroll");
+        window.scrollTo(0, 0);
+    }
+
     return (
         <div style={{display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "center"}}>
             {/* <h1>{user.login.username}</h1>
@@ -69,12 +74,12 @@ function Dashboard() {
             <button data-form="join" onClick={selectForm}>Search for Groups to Join</button>
             <button data-form="create" onClick={selectForm}>Create New Group</button>
             <GroupList groupIds={user.groups} /> */}
-            <Link to="/decks/public" style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Browse All Decks</div></Link>
-            <Link to={`/users/${user.userId}/decks`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Your Decks</div></Link>
-            <Link to={`/users/${user.userId}/decks/new`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Create a New Deck</div></Link>
-            <Link to={`/users/${user.userId}/groups`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Your Groups</div></Link>
-            <Link to={`/users/${user.userId}/practice`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Practice</div></Link>
-            <Link to={`/users/${user.userId}/statistics/sessions`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Stats</div></Link>
+            <Link to="/decks/public" style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}} onClick={scrollToTop}><div>Browse All Decks</div></Link>
+            <Link to={`/users/${user.userId}/decks`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}} onClick={scrollToTop}><div>Your Decks</div></Link>
+            <Link to={`/users/${user.userId}/decks/new`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}} onClick={scrollToTop} ><div>Create a New Deck</div></Link>
+            <Link to={`/users/${user.userId}/groups`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}} onClick={scrollToTop}><div>Your Groups</div></Link>
+            <Link to={`/users/${user.userId}/practice`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}} onClick={scrollToTop}><div>Practice</div></Link>
+            <Link to={`/users/${user.userId}/statistics/sessions`} style={{display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", color:"inherit", width: "20em", height: "20em", margin: "5em", border: "1px solid black", cursor: "pointer"}} onClick={scrollToTop}><div>Stats</div></Link>
             {/* {!modalContent ?
                 null
                 :

@@ -3,6 +3,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
+import { resetDeck } from '../reducers/deckSlice';
 import { addDeck } from '../reducers/decksSlice';
 import { addDeckToUser } from '../reducers/loginSlice';
 
@@ -27,6 +28,7 @@ function DeckForm() {
 		}
 		clearNameInput();
 		clearPubliclyAvailable();
+		dispatch(resetDeck());
 		axios.post(`${baseURL}/users/${userId}/decks`, newDeck)
 			.then((response) => {
 				dispatch(addDeckToUser({_id: response.data._id, name: response.data.name}));

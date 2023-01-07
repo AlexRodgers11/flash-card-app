@@ -66,9 +66,7 @@ export const deckSlice = createSlice({
     name: "deck",
     initialState,
     reducers: {
-        resetDeck: (state) => {
-            state = initialState;
-        }
+        resetDeck: (state) => initialState
     },
     extraReducers: (builder) => {
         builder.addCase(addCard.fulfilled, (state, action) => {

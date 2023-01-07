@@ -1,4 +1,5 @@
-import { Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import PracticeLaunchPage from './PracticeLaunchPage';
 import BrowseDecks from './BrowseDecks';
 import Dashboard from './Dashboard';
@@ -23,6 +24,12 @@ import CardStatsList from './CardStatsList';
 import CardAttemptList from './CardAttemptList';
 
 function Router() {
+    const { pathname } = useLocation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname])
+
     return (
         <div className="Router" style={{minHeight: "calc(100vh - 4.5rem)"}}>
             <Routes>

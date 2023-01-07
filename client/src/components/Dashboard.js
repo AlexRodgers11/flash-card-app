@@ -17,7 +17,6 @@ const StyledLink = styled(Link)`
     justify-content: center; 
     text-decoration: none; 
     color: black; 
-    cursor: pointer;
     &:hover {
         background-color: black;
         color: white !important;
@@ -51,20 +50,15 @@ const DashboardWrapper = styled.div`
 function Dashboard() {
     const user = useSelector((state) => state.login);
 
-    const scrollToTop = () => {
-        window.scrollTo(0, 0);
-    }
-
-
     return (
         <DashboardWrapper className="Dashboard">
             <Grid>
-                <StyledLink to="/decks/public" onClick={scrollToTop}>Browse All Decks</StyledLink>
-                <StyledLink to={`/users/${user.userId}/decks`} onClick={scrollToTop}>Your Decks</StyledLink>
-                <StyledLink to={`/users/${user.userId}/decks/new`} onClick={scrollToTop}>Create a New Deck</StyledLink>
-                <StyledLink to={`/users/${user.userId}/groups`} onClick={scrollToTop}>Your Groups</StyledLink>
-                <StyledLink to={`/users/${user.userId}/practice`} onClick={scrollToTop}>Practice</StyledLink>
-                <StyledLink to={`/users/${user.userId}/statistics/sessions`} onClick={scrollToTop}>Stats</StyledLink>
+                <StyledLink to="/decks/public" >Browse All Decks</StyledLink>
+                <StyledLink to={`/users/${user.userId}/decks`} >Your Decks</StyledLink>
+                <StyledLink to={`/users/${user.userId}/decks/new`} >Create a New Deck</StyledLink>
+                <StyledLink to={`/users/${user.userId}/groups`} >Your Groups</StyledLink>
+                <StyledLink to={`/users/${user.userId}/practice`} >Practice</StyledLink>
+                <StyledLink to={`/users/${user.userId}/statistics/sessions`} >Stats</StyledLink>
             </Grid>
         </DashboardWrapper>
     )

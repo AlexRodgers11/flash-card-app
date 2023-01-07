@@ -31,6 +31,7 @@ const HeaderContainer = styled.div`
 
 const MainContainer = styled.div`
 	min-height: calc(100vh - 4.5rem); 
+	// height: calc(100vh - 4.5rem);
 `
 
 const FooterContainer = styled.div`
@@ -40,7 +41,7 @@ const FooterContainer = styled.div`
 
 function App() {
 	return (
-		<AppWrapper>
+		<AppWrapper className="App">
 			<HeaderContainer>
 				<Header />
 			</HeaderContainer>

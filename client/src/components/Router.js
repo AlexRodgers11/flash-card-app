@@ -7,7 +7,6 @@ import DeckForm from './DeckForm';
 import Group from './Group';
 import LandingPage from './LandingPage';
 import Login from './Login';
-import Modal from './Modal';
 import PracticeSession from './PracticeSession';
 import RegisterCredentialsForm from './RegisterCredentialsForm';
 import RegisterEmailVerificationForm from './RegisterEmailVerification';
@@ -25,7 +24,7 @@ import CardAttemptList from './CardAttemptList';
 
 function Router() {
     return (
-        <div style={{marginTop: "76px"}}>
+        <div className="Router" style={{minHeight: "calc(100vh - 4.5rem)"}}>
             <Routes>
                 <Route exact path="/groups/:groupId" element={<Group />} />
                 <Route exact path="/decks/public" element={<BrowseDecks />}/>

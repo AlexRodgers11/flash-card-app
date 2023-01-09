@@ -6,12 +6,73 @@ import useFormInput from '../hooks/useFormInput';
 import { resetDeck } from '../reducers/deckSlice';
 import { addDeck } from '../reducers/decksSlice';
 import { addDeckToUser } from '../reducers/loginSlice';
+import styled from 'styled-components';
 
 const baseURL = 'http://localhost:8000';
 
+const DeckFormWrapper = styled.div`
+	height: calc(100vh - 4.5rem);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	& form {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		border: 2px solid black;
+		border-radius: 2em;
+		padding: 4rem 6rem 2rem 6rem;
+		& div {
+			margin: 1em 0;
+		} 
+		@media (max-width: 600px) {
+			padding: 1rem 2rem .5rem 2rem;
+		}
+		@media (max-width: 330px) {
+			padding: .25rem .5rem .125rem .5rem;	
+		}
+	}
+	& input {
+		@media (max-width: 600px) {
+			display: block;
+		}
+	}
+`;
+
+const RadioWrapper = styled.div`
+	display: flex;
+	justify-content: center;
+	& input {
+		vertical-align: middle;
+		width: 1rem;
+	}
+	& input:first-of-type {
+		margin-right: 1.25rem;
+	}
+	& label {
+		margin-right: .25rem;
+	}
+`;
+	
+const ButtonWrapper = styled.div`
+	padding-top: 6rem;
+	& button {
+		margin: 0 1.5rem;
+		@media (max-width: 330px) {
+			margin: 0 .75rem;
+		}
+	}
+	@media (max-width: 600px) {
+		padding-top: 4rem;
+	}
+	@media (max-width: 330px) {
+		padding-top: 2rem;
+	}
+`;
 
 function DeckForm() {
-  	const [nameInput, clearNameInput, handleNameInputChange] = useFormInput('');
+	const [nameInput, clearNameInput, handleNameInputChange] = useFormInput('');
   	const [publiclyAvailable, clearPubliclyAvailable, handlePubliclyAvailableChange] = useFormInput("false");
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -44,24 +105,24 @@ function DeckForm() {
 	}
 
   	return (
-		<div>
+		<DeckFormWrapper className="DeckFormWrapper">
 			<form onSubmit={handleSubmit}>
 					<div>
-						<label htmlFor="name">Deck Name</label>
-						<input type="text" id="name" name="name" value={nameInput} onChange={handleNameInputChange} />
+						<label className="form-label" htmlFor="name">Deck Name:</label>
+						<input  type="text" id="name" name="name" value={nameInput} onChange={handleNameInputChange} />
 					</div>
-					<div>
-						<label htmlFor="public">Public</label>
+					<RadioWrapper>
+						<label className="form-label" htmlFor="public">Public</label>
 						<input checked={publiclyAvailable==="true"} type="radio" id="public" name="publiclyAvailable" value="true" onChange={handlePubliclyAvailableChange} />
-						<label htmlFor="private">Private</label>
+						<label className="form-label" htmlFor="private">Private</label>
 						<input checked={publiclyAvailable==="false"} type="radio" id="private" name="publiclyAvailable" value="false" onChange={handlePubliclyAvailableChange} />
-					</div>
-					<div>
-						<button onClick={handleCancelCreateDeck}>Cancel</button>
-						<button type="submit">Create</button>
-					</div>
+					</RadioWrapper>
+					<ButtonWrapper>
+						<button className="btn btn-danger" onClick={handleCancelCreateDeck}>Cancel</button>
+						<button className="btn btn-primary" type="submit">Create</button>
+					</ButtonWrapper>
 				</form>
-		</div>
+		</DeckFormWrapper>
   )
 }
 

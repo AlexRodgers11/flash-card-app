@@ -1,15 +1,28 @@
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 import DeckList from "./DeckList";
+
+const UserDecksPageWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`
+
+const StyledButton = styled.button`
+    margin: 4rem 0 3rem 0;
+    width: 14rem;
+    height: 5rem;
+    border-radius: 1rem;
+`
 
 function UserDecksPage() {
     const { userId } = useParams(); 
     return (
-        <div>
-            {/* <Link to={`/users/${userId}/decks/new`} style={{textDecoration: "none", color:"inherit", margin: "5em", border: "1px solid black", cursor: "pointer"}}><div>Create a New Deck</div></Link> */}
-            <Link to={`/users/${userId}/decks/new`}  style={{display: "inline-block", textDecoration: "none", color:"inherit", margin: "5em", padding: ".5em 1em", border: "1px solid black", cursor: "pointer"}}><div>Create New Deck</div></Link>
+        <UserDecksPageWrapper className="UserDecksPageWrapper">
+            <Link to={`/users/${userId}/decks/new`}><StyledButton>Create New Deck</StyledButton></Link>
             <DeckList listType="user" listId={userId} />
-        </div>
+        </UserDecksPageWrapper>
     );
 }
 

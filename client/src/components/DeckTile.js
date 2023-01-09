@@ -34,6 +34,17 @@ const ContentWrapper = styled.p`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    font-weight: 600;
+    & img {
+        height: 7rem;
+        width: 100%;
+    }
+    & .large-name {
+        font-size: 2rem;
+    }
+    & .medium-name {
+        font-size: 1.5rem;
+    }
 `
 
 const StyledOpenEye = styled(RxEyeOpen)`
@@ -114,28 +125,18 @@ function DeckTile(props) {
   
     return (
         <DeckTileWrapper className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
-            {/* This holds the eye and card count */}
-            {/* <IndicatorsWrapper className="IndictorsWrapper" style={{display: "flex", alignItems: "center", justifyContent: "space-between", padding: ".75rem", paddingBottom: "0rem"}}> */}
             <IndicatorsWrapper className="IndictorsWrapper">
                 {deckData.publiclyAvailable ? <StyledOpenEye size="1.25rem"/> : <StyledClosedEye size="1.25rem" />}
                 <CardCountWrapper>
-                    {/* <span style={{paddingRight: ".1rem"}}>{deckData.cardCount}</span> */}
                     <span>{deckData.cardCount}</span>
                     <span />
                     <span />
                 </CardCountWrapper>
             </IndicatorsWrapper>
-            {/* This holds the deck name */}
             <ContentWrapper>
-                {deckData.url && <img src={deckData.url} alt="Deku" style={{height: "7rem", width: "100%"}} />}
-
-                {deckData.url && <p>{deckData.name}</p>}
-                {!deckData.url && <p style={{padding: "0 .25rem", margin: "0"}}>{deckData.name}</p>}
-                {/* {deckData.url && <h5>{deckData.name}</h5>}
-                {!deckData.url && <h1 style={{padding: "0 .25rem", margin: "0"}}>{deckData.name}</h1>} */}
+                {deckData.url && <img src={deckData.url} alt="profile-avatar"/>}
+                <p className={deckData.url ? "medium-name" : "large-name"}>{deckData.name}</p>
             </ContentWrapper>
-            {/* This provides offset to center the name */}
-            {/* <p style={{margin: "0", paddingBottom: ".75rem", height: "2.6rem"}}></p> */}
         </DeckTileWrapper>
     )
 }

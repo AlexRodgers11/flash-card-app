@@ -70,7 +70,9 @@ export const fetchGroupJoinOptions = createAsyncThunk("group/fetchGroupJoinOptio
 export const grantAdminAuthority = createAsyncThunk("group/grantAdminAuthority", async ({groupId, memberToAuthorizeId, requesterId}) => {
     try {
         const response = await axios.patch(`${baseURL}/groups/${groupId}/admins`, {groupId, memberId: memberToAuthorizeId, adminId: requesterId, action: "grant"});
-        return response.data;
+        // return response.data;
+        console.log({response: response.data})
+        return {userId: response.data.userId, memberIds: response.data.members};
     } catch (err) {
         console.error(err);
         return err;
@@ -80,7 +82,9 @@ export const grantAdminAuthority = createAsyncThunk("group/grantAdminAuthority",
 export const revokeAdminAuthority = createAsyncThunk("group/revokeAdminAuthority", async ({groupId, memberToDeauthorizeId, requesterId}) => {
     try {
         const response = await axios.patch(`${baseURL}/groups/${groupId}/admins`, {groupId, memberId: memberToDeauthorizeId, adminId: requesterId, action: "revoke"});
-        return response.data;
+        // return response.data;
+        console.log({response: response.data})
+        return {userId: response.data.userId, memberIds: response.data.members};
     } catch (err) {
         console.error(err);
         return err;
@@ -171,14 +175,14 @@ export const groupSlice = createSlice({
             state.joinOptions = action.payload.joinOptions;
         });
         builder.addCase(grantAdminAuthority.fulfilled, (state, action) => {
-            state.administrators = [...state.administrators, action.payload];
+            console.log({payload: action.payload});
+            state.administrators = [...state.administrators, action.payload.userId];
+            state.memberIds = action.payload.memberIds;
         });
         builder.addCase(revokeAdminAuthority.fulfilled, (state, action) => {
             console.log({payload: action.payload});
-            console.log(state.administrators.includes(action.payload));
-            console.log(state.administrators.length);
-            state.administrators = state.administrators.filter(adminId => adminId !== action.payload);
-            console.log(state.administrators.length);
+            state.administrators = state.administrators.filter(adminId => adminId !== action.payload.userId);
+            state.memberIds = action.payload.memberIds;
         });
         builder.addCase(updateGroup.fulfilled, (state, action) => {
             for(const key in action.payload) {

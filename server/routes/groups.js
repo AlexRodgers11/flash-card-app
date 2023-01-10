@@ -510,19 +510,37 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
         try {
             let user = await User.findById(req.body.memberId);
             if(user && req.group.members.includes(user._id)) {
+                let updatedGroup;
                 let updatedUser;
                 if(req.body.action === "grant") {
                     //need to create notification here eventually and possibly an activity
-                    await Group.findByIdAndUpdate(req.group._id, {$push: {administrators: user._id}});
+                    updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$push: {administrators: user._id}}, {new: true});
                     updatedUser = await User.findByIdAndUpdate(user._id, {$push: {adminOf: req.group._id}});
                 } else if(req.body.action === "revoke") {
                     //need to create notification here eventually
-                    await Group.findByIdAndUpdate(req.group._id, {$pull: {administrators: user._id}});
+                    updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$pull: {administrators: user._id}}, {new: true});
                     updatedUser = await User.findByIdAndUpdate(user._id, {$pull: {adminOf: req.group._id}});
                 } else {
                     res.status(500).send("There was an error with your request");
                 }
-                res.status(200).send(updatedUser._id);
+                let reorderedGroupMembers = [...updatedGroup.members].sort((a, b) => {
+                    if(a === updatedGroup.administrators[0]) {
+                        return -1;
+                    } else if (b === updatedGroup.administrators[0]) {
+                        return 1;
+                    } else if (updatedGroup.administrators.includes(a)) {
+                        if(updatedGroup.administrators.includes(b)) {
+                            return 0
+                        } 
+                        return -1; 
+                    } else if(updatedGroup.administrators.includes(b)) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            
+                await Group.findByIdAndUpdate(req.group._id, {members: reorderedGroupMembers});
+                res.status(200).send({userId: updatedUser._id, members: reorderedGroupMembers});
             } else {
                 res.status(404).send("User not found in selected group");
             }

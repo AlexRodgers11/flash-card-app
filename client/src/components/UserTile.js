@@ -4,6 +4,68 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { grantAdminAuthority, removeMember, revokeAdminAuthority } from '../reducers/groupSlice';
+import styled from 'styled-components';
+
+const UserTileWrapper = styled.div`    
+    display: inline-flex; 
+    flex-direction: column;    
+    text-align: center;  
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 1rem;
+    height: ${props => !props.editMode ? "8rem" : "12rem"};
+    width: 6rem; 
+`;
+const Button = styled.button`
+    font-size: .65rem;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 5.5rem;
+    display: block;
+`;
+
+const EditOptionsWrapper = styled.div`
+`;
+
+const ImageContainer = styled.div`
+    position: relative;
+    display: inline-block;
+    margin-top: .15rem;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 6rem;
+    height: 6rem;
+
+    &:hover .initials-overlay {
+        opacity: 1;
+    }
+`
+
+const InitialsOverlay = styled.div`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    opacity: 0;
+    transition: .25s ease;
+    background-color: #008CBA;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+`;
+
+const StyledImage = styled.img`
+    // display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+`;
 
 function UserTile(props) {
     const navigate = useNavigate();
@@ -47,25 +109,28 @@ function UserTile(props) {
     }
 
     return (
-        <div tabIndex={0} role="button" onKeyDown={props.editMode ? null : handleViewOnEnter} onClick={props.editMode ? null : viewUser} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
-            {(props.editMode && loggedInUserId !== props.memberId) &&
-                <div>
-                    {(((props.listType==="members") && props.memberId !== headAdmin) && (loggedInUserId === headAdmin || !props.isAdmin)) && <button onClick={handleRemoveMember}>Remove</button>}
-                    {(!props.isAdmin && props.listType==="members") && <button onClick={addMemberToAdmins}>Make Administrator</button>}
-                    {(loggedInUserId === headAdmin && props.listType==="admins") && <button onClick={removeMemberFromAdmins}>Remove From Administrators</button>}
-                </div>
+        <UserTileWrapper className="UserTileWrapper" editMode={props.editMode} tabIndex={0} role="button" onKeyDown={props.editMode ? null : handleViewOnEnter} onClick={props.editMode ? null : viewUser}>
+            {(props.editMode && loggedInUserId !== props.memberId) ?
+                <EditOptionsWrapper className="EditOptionsWrapper">
+                    {(((props.listType==="members") && props.memberId !== headAdmin) && (loggedInUserId === headAdmin || !props.isAdmin)) && <Button onClick={handleRemoveMember}>Remove From Group</Button>}
+                    {(!props.isAdmin && props.listType==="members") && <Button onClick={addMemberToAdmins}>Make Administrator</Button>}
+                    {(loggedInUserId === headAdmin && props.isAdmin) && <Button onClick={removeMemberFromAdmins}>Remove From Administrators</Button>}
+                </EditOptionsWrapper>
+                :
+                <p>{props.memberId === headAdmin ? "Head Admin" : props.isAdmin ? "Admin" : ""}</p>
             }
-            <h1>{userData.login?.username}</h1>
-            <h2>{userData.firstName} {userData.lastName}</h2>
-            <p>{userData.login?.email}</p>
-            <p>{userData.photo}</p>
-        </div>
+            {userData.photo ? 
+                <ImageContainer className="ImageContainer">
+                    <StyledImage className="StyledImage" src={userData.photo} alt="profile-icon" /> 
+                    <InitialsOverlay className="initials-overlay">{`${userData.firstName[0]}.${userData.lastName[0]}.`}</InitialsOverlay>
+                </ImageContainer>
+                : 
+                <div style={{display: "inline-block", border: "1.5px solid black", borderRadius: "50%", width: "65%"}}>{`${userData.firstName && userData.firstName[0]}.${userData.lastName && userData.lastName[0]}.`}</div> 
+            }
+        </UserTileWrapper>
     )
 }
 
-UserTile.propTypes = {
-    userId: PropTypes.string,
-    editMode: PropTypes.bool
-}
 
 export default UserTile
+

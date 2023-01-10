@@ -14,7 +14,13 @@ import { addMessage, removeGroup } from '../reducers/loginSlice';
 import { generateJoinCode } from '../utils';
 import UserTile from './UserTile';
 import GroupMemberOption from './GroupMemberOption';
+import styled from 'styled-components';
 
+const GroupWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
 
 const baseURL = 'http://localhost:8000';
 
@@ -235,14 +241,15 @@ function Group() {
 
     if(groupMemberIds?.includes(userId)) {
         return (
-            <div>
-                <p>{groupName}</p>
+            // <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <GroupWrapper>
+                <h1>{groupName}</h1>
                 {!administrators?.includes(userId) ?
                     null
                     :
                     <>
                         <div>
-                            <label htmlFor="join-code-options">Allow People to Join with a Code</label>
+                            <label htmlFor="join-code-options">Select how new members can join</label>
                             <select id="join-code-options" name="join-code-options" onChange={handleChangeJoinOptions}>
                                 <option selected={joinOptions === "invite"} value="invite">Invite Only</option>
                                 <option selected={joinOptions === "code"} value="code">Join Code</option>
@@ -266,17 +273,29 @@ function Group() {
                         }                    
                     </>
                 }
-                <h3>Head Admin</h3>
-                <UserTile memberId={administrators[0]} />
+                {/* <h3>Head Admin</h3>
+                <UserTile memberId={administrators[0]} /> */}
                 {administrators?.includes(userId) && <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>}
                 <button data-modalcontent={userId === headAdmin ? "head-admin-leave-group-confirmation" : "leave-group-confirmation"} onClick={handleSelectModalContent}>Leave Group</button>
                 {(editMode && userId === headAdmin) && <button data-modalcontent={groupMemberIds.length > 1 ? "delete-group-options" : "delete-group-confirmation"} onClick={handleSelectModalContent}>Delete Group</button>}
-                <h3>Administrators:</h3>
+                
+                
+                {/* <h3>Administrators:</h3>
                 <GroupMemberList editMode={userId === administrators[0] && editMode} listType="admins" groupMemberIds={administrators.slice(1, administrators.length)} />
                 <h3>Activity:</h3>
                 <ActivityList activityIds={activityIds}/>
+                
+                
                 <h3>Members:</h3>
-                <GroupMemberList editMode={administrators.includes(userId) && editMode} listType="members" groupMemberIds={groupMemberIds} />
+                <GroupMemberList editMode={administrators.includes(userId) && editMode} listType="members" groupMemberIds={groupMemberIds} /> */}
+
+
+                <div>
+                    <h3>Members:</h3>
+                    <GroupMemberList editMode={administrators.includes(userId) && editMode} listType="members" groupMemberIds={groupMemberIds} />
+                </div>
+
+
                 <button data-modalcontent="add-deck" onClick={handleSelectModalContent}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
                 <DeckList listType="group" listId={groupId} />
                 {!modalContent ?
@@ -286,7 +305,7 @@ function Group() {
                         {displayModalContent()}
                     </Modal>
                 }
-            </div>
+            </GroupWrapper>
       )
     } else {
         return (

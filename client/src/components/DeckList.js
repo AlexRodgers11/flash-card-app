@@ -32,7 +32,7 @@ const DeckListWrapper = styled.div`
     @media (min-width: 1600px) {
         grid-template-columns: repeat(6, 1fr);
     }
-    `
+`
 
 export default function DeckList(props) {
     const dispatch = useDispatch();

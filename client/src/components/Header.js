@@ -19,6 +19,7 @@ function Header() {
     const profilePic = useSelector((state) => state.login.photo);
     const notifications = useSelector((state) => state.login.notifications);
     const messages = useSelector((state) => state.login.messages.received);
+    
         
     const expandMessage = (id) => {
         setModalContent('message');
@@ -50,15 +51,17 @@ function Header() {
     const handleLogout = () => {
         dispatch(logout());
     }
+
+    
     
     return (
-        <nav className="navbar fixed-top navbar-light bg-light">
+        <nav className="navbar navbar-collapse fixed-top navbar-light bg-light" style={{height: "4.5rem", minWidth: "300px"}}>
             <div className="container-fluid">
                 <div style={{display: "flex"}}>
                     <div className="navbar-brand"><Link to="/dashboard">Logo</Link></div>
                     {/* Clicking the anchor tag resets state */}
                     {/* <a className="navbar-brand" href={username ? "/dashboard" : "/"}>Logo</a> */}
-                    <form className="d-flex">
+                    <form className="d-none d-sm-flex">
                         <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                         <button className="btn btn-outline-success" type="submit">Search</button>
                     </form>
@@ -66,12 +69,12 @@ function Header() {
                 <div style={{display: "flex", alignItems: "center"}}>
                     {username && 
                         <div data-source="inbox" onClick={handleButtonClick} style={{position: "relative", left: "1.5rem"}}>
-                            <IoMailSharp size="2.25em" />
+                            <IoMailSharp size="2.25em" style={{cursor: "pointer"}} />
                             <div style={{visibility: messages.filter(message => message.read.includes(userId) === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".5rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{messages.filter(message => message.read.includes(userId) === false).length >= 10 ? "9+": messages.filter(message => message.read.includes(userId) === false).length}</div>
                         </div>}
                     {username && 
                         <div data-source="notifications" onClick={handleButtonClick} style={{position: "relative", left: "1rem"}}>
-                            <IoNotificationsSharp size="2.25em" />
+                            <IoNotificationsSharp size="2.25em" style={{cursor: "pointer"}} />
                             <div style={{visibility: notifications.filter(notification => notification.read === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".85rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{notifications.filter(notification => notification.read === false).length >= 10 ? "9+": notifications.filter(notification => notification.read === false).length}</div>
                         </div>}
                     <li className="nav-item dropdown">

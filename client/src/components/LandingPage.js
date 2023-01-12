@@ -90,10 +90,20 @@ const StyledImage = styled.img`
 	}
 `;
 
+
 function LandingPage() {
 	const location = useLocation();
 	const navigate = useNavigate();
-		
+	
+	const openForm = evt => {
+		evt.preventDefault();
+		if(evt.target.dataset.location === "login") {
+			navigate("/login");
+		} else {
+			navigate("/register/credentials");
+		}
+	}
+
 	const goBackToHome = () => {
 		navigate("/");
 	};
@@ -101,7 +111,7 @@ function LandingPage() {
 	return (
 		<LandingPageWrapper className="LandingPageWrapper">
 			<CarouselWrapper className="CarouselWrapper">
-				<div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+				{/* <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
 					<div class="carousel-indicators">
 						<button type="button" className="indicator active" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" aria-current="true" aria-label="Slide 1"></button>
 						<button type="button" className="indicator" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -126,13 +136,13 @@ function LandingPage() {
 						<span class="carousel-control-next-icon" aria-hidden="true"></span>
 						<span class="visually-hidden">Next</span>
 					</button>
-				</div>
+				</div> */}
 			</CarouselWrapper>
 			<LoginControls className="LoginControls">
-				<button className="btn btn-lg btn-primary">Login</button>
-				<button className="btn btn-lg btn-success">Sign Up</button>
+				<button onClick={openForm} data-location="login" className="btn btn-lg btn-primary">Login</button>
+				<button onClick={openForm} data-location="register/credentials" className="btn btn-lg btn-success">SignUp</button>
 			</LoginControls>		
-			{location.pathname !== "/" && <Modal hideModal={location.pathname === "/register/credentials" ? goBackToHome : null}><Outlet /></Modal>}
+			{location.pathname !== "/" && <Modal hideModal={location.pathname === "/register/credentials" || location.pathname === "/login" ? goBackToHome : null}><Outlet /></Modal>}
 		</LandingPageWrapper>
 	)
 }

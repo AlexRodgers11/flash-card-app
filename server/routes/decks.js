@@ -1,5 +1,6 @@
 import express from "express";
 const deckRouter = express.Router();
+import mongoose from "mongoose";
 
 import DeckAttempt from "../models/deckAttempt.js";
 import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
@@ -26,21 +27,26 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
 deckRouter.get("/", async (req, res, next) => {
     try {
         if(req.query.categoryId) {
-            console.log({categoryId: req.query.categoryId});
+            console.log("There is a category Id")
+            
+            let categoryId = mongoose.Types.ObjectId(req.query.categoryId);
             if(req.query.searchString) {
-                console.log("this may take a while");
-                let category = await Category.findById(req.query.categoryId, "decks").populate("decks", "name").limit(100);
-                let filteredDecks = category.decks.filter(deck => deck.name.toLowerCase().includes(req.query.searchString.toLowerCase()));
-                res.status(200).send(filteredDecks);
+                console.log("There is a category and search string");
+                let regExp = new RegExp(req.query.searchString, "i");
+                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}, {categories: {$in: [categoryId]}}]}, "_id publiclyAvailable").limit(50);
+                res.status(200).send(decks.map(deck => deck._id));
             } else {
-                console.log("this should be fast");
-                let category = await Category.findById(req.query.categoryId, "decks").limit(100);
-                res.status(200).send(category.decks.map(deck => deck._id));
+                console.log("There is only a category");
+                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {categories: {$in: [categoryId]}}]}, "_id publiclyAvailable").limit(50);
+                console.log({decks});
+                res.status(200).send(decks.map(deck => deck._id));
             }
         } else {
+            console.log("only search");
+            
             let regExp = new RegExp(req.query.searchString, "i");            
-            console.log({regExp});
-            const decks = await Deck.find({name: {$regex: regExp}}, "_id").limit(100);
+            const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}]}, "_id publiclyAvailable").limit(50);
+
             res.status(200).send(decks.map(deck => deck._id));
         }
     } catch (err) {
@@ -48,6 +54,8 @@ deckRouter.get("/", async (req, res, next) => {
         console.error(err.message || "There was an error with your request");
     }   
 });
+
+
 
 deckRouter.post("/", (req, res, next) => {
     let newDeck = new Deck(req.body);

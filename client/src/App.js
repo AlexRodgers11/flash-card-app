@@ -1,6 +1,7 @@
 import Header from './components/Header';
 import Router from './components/Router';
 import styled from 'styled-components';
+import Footer from './components/Footer';
 
 const AppWrapper = styled.div`
 	text-align: center;
@@ -35,8 +36,10 @@ const MainContainer = styled.div`
 `
 
 const FooterContainer = styled.div`
-	height: 15vh; 
-	minHeight: 15rem
+	height: 17rem; 
+	@media (max-width: 500px) {
+		height: 35rem;
+	}
 `
 
 function App() {
@@ -49,7 +52,7 @@ function App() {
 				<Router />
 			</MainContainer>
 			<FooterContainer>
-				Footer will go here
+				<Footer />
 			</FooterContainer>
 		</AppWrapper>
 	);

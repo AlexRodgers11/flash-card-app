@@ -1,20 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
-import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchPublicDecks } from "../reducers/decksSlice";
-// import DeckList from "./DeckList";
 import DeckTile from "./DeckTile";
+import InfiniteScroll from "react-infinite-scroll-component";
+import axios from "axios";
 import styled from "styled-components";
-import InfiniteScroll from "react-infinite-scroller";
-import useFormInput from "../hooks/useFormInput";
 
 const baseURL = 'http://localhost:8000';
 
 const ControlBarWrapper = styled.form`
-    
+        
 `;
 
-const DeckListWrapper = styled.div`
+const StyledInfiniteScroll = styled(InfiniteScroll)`
     min-width: 350px;
     display: grid;
     place-items: center;
@@ -45,32 +41,50 @@ const DeckListWrapper = styled.div`
 
 function BrowseDecks() {
     const [categories, setCategories] = useState([]);
-    const [page, setPage] = useState(0);
-    const deckIds = useSelector((state) => state.decks.deckIds);
+    const [deckIds, setDeckIds] = useState([]);
+    const [hasMore, setHasMore] = useState(true);
+    const [page, setPage] = useState(1);
     
     const [criteria, setCriteria] = useState({
-        category: "",
-        search: "",
+        categoryId: "",
+        searchString: "",
         sort: ""
     });
 
-    const dispatch = useDispatch();
+    const fetchDecks = async (newCriteria) => {
+        let queryString;
+        if(!newCriteria) {
+            console.log("no new criteria");
+            queryString = new URLSearchParams({searchString: criteria.searchString, categoryId: criteria.categoryId, sort: criteria.sort, page}).toString();
+        } else {
+            console.log({newCriteria});
+            queryString = new URLSearchParams({searchString: newCriteria.searchString, categoryId: newCriteria.categoryId, sort: newCriteria.sort, page: 1}).toString();
+            console.log({queryString});
+            setCriteria(newCriteria);
+        }
+        if(queryString.length > 0) {
+            queryString = "?" + queryString;
+        }
+        try {
+            const response = await axios.get(`${baseURL}/decks${queryString}`);
+            setDeckIds(ids => newCriteria ? response.data : [...ids, ...response.data]);
+            setPage(page => newCriteria ? 1 : page + 1);
+            setHasMore(response.data.length === 25)
+        } catch(err) {
+            console.error(err.message);
+        }
+    };
 
-    const handleChangeCriteria = (evt) => {
-        setCriteria({...criteria, [evt.target.dataset.selection_type]: evt.target.value});
+    const handleChangeCriteria = async (evt) => {
+        fetchDecks({...criteria, [evt.target.dataset.selection_type]: evt.target.value});
     }
-
+    
+    
     useEffect(() => {
-        console.log("in useEffect to fetch updated deck results");
-        dispatch(fetchPublicDecks({searchString: criteria.search, categoryId: criteria.category, sort: criteria.sort}));
-    }, [dispatch, criteria.search, criteria.category, criteria.sort]);//do I need page here?
-
-    useEffect(() => {
-        //possibly hardcode in the categories. If not use special route to only get the category names and ids
         console.log("in useEffect to get category list for dropdown");
         if(!categories.length) {
             axios.get(`${baseURL}/categories`)
-                .then(categories => {
+            .then(categories => {
                     setCategories(categories.data);
                 })
                 .catch(err => {
@@ -78,18 +92,26 @@ function BrowseDecks() {
                 });
         }
     }, [categories.length]);
+
+    const firstFetchDone = useRef(false);
     
+    useEffect(() => {
+        if(deckIds.length < 1 && !firstFetchDone.current) {
+            console.log("this should make first pull");
+            fetchDecks();
+            firstFetchDone.current = true;
+        }
+    });
+
     return (
         <div>
             <ControlBarWrapper>
                 <label htmlFor="search">Search for decks</label>
-                <input type="text" name="search" id="search" onChange={handleChangeCriteria} value={criteria.search} data-selection_type="search" />
-                {/* <label htmlFor="category">By Category</label> */}
-                <select name="category" id="category" onChange={handleChangeCriteria} value={criteria.category} data-selection_type="category" >
+                <input type="text" name="searchString" id="searchString" onChange={handleChangeCriteria} value={criteria.search} data-selection_type="searchString" />
+                <select name="category" id="category" onChange={handleChangeCriteria} value={criteria.categoryId} data-selection_type="categoryId" >
                     <option value="">Filter By Category</option>
                     {categories.length > 0 && categories.map(category => <option key={category._id} value={category._id}>{category.name}</option>)}
                 </select>
-                {/* <label htmlFor="sort">Sort</label> */}
                 <select name="sort" id="sort" onChange={handleChangeCriteria} value={criteria.sort} data-selection_type="sort" >
                     <option value="">Sort</option>
                     <option value="a-z">A-Z</option>
@@ -97,23 +119,17 @@ function BrowseDecks() {
                     <option value="newest">Newest</option>
                     <option value="oldest">Oldest</option>
                 </select>
-            </ControlBarWrapper>   
-            <DeckListWrapper>
-                {deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
-            </DeckListWrapper>
-            {/* <DeckList listType="all" /> */}
+            </ControlBarWrapper>
+            <StyledInfiniteScroll
+                dataLength={deckIds.length}
+                next={fetchDecks}
+                hasMore={hasMore}
+                loader={<h4>Loading...</h4>}
+                >
+                    {deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
+                </StyledInfiniteScroll>
         </div>
     )
-    // const firstRender = useRef(true);
-    // useEffect(() => {
-    //     // if(firstRender.current) {
-    //     console.log("in useEffect to fetch deck results for the first time");
-    //     if(page === 0) {
-    //         dispatch(fetchPublicDecks({searchString: "", categoryId: "", sort: ""}));
-    //         setPage(1);
-    //     }
-    // }, [criteria.search, criteria.category, criteria.sort, dispatch, page]);
-
 }
 
 export default BrowseDecks;

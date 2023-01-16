@@ -25,7 +25,10 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
 });
 
 deckRouter.get("/", async (req, res, next) => {
+    console.log({query: req.query});
     try {
+        const page = req.query.page || 1;
+        const limit = 25;
         if(req.query.categoryId) {
             console.log("There is a category Id")
             
@@ -33,20 +36,18 @@ deckRouter.get("/", async (req, res, next) => {
             if(req.query.searchString) {
                 console.log("There is a category and search string");
                 let regExp = new RegExp(req.query.searchString, "i");
-                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}, {categories: {$in: [categoryId]}}]}, "_id publiclyAvailable").limit(50);
+                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}, {categories: {$in: [categoryId]}}]}, "_id publiclyAvailable").skip(((page - 1) * limit)).limit(limit);
                 res.status(200).send(decks.map(deck => deck._id));
             } else {
                 console.log("There is only a category");
-                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {categories: {$in: [categoryId]}}]}, "_id publiclyAvailable").limit(50);
-                console.log({decks});
+                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {categories: {$in: [categoryId]}}]}, "_id publiclyAvailable").skip(((page - 1) * limit)).limit(limit);
                 res.status(200).send(decks.map(deck => deck._id));
             }
         } else {
             console.log("only search");
             
             let regExp = new RegExp(req.query.searchString, "i");            
-            const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}]}, "_id publiclyAvailable").limit(50);
-
+            const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}]}, "_id publiclyAvailable").skip(((page - 1) * limit)).limit(limit);
             res.status(200).send(decks.map(deck => deck._id));
         }
     } catch (err) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchDecksOfCategory, fetchDecksOfGroup, fetchDecksOfUser, fetchPublicDecks } from '../reducers/decksSlice';
+import { fetchDecksOfCategory, fetchDecksOfGroup, fetchDecksOfUser } from '../reducers/decksSlice';
 import DeckTile from './DeckTile';
 import styled from 'styled-components';
 
@@ -51,9 +51,6 @@ export default function DeckList(props) {
                     break;
                 case "user":
                     dispatch(fetchDecksOfUser(props.listId));
-                    break;
-                case "all":
-                    dispatch(fetchPublicDecks({searchString: "", categoryId: "", sort: ""}));
                     break;
                 default:
                     break;

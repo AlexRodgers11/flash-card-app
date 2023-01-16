@@ -65,26 +65,6 @@ export const fetchDecksOfGroup = createAsyncThunk("decks/fetchDecksOfGroup", asy
     }
 });
 
-export const fetchPublicDecks = createAsyncThunk("decks/fetchPublicDecks", async ({searchString, categoryId, sort}) => {
-    console.log("fetching decks");
-    let queryString = new URLSearchParams({searchString, categoryId, sort}).toString();
-    if(queryString.length > 0) {
-        queryString = "?" + queryString;
-    }
-    try {
-        const response = await axios.get(`${baseURL}/decks${queryString}`);
-        // console.log({hasMore: response.data.length === 100});
-        return {
-            listType: "all",
-            listId: "",
-            deckIds: [...response.data],
-            // hasMore: response.data.length === 100,
-        }
-    } catch(err) {
-        console.error(err.message);
-    }
-});
-
 export const decksSlice = createSlice({
     name: "decks",
     initialState,
@@ -111,15 +91,6 @@ export const decksSlice = createSlice({
             state.listType = action.payload.listType;
             state.listId = action.payload.listId;
             state.deckIds = action.payload.deckIds;
-        });
-        builder.addCase(fetchPublicDecks.fulfilled, (state, action) => {
-            state.listType = action.payload.listType;
-            state.listId = action.payload.listId;
-            // console.log(state.deckIds);
-            // console.log([...state.deckIds, action.payload.deckIds]);
-            state.deckIds = action.payload.deckIds;
-            // state.deckIds = [...state.deckIds, ...action.payload.deckIds];
-            // state.hasMore = action.payload.hasMore;
         });
     }
 

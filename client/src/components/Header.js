@@ -9,6 +9,7 @@ import NotificationList from './NotificationList';
 import { HiOutlineUserCircle } from "react-icons/hi";
 import { IoMailSharp, IoNotificationsSharp } from "react-icons/io5";
 import styled from "styled-components";
+import Logo from './Logo';
 
 function Header() {
     const [modalContent, setModalContent] = useState('');
@@ -55,10 +56,14 @@ function Header() {
     
     
     return (
-        <nav className="navbar navbar-collapse fixed-top navbar-light bg-light" style={{height: "4.5rem", minWidth: "300px"}}>
-            <div className="container-fluid">
-                <div style={{display: "flex"}}>
-                    <div className="navbar-brand"><Link to="/dashboard">Logo</Link></div>
+        <nav className="navbar navbar-collapse fixed-top navbar-light bg-light" style={{height: "4.5rem", minWidth: "300px", padding: 0}}>
+            <div className="container-fluid" style={{height: "100%"}}>
+                <div style={{display: "flex", alignItems: "center", height: "100%"}}>
+                    <div className="navbar-brand">
+                        <Link to="/dashboard">
+                            <Logo />
+                        </Link>
+                    </div>
                     {/* Clicking the anchor tag resets state */}
                     {/* <a className="navbar-brand" href={username ? "/dashboard" : "/"}>Logo</a> */}
                     <form className="d-none d-sm-flex">

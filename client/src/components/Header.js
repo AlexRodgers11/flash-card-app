@@ -60,7 +60,7 @@ function Header() {
             <div className="container-fluid" style={{height: "100%"}}>
                 <div style={{display: "flex", alignItems: "center", height: "100%"}}>
                     <div className="navbar-brand">
-                        <Link to="/dashboard">
+                        <Link to={userId ? "/dashboard" : "/"}>
                             <Logo />
                         </Link>
                     </div>

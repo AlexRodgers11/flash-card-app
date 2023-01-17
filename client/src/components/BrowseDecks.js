@@ -15,6 +15,7 @@ const StyledInfiniteScroll = styled(InfiniteScroll)`
     display: grid;
     place-items: center;
 
+
     grid-template-columns: repeat(1, 1fr);
     
     @media (min-width: 515px) {
@@ -41,24 +42,109 @@ const StyledInfiniteScroll = styled(InfiniteScroll)`
 
 function BrowseDecks() {
     const [categories, setCategories] = useState([]);
-    const [deckIds, setDeckIds] = useState([]);
+    const [decks, setDecks] = useState([]);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     
     const [criteria, setCriteria] = useState({
         categoryId: "",
         searchString: "",
-        sort: ""
+        // sort: ""
     });
 
+    const [sort, setSort] = useState("");
+
+    const handleSortChange = evt => {
+        console.log("In handle sort change");
+        switch(evt.target.value) {
+            case "a-z":
+                console.log("a-z");
+                setDecks(decks.slice().sort((a, b) => {
+                    if(a.deckName < b.deckName) {
+                        return -1;
+                    } else if(a.deckName > b.deckName) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }));
+                break;
+            case "z-a": 
+                console.log("z-a");
+                setDecks(decks.slice().sort((a, b) => {
+                    if(a.deckName > b.deckName) {
+                        return -1;
+                    } else if(a.deckName < b.deckName) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }));
+                break;
+            case "card-count-up": 
+                console.log("card-count-up");
+                setDecks(decks.slice().sort((a, b) => {
+                    if(a.cardCount > b.cardCount) {
+                        return -1;
+                    } else if(a.cardCount < b.cardCount) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }));
+                break;
+            case "card-count-down": 
+                console.log("card-count-down");
+                setDecks(decks.slice().sort((a, b) => {
+                    if(a.cardCount < b.cardCount) {
+                        return -1;
+                    } else if(a.cardCount > b.cardCount) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }));
+                break;
+            case "newest":
+                console.log("newest");
+                setDecks(decks.slice().sort((a, b) => {
+                    let aDate = new Date(a.dateCreated);
+                    let bDate = new Date(b.dateCreated);
+                    if(aDate < bDate) {
+                        return -1;
+                    } else if(aDate > bDate) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }));
+                break;
+            case "oldest":
+                console.log("oldest");
+                setDecks(decks.slice().sort((a, b) => {
+                    let aDate = new Date(a.dateCreated);
+                    let bDate = new Date(b.dateCreated);
+                    if(aDate > bDate) {
+                        return -1;
+                    } else if(aDate < bDate) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }));
+                break;
+            default: 
+                break;
+        }
+        setSort(evt.target.value);
+    }
+    
     const fetchDecks = async (newCriteria) => {
         let queryString;
         if(!newCriteria) {
-            console.log("no new criteria");
-            queryString = new URLSearchParams({searchString: criteria.searchString, categoryId: criteria.categoryId, sort: criteria.sort, page}).toString();
+            queryString = new URLSearchParams({searchString: criteria.searchString, categoryId: criteria.categoryId, page}).toString();
         } else {
-            console.log({newCriteria});
-            queryString = new URLSearchParams({searchString: newCriteria.searchString, categoryId: newCriteria.categoryId, sort: newCriteria.sort, page: 1}).toString();
+            queryString = new URLSearchParams({searchString: newCriteria.searchString, categoryId: newCriteria.categoryId, page: 1}).toString();
             console.log({queryString});
             setCriteria(newCriteria);
         }
@@ -67,7 +153,7 @@ function BrowseDecks() {
         }
         try {
             const response = await axios.get(`${baseURL}/decks${queryString}`);
-            setDeckIds(ids => newCriteria ? response.data : [...ids, ...response.data]);
+            setDecks(decks => newCriteria ? response.data : [...decks, ...response.data]);
             setPage(page => newCriteria ? 1 : page + 1);
             setHasMore(response.data.length === 25)
         } catch(err) {
@@ -96,7 +182,7 @@ function BrowseDecks() {
     const firstFetchDone = useRef(false);
     
     useEffect(() => {
-        if(deckIds.length < 1 && !firstFetchDone.current) {
+        if(decks.length < 1 && !firstFetchDone.current) {
             console.log("this should make first pull");
             fetchDecks();
             firstFetchDone.current = true;
@@ -112,22 +198,24 @@ function BrowseDecks() {
                     <option value="">Filter By Category</option>
                     {categories.length > 0 && categories.map(category => <option key={category._id} value={category._id}>{category.name}</option>)}
                 </select>
-                <select name="sort" id="sort" onChange={handleChangeCriteria} value={criteria.sort} data-selection_type="sort" >
+                <select name="sort" id="sort" onChange={handleSortChange} value={sort} >
                     <option value="">Sort</option>
                     <option value="a-z">A-Z</option>
                     <option value="z-a">Z-A</option>
                     <option value="newest">Newest</option>
                     <option value="oldest">Oldest</option>
+                    <option value="card-count-up">Most Cards</option>
+                    <option value="card-count-down">Least Cards</option>
                 </select>
             </ControlBarWrapper>
             <StyledInfiniteScroll
-                dataLength={deckIds.length}
+                dataLength={decks.length}
                 next={fetchDecks}
                 hasMore={hasMore}
                 loader={<h4>Loading...</h4>}
                 >
-                    {deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
-                </StyledInfiniteScroll>
+                    {decks.map(deck => <DeckTile key={deck.deckId} deckId={deck.deckId} />)}
+            </StyledInfiniteScroll>
         </div>
     )
 }

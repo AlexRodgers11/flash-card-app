@@ -36,27 +36,31 @@ deckRouter.get("/", async (req, res, next) => {
             if(req.query.searchString) {
                 console.log("There is a category and search string");
                 let regExp = new RegExp(req.query.searchString, "i");
-                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}, {categories: {$in: [categoryId]}}]}, "_id publiclyAvailable").skip(((page - 1) * limit)).limit(limit);
-                res.status(200).send(decks.map(deck => deck._id));
+                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}, {categories: {$in: [categoryId]}}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
+                res.status(200).send(decks.map(deck => {
+                    return {cardCount: deck.cards.length, dateCreated: deck.createdAt, deckId: deck._id, deckName: deck.name}
+                }));
             } else {
                 console.log("There is only a category");
-                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {categories: {$in: [categoryId]}}]}, "_id publiclyAvailable").skip(((page - 1) * limit)).limit(limit);
-                res.status(200).send(decks.map(deck => deck._id));
+                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {categories: {$in: [categoryId]}}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
+                res.status(200).send(decks.map(deck => {
+                    return {cardCount: deck.cards.length, dateCreated: deck.createdAt, deckId: deck._id, deckName: deck.name}
+                }));
             }
         } else {
             console.log("only search");
             
             let regExp = new RegExp(req.query.searchString, "i");            
-            const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}]}, "_id publiclyAvailable").skip(((page - 1) * limit)).limit(limit);
-            res.status(200).send(decks.map(deck => deck._id));
+            const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
+            res.status(200).send(decks.map(deck => {
+                return {cardCount: deck.cards.length, dateCreated: deck.createdAt, deckId: deck._id, deckName: deck.name}
+            }));
         }
     } catch (err) {
         res.status(500).send("There was an error with your request");
         console.error(err.message || "There was an error with your request");
     }   
 });
-
-
 
 deckRouter.post("/", (req, res, next) => {
     let newDeck = new Deck(req.body);

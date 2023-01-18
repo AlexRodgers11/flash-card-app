@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { IoClose } from "react-icons/io5";
 import styled from 'styled-components';
 
 const ModalWrapper = styled.div`
@@ -48,9 +49,18 @@ const ModalClose = styled.p`
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	height: 1em;
+	// height: 1em;
 	margin: 0;
-	padding-top: 0.5em;
+	padding-top: 0.25em;
+`;
+
+
+const StyledCloseIcon = styled(IoClose)`
+	position: relative;
+	left: .75rem;
+	font-size: 1.5rem;
+	cursor: pointer;
+	margin-bottom: .5rem;
 `;
 
 function Modal(props) {
@@ -58,7 +68,7 @@ function Modal(props) {
 		<ModalWrapper className='Modal_active'>
 			<ModalBackdrop onClick={props.hideModal}></ModalBackdrop>
 			<ModalContent>
-				<ModalClose onClick={props.hideModal}>{props.hideModal && "X"}</ModalClose>
+			<ModalClose className="ModalClose" onClick={props.hideModal}>{props.hideModal && <StyledCloseIcon />}</ModalClose>
 				{props.children}
 			</ModalContent>
 		</ModalWrapper>

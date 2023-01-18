@@ -51,7 +51,7 @@ const StatsRow = styled.div`
 `
 
 const StatsWrapper = styled.div`
-    margin-bottom: 5rem; 
+    margin: 5rem; 
     max-width: 45rem;
 `
 

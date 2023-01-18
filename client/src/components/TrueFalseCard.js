@@ -4,81 +4,62 @@ import useToggle from '../hooks/useToggle';
 import Answer from './Answer';
 import styled from 'styled-components';
 
+const TrueFalseCardWrapper = styled.div`
+	height: 100%;
+`
+
+const QuestionBox = styled.div`
+	height: 45%;
+	width: 100%;
+	border-bottom: 1px solid black;
+`
+
+const HintBox = styled.div`
+	position: absolute;
+	width: 28rem;
+	text-align: left;
+	& button {
+		margin: .5rem;
+	}
+	& p {
+		display: inline-block;
+		margin-left: .5rem;
+		font-style: italic;
+		font-size: .75rem 	;
+		word-wrap: break-word;
+		overflow-wrap: break-word; 
+	}
+`
+
+const AnswerBox = styled.div`
+	height: 55%;
+`
+
+const AnswerWrapper = styled.div`
+	height: 50%;
+	border-bottom: .25px solid black;
+
+	&:first-child {
+		border-top: none;
+	}
+	&:last-child {
+		border-bottom: none
+	}
+`
+
+const QuestionWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+`
+
 function TrueFalseCard() {
 	const answered = useSelector((state) => state.practiceSession.cardAnswered);
 	const [showHint, toggleShowHint] = useToggle(false);
 
 	const activeCard = useSelector((state) => state.practiceSession.activeCard);
 
-	const TrueFalseCardWrapper = styled.div`
-		height: 100%;
-	`
-	
-	const QuestionBox = styled.div`
-		height: 45%;
-		width: 100%;
-		border-bottom: 1px solid black;
-	`
-	// const QuestionBox = styled.div`
-	// 	display: flex;
-	// 	flex-direction: column;
-	// 	justify-content: center;
-	// 	height: 40%;
-	// 	border-bottom: 1px solid black;
-	// `
-
-	// const HintBox = styled.div`
-	// 	position: absolute;
-	// 	& button {
-	// 		margin: .5rem;
-	// 	}
-	// 	& p {
-	// 		display: inline-block;
-	// 		font-style: italic;
-	// 		font-size: .75rem 	
-	// 	}
-	// `
-
-	const HintBox = styled.div`
-		position: absolute;
-		width: 28rem;
-		text-align: left;
-		& button {
-			margin: .5rem;
-		}
-		& p {
-			display: inline-block;
-			margin-left: .5rem;
-			font-style: italic;
-			font-size: .75rem 	;
-			word-wrap: break-word;
-			overflow-wrap: break-word; 
-		}
-	`
-
-	const AnswerBox = styled.div`
-		height: 55%;
-	`
-
-	const AnswerWrapper = styled.div`
-		height: 50%;
-		border-bottom: .25px solid black;
-
-		&:first-child {
-			border-top: none;
-		}
-		&:last-child {
-			border-bottom: none
-		}
-	`
-	
-	const QuestionWrapper = styled.div`
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-	`
-	
 	return (
 		<TrueFalseCardWrapper>
 			<QuestionBox>

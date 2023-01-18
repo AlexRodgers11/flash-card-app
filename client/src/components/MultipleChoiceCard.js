@@ -20,18 +20,6 @@ const QuestionWrapper = styled.div`
 	height: 100%;
 `
 
-// const HintBox = styled.div`
-// 	position: absolute;
-// 	& button {
-// 		margin: .5rem;
-// 	}
-// 	& p {
-// 		display: inline-block;
-// 		font-style: italic;
-// 		font-size: .75rem 	
-// 	}
-// `
-
 const HintBox = styled.div`
 	position: absolute;
 	width: 28rem;

@@ -6,6 +6,34 @@ import styled from "styled-components";
 
 const baseURL = 'http://localhost:8000';
 
+const BrowseDecksWrapper = styled.div`
+
+`;
+
+const SpinnerWrapper = styled.div`
+    align-items: center;
+    & {
+        width: 100vw;
+        height: calc(100vh - 7.5rem);
+        @media (max-width: 515px) {
+            height: calc(100vh - 9.5rem);
+        }
+    }
+    & div {
+        position: relative;
+        bottom: calc(30vh - 7.5rem);
+        width: 7rem;
+        height: 7rem;
+        @media (min-width: 800px) and (min-height: 800px) {
+            width: 12rem;
+            height: 12rem;
+        }
+        @media (max-height: 630px) {
+            bottom: 0;
+        }
+    }
+`;
+
 const ControlBarWrapper = styled.form`
     display: flex;
     align-items: center;
@@ -27,9 +55,6 @@ const ControlBarWrapper = styled.form`
             margin-right: .15rem;
         }
     }
-    // @media (max-width: 765px) {
-    //     font-size: .85rem;
-    // }
     @media (max-width: 960px) {
         font-size: 1rem;       
     @media (max-width: 790px) {
@@ -87,6 +112,7 @@ function BrowseDecks() {
     const [decks, setDecks] = useState([]);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
     
     const [criteria, setCriteria] = useState({
         categoryId: "",
@@ -194,11 +220,16 @@ function BrowseDecks() {
             queryString = "?" + queryString;
         }
         try {
+            setIsLoading(true);
             const response = await axios.get(`${baseURL}/decks${queryString}`);
-            setDecks(decks => newCriteria ? response.data : [...decks, ...response.data]);
-            setPage(page => newCriteria ? 1 : page + 1);
-            setHasMore(response.data.length === 25)
+            setTimeout(() => {
+                setDecks(decks => newCriteria ? response.data : [...decks, ...response.data]);
+                setPage(page => newCriteria ? 1 : page + 1);
+                setHasMore(response.data.length === 25)
+                setIsLoading(false);
+            }, 180000)
         } catch(err) {
+            setIsLoading(false);
             console.error(err.message);
         }
     };
@@ -232,7 +263,7 @@ function BrowseDecks() {
     });
 
     return (
-        <div>
+        <BrowseDecksWrapper className="BrowseDecksWrapper">
             <ControlBarWrapper>
                 <div>
                     <label htmlFor="search">Search for decks</label>
@@ -256,14 +287,21 @@ function BrowseDecks() {
                 </div>
             </ControlBarWrapper>
             <StyledInfiniteScroll
+                className="StyledInfiniteScroll"
                 dataLength={decks.length}
                 next={fetchDecks}
                 hasMore={hasMore}
-                loader={<h4>Loading...</h4>}
+                loader={
+                    <SpinnerWrapper className="d-flex justify-content-center SpinnerWrapper">
+                        <div className="spinner-border" role="status">
+                            <span className="sr-only"></span>
+                        </div>
+                    </SpinnerWrapper>
+                }
                 >
                     {decks.map(deck => <DeckTile key={deck.deckId} deckId={deck.deckId} />)}
             </StyledInfiniteScroll>
-        </div>
+        </BrowseDecksWrapper>
     )
 }
 

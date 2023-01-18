@@ -11,6 +11,10 @@ import { IoMailSharp, IoNotificationsSharp } from "react-icons/io5";
 import styled from "styled-components";
 import Logo from './Logo';
 
+const DropDownItem = styled.p`
+    cursor: pointer;
+`
+
 function Header() {
     const [modalContent, setModalContent] = useState('');
     const [messageId, setMessageId]  = useState('');
@@ -66,19 +70,20 @@ function Header() {
                     </div>
                     {/* Clicking the anchor tag resets state */}
                     {/* <a className="navbar-brand" href={username ? "/dashboard" : "/"}>Logo</a> */}
-                    <form className="d-none d-sm-flex">
+                    {/* <form className="d-none d-md-flex">
                         <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                         <button className="btn btn-outline-success" type="submit">Search</button>
-                    </form>
+                    </form> */}
                 </div>
                 <div style={{display: "flex", alignItems: "center"}}>
                     {username && 
-                        <div data-source="inbox" onClick={handleButtonClick} style={{position: "relative", left: "1.5rem"}}>
+                        <div data-source="inbox" onClick={handleButtonClick} className="d-none d-sm-block" style={{position: "relative", left: "1.5rem"}}>
+                        {/* <div data-source="inbox" onClick={handleButtonClick} style={{position: "relative", left: "1.5rem"}}> */}
                             <IoMailSharp size="2.25em" style={{cursor: "pointer"}} />
                             <div style={{visibility: messages.filter(message => message.read.includes(userId) === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".5rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{messages.filter(message => message.read.includes(userId) === false).length >= 10 ? "9+": messages.filter(message => message.read.includes(userId) === false).length}</div>
                         </div>}
                     {username && 
-                        <div data-source="notifications" onClick={handleButtonClick} style={{position: "relative", left: "1rem"}}>
+                        <div data-source="notifications" onClick={handleButtonClick} className="d-none d-sm-block" style={{position: "relative", left: "1rem"}}>
                             <IoNotificationsSharp size="2.25em" style={{cursor: "pointer"}} />
                             <div style={{visibility: notifications.filter(notification => notification.read === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".85rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{notifications.filter(notification => notification.read === false).length >= 10 ? "9+": notifications.filter(notification => notification.read === false).length}</div>
                         </div>}
@@ -89,8 +94,9 @@ function Header() {
                         <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a className="dropdown-item" onClick={username ? handleLogout : null} href={username ? "/" : "/login"}>{username ? "Log out" : "Login"}</a></li>
                             {!username && <li><a className="dropdown-item" href="register/credentials">Sign Up</a></li>}
-                            <li><hr className="dropdown-divider" /></li>
-                            <li><a className="dropdown-item" href="#">Something else here</a></li>
+                            {username && <li><hr className="dropdown-divider d-block d-sm-none " /></li>}
+                            {username && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Inbox</DropDownItem></li>}
+                            {username && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Notifications</DropDownItem></li>}
                         </ul>
                     </li>
                 </div>

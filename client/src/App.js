@@ -16,8 +16,8 @@ const AppWrapper = styled.div`
 		color: inherit
 	}
 	& * {
-		margin-block-start: 0;
-		margin-block-end: 0;
+		// margin-block-start: 0;
+		// margin-block-end: 0;
 		// margin-inline-start: 0;
 		// margin-inline-end: 0;
 	}

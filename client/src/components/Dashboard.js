@@ -21,6 +21,14 @@ const StyledLink = styled(Link)`
         background-color: black;
         color: white !important;
     }    
+    @media (max-width: 762px) {
+        height: 30vw;
+        width: 30vw;
+    }
+    @media (max-width: 625px) {
+        height: 40vw;
+        width: 40vw;
+    }
 `
 
 const Grid = styled.div`
@@ -28,15 +36,15 @@ const Grid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
 
-  @media (max-width: 768px) {
+  @media (max-width: 860px) {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
   }
 
-  @media (max-width: 430px) {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(6, 1fr);
-  }
+//   @media (max-width: 430px) {
+//     grid-template-columns: 1fr;
+//     grid-template-rows: repeat(6, 1fr);
+//   }
 `;
 
 const DashboardWrapper = styled.div`

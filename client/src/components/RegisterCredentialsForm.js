@@ -4,6 +4,26 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { signUp } from '../reducers/loginSlice';
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import styled from 'styled-components';
+import useToggle from '../hooks/useToggle';
+
+const PasswordWrapper = styled.div`
+    position: relative;
+`;
+
+const StyledOpenEye = styled(AiOutlineEye)`
+    position: absolute;
+    right: 4%;
+    top: 28%;
+`;
+
+const StyledClosedEye = styled(AiOutlineEyeInvisible)`
+    position: absolute;
+    right: 4%;
+    top: 28%;
+`;
+
 const baseURL = 'http://localhost:8000';
 
 function RegisterCredentialsForm() {
@@ -13,6 +33,7 @@ function RegisterCredentialsForm() {
     const [password, clearPassword, setPassword] = useFormInput('');
     const [showVerifyPassword, setShowVerifyPassword] = useState(false);
     const [verifyPassword, clearVerifyPassword, setVerifyPassword] = useFormInput('');
+    const [passwordVisible, togglePasswordVisible] = useToggle(false);
     const [errorMessage, setErrorMessage] = useState("");
     
     const handleSubmit = async (evt) => {
@@ -47,18 +68,19 @@ function RegisterCredentialsForm() {
         <div>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="email">Email</label>
-                    <input type="email" id="email" name="email" value={email} onChange={setEmail} />
+                    <input placeholder="email" type="email" id="email" name="email" value={email} onChange={setEmail} />
                 </div>
-                <div>
-                    <label htmlFor="password">Password</label>
-                    <input type="password" id="password" name="password" value={password} onChange={setPassword} />
-                </div> 
+                <PasswordWrapper>
+                    <input placeholder="password" type={passwordVisible ? "text" : "password"} id="password" name="password" value={password} onChange={setPassword} />
+                    {!passwordVisible && <StyledOpenEye onClick={togglePasswordVisible} />}
+                    {passwordVisible && <StyledClosedEye onClick={togglePasswordVisible} />}
+                </PasswordWrapper> 
                 {showVerifyPassword ? 
-                    <div>
-                        <label htmlFor="verifyPassword">Verify Password</label>
-                        <input type="password" id="verifyPassword" name="verifyPassword" value={verifyPassword} onChange={setVerifyPassword} />
-                    </div> 
+                    <PasswordWrapper>
+                        <input placeholder="verify password" type={passwordVisible ? "text" : "password"} id="verifyPassword" name="verifyPassword" value={verifyPassword} onChange={setVerifyPassword} />
+                        {!passwordVisible && <StyledOpenEye onClick={togglePasswordVisible} />}
+                        {passwordVisible && <StyledClosedEye onClick={togglePasswordVisible} />}
+                    </PasswordWrapper> 
                     :
                     null
                 }

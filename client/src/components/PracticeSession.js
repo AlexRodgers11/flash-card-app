@@ -55,6 +55,19 @@ const StatsWrapper = styled.div`
     max-width: 45rem;
 `
 
+const WrapUpButtonsContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 6rem 0;
+    & button {
+        width: 50%;
+    }
+`;
+
 function PracticeSession() {
     let { deckId, userId } = useParams();
     const activeCard = useSelector((state) => state.practiceSession.activeCard);
@@ -128,16 +141,16 @@ function PracticeSession() {
                 {activeCard?.cardType ? 
                     createCard(activeCard.cardType) 
                     : 
-                    <div>
+                    <WrapUpButtonsContainer>
                         {stats.numberWrong ? 
-                            <button onClick={handleRetryMissedCards}>Retry Missed Cards</button>
+                            <button className="btn btn-lg btn-danger" onClick={handleRetryMissedCards}>Retry Missed Cards</button>
                             :
                             null
                         }
-                        <button onClick={handlePracticeDeckAgain}>Practice Deck Again</button>
-                        <button value="practice" onClick={navigateAway}>Select Another Deck</button>
-                        <button value="dashboard" onClick={navigateAway}>Home</button>
-                    </div>
+                        <button className="btn btn-lg btn-success" onClick={handlePracticeDeckAgain}>Practice Deck Again</button>
+                        <button className="btn btn-lg btn-primary" value="practice" onClick={navigateAway}>Select Another Deck</button>
+                        <button className="btn btn-lg btn-dark" value="dashboard" onClick={navigateAway}>Home</button>
+                    </WrapUpButtonsContainer>
                 }
             </CardWrapper>
         </PracticeSessionWrapper>

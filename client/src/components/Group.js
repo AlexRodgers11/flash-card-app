@@ -24,6 +24,34 @@ const GroupWrapper = styled.div`
     }
 `;
 
+const DeckOptionContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    & p {
+        width: 250px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        @media (max-width: 400px) {
+            width: 200px;
+            font-size: .9rem;
+        }
+    }
+`;
+
+const DeckOption = styled.div`
+    width: 250px;
+    border: 1px solid black;
+    margin-bottom: .25rem;
+    padding: .15rem;
+    cursor: pointer;
+    @media (max-width: 400px) {
+        width: 200px;
+        font-size: .75rem;
+    }
+`;
+
 const GroupMemberOptionsContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -145,9 +173,15 @@ function Group() {
         switch(modalContent) {
             case "add-deck":
                 return (
-                    <div>
-                        {decks.map(deck => <span data-id={deck._id} key={deck._id} id={deck._id} onClick={chooseDeck}>{deck.name}</span>)}<button onClick={goToCreateNew}>Create new deck</button>
-                    </div>
+                    <DeckOptionContainer>
+                        <p>{!administrators?.includes(userId) ? "Submit Deck To Be Added" : "Select a deck to submit"}</p>
+                        {decks.map(deck => 
+                            <DeckOption data-id={deck._id} key={deck._id} id={deck._id} onClick={chooseDeck}>
+                                {deck.name}
+                            </DeckOption>
+                        )}
+                        <button onClick={goToCreateNew}>Create new deck</button>
+                    </DeckOptionContainer>
                 );
             case "leave-group-confirmation":
                 return (

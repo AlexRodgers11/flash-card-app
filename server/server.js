@@ -338,14 +338,14 @@ router.get("/seed-database", async(req, res, next) => {
                     let cardTypeDecider = Math.random();
                     let newCard;
                     if(cardTypeDecider <= .3333) {
-                        newCard = new FlashCard();
+                        newCard = new FlashCard({_id: new mongoose.Types.ObjectId()});
                         newCard.correctAnswer = Math.random() > .5 ? faker.hacker.noun() : faker.hacker.phrase();
                     } else if(cardTypeDecider <= .6666) {
-                        newCard = new TrueFalseCard();
+                        newCard = new TrueFalseCard({_id: new mongoose.Types.ObjectId()});
                         newCard.correctAnswer = Math.random() > .5 ? "True" : "False";
                         newCard.wrongAnswerOne = newCard.correctAnswer === "True" ? "False" : "True";
                     } else {
-                        newCard = new MultipleChoiceCard();
+                        newCard = new MultipleChoiceCard({_id: new mongoose.Types.ObjectId()});
                         const randomNum = Math.random();
                         newCard.correctAnswer = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();
                         newCard.wrongAnswerOne = randomNum > .2 ? faker.hacker.noun() : faker.hacker.phrase();

@@ -1,7 +1,7 @@
 import express from "express";
 const cardRouter = express.Router();
 
-import { Card } from "../models/card.js";
+import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
 import Deck from "../models/deck.js";
 
 cardRouter.param("cardId", (req, res, next, cardId) => {
@@ -22,15 +22,46 @@ cardRouter.get("/:cardId", (req, res, next) => {
     res.status(200).send(req.card);
 });
 
-cardRouter.put("/:cardId", (req, res, next) => {
-    Card.findByIdAndUpdate(req.card._id, req.body, (err, card) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } else {
-            res.status(200).send(card);
+cardRouter.put("/:cardId", async (req, res, next) => {
+    try {
+        const foundCard = await Card.findById(req.card._id);
+        let updatedCard;
+
+        switch(req.body.cardType) {
+            case "FlashCard":
+                if(foundCard.cardType === "FlashCard") {
+                    updatedCard = await FlashCard.findByIdAndUpdate(req.card._id, req.body, {new: true});
+                } else {
+                    await Card.findByIdAndDelete(req.card._id);
+                    let newCard = new FlashCard({...req.body, _id: req.card._id});
+                    updatedCard = await newCard.save();
+                }
+                break;
+            case "TrueFalseCard":
+                if(foundCard.cardType === "TrueFalseCard") {
+                    updatedCard = await TrueFalseCard.findByIdAndUpdate(req.card._id, req.body, {new: true})
+                } else {
+                    await Card.findByIdAndDelete(req.card._id);
+                    let newCard = new TrueFalseCard({...req.body, _id: req.card._id});;
+                    updatedCard = await newCard.save();
+                    console.log({updatedCard});
+                }
+                break;
+            case "MultipleChoiceCard":
+                if(foundCard.cardType === "MultipleChoiceCard") {
+                    updatedCard = await MultipleChoiceCard.findByIdAndUpdate(req.card._id, req.body, {new: true})
+                } else {
+                    await Card.findByIdAndDelete(req.card._id);
+                    let newCard = new MultipleChoiceCard({...req.body, _id: req.card._id});;
+                    updatedCard = await newCard.save();
+                }
+                break;
         }
-    });
+        
+        res.status(200).send(updatedCard);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
 cardRouter.delete("/:cardId", async (req, res, next) => {

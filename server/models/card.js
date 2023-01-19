@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const options = { discriminatorKey: 'cardType'}
 
 const CardSchema = new Schema({
+    _id: Schema.Types.ObjectId,
     creator: {type: Schema.Types.ObjectId, ref: "User"},
     question: String,
     correctAnswer: String,

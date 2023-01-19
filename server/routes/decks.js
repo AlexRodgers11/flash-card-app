@@ -181,13 +181,13 @@ deckRouter.post("/:deckId/cards", async (req, res, next) => {
     let newCard;
     switch(cardType) {
         case "FlashCard":
-            newCard = new FlashCard(req.body);
+            newCard = new FlashCard({...req.body, _id: new mongoose.Types.ObjectId()});
             break;
         case "TrueFalseCard":
-            newCard = new TrueFalseCard(req.body);
+            newCard = new TrueFalseCard({...req.body, _id: new mongoose.Types.ObjectId()});
             break;
         case "MultipleChoiceCard":
-            newCard = new MultipleChoiceCard(req.body);
+            newCard = new MultipleChoiceCard({...req.body, _id: new mongoose.Types.ObjectId()});
             break;
         default:
             res.status(500).send("Invalid card type selected");

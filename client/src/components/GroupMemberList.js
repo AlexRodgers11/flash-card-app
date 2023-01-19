@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 const GroupMemberListWrapper = styled.div`
     min-width: 350px;
+    width: 98%;
     display: grid;
     place-items: center;
     border: 1px solid black;
@@ -37,7 +38,7 @@ const GroupMemberListWrapper = styled.div`
         grid-template-columns: repeat(7, 1fr);
     }
 
-    @media (min-width: 1015px) {
+    @media (min-width: 1050px) {
         grid-template-columns: repeat(8, 1fr);
     }
 

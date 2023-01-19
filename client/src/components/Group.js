@@ -19,6 +19,25 @@ const GroupWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    & section {
+        width: 100%;
+    }
+`;
+
+const GroupMemberOptionsContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    & p {
+        width: 250px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        @media (max-width: 400px) {
+            width: 200px;
+            font-size: .9rem;
+        }
+    }
 `;
 
 const JoinOptionContainer = styled.div`
@@ -140,9 +159,10 @@ function Group() {
                 );
             case "group-control-designation": 
                 return (
-                    <div>
-                        {groupMemberIds.slice(1).map(memberId => <p data-memberid={memberId} onClick={handleSelectNewHeadAdmin}><GroupMemberOption memberId={memberId} /></p>)}
-                    </div>
+                    <GroupMemberOptionsContainer className="GroupMemberOptionsContainer">
+                        <p>Select a new Head Admin</p>
+                        {groupMemberIds.slice(1).map(memberId => <div key={memberId} data-memberid={memberId} onClick={handleSelectNewHeadAdmin}><GroupMemberOption memberId={memberId} /></div>)}
+                    </GroupMemberOptionsContainer>
                 )
             case "head-admin-leave-group-confirmation":
                 return (
@@ -330,7 +350,7 @@ function Group() {
                     </>
                 }                
                 
-                <section>
+                <section style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                     <SubHeading>Members:</SubHeading>
                     <GroupMemberList editMode={administrators.includes(userId) && editMode} listType="members" groupMemberIds={groupMemberIds} />
                 </section>

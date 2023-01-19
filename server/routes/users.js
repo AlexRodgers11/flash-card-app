@@ -146,7 +146,7 @@ userRouter.post("/:userId/decks", async (req, res, next) => {
     try {
         let newDeck = new Deck({
             name: req.body.deckName,
-            public: req.body.public,
+            publiclyAvailable: req.body.publiclyAvailable,
             creator: req.body.creator,
         });
         const deck = await newDeck.save();

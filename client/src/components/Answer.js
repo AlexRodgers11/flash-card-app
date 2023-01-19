@@ -52,7 +52,7 @@ function Answer(props) {
                 question: activeCard.question,
                 cardType: activeCard.cardType,
                 datePracticed: Date.now()}));
-        }, 10000);
+        }, 2500);
     }
 
     return (

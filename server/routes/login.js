@@ -108,7 +108,8 @@ passport.use(
                         code: code,
                         codeExpDate: Date.now() + (1000 * 60 * 60 * 24),
                         verified: false
-                    }
+                    },
+                    accountSetupStage: "email"
                 }
             );
             newUser.save((err, user) => {
@@ -120,6 +121,7 @@ passport.use(
             });
     })
 );
+
 
 const requireSignIn = passport.authenticate("login", {session: false});
 const requireRegister = passport.authenticate("register", {session: false});
@@ -151,7 +153,8 @@ loginRouter.post("/new", requireRegister, (req, res, next) => {
     res.status(200).send({
         token: tokenForUser(req.user),
         userId: req.user._id,
-        email: req.user.email
+        email: req.user.email,
+        accountSetupStage: req.user.accountSetupStage,
     });
 });
 

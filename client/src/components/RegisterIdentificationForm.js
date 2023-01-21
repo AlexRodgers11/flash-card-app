@@ -14,19 +14,17 @@ function RegisterIdentificationForm() {
     const userId = useSelector((state) => state.login.userId);
     const name = useSelector((state) => state.login.name);
     const email = useSelector((state) => state.login.email);
+    const storedPhoto = useSelector((state) => state.login.photo);
 
     const handleSubmit = evt => {
         evt.preventDefault();
         console.log("about to dispatch register identification action");
-        dispatch(updateUser({userId, userUpdates: {login: {username: username, email: email}, name: {first: firstName, last: lastName}, photo}}))
-        .then(() => {
-            console.log("action complete, about to go to join groups");
-            navigate("/register/join-groups");
-            clearUsername();
-            clearFirstName();
-            clearLastName();
-            setPhoto();
-        });
+        dispatch(updateUser({userId, userUpdates: {login: {username: username, email: email}, name: {first: firstName, last: lastName}, photo: photo || ""}}))
+        clearUsername();
+        clearFirstName();
+        clearLastName();
+        setPhoto("");
+    
     }
 
     const handlePhotoChange = (evt) => {
@@ -36,13 +34,13 @@ function RegisterIdentificationForm() {
     }    
 
     useEffect(() => {
-        if(!userId) {
-            navigate("/");
+        if(storedPhoto) {
+            navigate("register/profile-pic/crop");
+        } else if(name.first) {
+            navigate("/register/join-groups");
         }
-        if(name?.first) {
-            navigate("/dashboard");
-        }
-    }, [name, navigate, userId]);
+    }, [name.first, navigate, storedPhoto])
+
 
     return (
         <div>

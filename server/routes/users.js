@@ -89,15 +89,21 @@ userRouter.get("/:userId/groups", (req, res, next) => {
 });
 
 userRouter.patch("/:userId/verification", async (req, res, next) => {
+    try {
     if(Date.now() < req.user.verification.codeExpDate) {
         if(req.user.verification.code === req.body.code) {
             await User.findByIdAndUpdate(req.user._id, {"verification.verified": true});
-            res.status(200).send({verificationResponse: "verified"});
+                const updatedUser = await User.findByIdAndUpdate(req.user._id, { accountSetupStage: "verified"}, {new: true});
+                // res.status(200).send({verificationResponse: "verified"});
+                res.status(200).send({accountSetupStage: updatedUser.accountSetupStage});
         } else {
             res.status(401).send({verificationResponse: "invalid"})
         }
     } else {
         res.status(401).send({verificationResponse: "expired"});
+    }
+    } catch (err) {
+        res.status(500).send(err.message);
     }
 });
 
@@ -304,9 +310,12 @@ const upload = multer({
 });
 
 userRouter.patch("/:userId", upload.single("photo"), async (req, res, next) => {
+    console.log("made it into patch");
     const patchObj = {};
     
+    // if(req.file && req.body.photo) {
     if(req.file) {
+        console.log("upload file block reached");
         const file = req.file;
         let photoName;
         if(req.user.photo) {
@@ -334,18 +343,28 @@ userRouter.patch("/:userId", upload.single("photo"), async (req, res, next) => {
             password: req.body.password ? req.body.password : req.user.login.password ? req.user.login.password : "",
             email: req.body.email ? req.body.email : req.user.login.email ? req.user.login.email : ""
         }
+        // if(req.body.accountSetupStage) {
+        //     patchObj.accountSetupStage = req.body.accountSetupStage
+        // }
     }
 
     console.log({patchObj});
     try {
-        const user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
+        let user;
+        user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
+        if(user.accountSetupStage !== "complete" && ((user._id && user.name.first) && (user.name.last && user.login.email))) {
+            console.log("in correct conditional to update stage");
+            user = await User.findByIdAndUpdate(req.user._id, {accountSetupStage: "complete"}, {new: true});
+        }
         let responseData = user;
-        // why doesn't this delete the password
-        // delete responseData.login.password;
+        console.log({responseData});
 
         responseData.login = {username: user.login.username};
+        if(user.photo) {
+            console.log("in retrieving getObjectSignedUrl block");
         let photoUrl = await getObjectSignedUrl(user.photo);
         responseData.photo = photoUrl;
+        }
         res.status(200).send(responseData);
     } catch (err) {
         res.status(500).send("There was an error with your request");

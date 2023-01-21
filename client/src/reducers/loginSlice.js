@@ -23,7 +23,8 @@ const initialState = {
         sent: [],
         received: [], 
     },
-    notifications: []
+    notifications: [],
+    accountSetupStage: ""
 }
 
 export const login = createAsyncThunk("login/login", async({usernameOrEmail, password}) => {
@@ -51,32 +52,24 @@ export const signUp = createAsyncThunk("login/signUp", async({email, password}) 
             email,
             password
         });
+        console.log({data: response.data});
         return {
             token: response.data.token,
             userId: response.data.userId,
-            email: response.data.email
+            email: response.data.email,
+            accountSetupStage: response.data.accountSetupStage
         }
     } catch (err) {
         return err;
     }
 });
 
-export const setIdentificationData = createAsyncThunk("login/setIdentificationData", async({userId, username, firstName, lastName, photo}) => {
-    console.log("updating user info");
+export const submitVerificationCode = createAsyncThunk("login/submitVerificationCode", async({userId, verificationCode}) => {
     try {
-        const response = await axios.put(`${baseURL}/users/${userId}`, {
-            login: {
-                username: username
-            },
-            name: {
-                first: firstName,
-                last: lastName
-            },
-            photo: photo
-        });
+        const response = await axios.patch(`${baseURL}/users/${userId}/verification`, {code: verificationCode});
         return response.data;
     } catch (err) {
-        return err;
+        console.error(err);
     }
 });
 
@@ -85,6 +78,7 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
         const response = await axios.get(`${baseURL}/users/${userId}`);
         //need better protection here
         delete response.data.login.password;
+        console.log({fetchedData: response.data});
         return response.data;
     } catch (err) {
         return err;
@@ -157,13 +151,16 @@ export const updateUser = createAsyncThunk("login/updateUser", async ({userId, u
         formData.append("username", userUpdates.login.username);
         formData.append("first", userUpdates.name.first);
         formData.append("last", userUpdates.name.last);
-        formData.append("photo", userUpdates.photo);
+        userUpdates.photo && formData.append("photo", userUpdates.photo);
         const response = await axios.patch(`${baseURL}/users/${userId}`, formData, { headers: {"Content-Type": "multipart/form-data"}});
         const stateUpdateObj = {};
         for(const key in userUpdates) {
             if(response.data.hasOwnProperty(key)) {
                 stateUpdateObj[key] = response.data[key];
             }
+        }
+        if(response.data.accountSetupStage === "complete") {
+            stateUpdateObj.accountSetupStage = response.data.accountSetupStage;
         }
         return stateUpdateObj;
     } catch (err) {}
@@ -199,6 +196,7 @@ export const loginSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchLoggedInUserData.fulfilled, (state, action) => {
+            console.log({stage: action.payload.accountSetupStage});
             state.userId = action.payload._id;
             state.login.username = action.payload.login.username;
             state.name = action.payload.name;
@@ -210,6 +208,7 @@ export const loginSlice = createSlice({
             state.messages.received = action.payload.messages.received;
             state.messages.sent = action.payload.messages.sent;
             state.notifications = action.payload.notifications;
+            state.accountSetupStage = action.payload.accountSetupStage;
         });
         builder.addCase(addGroup.fulfilled, (state, action) => {
             state.groups = [...state.groups, action.payload];
@@ -237,14 +236,13 @@ export const loginSlice = createSlice({
             state.token = action.payload.token;
             state.userId = action.payload.userId;
             state.email = action.payload.email;
+            state.accountSetupStage = action.payload.accountSetupStage;
+        });
+        builder.addCase(submitVerificationCode.fulfilled, (state, action) => {
+            state.accountSetupStage = action.payload.accountSetupStage;
         });
         builder.addCase(sendJoinRequest.fulfilled, (state, action) => {
             state.messages.sent = [...state.messages.sent, action.payload];
-        });
-        builder.addCase(setIdentificationData.fulfilled, (state, action) => {
-            state.username = action.payload.username;
-            state.name = action.payload.name;
-            state.photo = action.payload.photo;
         });
         builder.addCase(submitJoinCode.fulfilled, (state, action) => {
             //okay to just only change state conditionally? Is that better than triggering rerender if allowed?

@@ -26,7 +26,8 @@ const User = new Schema({
         code: String,
         codeExpDate: Date,
         verified: Boolean
-    }
+    },
+    accountSetupStage: String //email, verified, complete
 }, {timestamps: true});
 
 export default mongoose.model("User", User);

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import PracticeLaunchPage from './PracticeLaunchPage';
 import BrowseDecks from './BrowseDecks';
 import Dashboard from './Dashboard';
@@ -22,14 +22,52 @@ import Sessions from './Sessions';
 import DeckAttempt from './DeckAttempt';
 import CardStatsList from './CardStatsList';
 import CardAttemptList from './CardAttemptList';
+import RegisterProfilePicCropForm from './RegisterProfilePicCropForm';
+import { useSelector } from 'react-redux';
 
 function Router() {
     const { pathname } = useLocation();
+    const userId = useSelector((state) => state.login.userId);
+    const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
+
+    const pathnamesThatDoNotNeedUserId = ["/", "/login", "/register/credentials", "/decks/public"];
 
     useEffect(() => {
         window.scrollTo(0, 0);
-    }, [pathname])
+    }, [pathname]);
+    
+    if(userId) {
+        // console.log("userId found");
+        if(accountSetupStage !== "complete") {
+            // console.log("registration incomplete");
+            // console.log(`still on stage ${accountSetupStage}`);
+            switch(accountSetupStage) {
+                case "email":
+                    // console.log("in email case");
+                    if(pathname !== "/register/email-verification") {
+                        return <Navigate to="/register/email-verification" replace />;
+                    }
+                    break;
+                case "verified":
+                    // console.log("in verified case");
+                    if(pathname !== "/register/email-verification" && pathname !== "/register/identification") {
+                        return <Navigate to="/register/identification" replace />;
+                    }
+                    break;
+                default: 
+                    // console.log("in default case");
+                    break;
+            }
+        }
+    } else {
+        // console.log("no userId found")
+        if(!pathnamesThatDoNotNeedUserId.includes(pathname)) {
+            console.log("user unauthorized to view requested page");
+            return <Navigate to="/" replace />
+        }
+    }
 
+    // console.log("made it past conditional tree");
     return (
         <div className="Router" style={{minHeight: "calc(100vh - 4.5rem)"}}>
             <Routes>
@@ -56,6 +94,7 @@ function Router() {
                     <Route path="register/credentials" element={<RegisterCredentialsForm />} />
                     <Route path="register/email-verification" element={<RegisterEmailVerificationForm />} />
                     <Route path="register/identification" element={<RegisterIdentificationForm />} />
+                    <Route path="register/profile-pic-crop" element={<RegisterProfilePicCropForm />} />
                     <Route path="register/join-groups" element={<RegisterJoinGroupsForm />} />
                 </Route>
             </Routes>

@@ -1,25 +1,31 @@
-import React, { useState } from "react";
-import axios from 'axios';
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import useFormInput from "../hooks/useFormInput";
-
-const baseURL = 'http://localhost:8000';
-
+import { submitVerificationCode } from "../reducers/loginSlice";
 
 function RegisterEmailVerificationForm() {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [verificationCode, clearVerificationCode, handleVerificationCodeChange] = useFormInput("");
     const [verificationResponse, setVerificationResponse] = useState("");
     const userId = useSelector((state) => state.login.userId);
+    const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
 
+    useEffect(() => {
+        if(accountSetupStage === "verified") {
+            navigate("/register/identification");
+        }
+    }, [accountSetupStage, navigate]);
+    
     const checkValidationCode = async (evt) => {
         evt.preventDefault();
         try {
-            await axios.patch(`${baseURL}/users/${userId}/verification`, {code: verificationCode});
+            dispatch(submitVerificationCode({userId, verificationCode}));
             clearVerificationCode();
-            navigate("/register/identification");
         } catch (err) {
+            //make sure this works or refactor- probably add error message to login state
+            console.log("an error occurred after submitting verification code");
             clearVerificationCode();
             switch(err.response.data.verificationResponse) {
                 case "invalid":

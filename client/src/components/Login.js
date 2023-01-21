@@ -33,22 +33,17 @@ function Login() {
 
     const handleSubmit = evt => {
         evt.preventDefault();
-        dispatch(login({usernameOrEmail, password}))
-            .then(action => {
-                console.log({payload: action.payload});
-                if(action.payload.userId) {
-                    navigate("/dashboard");
-                }
-                clearPassword();
-                clearUsernameOrEmail();
-            });
+        dispatch(login({usernameOrEmail, password}))    
+        clearPassword();
+        clearUsernameOrEmail();
     }
 
     useEffect(() => {
         if(userId) {
             dispatch(fetchLoggedInUserData(userId));
+            navigate("/dashboard");
         }
-    }, [userId, dispatch]);
+    }, [userId, dispatch, navigate]);
 
     return (
         <div>

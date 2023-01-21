@@ -227,7 +227,7 @@ function BrowseDecks() {
                 setPage(page => newCriteria ? 1 : page + 1);
                 setHasMore(response.data.length === 25)
                 setIsLoading(false);
-            }, 180000)
+            }, 300);
         } catch(err) {
             setIsLoading(false);
             console.error(err.message);

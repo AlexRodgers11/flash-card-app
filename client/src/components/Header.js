@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { logout, markNotificationsAsRead } from '../reducers/loginSlice';
 import Message from './Message';
 import MessageList from './MessageList';
@@ -18,12 +18,13 @@ const DropDownItem = styled.p`
 function Header() {
     const [modalContent, setModalContent] = useState('');
     const [messageId, setMessageId]  = useState('');
-    const dispatch = useDispatch();
     const username = useSelector((state) => state.login.login.username);
     const userId = useSelector((state) => state.login.userId);
     const profilePic = useSelector((state) => state.login.photo);
     const notifications = useSelector((state) => state.login.notifications);
     const messages = useSelector((state) => state.login.messages.received);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     
         
     const expandMessage = (id) => {
@@ -53,7 +54,13 @@ function Header() {
         setModalContent(evt.currentTarget.dataset.source);
     }
 
+    const handleLogin = (evt) => {
+        evt.preventDefault();
+        navigate("/login");
+    }
+
     const handleLogout = () => {
+        navigate("/");
         dispatch(logout());
     }
 
@@ -92,7 +99,7 @@ function Header() {
                             {profilePic ? <img alt={username} src={profilePic} style={{border: "2px solid black", borderRadius: "50%", height: "3em", width: "3em"}}/> : <HiOutlineUserCircle color="black" size="3em" />}
                         </div>
                         <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a className="dropdown-item" onClick={username ? handleLogout : null} href={username ? "/" : "/login"}>{username ? "Log out" : "Login"}</a></li>
+                            <li><a className="dropdown-item" onClick={username ? handleLogout : handleLogin} href="/">{username ? "Log out" : "Login"}</a></li>
                             {!username && <li><a className="dropdown-item" href="register/credentials">Sign Up</a></li>}
                             {username && <li><hr className="dropdown-divider d-block d-sm-none " /></li>}
                             {username && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Inbox</DropDownItem></li>}

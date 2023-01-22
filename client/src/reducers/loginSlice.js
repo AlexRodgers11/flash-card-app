@@ -176,7 +176,10 @@ export const loginSlice = createSlice({
         addDeckToUser: (state, action) => {
             console.log("in addDeckToUser");
             console.log(action.payload);
-            state.decks = [...state.decks, action.payload] ;
+            state.decks = [...state.decks, action.payload];
+        },
+        removeDeckFromUser: (state, action) => {
+            state.decks = state.decks.filter(deck => deck._id !== action.payload.deckId)
         },
         addMessage: (state, action) => {
             state.messages[action.payload.direction].push(action.payload.message);
@@ -259,5 +262,5 @@ export const loginSlice = createSlice({
     }
 });
 
-export const { addDeckToUser, addMessage, editMessage, logout, removeGroup, setGroups } = loginSlice.actions;
+export const { addDeckToUser, addMessage, editMessage, logout, removeDeckFromUser, removeGroup, setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

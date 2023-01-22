@@ -9,6 +9,7 @@ import useToggle from '../hooks/useToggle';
 import Card from './Card';
 import CardForm from './CardForm';
 import Modal from './Modal';
+import { removeDeckFromUser } from '../reducers/loginSlice';
 
 const baseURL = 'http://localhost:8000';
 
@@ -67,10 +68,11 @@ function Deck() {
     }
 
     const confirmDeleteDeck = () => {
+        navigate("/dashboard");
         dispatch(deleteDeck(deckId))
             .then(() => {
-                navigate("/dashboard");
                 dispatch(resetDeck());
+                dispatch(removeDeckFromUser({deckId}));
             });
     };
 

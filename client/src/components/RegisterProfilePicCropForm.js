@@ -54,9 +54,9 @@ function RegisterProfilePicCropForm() {
     const [aspect, setAspect] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-    const dispatch = useDispatch();
     const userId = useSelector((state) => state.login.userId);
-    
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const handleCropComplete = useCallback((croppedArea, croppedAreaPixelsArg) => {
         setCroppedAreaPixels(croppedAreaPixelsArg);
     }, []);
@@ -74,7 +74,10 @@ function RegisterProfilePicCropForm() {
             console.log(croppedImage instanceof Blob);
             const fileFromURL = urlToFile(croppedImage);
 
-            dispatch(updateProfilePic({userId: userId, photo: fileFromURL}));
+            dispatch(updateProfilePic({userId: userId, photo: fileFromURL}))
+                .then(() => {
+                    navigate("/register/join-groups");
+                });
           
         } catch (e) {
           console.error(e);

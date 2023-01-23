@@ -268,7 +268,7 @@ export const loginSlice = createSlice({
             }
         });
         builder.addCase(updateProfilePic.fulfilled, (state, action) => {
-            state.photo = action.payload.photo;
+            state.photo = action.payload;
         });
     }
 });

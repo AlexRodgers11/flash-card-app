@@ -35,7 +35,7 @@ function RegisterIdentificationForm() {
 
     useEffect(() => {
         if(storedPhoto) {
-            navigate("register/profile-pic/crop");
+            navigate("/register/profile-pic-crop");
         } else if(name.first) {
             navigate("/register/join-groups");
         }

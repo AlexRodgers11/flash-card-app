@@ -166,6 +166,14 @@ export const updateUser = createAsyncThunk("login/updateUser", async ({userId, u
     } catch (err) {}
 });
 
+export const updateProfilePic = createAsyncThunk("login/updateProfilePic", async({userId, photo}) => {
+    const formData = new FormData();
+    formData.append("photo", photo);
+    const response = await axios.patch(`${baseURL}/users/${userId}`, formData, { headers: {"Content-Type": "multipart/form-data"}});
+    console.log(response.data);
+    return response.data.photo;
+});
+
 export const loginSlice = createSlice({
     name: "login",
     initialState,
@@ -258,6 +266,9 @@ export const loginSlice = createSlice({
                     state[key] = action.payload[key];
                 }
             }
+        });
+        builder.addCase(updateProfilePic.fulfilled, (state, action) => {
+            state.photo = action.payload.photo;
         });
     }
 });

@@ -34,14 +34,19 @@ const ModalContent = styled.div`
 	z-index: 3;
 	opacity: 1;
 	border: 3px solid black;
-	border-radius: 1em;
-	padding: 1em;
-	padding-top: 0;
+	border-radius: 1rem;
+	padding: 4rem 4rem 4rem 4rem;
 	overflow: scroll;
 	max-height: 70%;
 	scrollbar-width: none;
 	&::-web-kit-scrollbar {
 		display: none;
+	}
+	& input {
+
+	}
+	& button {
+		margin-top: 3.5rem;
 	}
 `;
 
@@ -49,18 +54,17 @@ const ModalClose = styled.p`
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	// height: 1em;
 	margin: 0;
-	padding-top: 0.25em;
+	padding-top: 0.25rem;
 `;
 
 
 const StyledCloseIcon = styled(IoClose)`
 	position: relative;
-	left: .75rem;
-	font-size: 1.5rem;
+	left: 3.75rem;
+	bottom: 4rem;
+	font-size: 2rem;
 	cursor: pointer;
-	margin-bottom: .5rem;
 `;
 
 function Modal(props) {
@@ -68,7 +72,7 @@ function Modal(props) {
 		<ModalWrapper className='Modal_active'>
 			<ModalBackdrop onClick={props.hideModal}></ModalBackdrop>
 			<ModalContent>
-			<ModalClose className="ModalClose" onClick={props.hideModal}>{props.hideModal && <StyledCloseIcon />}</ModalClose>
+				<ModalClose className="ModalClose" onClick={props.hideModal}>{props.hideModal && <StyledCloseIcon />}</ModalClose>
 				{props.children}
 			</ModalContent>
 		</ModalWrapper>

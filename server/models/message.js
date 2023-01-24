@@ -11,13 +11,21 @@ const MessageSchema = new Schema({
     read: [{type: Schema.Types.ObjectId, ref: "User"}]
 // }, {timestamps: true});
 // }, {discriminatorKey: "messageType", timestamps: true});
-}, {discriminatorKey: "message", timestamps: true});
+}, {discriminatorKey: "messageType", timestamps: true});
 
 const Message = mongoose.model('Message', MessageSchema);
 
 const CardSubmission = Message.discriminator("CardSubmission", new Schema({
     acceptanceStatus: String,
     targetDeck: {type: Schema.Types.ObjectId, ref: "Deck"},
+}));
+
+const CardDecision = Message.discriminator("CardDecision", new Schema({
+    targetCard: {type: Schema.Types.ObjectId, ref: "Card"},
+    decision: String,
+    comment: String,
+    targetDeck: {type: Schema.Types.ObjectId, ref: "Deck"},
+    targetGroup: {type: Schema.Types.ObjectId, ref: "Group"}
 }));
 
 const DeckSubmission = Message.discriminator("DeckSubmission", new Schema({
@@ -42,4 +50,13 @@ const JoinRequest = Message.discriminator("JoinRequest", new Schema({
     targetGroup: {type: Schema.Types.ObjectId, ref: "Group"}
 }));
 
-export { CardSubmission, DeckDecision, DeckSubmission, DirectMessage, JoinRequest, Message };
+const JoinDecision = Message.discriminator("JoinDecision", new Schema({
+    acceptanceStatus: String, 
+    comment: String,
+    targetGroup: {type: Schema.Types.ObjectId, ref: "Group"},
+    targetUser: {type: Schema.Types.ObjectId, ref: "User"}
+}));
+
+
+
+export { CardDecision, CardSubmission, DeckDecision, DeckSubmission, DirectMessage, JoinRequest, JoinDecision, Message };

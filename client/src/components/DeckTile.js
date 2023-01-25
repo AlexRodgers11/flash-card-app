@@ -16,6 +16,7 @@ const DeckTileWrapper = styled.div`
     height: 17rem; 
     width: 13rem; 
     margin: 1em;
+    cursor: pointer;
 `
 
 const IndicatorsWrapper = styled.div`
@@ -102,11 +103,12 @@ function DeckTile(props) {
     const navigate = useNavigate();
 
     const handleSelection = () => {
-        let letter = location.pathname.slice(32, 33)
-        if(letter === "d") {
+        if(location.pathname.slice(32, 33) === "d") {
             navigate(`/decks/${props.deckId}`)
-        } else if(letter === "p") {
+        } else if(location.pathname.slice(32, 33) === "p") {
             navigate(`/users/${deckData.creatorId}/decks/${props.deckId}/practice-session`);
+        } else if(location.pathname.slice(1,2) === "g") {
+            navigate(`/decks/${props.deckId}`);
         }
     }
     

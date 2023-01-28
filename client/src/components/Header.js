@@ -1,48 +1,52 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
-import { logout, markNotificationsAsRead } from '../reducers/loginSlice';
-import Message from './Message';
-import MessageList from './MessageList';
-import Modal from './Modal';
-import NotificationList from './NotificationList';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { logout, markNotificationsAsRead } from "../reducers/loginSlice";
+import Message from "./Message";
+import MessageList from "./MessageList";
+import Modal from "./Modal";
+import NotificationList from "./NotificationList";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import { IoMailSharp, IoNotificationsSharp } from "react-icons/io5";
 import styled from "styled-components";
-import Logo from './Logo';
+import Logo from "./Logo";
 
 const DropDownItem = styled.p`
     cursor: pointer;
 `
 
 function Header() {
-    const [modalContent, setModalContent] = useState('');
-    const [messageId, setMessageId]  = useState('');
+    const [modalContent, setModalContent] = useState("");
+    const [messageId, setMessageId]  = useState("");
+    const [messageType, setMessageType] = useState("");
     const username = useSelector((state) => state.login.login.username);
     const userId = useSelector((state) => state.login.userId);
     const profilePic = useSelector((state) => state.login.photo);
-    const notifications = useSelector((state) => state.login.notifications);
-    const messages = useSelector((state) => state.login.messages.received);
+    // const notifications = useSelector((state) => state.login.notifications);
+    const notifications = useSelector((state) => state.communications.notifications);
+    // const messages = useSelector((state) => state.login.messages.received);
+    const messages = useSelector((state) => state.communications.messages.received);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     
         
-    const expandMessage = (id) => {
-        setModalContent('message');
+    const expandMessage = (id, type) => {
+        setModalContent("message");
         setMessageId(id);
+        setMessageType(type);
     }
 
     const closeMessage = () => {
-        setModalContent('inbox');
-        setMessageId('');
+        setModalContent("inbox");
+        setMessageId("");
     }
 
     const handleHideModal = () => {
         if(modalContent === "notifications") {
             dispatch(markNotificationsAsRead({userId}));
         }
-        setModalContent('');
-        setMessageId('');
+        setModalContent("");
+        setMessageId("");
     }
     
     const handleSetModalContent = (type, id) => {
@@ -112,18 +116,18 @@ function Header() {
                 null
                 :
                 <Modal hideModal={handleHideModal}>
-                    {modalContent === 'inbox' ?
+                    {modalContent === "inbox" ?
                         <MessageList expandMessage={expandMessage} hideModal={handleHideModal} setModalContent={handleSetModalContent}/>
                         :
-                        modalContent === 'deck' ? 
+                        modalContent === "deck" ? 
                             <p>Deck Info will go here</p>
                             :
-                            modalContent === 'notifications' ?
+                            modalContent === "notifications" ?
                                 <div><NotificationList hideModal={handleHideModal} /></div>
                                 :
                                 <>
                                     <button onClick={closeMessage}>Back to Inbox</button>
-                                    <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId}/></div>
+                                    <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId} messageType={messageType}/></div>
                                 </>
                     }
                 </Modal>

@@ -117,7 +117,7 @@ export const markNotificationsAsRead = createAsyncThunk("login/markNotifications
     }
 });
 
-export const addGroup = createAsyncThunk("login/addGroup", async({creator, name}) => {
+export const createGroup = createAsyncThunk("login/createGroup", async({creator, name}) => {
     try {
         const response = await axios.post(`${baseURL}/users/${creator}/groups`, {creator, name, administrators: [creator], members: [creator]});
         return response.data;
@@ -189,6 +189,9 @@ export const loginSlice = createSlice({
         removeDeckFromUser: (state, action) => {
             state.decks = state.decks.filter(deck => deck._id !== action.payload.deckId)
         },
+        addGroup: (state, action) => {
+            state.groups = [...state.groups, action.payload.groupId];
+        },
         addMessage: (state, action) => {
             state.messages[action.payload.direction].push(action.payload.message);
         },
@@ -221,7 +224,7 @@ export const loginSlice = createSlice({
             state.notifications = action.payload.notifications;
             state.accountSetupStage = action.payload.accountSetupStage;
         });
-        builder.addCase(addGroup.fulfilled, (state, action) => {
+        builder.addCase(createGroup.fulfilled, (state, action) => {
             state.groups = [...state.groups, action.payload];
         });
         builder.addCase(login.fulfilled, (state, action) => {
@@ -273,5 +276,5 @@ export const loginSlice = createSlice({
     }
 });
 
-export const { addDeckToUser, addMessage, editMessage, logout, removeDeckFromUser, removeGroup, setGroups } = loginSlice.actions;
+export const { addDeckToUser, addGroup, addMessage, editMessage, logout, removeDeckFromUser, removeGroup, setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

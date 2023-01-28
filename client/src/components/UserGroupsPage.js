@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-import { addGroup } from '../reducers/loginSlice';
+import { createGroup } from '../reducers/loginSlice';
 import RegisterJoinGroupsForm from "./RegisterJoinGroupsForm";
 import GroupTile from "./GroupTile";
 import useFormInput from "../hooks/useFormInput";
@@ -17,7 +17,7 @@ function UserGroupsPage() {
 
     const createNewGroup = (evt) => {
         evt.preventDefault();
-        dispatch(addGroup({creator: userId, name: groupName}))
+        dispatch(createGroup({creator: userId, name: groupName}))
             .then(response => {
                 clearGroupNameChange();
                 setModalContent("");

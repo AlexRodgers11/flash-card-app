@@ -4,6 +4,11 @@ const LogoWrapper = styled.div`
     position: relative;
     height: 52px;
     bottom: 2px;
+    background-color: white;
+    &:hover div{
+        background-color: #fafafa;
+        color: #363636;
+    }
     & div {
         position: relative;
         display: flex;
@@ -26,11 +31,12 @@ const LogoWrapper = styled.div`
             bottom: 46px;
             left: 36.5px;
         }
+    
 `;
 
 function Logo() {
     return (
-        <LogoWrapper>
+        <LogoWrapper className="LogoWrapper">
             <div>Flish</div>
             <div>Flash</div>
         </LogoWrapper>

@@ -2,14 +2,12 @@ import express from "express";
 const groupRouter = express.Router();
 
 import Activity from "../models/activity.js";
-import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
-// import deck from "../models/deck.js";
+import { Card } from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import { DeckSubmission, JoinRequest } from "../models/message.js";
-import { JoinDecision } from "../models/notification.js";
 import User from "../models/user.js";
-import { swapIndexes } from "../utils.js";
+import { copyDeck, swapIndexes } from "../utils.js";
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
     Group.findById(groupId, (err, group) => {
@@ -64,398 +62,28 @@ groupRouter.get("/:groupId/decks", (req, res, next) => {
     res.status(200).send(JSON.stringify(req.group.decks));
 });
 
+//start here and make sure action payload lines up then move on to patch then do the rest of DeckSubmission
 groupRouter.post("/:groupId/decks", async (req, res, next) => {
-    //find a different way to do this- maybe use token with request for approval queries then reject if unapproved, then use the same
-    if(req.query.approved) {
-        try {
-            let foundDeck = await Deck.findById(req.body.idOfDeckToCopy);
-            let deckCopy = new Deck();
-            deckCopy.name = foundDeck.name;
-            deckCopy.publiclyAvailable = false;
-            deckCopy.creator = foundDeck.creator;
-            deckCopy.permissions = foundDeck.permissions;
-            let cardsCopy = [];        
-            for(let i = 0; i < foundDeck.cards.length; i++) {
-                cardsCopy.push(new Promise((resolve, reject) => {                    
-                    Card.findById(foundDeck.cards[i], (cardFindErr, foundCard) => {
-                        if(cardFindErr) {
-                            err.message = "couldn't find card";
-                            err.status = 404;
-                            throw err;
-                        }
-                        switch(foundCard.cardType) {
-                            case "FlashCard":
-                                FlashCard.findById(foundCard._id, "-_id")
-                                .then(foundFlashCard => {
-                                    let foundFlashCardCopy = foundFlashCard.toObject();
-                                    foundFlashCardCopy.stats = {
-                                        numberCorrect: 0,
-                                        numberIncorrect: 0
-                                    }
-                                    let flashCardCopy = new FlashCard(foundFlashCardCopy);
-                                    flashCardCopy.save((cardSaveErr, card) => {
-                                        if(cardSaveErr) {
-                                            cardSaveErr.message = "There was an error with your flash card save request";
-                                            cardSaveErr.status = 500;
-                                            throw cardSaveErr;
-                                        }
-                                        resolve(card);
-                                    });
-                                })
-                                .catch(err => {
-                                    err.message = "There was an error with your flash request";
-                                    err.status = 500;
-                                    throw err;
-                                });
-                                break;
-                            case "TrueFalseCard":
-                                TrueFalseCard.findById(foundCard._id, "-_id")
-                                .then(foundTrueFalseCard => {
-                                    let foundTrueFalseCardCopy = foundTrueFalseCard.toObject();
-                                    foundTrueFalseCardCopy.stats = {
-                                        numberCorrect: 0,
-                                        numberIncorrect: 0
-                                    }
-                                    let trueFalseCardCopy = new TrueFalseCard(foundTrueFalseCardCopy);
-
-                                    trueFalseCardCopy.save((cardSaveErr, card) => {
-                                        if(cardSaveErr) {
-                                            cardSaveErr.message = "There was an error with your true false save request";
-                                            cardSaveErr.status = 500;
-                                            throw cardSaveErr;
-                                        }
-                                        resolve(card);
-                                    });
-                                })
-                                .catch(err => {
-                                    err.message = "There was an error with your true false request";
-                                    err.status = 500;
-                                    throw err;
-                                });
-                                break;
-                            case "MultipleChoiceCard":
-                                MultipleChoiceCard.findById(foundCard._id, "-_id")
-                                .then(foundMultipleChoiceCard => {
-                                    let foundMultipleChoiceCardCopy = foundMultipleChoiceCard.toObject();
-                                    foundMultipleChoiceCardCopy.stats = {
-                                        numberCorrect: 0,
-                                        numberIncorrect: 0
-                                    }
-                                    let multipleChoiceCardCopy = new MultipleChoiceCard(foundMultipleChoiceCardCopy);
-                                    multipleChoiceCardCopy.save((cardSaveErr, card) => {
-                                        if(cardSaveErr) {
-                                            cardSaveErr.message = "There was an error with your mulitple choice save request";
-                                            cardSaveErr.status = 500;
-                                            throw cardSaveErr;
-                                        }
-                                        resolve(card);
-                                    });
-                                })
-                                .catch(err => {
-                                    err.message = "There was an error with your multiple choice request";
-                                    err.status = 500;
-                                    throw err;
-                                });
-                                break;
-                            default: 
-                                let err = new Error();
-                                err.message = "Invalid card type selected";
-                                err.status = 500;
-                                throw err;
-                        }
-                    });
-                }));
-            }
-            const cards = await Promise.all(cardsCopy);
-            console.log("all cards copied over");
-            deckCopy.cards = cards;
-            console.log(deckCopy);
-            let savedDeck = await deckCopy.save();            
-            console.log('deckCopy saved');
-            let newActivity = new Activity();
-            newActivity.actor = savedDeck.creator;
-            newActivity.type = "add-deck";
-            newActivity.groupTarget = req.group._id;
-            console.log(`savedDeckId: ${savedDeck._id}, deckCopyId: ${deckCopy._id}`);
-            newActivity.deckTarget = savedDeck._id;
-            const activity = await newActivity.save();
-            console.log('activity saved');
-
-            await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deckCopy._id, activities: activity._id}});
-            console.log("group updated");
-            res.status(200).send({
-                newDeck: deckCopy._id,
-                newActivity: activity._id
-            });
-        } catch (err) {
-            console.log("error caught");
-            res.status(err.status ?? 500).send(err.message);
-            throw err;
-        }
-        
-    } else {
-        try {
-            console.log({body: req.body});
-            console.log({id: req.body.idOfDeckToCopy});
-            let foundDeck = await Deck.findById(req.body.idOfDeckToCopy);
-            let deckCopy = new Deck();
-            deckCopy.name = foundDeck.name;
-            deckCopy.publiclyAvailable = false;
-            deckCopy.creator = foundDeck.creator;
-            deckCopy.permissions = foundDeck.permissions;
-            let cardsCopy = [];        
-            for(let i = 0; i < foundDeck.cards.length; i++) {
-                cardsCopy.push(new Promise((resolve, reject) => {                    
-                    Card.findById(foundDeck.cards[i], (cardFindErr, foundCard) => {
-                        if(cardFindErr) {
-                            err.message = "couldn't find card";
-                            err.status = 404;
-                            throw err;
-                        }
-                        switch(foundCard.cardType) {
-                            case "FlashCard":
-                                FlashCard.findById(foundCard._id, "-_id")
-                                .then(foundFlashCard => {
-                                    let foundFlashCardCopy = foundFlashCard.toObject();
-                                    foundFlashCardCopy.stats = {
-                                        numberCorrect: 0,
-                                        numberIncorrect: 0
-                                    }
-                                    let flashCardCopy = new FlashCard(foundFlashCardCopy);
-                                    flashCardCopy.save((cardSaveErr, card) => {
-                                        if(cardSaveErr) {
-                                            cardSaveErr.message = "There was an error with your flash card save request";
-                                            cardSaveErr.status = 500;
-                                            throw cardSaveErr;
-                                        }
-                                        resolve(card);
-                                    });
-                                })
-                                .catch(err => {
-                                    err.message = "There was an error with your flash request";
-                                    err.status = 500;
-                                    throw err;
-                                });
-                                break;
-                            case "TrueFalseCard":
-                                TrueFalseCard.findById(foundCard._id, "-_id")
-                                .then(foundTrueFalseCard => {
-                                    let foundTrueFalseCardCopy = foundTrueFalseCard.toObject();
-                                    foundTrueFalseCardCopy.stats = {
-                                        numberCorrect: 0,
-                                        numberIncorrect: 0
-                                    }
-                                    let trueFalseCardCopy = new TrueFalseCard(foundTrueFalseCardCopy);
-
-                                    trueFalseCardCopy.save((cardSaveErr, card) => {
-                                        if(cardSaveErr) {
-                                            cardSaveErr.message = "There was an error with your true false save request";
-                                            cardSaveErr.status = 500;
-                                            throw cardSaveErr;
-                                        }
-                                        resolve(card);
-                                    });
-                                })
-                                .catch(err => {
-                                    err.message = "There was an error with your true false request";
-                                    err.status = 500;
-                                    throw err;
-                                });
-                                break;
-                            case "MultipleChoiceCard":
-                                MultipleChoiceCard.findById(foundCard._id, "-_id")
-                                .then(foundMultipleChoiceCard => {
-                                    let foundMultipleChoiceCardCopy = foundMultipleChoiceCard.toObject();
-                                    foundMultipleChoiceCardCopy.stats = {
-                                        numberCorrect: 0,
-                                        numberIncorrect: 0
-                                    }
-                                    let multipleChoiceCardCopy = new MultipleChoiceCard(foundMultipleChoiceCardCopy);
-                                    multipleChoiceCardCopy.save((cardSaveErr, card) => {
-                                        if(cardSaveErr) {
-                                            cardSaveErr.message = "There was an error with your mulitple choice save request";
-                                            cardSaveErr.status = 500;
-                                            throw cardSaveErr;
-                                        }
-                                        resolve(card);
-                                    });
-                                })
-                                .catch(err => {
-                                    err.message = "There was an error with your multiple choice request";
-                                    err.status = 500;
-                                    throw err;
-                                });
-                                break;
-                            default: 
-                                let err = new Error();
-                                err.message = "Invalid card type selected";
-                                err.status = 500;
-                                throw err;
-                        }
-                    });
-                }));
-            }
-            const cards = await Promise.all(cardsCopy);
-            console.log("all cards copied over");
-            deckCopy.cards = cards;
-            console.log(deckCopy);
-            let savedDeck = await deckCopy.save();            
-            console.log('deckCopy saved');
-            let newActivity = new Activity();
-            newActivity.actor = savedDeck.creator;
-            newActivity.type = "add-deck";
-            newActivity.groupTarget = req.group._id;
-            console.log(`savedDeckId: ${savedDeck._id}, deckCopyId: ${deckCopy._id}`);
-            newActivity.deckTarget = savedDeck._id;
-            const activity = await newActivity.save();
-            console.log('activity saved');
-
-            await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deckCopy._id, activities: activity._id}});
-            console.log("group updated");
-            res.status(200).send({
-                newDeck: deckCopy._id,
-                newActivity: activity._id
-            });
-        } catch (err) {
-            console.log("error caught");
-            res.status(err.status ?? 500).send(err.message);
-            throw err;
-        }
+    try {
+        const deckCopy = copyDeck(req.body.deckId);
+        await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deckCopy}});
+        res.status(200).send(deckCopy._id);
+    } catch (err) {
+        res.status(500).send(err.message);
     }
-    
 });
 
-// groupRouter.post("/:groupId/decks", (req, res, next) => {
-//     if(req.query.approved) {
-//         Deck.findById(req.body.idOfDeckToCopy)
-//             .then(foundDeck => {
-//                 let deckCopy = new Deck();
-//                 deckCopy.name = foundDeck.name;
-//                 deckCopy.publiclyAvailable = foundDeck.publiclyAvailable || false;
-//                 deckCopy.creator = foundDeck.creator;
-//                 deckCopy.cards = foundDeck.cards;
-//                 deckCopy.permissions = foundDeck.permissions;
-//                 let cardsCopy = [];
-//                 for(let i = 0; i < foundDeck.cards.length; i++) {
-//                     cardsCopy.push(new Promise((resolve, reject) => {
-//                         Card.findById(foundDeck.cards[i], (cardFindErr, foundCard) => {
-//                             if(cardFindErr) {
-//                                 res.status(500).send("There was an error with your request");
-//                                 throw err;
-//                             }
-//                             let newCard = new Card();
-//                             newCard.creator = foundCard.creator;
-//                             newCard.type = foundCard.type;
-//                             newCard.question = foundCard.question;
-//                             newCard.correctAnswer = foundCard.correctAnswer;
-//                             newCard.wrongAnswerOne = foundCard.wrongAnswerOne;
-//                             newCard.wrongAnswerTwo = foundCard.wrongAnswerTwo;
-//                             newCard.wrongAnswerThree = foundCard.wrongAnswerThree;
-//                             newCard.hint = foundCard.hint;
-//                             newCard.stats = {
-//                                 numberCorrect: 0,
-//                                 numberIncorrect: 0
-//                             }
-//                             newCard.save((cardSaveErr, card) => {
-//                                 console.log("card copy saved");
-//                                 if(cardSaveErr) {
-//                                     res.status(500).send("There was an error with your request");
-//                                     throw cardSaveErr;
-//                                 }
-//                                 resolve(card);
-//                             });
-//                         });
-//                     }));
-//                 }
-//                 Promise.all(cardsCopy).then(cards => {
-//                     console.log("all cards coppied over");
-//                     deckCopy.cards = cards;
-//                     deckCopy.save((err, deck) => {
-//                         if(err) {
-//                             res.status(500).send("There was an error with your request");
-//                             throw err;
-//                         } else {
-//                             let newActivity = new Activity();
-//                             // newActivity.actor = req.body.actor;
-//                             newActivity.actor = deck.creator;
-//                             newActivity.type = "add-deck";
-//                             newActivity.groupTarget = req.group._id;
-//                             newActivity.deckTarget = deck._id
-//                             newActivity.save((err, activity) => {
-//                                 if(err) {
-//                                     res.status(500).send("There was an error with your request");
-//                                     throw err;
-//                                 } else {
-//                                     console.log({activity});
-//                                     console.log({deck});
-//                                         Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
-//                                     .then(() => {
-//                                         res.status(200).send({
-//                                             newDeck: deck._id,
-//                                             newActivity: activity._id
-//                                         });
-//                                     })
-//                                     .catch(err => {
-//                                         console.error(err);
-//                                         res.status(500).send("There was an error with your request");
-//                                     })
-//                                 }
-//                             });
-//                         }
-//                     }); 
-//                 })
-//                 .catch(copyCardsPromiseErr => {
-//                     res.status(500).send("There was an error with your request");
-//                     throw copyCardsPromiseErr;
-//                 });
-//             })
-//             .catch(error => {
-//                 console.error(error);
-//                 throw error;
-//             })
-//     } else {
-//         let newDeck = new Deck()
-//         newDeck.name = req.body.name;
-//         newDeck.publiclyAvailable = req.body.publiclyAvailable || false;
-//         newDeck.creator = req.body.creator;
-//         newDeck.cards = req.body.cards;
-//         newDeck.permissions = req.body.permissions;
-//         newDeck.save((err, deck) => {
-//             if(err) {
-//                 console.error(err);
-//                 res.status(500).send("There was an error with your request");
-//                 throw err;
-//             } else {
-//                 let newActivity = new Activity();
-//                 newActivity.actor = req.body.creator;
-//                 newActivity.type = "add-deck";
-//                 newActivity.groupTarget = req.group._id;
-//                 newActivity.deckTarget = deck._id
-//                 newActivity.save((err, activity) => {
-//                     if(err) {
-//                         res.status(500).send("There was an error with your request");
-//                         throw err;
-//                     } else {
-//                         console.log({activity});
-//                         console.log({deck});
-//                             Group.findByIdAndUpdate(req.group._id, {$push: {decks: deck._id, activity: activity._id}})
-//                         .then(() => {
-//                             res.status(200).send({
-//                                 newDeck: deck._id,
-//                                 newActivity: activity._id
-//                             });
-//                         })
-//                         .catch(err => {
-//                             console.error(err);
-//                             res.status(500).send("There was an error with your request");
-//                         })
-//                     }
-//                 });
-//             }
-//         }); 
-//     }
-    
-// });
+groupRouter.patch("/:groupId/decks", async (req, res, next) => {
+    try {
+        const deckCopy = await copyDeck(req.body.deckId);
+        console.log({deckCopy});
+        await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deckCopy}});
+        res.status(200).send({submittedDeckId: deckCopy._id, submittedDeckName: deckCopy.name});
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 
 groupRouter.patch("/:groupId/head-admin", async (req, res, next) => {
     try {
@@ -554,16 +182,20 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
 });
 
 groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next) => {
+    console.log({body: req.body});
     try {
-        let newMessage = new JoinRequest();
-            newMessage.acceptanceStatus = 'pending';
-            newMessage.sendingUser = req.body.sendingUser;
-            newMessage.targetGroup = req.body.targetGroup;
-            let message = await newMessage.save();
+        const newMessage = new JoinRequest({
+            acceptanceStatus: 'pending',
+            sendingUser: req.body.sendingUser,
+            targetGroup: req.body.targetGroup,
+        });
+            
+        const savedMessage = await newMessage.save();
+        console.log({savedMessage});
+        await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
+        await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': savedMessage}});
 
-            await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': message}});
-            await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': message}});
-            res.status(200).send(message._id);
+        res.status(200).send({_id: savedMessage._id, messageType: "JoinRequest", read: []});
     } catch(err) {
         res.status(500).send("There was an error sending the join request to the group admins");
     }
@@ -571,15 +203,27 @@ groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next)
 
 groupRouter.post("/:groupId/messages/admin/deck-submission", async (req, res, next) => {
     try {
-        let newMessage = new DeckSubmission();
-        newMessage.acceptanceStatus = 'pending';
-        newMessage.sendingUser = req.body.sendingUser;
-        newMessage.targetDeck = req.body.targetDeck;
-        newMessage.targetGroup = req.body.targetGroup;
-        let message = await newMessage.save();
-        await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': message}});
-        await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': message}});
-        res.status(200).send(message);
+        //create a copy of the deck that will either be added to the group upon approval or deleted upon rejection (this way original deck edits don't affect submitted)
+        const deckCopy = await copyDeck(req.body.deckToCopy);
+        console.log({deckCopy});
+        deckCopy.groupDeckBelongsTo = req.group._id;
+        deckCopy.approvedByGroupAdmins = false,
+        deckCopy.deckCopiedFrom = req.body.deckToCopy;
+        const savedDeckCopy = await deckCopy.save();
+
+        const newMessage = new DeckSubmission({
+            acceptanceStatus: 'pending',
+            sendingUser: req.body.sendingUser,
+            targetDeck: savedDeckCopy._id,
+            targetGroup: req.body.targetGroup,
+            deckName: savedDeckCopy.name,
+            read: []
+        });
+        const savedMessage = await newMessage.save();
+        await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
+        await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': savedMessage}});
+
+        res.status(200).send({_id: savedMessage._id, messageType: "DeckSubmission", read: []});
     } catch (err) {
         res.status(500).send("There was an error updating receiving admins received messages");
         throw err;

@@ -1,7 +1,10 @@
 import express from "express";
 const messageRouter = express.Router();
 import axios from "axios";
-import { DeckSubmission, DirectMessage, JoinRequest, Message } from "../models/message.js";
+import { DeckDecision, DeckSubmission, DirectMessage, JoinDecision, JoinRequest, Message } from "../models/message.js";
+import Deck from "../models/deck.js";
+import Group from "../models/group.js";
+import User from "../models/user.js";
 
 const baseURL = 'http://localhost:8000';
 
@@ -20,16 +23,12 @@ messageRouter.param("messageId", (req, res, next, messageId) => {
     })
 });
 
-messageRouter.get("/:messageId", (req, res, next) => {
-    Message.findById(req.message._id, (err, message) => {
-        if(err) {
-            console.error(err);
-            throw err;
-        }
-        // switch(message.__t) {
-        switch(message.message) {
+messageRouter.get("/:messageId", async (req, res, next) => {
+    try {
+        let populatedMessage;
+        switch(req.query.type) {
             case 'DeckSubmission':
-                message.populate(
+                populatedMessage = await DeckSubmission.findById(req.message._id).populate(
                         [
                             {
                                 path: 'sendingUser',
@@ -42,59 +41,85 @@ messageRouter.get("/:messageId", (req, res, next) => {
                             {
                                 path: 'targetGroup',
                                 select: 'name'
-                            }
+                            },
                         ]
                     )
-                        .then(message => {
-                            res.status(200).send(message);
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            throw err;
-                        })
+                console.log({populatedMessage});
+                res.status(200).send(populatedMessage);
                 break;
             case 'DeckDecision':
-                message.populate(
+                populatedMessage = await DeckDecision.findById(req.message._id).populate(
                     [
                         {
                             path: 'sendingUser',
                             select: 'login.username name.first name.last'
                         },
                         {
-                            path: 'targetDeck',
+                            path: 'targetGroup',
                             select: 'name'
                         },
                         {
-                            path: 'targetGroup',
-                            select: 'name'
+                            path: "targetUser",
+                            select: "login.username name.first name.last"
                         }
                     ]
-                )
+                );
+                console.log(populatedMessage);
+                res.status(200).send(populatedMessage);
+                break;
             case "JoinRequest":
-                message.populate(
+                console.log("In JoinRequest case");
+                populatedMessage = await JoinRequest.findById(req.message._id).populate(
                     [
                         {
-                            path: 'sendingUser',
-                            select: 'login.username name.first name.last'
+                            path: "sendingUser",
+                            select: "login.username name.first name.last"
                         },
                         {
-                            path: 'targetGroup',
-                            select: 'name'
+                            path: "targetGroup",
+                            select: "name"
                         }
                     ]
-                )
-                    .then(message => {
-                        res.status(200).send(message);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        throw err;
-                    })
+                );
+                console.log({populatedMessage});
+                res.status(200).send(populatedMessage);
+                break;
+            case "JoinDecision":
+                console.log("In join decision case");
+                populatedMessage = await JoinDecision.findById(req.message._id).populate(
+                    [
+                        {
+                            path: "sendingUser",
+                            select: "login.username name.first name.last"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        },
+                        {
+                            path: "targetUser",
+                            select: "login.username name.first name.last"
+                        }
+                    ]
+                );
+                res.status(200).send(populatedMessage);
                 break;
             default:
+                console.error(error);
                 res.status(500).send("There was an error with your request");
                 break;
         }
+    } catch (err) {
+
+    }
+    
+    Message.findById(req.message._id, async (err, message) => {
+        if(err) {
+            console.error(err);
+            throw err;
+        }
+        // switch(message.__t) {
+        
 
     }); 
 });
@@ -110,50 +135,103 @@ messageRouter.patch('/:messageId/add-to-read', async (req, res, next) => {
 
 messageRouter.patch('/:messageId', async (req, res, next) => {
     console.log({body: req.body});
-    const updateObj = {acceptanceStatus: req.body.acceptanceStatus};
-    
-    const options = {new: true};
-    
+
     try {
         switch(req.body.messageType) {
-            case 'DeckSubmission':
-                const updatedDeckSubmissionMessage = await DeckSubmission.findByIdAndUpdate(req.message._id, updateObj, options);
+            case "DeckDecision": //should this be DeckSubmission
+                //first make sure hasn't already been approved/denied by another admin
+                const foundDeckSubmissionMessage = await DeckSubmission.findById(req.message._id).populate("targetDeck", "name");
 
-                const deckCopyResponse = await axios.post(`${baseURL}/groups/${updatedDeckSubmissionMessage.targetGroup}/decks?approved=true`, {idOfDeckToCopy: updatedDeckSubmissionMessage.targetDeck});
+                //if it has, send back the acceptanceStatus and (if approved) the added deck id
+                if(foundDeckSubmissionMessage.acceptanceStatus !== "pending") {
+                    res.status(200).send({
+                        acceptanceStatus: foundDeckSubmissionMessage.acceptanceStatus,
+                        deckName: foundDeckSubmissionMessage.targetDeck.name,
+                        //only send back the _id if approved because otherwise the deck would have been deleted and the id would no longer exist
+                        ...(acceptanceStatus === "approved" && {deckId: foundDeckSubmissionMessage.targetDeck._id})
+                    });
+                } else {
+                    //otherwise first update the acceptanceStatus of the DeckSubmission message
+                    await DeckSubmission.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
 
+                    // get the deck name to send back for the message in case deck/id get deleted if submission denied
+                    const submittedDeck = await Deck.findById(req.body.deckId, "name creator");
 
-                const responseMessage = await axios.post(`${baseURL}/users/${req.message.sendingUser}/messages`, {
-                    messageType: "DeckDecision",
-                    acceptanceStatus: req.body.acceptanceStatus,
-                    comment: req.body.comment,
-                    targetDeck: req.message.targetDeck,
-                    targetGroup: req.message.targetGroup,
-                    sendingUser: req.body.decidingUserId
-                });
-
-                res.status(200).send({
-                    newActivity: deckCopyResponse.data.newActivity,
-                    newDeck: deckCopyResponse.data.newDeck,
-                    responseMessage: {
-                        _id: responseMessage.data._id,
-                        read: [],
-                        message: responseMessage.data.message
+                    //handle add/delete deck based on approval/denial decision
+                    if(req.body.decision === "approved") {
+                        const updatedDeck = await Deck.findByIdAndUpdate(req.body.deckId, {approvedByGroupAdmins: true}, {new: true});
+                        await Group.findByIdAndUpdate(req.body.groupId, {$push: {decks: updatedDeck._id}});
+                    } else if(req.body.decision === "denied") {
+                        await Deck.findByIdAndDelete(req.body.deckId)
                     }
-                });
-                break;
 
-            case 'DirectMessage':
-                await DirectMessage.findByIdAndUpdate(req.message._id, updateObj, options);
+                    console.log({submittedDeck});
+                    const deckDecisionMessage = new DeckDecision({
+                        sendingUser: req.body.decidingUserId,
+                        read: [],
+                        acceptanceStatus: req.body.decision,
+                        comment: req.body.comment,
+                        deckName: submittedDeck.name,
+                        targetDeck: req.body.deckId,
+                        targetGroup: req.body.groupId,
+                        targetUser: submittedDeck.creator
+                    });
+
+                    const savedDeckDecisionMessage = await deckDecisionMessage.save();
+                    console.log({savedDeckDecisionMessage});
+                    await User.findByIdAndUpdate(foundMessage.sendingUser, {$push: {"messages.received": savedDeckDecisionMessage}});
+                    await User.findByIdAndUpdate(req.body.decidingUserId, {$push: {"messages.sent": savedDeckDecisionMessage}});
+
+                    res.status(200).send({sentMessage: {_id: savedDeckDecisionMessage._id, read: savedDeckDecisionMessage.read, messageType: savedDeckDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
+                }
                 break;
-            case 'JoinRequest':
-                await JoinRequest.findByIdAndUpdate(req.message._id, updateObj, options);
-                break;
+                case 'JoinRequest':
+                    console.log("in JoinRequest case");
+                    const foundJoinRequestMessage = await JoinRequest.findById(req.message._id);
+                    console.log({foundJoinRequestMessage});
+                    
+                    if(foundJoinRequestMessage.acceptanceStatus !== "pending") {
+                        console.log("message already handled");
+                        res.status(200).send({
+                            acceptanceStatus: foundJoinRequestMessage.acceptanceStatus,
+                            groupId: foundJoinRequestMessage.targetGroup._id
+                        });
+                    } else {
+                        await JoinRequest.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
+
+                        if(req.body.decision === "approved") {
+                            await Group.findByIdAndUpdate(foundJoinRequestMessage.targetGroup, {$addToSet: {members: foundJoinRequestMessage.sendingUser}});
+                            await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$addToSet: {groups: foundJoinRequestMessage.targetGroup}});
+                        }  
+
+                        const joinDecisionMessage = new JoinDecision({
+                            sendingUser: req.body.decidingUserId,
+                            read: [],
+                            acceptanceStatus: req.body.decision,
+                            comment: req.body.comment,
+                            targetGroup: foundJoinRequestMessage.targetGroup,
+                            targetUser: foundJoinRequestMessage.sendingUser
+                        });
+
+                        const savedJoinDecisionMessage = await joinDecisionMessage.save();
+
+                        await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$push: {"messages.received": savedJoinDecisionMessage}});
+                        await User.findByIdAndUpdate(req.body.decidingUserId, {$push: {"messages.sent": savedJoinDecisionMessage}});
+
+
+                        res.status(200).send({sentMessage: {_id: savedJoinDecisionMessage._id, read: savedJoinDecisionMessage.read, messageType: savedJoinDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
+                    }
+                    break;
+                    
+                case 'DirectMessage':
+                    // await DirectMessage.findByIdAndUpdate(req.message._id, updateObj, options);
+                    break;
             default:
-                await Message.findByIdAndUpdate(req.message._id, updateObj, options);
                 break;
         }    
 
     } catch (err) {
+        console.error(err);
         res.status(500).send(err.message);
     }
 });

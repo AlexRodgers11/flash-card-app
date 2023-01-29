@@ -8,7 +8,8 @@ import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
 import { DeckDecision, DeckSubmission, Message } from "../models/message.js";
 // import { CardDecision, DeckDecision, JoinDecision, Notification } from '../models/notification.js';
-import { CardDecision, JoinDecision, Notification } from '../models/notification.js';
+// import { CardDecision, JoinDecision, Notification } from '../models/notification.js';
+import { Notification } from '../models/notification.js';
 import { generateRandomFileName } from "../utils.js";
 
 import multer from "multer";
@@ -29,6 +30,7 @@ userRouter.param("userId", (req, res, next, userId) => {
     });
 });
 
+//should probably move this to login
 userRouter.get("/emails", async (req, res, next) => {
     if(req.query.email) {
         let user = await User.findOne({"login.email": req.query.email});
@@ -64,9 +66,6 @@ userRouter.get("/:userId", async (req, res, next) => {
     try {
         let userData = await User.findById(req.user._id)
             .populate("decks", "name")
-            .populate("messages.received", "read")
-            .populate("messages.sent", "read")
-            .populate("notifications", "read");
         userData.photo = req.user.photo ? !req.user.photo.includes(".") ? await getObjectSignedUrl(req.user.photo) : req.user.photo : "",
         
         res.status(200).send(userData);          
@@ -164,6 +163,24 @@ userRouter.post("/:userId/decks", async (req, res, next) => {
     }
 });
 
+/////////////////////////////////////////////////////////////Messages///////////////////////////////////////////////////////////////
+
+//////////done/////////////////
+userRouter.get("/:userId/communications", async (req, res, next) => {
+    try {
+        const foundUser = await User.findById(req.user._id, "messages notifications -_id")
+            .populate("messages.received", "messageType read")
+            .populate("messages.sent", "messageType read")
+            .populate("notifications", "messageType read");
+        res.status(200).send({messages: foundUser.messages, notifications: foundUser.notifications});
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+////////////////////////////////
+
+
+
 userRouter.post("/:userId/messages", async (req, res, next) => {
     let newMessage;
     try {
@@ -195,22 +212,6 @@ userRouter.post("/:userId/messages", async (req, res, next) => {
         res.status(500).send(err.message);
     }
 });
-// userRouter.post("/:userId/messages", async (req, res, next) => {
-//     try {
-//         let newMessage = new Message();
-//         newMessage.type = req.body.type;
-//         newMessage.sendingUser = req.body.sendingUser;
-//         newMessage.targetDeck = req.body.targetDeck;
-//         newMessage.targetGroup = req.body.targetGroup;
-//         const message = await newMessage.save();
-//         await User.findByIdAndUpdate(req.user._id, {$push: {'messages.received': message}});
-//         await User.findByIdAndUpdate(message.sendingUser, {$push: {'messages.sent': message}});
-//         res.status(200).send(message);
-//     } catch (err) {
-//         res.status(500).send("There was an error with your request");
-//         throw receivingUserErr;
-//     }
-// });
 
 userRouter.delete("/:userId/messages/:messageId", async (req, res, next) => {
     try {
@@ -238,9 +239,10 @@ userRouter.post("/:userId/notifications", async (req, res, next) => {
             case CardDecision: 
                 newNotification = CardDecision(req.body);
                 break;
-            case "JoinDecision":
-                newNotification = JoinDecision(req.body);
-                break;
+            //this needs to be a message
+            // case "JoinDecision":
+            //     newNotification = JoinDecision(req.body);
+            //     break;
             default: 
                 res.status(400).send("Invalid notification type");
                 break;

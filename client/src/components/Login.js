@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router'
 import useFormInput from '../hooks/useFormInput';
 import { fetchLoggedInUserData, login } from '../reducers/loginSlice';
+import { fetchCommunications } from '../reducers/communicationsSlice';
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styled from 'styled-components';
 import useToggle from '../hooks/useToggle';
@@ -41,6 +42,7 @@ function Login() {
     useEffect(() => {
         if(userId) {
             dispatch(fetchLoggedInUserData(userId));
+            dispatch(fetchCommunications({userId}));
             navigate("/dashboard");
         }
     }, [userId, dispatch, navigate]);

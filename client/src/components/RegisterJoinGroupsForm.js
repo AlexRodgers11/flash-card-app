@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { fetchGroupJoinOptions } from '../reducers/groupSlice';
-import { sendJoinRequest, submitJoinCode } from '../reducers/loginSlice';
+import { submitJoinCode } from '../reducers/loginSlice';
+import { sendJoinRequest } from "../reducers/communicationsSlice";
 
 const baseURL = "http://localhost:8000";
 
@@ -104,7 +105,7 @@ function RegisterJoinGroupsForm(props) {
                 return (
                     <>
                         <p>To join this group you must submit a request to its administrators</p>
-                        <button data-joinType="request" onClick={sendRequestToJoin}>Request to Join</button>
+                        <button onClick={sendRequestToJoin}>Request to Join</button>
                         {content === "failure" && <p style={{color: "red", fontSize: "1.1em", fontWeight: "600"}}>Incorrect code entered</p>}
                         <button onClick={continueSearching}>Cancel</button>
                     </>
@@ -112,7 +113,7 @@ function RegisterJoinGroupsForm(props) {
             case "code":
                 return (
                     <>
-                        <form autoComplete='off' data-joinType="code" onSubmit={joinGroup}>
+                        <form autoComplete='off' onSubmit={joinGroup}>
                             <label htmlFor="join-code-entry-one">Enter the group's code to join</label>
                             <input type="text" id="join-code-entry-one" name="join-code-entry-one" onChange={handleChangeUserEnteredJoinCode} value={userEnteredJoinCode} />
                             <button type="submit" onClick={joinGroup}>Submit</button>
@@ -124,13 +125,13 @@ function RegisterJoinGroupsForm(props) {
                 return (
                     <>
                         <p>To join this group you can either enter the group's join code or send a request to its administrators</p>
-                        <form autoComplete='off' data-joinType="code" onSubmit={joinGroup}>
+                        <form autoComplete='off' onSubmit={joinGroup}>
                             <label htmlFor="join-code-entry-two">Enter the group's code to join</label>
                             <input id="join-code-entry-two" name="join-code-entry-two" type="text" onChange={handleChangeUserEnteredJoinCode} value={userEnteredJoinCode} />
                             <button type="submit" onClick={joinGroup}>Submit</button>
                             {content === "failure" && <p style={{color: "red", fontSize: "1.1em", fontWeight: "600"}}>Incorrect code entered</p>}
                         </form>
-                        <button data-joinType="request" onClick={sendRequestToJoin}>Send Request to Join</button>
+                        <button onClick={sendRequestToJoin}>Send Request to Join</button>
                         <button onClick={continueSearching}>Cancel</button>
                     </>
                 );

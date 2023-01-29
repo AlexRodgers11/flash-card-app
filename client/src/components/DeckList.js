@@ -41,7 +41,7 @@ export default function DeckList(props) {
     const listId = useSelector((state) => state.decks.listId);
 
     useEffect(() => {
-        if(listType !== props.listType && listId !== props.listId) {
+        if(listType !== props.listType || listId !== props.listId) {
             switch(props.listType) {
                 case "category":
                     dispatch(fetchDecksOfCategory(props.listId));

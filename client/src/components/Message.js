@@ -10,12 +10,11 @@ import JoinDecisionMessage from './JoinDecisionMessage';
 function Message(props) {
 	const dispatch = useDispatch();
 	const userId = useSelector((state) => state.login.userId);
-	const [read, setRead] = useState(false);
 	
 	const expandMessage = () => {
 		console.log("expanding message");
 		props.expandMessage(props.messageId, props.messageType);
-		if(!read) {
+		if(!props.read) {
 			dispatch(markMessageAsRead({messageId: props.messageId, direction: props.direction, readerId: userId}));
 		}
 	}
@@ -67,6 +66,7 @@ Message.propTypes = {
 	direction: PropTypes.string,
     messageId: PropTypes.string,
 	messageType: PropTypes.string,
+	read: PropTypes.bool,
 	expandMessage: PropTypes.func,
 	hideModal: PropTypes.func
 }

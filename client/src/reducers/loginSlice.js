@@ -19,11 +19,6 @@ const initialState = {
     decks: [],
     groups: [],
     attempts: "",
-    messages: {
-        sent: [],
-        received: [], 
-    },
-    notifications: [],
     accountSetupStage: ""
 }
 
@@ -85,53 +80,11 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
     }
 });
 
-export const markMessageAsRead = createAsyncThunk("login/markMessageAsRead", async ({messageId, readerId, direction}) => {
-    try {
-        const response = await axios.patch(`${baseURL}/messages/${messageId}/add-to-read`, {readerId});
-        console.log("response received");
-        console.log({data: response.data});
-        console.log({direction});
-        return {...response.data, direction};
-    } catch (err) {
-        console.error(err.message);
-    }
-});
-
-export const makeApprovalDecision = createAsyncThunk("login/makeApprovalDecision", async ({messageId, decision, comment, messageType, decidingUserId}) => {
-    try {
-        const response = await axios.patch(`${baseURL}/messages/${messageId}`, {acceptanceStatus: decision, comment, messageType, decidingUserId});
-        return {
-            responseMessage: response.data.responseMessage,
-        } 
-    } catch(err) {
-        console.error(err.message);
-    }
-});
-
-export const markNotificationsAsRead = createAsyncThunk("login/markNotificationsAsRead", async({userId}) => {
-    try {
-        const response = await axios.patch(`${baseURL}/users/${userId}/notifications/mark-as-read`, {});
-        return response.data;
-    } catch (err) {
-        console.error(err.message);
-    }
-});
-
 export const createGroup = createAsyncThunk("login/createGroup", async({creator, name}) => {
     try {
         const response = await axios.post(`${baseURL}/users/${creator}/groups`, {creator, name, administrators: [creator], members: [creator]});
         return response.data;
     } catch (err) {}    
-});
-
-export const sendJoinRequest = createAsyncThunk("login/sendJoinRequest", async({userId, groupId}) => {
-    try {
-        const response = await axios.post(`${baseURL}/groups/${groupId}/messages/admin/join-request`, {sendingUser: userId, targetGroup: groupId});
-        return response.data;
-    } catch(err) {
-        console.error(err);
-        return err;
-    }
 });
 
 export const submitJoinCode = createAsyncThunk("login/submitJoinCode", async({userId, groupId, joinCode}) => {
@@ -192,17 +145,6 @@ export const loginSlice = createSlice({
         addGroup: (state, action) => {
             state.groups = [...state.groups, action.payload.groupId];
         },
-        addMessage: (state, action) => {
-            state.messages[action.payload.direction].push(action.payload.message);
-        },
-        editMessage: (state, action) => {
-            state.messages[action.payload.direction].map(message => {
-                if(message._id === action.payload.message._id) {
-                    return action.payload.message;
-                }
-                return message;
-            });
-        },
         removeGroup: (state, action) => {
             state.groups = state.groups.filter(id => id !== action.payload.groupId);
         },
@@ -219,9 +161,6 @@ export const loginSlice = createSlice({
             state.decks = action.payload.decks;
             state.groups = action.payload.groups;
             state.attempts = action.payload.attempts;
-            state.messages.received = action.payload.messages.received;
-            state.messages.sent = action.payload.messages.sent;
-            state.notifications = action.payload.notifications;
             state.accountSetupStage = action.payload.accountSetupStage;
         });
         builder.addCase(createGroup.fulfilled, (state, action) => {
@@ -230,22 +169,7 @@ export const loginSlice = createSlice({
         builder.addCase(login.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId;
-        });
-        builder.addCase(makeApprovalDecision.fulfilled, (state, action) => {
-            state.messages.sent = [...state.messages.sent, action.payload.responseMessage];
-        });
-        builder.addCase(markMessageAsRead.fulfilled, (state, action) => {
-            console.log({payload: action.payload});
-            state.messages[action.payload.direction] = state.messages[action.payload.direction].map(message => {
-                if(message._id === action.payload.messageId) {
-                    return {...message, read: action.payload.read}
-                }
-                return message;
-            });
-        });
-        builder.addCase(markNotificationsAsRead.fulfilled, (state, action) => {
-            state.notifications = action.payload;
-        });
+        });        
         builder.addCase(signUp.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId;
@@ -255,11 +179,7 @@ export const loginSlice = createSlice({
         builder.addCase(submitVerificationCode.fulfilled, (state, action) => {
             state.accountSetupStage = action.payload.accountSetupStage;
         });
-        builder.addCase(sendJoinRequest.fulfilled, (state, action) => {
-            state.messages.sent = [...state.messages.sent, action.payload];
-        });
         builder.addCase(submitJoinCode.fulfilled, (state, action) => {
-            //okay to just only change state conditionally? Is that better than triggering rerender if allowed?
             state.groups = action.payload ? [...state.groups, action.payload] : [...state.groups];
         });
         builder.addCase(updateUser.fulfilled, (state, action) => {
@@ -276,5 +196,5 @@ export const loginSlice = createSlice({
     }
 });
 
-export const { addDeckToUser, addGroup, addMessage, editMessage, logout, removeDeckFromUser, removeGroup, setGroups } = loginSlice.actions;
+export const { addDeckToUser, addGroup, logout, removeDeckFromUser, removeGroup, setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import Notification from './Notification';
 
 function NotificationList(props) {
-	const notifications = useSelector((state) => state.login.notifications);
+	const notifications = useSelector((state) => state.communications.notifications);
 	return (
 		<div>{notifications.map(notification => <Notification notificationId={notification._id} hideModal={props.hideModal}/>)}</div>
 	)

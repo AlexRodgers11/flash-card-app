@@ -27,6 +27,27 @@ export const fetchCommunications = createAsyncThunk("communications/fetchCommuni
     }    
 });
 
+export const markNotificationsAsRead = createAsyncThunk("login/markNotificationsAsRead", async({userId}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/users/${userId}/notifications/mark-as-read`, {});
+        return response.data;
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+export const markMessageAsRead = createAsyncThunk("login/markMessageAsRead", async ({messageId, readerId, direction}) => {
+    try {
+        const response = await axios.patch(`${baseURL}/messages/${messageId}/add-to-read`, {readerId});
+        console.log("response received");
+        console.log({data: response.data});
+        console.log({direction});
+        return {...response.data, direction};
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 export const submitDeck = createAsyncThunk("communications/submitDeck", async ({userId, groupId, deckId}) => {
     try {
         let messageData = {
@@ -42,10 +63,9 @@ export const submitDeck = createAsyncThunk("communications/submitDeck", async ({
     }
 }); 
 
-//sent when an admin decides whether to approve or deny a request to add a deck to the group
 export const makeDeckSubmissionDecision = createAsyncThunk("communications/makeDeckSubmissionDecision", async ({messageId, decision, comment,decidingUserId, groupId, deckId}) => {
     try {
-        const response = await axios.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "DeckDecision", decidingUserId, groupId, deckId});
+        const response = await axios.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "DeckSubmission", decidingUserId, groupId, deckId});
         console.log({response});
 
         if(!response.data.sentMessage) {
@@ -63,17 +83,27 @@ export const makeDeckSubmissionDecision = createAsyncThunk("communications/makeD
     }
 });
 
-export const sendJoinRequest = createAsyncThunk("communications/sendJoinRequest", async ({sendingUser: userId, targetGroup: groupId}) => {
+export const sendJoinRequest = createAsyncThunk("communications/sendJoinRequest", async ({userId, groupId}) => {
     try {
-        // axios.
+        const response = await axios.post(`${baseURL}/groups/${groupId}/messages/admin/join-request`, {sendingUser: userId, targetGroup: groupId});
+        return response.data;
     } catch (err) {
-        console.error(err)
+        console.error(err);
     }
 });
 
-export const makeJoinRequestDecision = createAsyncThunk("communications/makeJoinRequestDecision", async ({messageId, decision, comment, messageType, decidingUserId}) => {
+export const makeJoinRequestDecision = createAsyncThunk("communications/makeJoinRequestDecision", async ({messageId, decision, comment, decidingUserId}) => {
     try {
-        // axios.
+        const response = await axios.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "JoinRequest", decidingUserId});
+        if(!response.data.sentMessage) {
+            console.log("returning the acceptance status");
+            return {
+                acceptanceStatus: response.data.acceptanceStatus,
+            }
+        } else {
+            console.log("returning new sent message");
+            return response.data;
+        }
     } catch (err) {
         console.error(err)
     }
@@ -89,9 +119,20 @@ export const communicationsSlice = createSlice({
         builder.addCase(fetchCommunications.fulfilled, (state, action) => {
             console.log(action.payload.messages.received);
             state.messages.received = action.payload.messages.received;
-            // state.messages.received = [...action.payload.messages.received];
             state.messages.sent = action.payload.messages.sent;
             state.notifications = action.payload.notifications;
+        });
+        builder.addCase(markNotificationsAsRead.fulfilled, (state, action) => {
+            state.notifications = action.payload;
+        });
+        builder.addCase(markMessageAsRead.fulfilled, (state, action) => {
+            console.log({payload: action.payload});
+            state.messages[action.payload.direction] = state.messages[action.payload.direction].map(message => {
+                if(message._id === action.payload.messageId) {
+                    return {...message, read: action.payload.read}
+                }
+                return message;
+            });
         });
         builder.addCase(submitDeck.fulfilled, (state, action) => {
             state.messages.sent = [...state.messages.sent, action.payload]
@@ -102,6 +143,15 @@ export const communicationsSlice = createSlice({
                 state.messages.sent = [...state.messages.sent, action.payload.sentMessage];
             }
         });
+        builder.addCase(sendJoinRequest.fulfilled, (state, action) => {
+            state.messages.sent = [...state.messages.sent, action.payload];
+        });
+        builder.addCase(makeJoinRequestDecision.fulfilled, (state, action) => {
+            console.log({payload: action.payload});
+            if(action.payload.sentMessage) {
+                state.messages.sent = [...state.messages.sent, action.payload.sentMessage];
+            }
+        })
     }
 });
 

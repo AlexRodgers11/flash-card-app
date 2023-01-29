@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { logout, markNotificationsAsRead } from "../reducers/loginSlice";
+import { markNotificationsAsRead } from "../reducers/communicationsSlice";
+import { logout } from "../reducers/loginSlice";
 import Message from "./Message";
 import MessageList from "./MessageList";
 import Modal from "./Modal";
@@ -22,9 +23,7 @@ function Header() {
     const username = useSelector((state) => state.login.login.username);
     const userId = useSelector((state) => state.login.userId);
     const profilePic = useSelector((state) => state.login.photo);
-    // const notifications = useSelector((state) => state.login.notifications);
     const notifications = useSelector((state) => state.communications.notifications);
-    // const messages = useSelector((state) => state.login.messages.received);
     const messages = useSelector((state) => state.communications.messages.received);
     const dispatch = useDispatch();
     const navigate = useNavigate();

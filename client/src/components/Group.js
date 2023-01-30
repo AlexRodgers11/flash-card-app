@@ -3,14 +3,15 @@ import { batch, useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { addActivity, addMember, deleteGroup, fetchGroupData, removeMember, replaceHeadAdmin, updateGroup } from '../reducers/groupSlice';
+import { submitDeck } from "../reducers/communicationsSlice";
 import DeckList from './DeckList';
 import ActivityList from './ActivityList';
 import GroupMemberList from './GroupMemberList';
 import Modal from './Modal';
 import useToggle from '../hooks/useToggle';
 import axios from 'axios';
-import { addDeck, fetchDecksOfUser } from '../reducers/decksSlice';
-import { addMessage, removeGroup } from '../reducers/loginSlice';
+import { addAdminDeck, fetchDecksOfUser } from '../reducers/decksSlice';
+import { removeGroup } from '../reducers/loginSlice';
 import { generateJoinCode } from '../utils';
 import GroupMemberOption from './GroupMemberOption';
 import styled from 'styled-components';
@@ -128,7 +129,7 @@ function Group() {
     const [modalContent, setModalContent] = useState("");
     const [editMode, toggleEditMode] = useToggle(false);
     const userId = useSelector((state) => state.login.userId);
-    const decks = useSelector((state) => state.login.decks);
+    const userDecks = useSelector((state) => state.login.decks);
     const [groupDeletionInProgress, toggleGroupDeletionInProgress] = useToggle(false);
     const storedGroupId = useSelector((state) => state.group.groupId);
     const groupName = useSelector((state) => state.group.name);
@@ -137,35 +138,22 @@ function Group() {
     const administrators = useSelector((state) => state.group.administrators);
     const activityIds = useSelector((state) => state.group.activities);
     const joinOptions = useSelector((state) => state.group.joinOptions);
-    const joinCode = useSelector((state) => state.group.joinCode);
+    const joinCode = useSelector((state) => state.group.joinCode);//need to figure out how to make sure only admins can see this
     const [joinCodeVisible, toggleJoinCodeVisible] = useToggle(false);
     const [userEnteredJoinCode, clearUserEnteredJoinCode, handleChangeUserEnteredJoinCode, setUserEnteredJoinCode] = useFormInput("");
     const [deleteConfirmation, clearDeleteConfirmation, handleChangeDeleteConfirmation] = useFormInput("");
     
     const chooseDeck = evt => {
         if(administrators?.includes(userId)) {
-            axios.post(`${baseURL}/groups/${groupId}/decks`, {idOfDeckToCopy: evt.target.dataset.id})
-                .then((res) => {
-                    dispatch(addActivity({activityId: res.data.newActivity}));
-                    dispatch(addDeck({deckId: res.data.newDeck}));
+            dispatch(addAdminDeck({deckId: evt.target.dataset.id, adminId: userId, groupId}))
+                .then(() => {
+                    // dispatch(addActivity({activityId: res.data.newActivity}));
                     setModalContent("");
-                })
-                .catch(err => console.error(err));
-        } else {
-            let message = {
-                requestType: "DeckSubmission",
-                sendingUser: userId,
-                targetGroup: groupId,
-                targetDeck: evt.target.id
-            }
-            axios.post(`${baseURL}/groups/${groupId}/messages/admin/deck-submission`, message)
-                .then((response) => {
-                    dispatch(addMessage({message: response.data._id, direction: 'sent'}));
-                    setModalContent("");
-                })
-                .catch(err => {
-                    console.error(err);
                 });
+        } else {
+            console.log({userId, groupId, deckId: evt.target.id});
+            dispatch(submitDeck({userId, groupId, deckId: evt.target.id}));
+            setModalContent("");
         }
     }
     
@@ -175,7 +163,7 @@ function Group() {
                 return (
                     <DeckOptionContainer>
                         <p>{!administrators?.includes(userId) ? "Submit Deck To Be Added" : "Select a deck to submit"}</p>
-                        {decks.map(deck => 
+                        {userDecks.map(deck => 
                             <DeckOption data-id={deck._id} key={deck._id} id={deck._id} onClick={chooseDeck}>
                                 {deck.name}
                             </DeckOption>
@@ -300,7 +288,7 @@ function Group() {
     const handleSubmitUserEnteredJoinCode = (evt) => {
         evt.preventDefault();
         if(userEnteredJoinCode === joinCode) {
-            dispatch(addMember({groupId, userId}));
+            dispatch(addMember({groupId, userId}));//
         } else {
             //add logic here to count missed attempts within certain window, or maybe handle on backend
             clearUserEnteredJoinCode();
@@ -311,21 +299,21 @@ function Group() {
         setModalContent("");
     }
 
-    const sendJoinRequest = () => {
-        const message = {
-            requestType: "JoinRequest",
-            sendingUser: userId,
-            targetGroup: groupId
-        }
-        axios.post(`${baseURL}/groups/${groupId}/messages/admin`, message)
-            .then(response => {
-                dispatch(addMessage({message: response.data._id, direction: 'sent'}));
-                //eventually need to make group able to be private (or maybe be private by default. If private, instead of routing to Group show modal stating group is private, with optional join button, if group allows join requests)
-            })
-            .catch(err => {
-                console.error(err);
-            });
-    }
+    // const sendJoinRequest = () => {
+    //     const message = {
+    //         requestType: "JoinRequest",
+    //         sendingUser: userId,
+    //         targetGroup: groupId
+    //     }
+    //     axios.post(`${baseURL}/groups/${groupId}/messages/admin`, message)
+    //         .then(response => {
+    //             dispatch(addMessage({message: response.data._id, direction: 'sent'}));
+    //             //eventually need to make group able to be private (or maybe be private by default. If private, instead of routing to Group show modal stating group is private, with optional join button, if group allows join requests)
+    //         })
+    //         .catch(err => {
+    //             console.error(err);
+    //         });
+    // }
 
     useEffect(() => {
         if(!storedGroupId || (storedGroupId !== groupId)) {
@@ -420,7 +408,8 @@ function Group() {
                         {userEnteredJoinCode && <button type="submit">Join</button>}
                     </form>
                     :
-                    <button onClick={sendJoinRequest}>Request to Join Group</button>
+                    // <button onClick={sendJoinRequest}>Request to Join Group</button>
+                    <button>Request to Join Group</button>
                 }
             </div>
         )

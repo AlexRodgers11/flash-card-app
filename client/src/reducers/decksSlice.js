@@ -14,6 +14,16 @@ const initialState = {
     hasMore: true,
 };
 
+export const addAdminDeck = createAsyncThunk("decks/addAdminDeck", async ({deckId, groupId, adminId}) => {
+    try {
+        const response = await axios.post(`${baseURL}/groups/${groupId}/decks`, {deckId, groupId, adminId});
+        
+        return response.data;
+    } catch (err) {
+        console.error(err);
+    }
+}); 
+
 export const deleteDeck = createAsyncThunk("decks/deleteDeck", async (deckId) => {
     try {
         const response = await axios.delete(`${baseURL}/decks/${deckId}`);
@@ -69,11 +79,14 @@ export const decksSlice = createSlice({
     name: "decks",
     initialState,
     reducers: {
-        addDeck: (state, action) => {
+        addMemberSubmittedDeck: (state, action) => {
             state.deckIds = [...state.deckIds, action.payload.deckId]
         }
     },
     extraReducers: (builder) => {
+        builder.addCase(addAdminDeck.fulfilled, (state, action) => {
+            state.deckIds = [...state.deckIds, action.payload.deckId];
+        });
         builder.addCase(deleteDeck.fulfilled, (state, action) => {
             state.deckIds = state.deckIds.filter(id => id !== action.payload);
         });
@@ -96,5 +109,7 @@ export const decksSlice = createSlice({
 
 });
 
-export const { addDeck } = decksSlice.actions;
+export const { addMemberSubmittedDeck } = decksSlice.actions;
+
+
 export default decksSlice.reducer;

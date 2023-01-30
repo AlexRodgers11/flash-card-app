@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { resetDeck } from '../reducers/deckSlice';
-import { addDeck } from '../reducers/decksSlice';
+import { addMemberSubmittedDeck } from '../reducers/decksSlice';
 import { addDeckToUser } from '../reducers/loginSlice';
 import styled from 'styled-components';
 
@@ -93,7 +93,7 @@ function DeckForm() {
 		axios.post(`${baseURL}/users/${userId}/decks`, newDeck)
 			.then((response) => {
 				dispatch(addDeckToUser({_id: response.data._id, name: response.data.name}));
-				dispatch(addDeck({deckId: response.data._id}));
+				dispatch(addMemberSubmittedDeck({deckId: response.data._id}));//this will be handled in dispatched action from decksSlice, or renamed if dispatched elsewhere
 				navigate(`/decks/${response.data._id}`);
 			})
 			.catch(err => console.error(err));

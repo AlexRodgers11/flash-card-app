@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { addDeck } from '../reducers/decksSlice';
+import { addMemberSubmittedDeck } from '../reducers/decksSlice';
 import { addActivity } from '../reducers/groupSlice';
 import useFormInput from '../hooks/useFormInput';
 import { makeDeckSubmissionDecision } from '../reducers/communicationsSlice';
@@ -15,6 +15,7 @@ function DeckSubmissionMessage(props) {
 	const dispatch = useDispatch();
 	const userId = useSelector((state) => state.login.userId);
 	const deckListType = useSelector((state) => state.decks.listType);
+    const deckListId = useSelector((state) => state.decks.listId);
 	const [sender, setSender] = useState({});
 	const [targetDeck, setTargetDeck] = useState({});
     const [targetGroup, setTargetGroup] = useState({});
@@ -38,8 +39,8 @@ function DeckSubmissionMessage(props) {
                 console.log({payload: response.payload});
                 if(!response.payload.sentMessage) {
                     alert(`This deck has already been ${response.payload.acceptanceStatus}`);
-                } else if(response.payload.acceptanceStatus === "approved" && deckListType === "group") {
-                    dispatch(addDeck({deckId: targetDeck._id}));
+                } else if((response.payload.acceptanceStatus === "approved" && deckListType === "group") && deckListId === targetGroup._id) {
+                    dispatch(addMemberSubmittedDeck({deckId: targetDeck._id}));
 					// dispatch(addActivity({activityId: payload.newActivity, groupId: targetGroup._id}));
                 }
                 props.hideModal();

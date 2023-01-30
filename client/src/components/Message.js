@@ -28,28 +28,28 @@ function Message(props) {
 				console.log("DeckSubmission message found");
 				return (
 					<div onClick={!props.fullView ? expandMessage : null}>
-						<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} direction={props.direction} />
+						<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} />
 					</div>
 				);
 			case 'DeckDecision':
 				console.log("DeckDecision message found");
 				return (
 					<div onClick={!props.fullView ? expandMessage : null}>
-						<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} direction={props.direction} />
+						<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} />
 					</div>
 				);
 			case 'JoinRequest':
 				console.log("Join request message");
 				return (
 					<div onClick={!props.fullView ? expandMessage : null}>
-						<JoinRequestMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} direction={props.direction} />
+						<JoinRequestMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} />
 					</div>
 				);
 			case "JoinDecision":
 				console.log("JoinDecision message");
 				return (
 					<div onClick={!props.fullView ? expandMessage : null}>
-						<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} direction={props.direction} />
+						<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} />
 					</div>
 				);
 			default:

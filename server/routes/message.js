@@ -134,11 +134,9 @@ messageRouter.patch('/:messageId/add-to-read', async (req, res, next) => {
 });
 
 messageRouter.patch('/:messageId', async (req, res, next) => {
-    console.log({body: req.body});
-
     try {
         switch(req.body.messageType) {
-            case "DeckDecision": //should this be DeckSubmission
+            case "DeckSubmission": //should this be DeckSubmission
                 //first make sure hasn't already been approved/denied by another admin
                 const foundDeckSubmissionMessage = await DeckSubmission.findById(req.message._id).populate("targetDeck", "name");
 
@@ -165,7 +163,6 @@ messageRouter.patch('/:messageId', async (req, res, next) => {
                         await Deck.findByIdAndDelete(req.body.deckId)
                     }
 
-                    console.log({submittedDeck});
                     const deckDecisionMessage = new DeckDecision({
                         sendingUser: req.body.decidingUserId,
                         read: [],
@@ -178,8 +175,7 @@ messageRouter.patch('/:messageId', async (req, res, next) => {
                     });
 
                     const savedDeckDecisionMessage = await deckDecisionMessage.save();
-                    console.log({savedDeckDecisionMessage});
-                    await User.findByIdAndUpdate(foundMessage.sendingUser, {$push: {"messages.received": savedDeckDecisionMessage}});
+                    await User.findByIdAndUpdate(foundDeckSubmissionMessage.sendingUser, {$push: {"messages.received": savedDeckDecisionMessage}});
                     await User.findByIdAndUpdate(req.body.decidingUserId, {$push: {"messages.sent": savedDeckDecisionMessage}});
 
                     res.status(200).send({sentMessage: {_id: savedDeckDecisionMessage._id, read: savedDeckDecisionMessage.read, messageType: savedDeckDecisionMessage.messageType}, acceptanceStatus: req.body.decision});

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { resetDeck } from '../reducers/deckSlice';
@@ -74,6 +74,7 @@ const ButtonWrapper = styled.div`
 function DeckForm() {
 	const [nameInput, clearNameInput, handleNameInputChange] = useFormInput('');
   	const [publiclyAvailable, clearPubliclyAvailable, handlePubliclyAvailableChange] = useFormInput("false");
+	const listType = useSelector((state) => state.decks.listType);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	let { userId } = useParams();
@@ -93,7 +94,9 @@ function DeckForm() {
 		axios.post(`${baseURL}/users/${userId}/decks`, newDeck)
 			.then((response) => {
 				dispatch(addDeckToUser({_id: response.data._id, name: response.data.name}));
-				dispatch(addMemberSubmittedDeck({deckId: response.data._id}));//this will be handled in dispatched action from decksSlice, or renamed if dispatched elsewhere
+				if(listType === "user") {
+					dispatch(addMemberSubmittedDeck({deckId: response.data._id}));//this will be handled in dispatched action from decksSlice, or renamed if dispatched elsewhere
+				}
 				navigate(`/decks/${response.data._id}`);
 			})
 			.catch(err => console.error(err));

@@ -6,6 +6,7 @@ import useFormInput from '../hooks/useFormInput';
 import { fetchGroupJoinOptions } from '../reducers/groupSlice';
 import { submitJoinCode } from '../reducers/loginSlice';
 import { sendJoinRequest } from "../reducers/communicationsSlice";
+import { addGroup } from '../reducers/loginSlice';
 
 const baseURL = "http://localhost:8000";
 
@@ -60,6 +61,8 @@ function RegisterJoinGroupsForm(props) {
             if(result.payload) {
                 setContent("success");
                 setJoinAttemptType("code");
+                dispatch(addGroup({groupId: selectedGroupId}));
+                
             } else {
                 setContent("failure");
                 setUserEnteredJoinCode("");

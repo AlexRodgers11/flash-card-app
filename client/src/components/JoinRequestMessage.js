@@ -19,31 +19,28 @@ function JoinRequestMessage(props) {
 	const [acceptanceStatus, setAcceptanceStatus] = useState("");
 	const [decision, setDecision] = useState("");
 	const [comment, clearComment, handleCommentChange, setComment] = useFormInput("");
+	const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		console.log("in JoinRequestMessage useEffect");
-		console.log(sender);
-		if(!sender) {
-			console.log("no sender");
+		if(loading) {
 			(async () => {
 				try {
-					console.log("retrieving join request message")
 					const messageRetrievalResponse = await axios.get(`${baseURL}/messages/${props.messageId}?type=JoinRequest`);
 					let data = messageRetrievalResponse.data;
-					console.log({data});
 					setSender(data.sendingUser);
 					setRead(data.read.includes(userId));
 					setTargetGroup(data.targetGroup);
                     setAcceptanceStatus(data.acceptanceStatus);
+					setLoading(false);
 				} catch (err) {
 					console.error(err);
 				}
 
 			})();
 		}
-	}, []);
+	}, [loading, props.messageId, userId]);
 
 	const acceptUser = () => {
 		setDecision("approved");
@@ -77,20 +74,17 @@ function JoinRequestMessage(props) {
 		navigate(`users/${sender._id}?review=true`);
 	}
 	
-	if(!acceptanceStatus) {
-		console.log("acceptance status not found");
+	if(loading) {
 		return (
 			<></>
 		);
-	} else {
-		console.log("acceptance status not found");
-		
+	} else {		
 		return (
 			<div>
                 {props.fullView ? 
                     <div>
-                        {props.direction === "received" ? <p>From: {sender.login.username || `${sender.name.first} ${sender.name.last}`}</p> : <p>To: {targetGroup.name} admins</p>}
-                        <p><span>{sender.login.username}</span> would like to join: {targetGroup.name}</p>
+                        {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup?.name || "deleted group"} admins</p>}
+                        <p><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to join: {targetGroup?.name || "deleted group"}</p>
                         {!decision ? 
                             userId !== sender._id && <><button onClick={acceptUser}>Accept</button><button onClick={denyUser}>Decline</button><button onClick={reviewUser}>View User</button></>
                             :
@@ -106,8 +100,8 @@ function JoinRequestMessage(props) {
                     </div>
                     :
                     <div>
-                        {props.direction === "received" ? <p>From: {sender.login.username || `${sender.name.first} ${sender.name.last}`}</p> : <p>To: {targetGroup.name} admins</p>}
-                        <p><span>{read ? 'Read': 'Unread'}: </span><span>{sender.login.username || `${sender.name.first} ${sender.name.last}`}</span>would like to join: {targetGroup.name}</p>
+                        {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup?.name || "deleted user"} admins</p>}
+                        <p><span>{read ? 'Read': 'Unread'}: </span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to join: {targetGroup?.name || "deleted group"}</p>
                         <hr />
                     </div>
                 }

@@ -14,51 +14,46 @@ function JoinDecisionMessage(props) {
     const [targetGroup, setTargetGroup] = useState({})
 	const [acceptanceStatus, setAcceptanceStatus] = useState();
 	const [comment, setComment] = useState();
+    const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-        console.log("in useEffect of JoinDecisionMessage");
-		if(!acceptanceStatus) {
+		if(loading) {
             (async () => {
                 try {
-                    console.log("retrieving data");
-                    console.log({messageId: props.messageId});
 					const messageRetrievalResponse = await axios.get(`${baseURL}/messages/${props.messageId}?type=JoinDecision`);
-                    console.log({messageRetrievalResponse});
 					let data = messageRetrievalResponse.data;
-                    console.log({data});
 					setSender(data.sendingUser);
                     setRead(data.read.includes(userId));
 					setTargetGroup(data.targetGroup);
                     setTargetUser(data.targetUser);
                     setAcceptanceStatus(data.acceptanceStatus);
                     setComment(data.comment);
+                    setLoading(false);
 				} catch (err) {
 					console.error(err.message);
 				}
 
 			})();
 		}
-	}, [acceptanceStatus, props.messageId]);
+	}, [loading, props.messageId, userId]);
 
-    if(!acceptanceStatus) {
-        console.log("acceptance status not found");
+    if(loading) {
         return (
             <></>
         );
     } else {
-        console.log("acceptance status found");
         return (
             <div>
                 {props.fullView ? 
                     <div>
-                        {props.direction === "received" ? <p>From: {sender.login.username || `${sender.name.first} ${sender.name.last}`}</p> : <p>To: {targetUser.login.username || `${targetUser.name.first} ${targetUser.name.last}`}</p>}
+                        {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetUser?.login?.username || targetUser ? `${targetUser.name.first} ${targetUser.name.last}` : "deleted user"}</p>}
                         <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender.login.username}</span> {acceptanceStatus} your request to join group <span>{targetGroup.name}</span></p>
                         {comment && <p>Comment: "{comment}"</p>}
                     </div>
                     :
                     <div>
-                        {props.direction === "received" ? <p>From: {sender.login.username || `${sender.name.first} ${sender.name.last}`}</p> : <p>To: {targetUser.login.username || `${targetUser.name.first} ${targetUser.name.last}`}</p>}
-                        <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender.login.username}</span> {acceptanceStatus} your request to join group: <span>{targetGroup.name}</span>.</p>
+                        {props.direction === "received" ? <p>From: {sender?.login?.username || `${sender.name.first} ${sender.name.last}`}</p> : <p>To: {targetUser.login.username || `${targetUser.name.first} ${targetUser.name.last}`}</p>}
+                        <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> {acceptanceStatus} your request to join group: <span>{targetGroup?.name || "deleted group"}</span>.</p>
                         <hr />
                     </div>
                 }

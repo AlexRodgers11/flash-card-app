@@ -24,6 +24,7 @@ function DeckSubmissionMessage(props) {
 	const [acceptanceStatus, setAcceptanceStatus] = useState("");
     const [decision, setDecision] = useState("");
 	const [comment, clearComment, handleCommentChange, setComment] = useFormInput("");
+    const [loading, setLoading] = useState(true);
 
     const acceptDeck = () => {
         setDecision("approved");
@@ -59,7 +60,7 @@ function DeckSubmissionMessage(props) {
 	}
 
 	useEffect(() => {
-		if(!acceptanceStatus) {
+		if(loading) {
 			(async () => {
 				try {
 					const messageRetrievalResponse = await axios.get(`${baseURL}/messages/${props.messageId}?type=DeckSubmission`);
@@ -71,26 +72,26 @@ function DeckSubmissionMessage(props) {
                     setTargetDeck(data.targetDeck);
                     setDeckName(data.deckName);
                     setAcceptanceStatus(data.acceptanceStatus);
+                    setLoading(false);
 				} catch (err) {
 					console.error(err);
 				}
 
 			})();
 		}
-	}, []);
+	}, [loading, props.messageId, userId]);
     
-    if(!acceptanceStatus) {
+    if(loading) {
         return (
             <></>
         );
     } else {
-        console.log({id: props.messageId})
         return (
             <div>
                 {props.fullView ? 
                     <div>
-                        {props.direction === "received" ? <p>From: {sender.login.username || `${sender.name.first} ${sender.name.last}`}</p> : <p>To: {targetGroup.name} admins</p>}
-                        <p><span>{sender.login.username || `${sender.name.first} ${sender.name.last}`}</span> would like to add deck: {deckName} to <span>{targetGroup.name}</span></p>
+                        {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup.name} admins</p>}
+                        <p><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to add deck: {deckName} to <span>{targetGroup?.name || "deleted group"}</span></p>
                         {!decision ? 
                             userId !== sender._id && <><button onClick={acceptDeck}>Accept</button><button onClick={denyDeck}>Decline</button><button onClick={reviewDeck}>View Deck</button></>
                             :
@@ -106,8 +107,8 @@ function DeckSubmissionMessage(props) {
                     </div>
                     :
                     <div>
-                        {props.direction === "received" ? <p>From: {sender.login.username || `${sender.name.first} ${sender.name.last}`}</p> : <p>To: {targetGroup.name} admins</p>}
-                        <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender.login.username || `${sender.name.first} ${sender.name.last}`}</span> would like to add deck: {deckName} to <span>{targetGroup.name}</span></p>
+                        {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup?.name || "deleted group"} admins</p>}
+                        <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to add deck: {deckName} to <span>{targetGroup?.name || "deleted group"}</span></p>
                         <hr />
                     </div>
                 }

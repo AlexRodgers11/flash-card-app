@@ -53,12 +53,11 @@ function JoinRequestMessage(props) {
 	const submitUserDecision = () => {
 		dispatch(makeJoinRequestDecision({messageId: props.messageId, decision, comment, decidingUserId: userId}))
 			.then((response) => {
-				console.log({response});
-				console.log({payload: response.payload});
 				if(!response.payload.sentMessage) {
 					alert(`This user has already been ${response.payload.acceptanceStatus}`);
-				} else if(response.payload.acceptanceStatus === "approved" && storedGroupId === targetGroup) {
-					dispatch(addMember({groupId: targetGroup, userId}));
+				} else if(response.payload.acceptanceStatus === "approved" && storedGroupId === targetGroup._id) {
+					console.log("should be adding member to group store in real time");
+					dispatch(addMember({groupId: targetGroup._id, userId: sender._id}));
 				}
 				props.hideModal();
 			});

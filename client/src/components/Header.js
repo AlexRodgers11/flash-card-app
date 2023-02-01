@@ -65,6 +65,7 @@ function Header() {
     const handleLogout = () => {
         navigate("/");
         dispatch(logout());
+        handleHideModal();
     }
 
     

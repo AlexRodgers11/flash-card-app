@@ -36,10 +36,10 @@ function RegisterIdentificationForm() {
     useEffect(() => {
         if(storedPhoto) {
             navigate("/register/profile-pic-crop");
-        } else if(name.first) {
+        } else if(name?.first) {
             navigate("/register/join-groups");
         }
-    }, [name.first, navigate, storedPhoto])
+    }, [name?.first, navigate, storedPhoto])
 
 
     return (

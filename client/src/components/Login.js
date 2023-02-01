@@ -1,40 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router'
-import useFormInput from '../hooks/useFormInput';
 import { fetchLoggedInUserData, login } from '../reducers/loginSlice';
 import { fetchCommunications } from '../reducers/communicationsSlice';
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styled from 'styled-components';
 import useToggle from '../hooks/useToggle';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { ErrorMessage } from './StyledComponents/ErrorMessage';
+import { PasswordWrapper, StyledClosedEye, StyledOpenEye } from './StyledComponents/Password';
 
 const FormWrapper = styled.form`
     & input {
         width: 100%;
     }
 `;
-
-const PasswordWrapper = styled.div`
-    position: relative;
-`;
-
-const StyledOpenEye = styled(AiOutlineEye)`
-    position: absolute;
-    right: 4%;
-    top: 28%;
-    cursor: pointer;
-`;
-
-const StyledClosedEye = styled(AiOutlineEyeInvisible)`
-    position: absolute;
-    right: 4%;
-    top: 28%;
-    cursor: pointer;
-`;
-
-
 
 function Login() {
     const dispatch = useDispatch();

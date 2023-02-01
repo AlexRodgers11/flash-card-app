@@ -1,29 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { signUp } from '../reducers/loginSlice';
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styled from 'styled-components';
 import useToggle from '../hooks/useToggle';
 import { ErrorMessage } from './StyledComponents/ErrorMessage';
-
-const PasswordWrapper = styled.div`
-    position: relative;
-`;
-
-const StyledOpenEye = styled(AiOutlineEye)`
-    position: absolute;
-    right: 4%;
-    top: 28%;
-`;
-
-const StyledClosedEye = styled(AiOutlineEyeInvisible)`
-    position: absolute;
-    right: 4%;
-    top: 28%;
-`;
+import { PasswordWrapper, StyledClosedEye, StyledOpenEye } from './StyledComponents/Password';
 
 const FormWrapper = styled.form`
     & input {

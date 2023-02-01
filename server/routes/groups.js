@@ -62,12 +62,21 @@ groupRouter.get("/:groupId/decks", (req, res, next) => {
     res.status(200).send(JSON.stringify(req.group.decks));
 });
 
-//start here and make sure action payload lines up then move on to patch then do the rest of DeckSubmission
+
 groupRouter.post("/:groupId/decks", async (req, res, next) => {
     try {
-        const deckCopy = copyDeck(req.body.deckId);
-        await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deckCopy}});
-        res.status(200).send(deckCopy._id);
+        const deckCopy = await copyDeck(req.body.deckId);
+        deckCopy.groupDeckBelongsTo = req.group._id;
+        deckCopy.approvedByGroupAdmins = true,
+        deckCopy.deckCopiedFrom = req.body.deckId;
+        const savedDeckCopy = await deckCopy.save();
+        const updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$push: {decks: savedDeckCopy}}); 
+        //possibly exclude the approver's id
+
+        const otherGroupMembers = updatedGroup.members.filter(memberId => memberId.toString() !== req.body.adminId);
+
+        await User.updateMany({_id: {$in: otherGroupMembers}}, {$push: {notifications: await DeckAddedNotification.create({targetDeck: savedDeckCopy._id, targetGroup: updatedGroup._id, read: false})}});
+        res.status(200).send(savedDeckCopy._id);
     } catch (err) {
         res.status(500).send(err.message);
     }

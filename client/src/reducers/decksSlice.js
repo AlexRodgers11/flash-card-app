@@ -17,7 +17,6 @@ const initialState = {
 export const addAdminDeck = createAsyncThunk("decks/addAdminDeck", async ({deckId, groupId, adminId}) => {
     try {
         const response = await axios.post(`${baseURL}/groups/${groupId}/decks`, {deckId, groupId, adminId});
-        
         return response.data;
     } catch (err) {
         console.error(err);
@@ -85,7 +84,7 @@ export const decksSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(addAdminDeck.fulfilled, (state, action) => {
-            state.deckIds = [...state.deckIds, action.payload.deckId];
+            state.deckIds = [...state.deckIds, action.payload];
         });
         builder.addCase(deleteDeck.fulfilled, (state, action) => {
             state.deckIds = state.deckIds.filter(id => id !== action.payload);

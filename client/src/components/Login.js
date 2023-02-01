@@ -7,6 +7,13 @@ import { fetchCommunications } from '../reducers/communicationsSlice';
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styled from 'styled-components';
 import useToggle from '../hooks/useToggle';
+import { NavigationSpan } from './StyledComponents/NavigationSpan';
+
+const FormWrapper = styled.form`
+    & input {
+        width: 100%;
+    }
+`;
 
 const PasswordWrapper = styled.div`
     position: relative;
@@ -24,6 +31,8 @@ const StyledClosedEye = styled(AiOutlineEyeInvisible)`
     top: 28%;
 `;
 
+
+
 function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -39,6 +48,10 @@ function Login() {
         clearUsernameOrEmail();
     }
 
+    const goToSignUpPage = () => {
+        navigate("/register/credentials")
+    }
+
     useEffect(() => {
         if(userId) {
             dispatch(fetchLoggedInUserData(userId));
@@ -49,7 +62,7 @@ function Login() {
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
+            <FormWrapper onSubmit={handleSubmit}>
                 <div>
                     <input placeholder="username or email" type="text" id="usernameOrEmail" name="usernameOrEmail" value={usernameOrEmail} onChange={setUsernameOrEmail} />
                 </div>
@@ -59,7 +72,8 @@ function Login() {
                     {passwordVisible && <StyledClosedEye onClick={togglePasswordVisible} />}
                 </PasswordWrapper> 
                 <button type="submit">Submit</button>
-            </form>
+                <p>Don't have an account? <NavigationSpan onClick={goToSignUpPage}>Sign up now!</NavigationSpan></p>
+            </FormWrapper>
         </div>
     )
 }

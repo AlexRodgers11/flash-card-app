@@ -1,43 +1,28 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import axios from 'axios';
-import { useNavigate } from 'react-router';
-
-const baseURL = 'http://localhost:8000';
+import NewMemberJoinedNotification from './NewMemberJoinedNotification';
+import DeckAddedNotification from './DeckAddedNotification';
+import AdminChangeNotification from './AdminChangeNotification';
+import RemovedFromGroupNotification from './RemovedFromGroupNotification';
+import GroupDeletedNotification from './GroupDeletedNotification';
+import HeadAdminChangeNotification from './HeadAdminChangeNotification';
 
 function Notification(props) {
-	const navigate = useNavigate();
-	const [notification, setNotification] = useState({});
-
-	useEffect(() => {
-		if(!notification.notificationType) {
-			axios.get(`${baseURL}/notifications/${props.notificationId}`)
-				.then((response) => {
-					setNotification(response.data);
-				})
-		}
-	}, [notification, props.notificationId]);
-
-	const handleClick = () => {
-		//make sure hiding Modal and thus destroying component chain won't short circuit navigation call if using React 18's concurrency
-		props.hideModal();
-		switch(notification.notificationType) {
-			case 'DeckSubmission':
-				if(notification.decision === 'approved') {
-					navigate(`/groups/${notification.groupTarget._id}`);
-				}
-				break;
-			default:
-				break;
-		}
-	}
 	
 	const renderNotification = () => {
-		switch(notification.notificationType) {
-			case 'DeckDecision':
-				return <p onClick={handleClick}>{notification.actor.login.username} {notification.decision} your request to add deck {notification.deckTarget.name} to {notification.groupTarget.name}</p>
-			case "JoinDecision":
-				return <p onClick={handleClick}>{notification.actor.login.username} {notification.decision} your request to join the group {notification.groupTarget.name}</p>
+		switch(props.notificationType) {
+			case "NewMemberJoined": 
+				return <NewMemberJoinedNotification hideModal={props.hideModal} notificationId={props.notificationId} />
+			case "DeckAdded":
+				return <DeckAddedNotification hideModal={props.hideModal} notificationId={props.notificationId} />
+			case "AdminChange":
+				return <AdminChangeNotification hideModal={props.hideModal} notificationId={props.notificationId}/>
+			case "RemovedFromGroup":
+				return <RemovedFromGroupNotification hideModal={props.hideModal} notificationId={props.notificationId} />
+			case "GroupDeleted": 
+				return <GroupDeletedNotification hideModal={props.hideModal} notificationId={props.notificationId} />
+			case "HeadAdminChange":
+				return <HeadAdminChangeNotification hideModal={props.hideModal} notificationId={props.notificationId} />
 			default:
 				return null
 		}

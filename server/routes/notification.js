@@ -1,6 +1,6 @@
 import express from "express";
 const notificationRouter = express.Router();
-import { JoinDecision, Notification }  from "../models/notification.js";
+import { AdminChangeNotification, DeckAddedNotification, GroupDeletedNotification, HeadAdminChangeNotification, NewMemberJoinedNotification, Notification, RemovedFromGroupNotification }  from "../models/notification.js";
 
 notificationRouter.param("notificationId", (req, res, next, notificationId) => {
     Notification.findById(notificationId, (err, notification) => {
@@ -16,6 +16,102 @@ notificationRouter.param("notificationId", (req, res, next, notificationId) => {
             next();
         }
     });
+});
+
+notificationRouter.get("/:notificationId", async (req, res, next) => {
+    let notificationResponse;
+    try {
+        switch(req.query.type) {
+            case "NewMemberJoined": 
+                notificationResponse = await NewMemberJoinedNotification.findById(req.notification._id).populate(
+                    [
+                        {
+                            path: "member",
+                            select: "login.username name.first name.last"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        }
+                    ]
+                );
+                res.status(200).send(notificationResponse);
+                break;
+            case "DeckAdded":
+                notificationResponse = await DeckAddedNotification.findById(req.notification._id).populate(
+                    [
+                        {
+                            path: "targetDeck",
+                            select: "name"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        }
+                    ]
+                );
+                res.status(200).send(notificationResponse);
+                break;
+            case "AdminChange":
+                notificationResponse = await AdminChangeNotification.findById(req.notification._id).populate(
+                    [
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        },
+                        {
+                            path: "decidingUser",
+                            select: "login.username name.first name.last"
+                        }
+                    ]
+                );
+                res.status(200).send(notificationResponse);
+                break;
+            case "RemovedFromGroup":
+                notificationResponse = await RemovedFromGroupNotification.findById(req.notification._id).populate(
+                    [
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        },
+                        {
+                            path: "decidingUser",
+                            select: "login.username name.first name.last"
+                        }
+                    ]
+                );
+                res.status(200).send(notificationResponse);
+                break;
+            case "GroupDeleted":
+                notificationResponse = await GroupDeletedNotification.findById(req.notification._id);
+                res.status(200).send(notificationResponse);
+                break;
+            case "HeadAdminChange":
+                notificationResponse = await HeadAdminChangeNotification.findById(req.notification._id).populate(
+                    [
+                        {
+                            path: "previousHeadAdmin",
+                            select: "login.username name.first name.last"
+                        },
+                        {
+                            path: "newHeadAdmin",
+                            select: "login.username name.first name.last"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        }
+                    ]
+                );
+                res.status(200).send(notificationResponse);
+                break;
+            default: 
+                res.status(500).send("Invalid notification type requested");
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
 });
 
 notificationRouter.get("/:notificationId", (req, res, next) => {

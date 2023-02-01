@@ -5,6 +5,7 @@ import { DeckDecision, DeckSubmission, DirectMessage, JoinDecision, JoinRequest,
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import User from "../models/user.js";
+import { DeckAddedNotification, NewMemberJoinedNotification } from "../models/notification.js";
 
 const baseURL = 'http://localhost:8000';
 
@@ -158,7 +159,10 @@ messageRouter.patch('/:messageId', async (req, res, next) => {
                     //handle add/delete deck based on approval/denial decision
                     if(req.body.decision === "approved") {
                         const updatedDeck = await Deck.findByIdAndUpdate(req.body.deckId, {approvedByGroupAdmins: true}, {new: true});
-                        await Group.findByIdAndUpdate(req.body.groupId, {$push: {decks: updatedDeck._id}});
+                        const updatedGroup = await Group.findByIdAndUpdate(req.body.groupId, {$push: {decks: updatedDeck._id}});
+                        //possibly exclude the approver's id
+                        const otherGroupMembers = updatedGroup.members.filter(memberId => memberId.toString() !== req.body.decidingUserId && memberId.toString() !== req.message.sendingUser.toString());
+                        await User.updateMany({_id: {$in: otherGroupMembers}}, {$push: {notifications: await DeckAddedNotification.create({targetDeck: updatedDeck, targetGroup: foundDeckSubmissionMessage.targetGroup, read: false})}});
                     } else if(req.body.decision === "denied") {
                         await Deck.findByIdAndDelete(req.body.deckId)
                     }
@@ -196,8 +200,30 @@ messageRouter.patch('/:messageId', async (req, res, next) => {
                         await JoinRequest.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
 
                         if(req.body.decision === "approved") {
+                            const foundGroup = await Group.findById(foundJoinRequestMessage.targetGroup, "members");
                             await Group.findByIdAndUpdate(foundJoinRequestMessage.targetGroup, {$addToSet: {members: foundJoinRequestMessage.sendingUser}});
                             await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$addToSet: {groups: foundJoinRequestMessage.targetGroup}});
+                            // const memberJoinedNotification = new NewMemberJoinedNotification({member: foundJoinRequestMessage.sendingUser, targetGroup: foundJoinRequestMessage.targetDeck});
+                            // await memberJoinedNotification.save();
+                            // await User.updateMany({_id: {$in: foundGroup.members}}, {$push: {notifications: memberJoinedNotification}});
+                            const otherGroupMembers = foundGroup.members.filter(memberId => memberId.toString() !== req.body.decidingUserId);
+                            await User.updateMany({_id: {$in: otherGroupMembers}}, {$push: {notifications: await NewMemberJoinedNotification.create({member: foundJoinRequestMessage.sendingUser, targetGroup: foundJoinRequestMessage.targetGroup, read: false})}});
+
+
+                            // const bulkOps = foundGroup.members.map(async memberId => {
+                            //     try {
+                            //         const memberJoinedNotification = await NewMemberJoinedNotification.create({member: foundJoinRequestMessage.sendingUser, targetGroup: foundJoinRequestMessage.targetDeck});
+                            //         return {updateOne: {
+                            //           filter: { _id: memberId },
+                            //           update: { $push: { notifications: memberJoinedNotification } }
+                            //         }}
+                            //     } catch (err) {
+                            //         console.error(err);
+                            //         throw err;
+                            //     }
+                            //   });
+                              
+                            // await User.bulkWrite(bulkOps);
                         }  
 
                         const joinDecisionMessage = new JoinDecision({

@@ -171,7 +171,7 @@ userRouter.get("/:userId/communications", async (req, res, next) => {
         const foundUser = await User.findById(req.user._id, "messages notifications -_id")
             .populate("messages.received", "messageType read")
             .populate("messages.sent", "messageType read")
-            .populate("notifications", "messageType read");
+            .populate("notifications", "notificationType read");
         res.status(200).send({messages: foundUser.messages, notifications: foundUser.notifications});
     } catch (err) {
         res.status(500).send(err.message);
@@ -262,7 +262,7 @@ userRouter.patch("/:userId/notifications/mark-as-read", async (req, res, next) =
         let user = await User.findById(req.user._id, "notifications")
             .populate({
                 path: "notifications",
-                select: "read -notificationType"
+                select: "read notificationType"
             })
         res.status(200).send(user.notifications);
     } catch (err) {

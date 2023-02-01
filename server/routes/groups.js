@@ -1,11 +1,13 @@
 import express from "express";
 const groupRouter = express.Router();
+import mongoose from "mongoose";
 
 import Activity from "../models/activity.js";
 import { Card } from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import { DeckSubmission, JoinRequest } from "../models/message.js";
+import { AdminChangeNotification, DeckAddedNotification, GroupDeletedNotification, HeadAdminChangeNotification, NewMemberJoinedNotification, RemovedFromGroupNotification } from "../models/notification.js";
 import User from "../models/user.js";
 import { copyDeck, swapIndexes } from "../utils.js";
 
@@ -85,7 +87,6 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
 groupRouter.patch("/:groupId/decks", async (req, res, next) => {
     try {
         const deckCopy = await copyDeck(req.body.deckId);
-        console.log({deckCopy});
         await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deckCopy}});
         res.status(200).send({submittedDeckId: deckCopy._id, submittedDeckName: deckCopy.name});
     } catch (err) {
@@ -96,19 +97,38 @@ groupRouter.patch("/:groupId/decks", async (req, res, next) => {
 
 groupRouter.patch("/:groupId/head-admin", async (req, res, next) => {
     try {
-        let newAdminIdx = req.group.administrators.indexOf(req.body.newAdminId);
-        let newAdministrators = req.group.administrators.slice();
-        let prevAdmin = req.group.administrators[0];
-        if(newAdminIdx > 0) {
-            swapIndexes(newAdministrators, 0, newAdminIdx);
-            newAdministrators.splice(newAdminIdx, 1);
+        const newHeadAdminIdx = req.group.administrators.indexOf(req.body.newAdminId);
+        const newAdministrators = req.group.administrators.slice();
+        const prevAdminId = req.group.administrators[0];
+        if(newHeadAdminIdx > 0) {//start here- make sure if mbr wasn't an admin making them head admin places them at the front of the member list and admin list
+            swapIndexes(newAdministrators, 0, newHeadAdminIdx);
+            newAdministrators.splice(newHeadAdminIdx, 1);
         } else {
             newAdministrators.shift();
             newAdministrators.unshift(req.body.newAdminId);
         }
         await User.findByIdAndUpdate(req.body.newAdminId, {$push: {adminOf: req.group._id}});
-        await User.findByIdAndUpdate(prevAdmin, {$pull: {adminOf: req.group._id, groups: req.group._id}});
-        let updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$set: {administrators: newAdministrators}, $pull: {members: prevAdmin}},  {new: true});
+        await User.findByIdAndUpdate(prevAdminId, {$pull: {adminOf: req.group._id, groups: req.group._id}});
+        const updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$set: {administrators: newAdministrators}, $pull: {members: prevAdminId}},  {new: true});
+        // const otherGroupMembers = updatedGroup.members.filter(memberId => memberId.toString() !== req.body.newAdminId);
+        let reorderedGroupMembers = [...updatedGroup.members].sort((a, b) => {
+            if(a.toString() === req.body.newAdminId) {
+                return -1;
+            } else if (b.toString() === req.body.newAdminId) {
+                return 1;
+            } else if (updatedGroup.administrators.includes(a)) {
+                if(updatedGroup.administrators.includes(b)) {
+                    return 0
+                } 
+                return -1; 
+            } else if(updatedGroup.administrators.includes(b)) {
+                return 1;
+            }
+            return 0;
+        });
+        await Group.findByIdAndUpdate(req.group._id, {$set: {members: reorderedGroupMembers}});
+
+        await User.updateMany({_id: {$in: updatedGroup.members}}, {$push: {notifications: await HeadAdminChangeNotification.create({targetGroup: updatedGroup._id, previousHeadAdmin: prevAdminId, newHeadAdmin: req.body.newAdminId, read: false})}});
         res.status(200).send({
             administrators: updatedGroup.administrators,
             members: updatedGroup.members
@@ -124,18 +144,24 @@ groupRouter.patch("/:groupId/members", async (req, res, next) => {
     //necessary to do this check since it would take Postman or something to send a request with a member Id not in the group?
     if(req.group.members.includes(req.body.memberToRemoveId)) {
         //Is this truly secure? Admin ids are exposed in devtools...
-        //also, may need to split this into two ifs so notification can be sent if an admin removes a group member
-        if(req.group.members.includes(req.body.requesterId) || req.group.administrators.includes(req.body.requesterId)) {
-            try {
+        try {
+            let updatedUser;
+            //process the removalif either the requesting user is the one to be deleted or the requesting user is a group admin
+            if(req.body.requesterId === req.body.memberToRemoveId || req.group.members.includes(mongoose.Types.ObjectId(req.body.requesterId))) {
                 await Group.findByIdAndUpdate(req.group._id, {$pull: {members: req.body.memberToRemoveId, administrators: req.body.memberToRemoveId}});
-                const updatedUser = await User.findByIdAndUpdate(req.body.memberToRemoveId, {$pull: {groups: req.group._id, adminOf: req.group._id}});
+                updatedUser = await User.findByIdAndUpdate(req.body.memberToRemoveId, {$pull: {groups: req.group._id, adminOf: req.group._id}});
+                
+                //if the user is being removed by an admin (other than an admin removing themselves) send a notification to the removed user
+                if(req.body.requesterId !== req.body.memberToRemoveId) {
+                    await User.findByIdAndUpdate(updatedUser._id, {$push: {notifications: await RemovedFromGroupNotification.create({targetGroup: req.group._id, decidingUser: req.body.requesterId, read: false})}});
+                }
                 res.status(200).send(updatedUser._id);
-            } catch (err) {
-                res.status(500).send(err.message);
-                throw err;
+            } else {
+                res.status(403).send("You do not have the authority to remove this member");
             }
-        } else {
-            res.status(403).send("You do not have the authority to remove this member");
+        } catch (err) {
+            console.error(err);
+            res.status(500).send(err.message);
         }
     } else {
         res.status(404).send("Cannot remove member because member not found");
@@ -150,11 +176,9 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
                 let updatedGroup;
                 let updatedUser;
                 if(req.body.action === "grant") {
-                    //need to create notification here eventually and possibly an activity
                     updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$push: {administrators: user._id}}, {new: true});
                     updatedUser = await User.findByIdAndUpdate(user._id, {$push: {adminOf: req.group._id}});
                 } else if(req.body.action === "revoke") {
-                    //need to create notification here eventually
                     updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$pull: {administrators: user._id}}, {new: true});
                     updatedUser = await User.findByIdAndUpdate(user._id, {$pull: {adminOf: req.group._id}});
                 } else {
@@ -175,8 +199,11 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
                     }
                     return 0;
                 });
-            
+                
                 await Group.findByIdAndUpdate(req.group._id, {members: reorderedGroupMembers});
+
+                await User.findByIdAndUpdate(user._id, {$push: {notifications: await AdminChangeNotification.create({targetGroup: req.group._id, decidingUser: req.body.adminId, action: req.body.action, read: false})}});
+
                 res.status(200).send({userId: updatedUser._id, members: reorderedGroupMembers});
             } else {
                 res.status(404).send("User not found in selected group");
@@ -191,7 +218,6 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
 });
 
 groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next) => {
-    console.log({body: req.body});
     try {
         const newMessage = new JoinRequest({
             acceptanceStatus: 'pending',
@@ -200,7 +226,6 @@ groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next)
         });
             
         const savedMessage = await newMessage.save();
-        console.log({savedMessage});
         await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
         await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': savedMessage}});
 
@@ -214,7 +239,6 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", async (req, res, ne
     try {
         //create a copy of the deck that will either be added to the group upon approval or deleted upon rejection (this way original deck edits don't affect submitted)
         const deckCopy = await copyDeck(req.body.deckToCopy);
-        console.log({deckCopy});
         deckCopy.groupDeckBelongsTo = req.group._id;
         deckCopy.approvedByGroupAdmins = false,
         deckCopy.deckCopiedFrom = req.body.deckToCopy;
@@ -255,6 +279,10 @@ groupRouter.delete("/:groupId", async (req, res, next) => {
             await User.updateMany({_id: {$in: req.group.members}}, {$pull: {groups: req.group._id}});
 
             await User.updateMany({_id: {$in: req.group.administrators}}, {$pull: {adminOf: req.group._id}});
+
+            const otherGroupMembers = req.group.members.filter(memberId => memberId.toString() !== req.query.requestingUser);
+
+            await User.updateMany({_id: {$in: otherGroupMembers}}, {$push: {notifications: await GroupDeletedNotification.create({groupName: req.group.name, read: false})}});
 
             res.status(200).send(group);
         } else {
@@ -327,27 +355,24 @@ groupRouter.put("/:groupId", (req, res, next) => {
 // });
 
 groupRouter.post("/:groupId/members/join-code", async(req, res, next) => {
-    console.log("join-code route hit");
-    console.log({group: req.group});
     try {
         const user = await User.findById(req.body.userId);
-        console.log({user});
-        if(user && req.body.joinCode === req.group.joinCode) {
-            console.log("join codes match");
+        const foundGroup = await Group.findById(req.group._id, "members");
+        if((user && foundGroup) && (req.body.joinCode === req.group.joinCode)) {
             const updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}}, {new: true});
             await User.findByIdAndUpdate(req.body.userId, {$addToSet: {groups: updatedGroup._id}});
-            //create new notification here to send to all members of the group
+            await User.updateMany({_id: {$in: foundGroup.members}}, {$push: {notifications: await NewMemberJoinedNotification.create({member: req.body.userId, targetGroup: updatedGroup._id, read: false})}});
             res.status(200).send(updatedGroup._id);
         } else {
             res.status(404).send("Invalid join code");
         }
     } catch (err) {
+        console.error(err.message);
         res.status(500).send("There was an error with your request");
     }
 });
 
 groupRouter.post("/:groupId/members/request", async(req, res, next) => {
-    console.log("request route hit");
     try {
         if(req.group.administrators.includes(req.body.adminId)) {
             const user = await User.findById(req.body.newMember);

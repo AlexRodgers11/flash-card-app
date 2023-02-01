@@ -6,7 +6,7 @@ import Notification from './Notification';
 function NotificationList(props) {
 	const notifications = useSelector((state) => state.communications.notifications);
 	return (
-		<div>{notifications.map(notification => <Notification notificationId={notification._id} hideModal={props.hideModal}/>)}</div>
+		<div>{notifications.map(notification => <Notification key={notification._id} notificationId={notification._id} notificationType={notification.notificationType} hideModal={props.hideModal}/>)}</div>
 	)
 }
 

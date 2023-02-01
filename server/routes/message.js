@@ -146,7 +146,7 @@ messageRouter.patch('/:messageId', async (req, res, next) => {
                         acceptanceStatus: foundDeckSubmissionMessage.acceptanceStatus,
                         deckName: foundDeckSubmissionMessage.targetDeck.name,
                         //only send back the _id if approved because otherwise the deck would have been deleted and the id would no longer exist
-                        ...(acceptanceStatus === "approved" && {deckId: foundDeckSubmissionMessage.targetDeck._id})
+                        ...(foundDeckSubmissionMessage.acceptanceStatus === "approved" && {deckId: foundDeckSubmissionMessage.targetDeck._id})
                     });
                 } else {
                     //otherwise first update the acceptanceStatus of the DeckSubmission message

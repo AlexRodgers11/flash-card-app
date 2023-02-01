@@ -7,6 +7,7 @@ import { signUp } from '../reducers/loginSlice';
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styled from 'styled-components';
 import useToggle from '../hooks/useToggle';
+import { ErrorMessage } from './StyledComponents/ErrorMessage';
 
 const PasswordWrapper = styled.div`
     position: relative;
@@ -24,17 +25,38 @@ const StyledClosedEye = styled(AiOutlineEyeInvisible)`
     top: 28%;
 `;
 
+const FormWrapper = styled.form`
+    & input {
+        width: 100%;
+    }
+`;
+
+
 const baseURL = 'http://localhost:8000';
 
 function RegisterCredentialsForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [email, clearEmail, setEmail] = useFormInput('');
-    const [password, clearPassword, setPassword] = useFormInput('');
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [showVerifyPassword, setShowVerifyPassword] = useState(false);
     const [verifyPassword, clearVerifyPassword, setVerifyPassword] = useFormInput('');
     const [passwordVisible, togglePasswordVisible] = useToggle(false);
     const [errorMessage, setErrorMessage] = useState("");
+
+    const handleEmailChange = (evt) => {
+        setEmail(evt.target.value);
+        if(errorMessage) {
+            setErrorMessage("");
+        }
+    }
+
+    const handlePasswordChange = (evt) => {
+        setPassword(evt.target.value);
+        if(errorMessage) {
+            setErrorMessage("");
+        }
+    }
     
     const handleSubmit = async (evt) => {
         evt.preventDefault();
@@ -46,13 +68,13 @@ function RegisterCredentialsForm() {
             } else {
                 setErrorMessage("An account with this email already exists");
             }
-            clearEmail();
-            clearPassword();
+            setEmail("");
+            setPassword("");
             clearVerifyPassword();
         } else {
-            clearPassword();
+            setPassword("");
             clearVerifyPassword();
-            alert("Passwords do not match");
+            setErrorMessage("Passwords do not match");
         }
     }
 
@@ -66,12 +88,12 @@ function RegisterCredentialsForm() {
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
+            <FormWrapper onSubmit={handleSubmit}>
                 <div>
-                    <input placeholder="email" type="email" id="email" name="email" value={email} onChange={setEmail} />
+                    <input placeholder="email" type="email" id="email" name="email" value={email} onChange={handleEmailChange} />
                 </div>
                 <PasswordWrapper>
-                    <input placeholder="password" type={passwordVisible ? "text" : "password"} id="password" name="password" value={password} onChange={setPassword} />
+                    <input placeholder="password" type={passwordVisible ? "text" : "password"} id="password" name="password" value={password} onChange={handlePasswordChange} />
                     {!passwordVisible && <StyledOpenEye onClick={togglePasswordVisible} />}
                     {passwordVisible && <StyledClosedEye onClick={togglePasswordVisible} />}
                 </PasswordWrapper> 
@@ -84,9 +106,9 @@ function RegisterCredentialsForm() {
                     :
                     null
                 }
+                {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
                 <button type="submit">Submit</button>
-                {(errorMessage && (!email.length && !password.length)) && <p>{errorMessage}</p>}
-            </form>
+            </FormWrapper>
         </div>
     )
 }

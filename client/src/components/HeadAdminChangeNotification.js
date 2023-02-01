@@ -2,15 +2,10 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios';
 import { useNavigate } from 'react-router';
-import styled from 'styled-components';
 import { useSelector } from 'react-redux';
+import { NavigationSpan } from './StyledComponents/NavigationSpan';
 
 const baseURL = 'http://localhost:8000';
-
-const NavigationSpan = styled.span`
-    font-weight: 600;
-    cursor: pointer;
-`;
 
 function HeadAdminChangeNotification(props) {
     const userId = useSelector((state) => state.login.userId);

@@ -60,9 +60,7 @@ function RegisterJoinGroupsForm(props) {
         .then(result => {
             if(result.payload) {
                 setContent("success");
-                setJoinAttemptType("code");
-                dispatch(addGroup({groupId: selectedGroupId}));
-                
+                setJoinAttemptType("code");                
             } else {
                 setContent("failure");
                 setUserEnteredJoinCode("");

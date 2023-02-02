@@ -1,14 +1,24 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import NewMemberJoinedNotification from './NewMemberJoinedNotification';
-import DeckAddedNotification from './DeckAddedNotification';
-import AdminChangeNotification from './AdminChangeNotification';
-import RemovedFromGroupNotification from './RemovedFromGroupNotification';
-import GroupDeletedNotification from './GroupDeletedNotification';
-import HeadAdminChangeNotification from './HeadAdminChangeNotification';
+import React from "react"
+import { useDispatch } from "react-redux";
+import PropTypes from "prop-types"
+import NewMemberJoinedNotification from "./NewMemberJoinedNotification";
+import DeckAddedNotification from "./DeckAddedNotification";
+import AdminChangeNotification from "./AdminChangeNotification";
+import RemovedFromGroupNotification from "./RemovedFromGroupNotification";
+import GroupDeletedNotification from "./GroupDeletedNotification";
+import HeadAdminChangeNotification from "./HeadAdminChangeNotification";
+import { FaTrashAlt } from "react-icons/fa";
+import styled from "styled-components";
+import { deleteNotification } from "../reducers/communicationsSlice";
+
 
 function Notification(props) {
-	
+	const dispatch = useDispatch();
+
+	const handleDeleteNotification = () => {
+		dispatch(deleteNotification({notificationId: props.notificationId}));
+	}
+
 	const renderNotification = () => {
 		switch(props.notificationType) {
 			case "NewMemberJoined": 
@@ -29,7 +39,10 @@ function Notification(props) {
 	}
 
 	return (
-		<div>{renderNotification()}</div>
+		<div>
+			{renderNotification()}
+			<FaTrashAlt onClick={handleDeleteNotification} />
+		</div>
 	)
 }
 

@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { markMessageAsRead } from '../reducers/communicationsSlice';
+import { deleteMessage, markMessageAsRead } from '../reducers/communicationsSlice';
 import DeckSubmissionMessage from './DeckSubmissionMessage';
 import DeckDecisionMessage from './DeckDecisionMessage';
 import JoinRequestMessage from './JoinRequestMessage';
 import JoinDecisionMessage from './JoinDecisionMessage';
+import { FaTrashAlt } from 'react-icons/fa';
 
 function Message(props) {
 	const dispatch = useDispatch();
 	const userId = useSelector((state) => state.login.userId);
+
+	const handleDeleteMessage = () => {
+		dispatch(deleteMessage({messageId: props.messageId, deletingUserId: userId, direction: props.direction}));
+	}
 	
 	const expandMessage = () => {
 		console.log("expanding message");
@@ -53,7 +58,10 @@ function Message(props) {
 	}
 	
 	return (
-		<div>{renderMessage()}</div>
+		<div>
+			{renderMessage()}
+			<FaTrashAlt onClick={handleDeleteMessage} />
+		</div>
 	)
 }
 

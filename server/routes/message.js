@@ -1,6 +1,5 @@
 import express from "express";
 const messageRouter = express.Router();
-import axios from "axios";
 import { DeckDecision, DeckSubmission, DirectMessage, JoinDecision, JoinRequest, Message } from "../models/message.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
@@ -29,7 +28,7 @@ messageRouter.get("/:messageId", async (req, res, next) => {
         let populatedMessage;
         switch(req.query.type) {
             case 'DeckSubmission':
-                populatedMessage = await DeckSubmission.findById(req.message._id).populate(
+                populatedMessage = await DeckSubmission.findById(req.message._id, "-sendingUserDeleted").populate(
                         [
                             {
                                 path: 'sendingUser',
@@ -45,11 +44,10 @@ messageRouter.get("/:messageId", async (req, res, next) => {
                             },
                         ]
                     )
-                console.log({populatedMessage});
                 res.status(200).send(populatedMessage);
                 break;
             case 'DeckDecision':
-                populatedMessage = await DeckDecision.findById(req.message._id).populate(
+                populatedMessage = await DeckDecision.findById(req.message._id, "-sendingUserDeleted").populate(
                     [
                         {
                             path: 'sendingUser',
@@ -65,12 +63,10 @@ messageRouter.get("/:messageId", async (req, res, next) => {
                         }
                     ]
                 );
-                console.log(populatedMessage);
                 res.status(200).send(populatedMessage);
                 break;
             case "JoinRequest":
-                console.log("In JoinRequest case");
-                populatedMessage = await JoinRequest.findById(req.message._id).populate(
+                populatedMessage = await JoinRequest.findById(req.message._id, "-sendingUserDeleted").populate(
                     [
                         {
                             path: "sendingUser",
@@ -82,12 +78,10 @@ messageRouter.get("/:messageId", async (req, res, next) => {
                         }
                     ]
                 );
-                console.log({populatedMessage});
                 res.status(200).send(populatedMessage);
                 break;
             case "JoinDecision":
-                console.log("In join decision case");
-                populatedMessage = await JoinDecision.findById(req.message._id).populate(
+                populatedMessage = await JoinDecision.findById(req.message._id, "-sendingUserDeleted").populate(
                     [
                         {
                             path: "sendingUser",
@@ -113,16 +107,6 @@ messageRouter.get("/:messageId", async (req, res, next) => {
     } catch (err) {
 
     }
-    
-    Message.findById(req.message._id, async (err, message) => {
-        if(err) {
-            console.error(err);
-            throw err;
-        }
-        // switch(message.__t) {
-        
-
-    }); 
 });
 
 messageRouter.patch('/:messageId/add-to-read', async (req, res, next) => {
@@ -169,7 +153,7 @@ messageRouter.patch('/:messageId', async (req, res, next) => {
 
                     const deckDecisionMessage = new DeckDecision({
                         sendingUser: req.body.decidingUserId,
-                        read: [],
+                        receivingUsers: [submittedDeck.creator. _id],
                         acceptanceStatus: req.body.decision,
                         comment: req.body.comment,
                         deckName: submittedDeck.name,
@@ -228,7 +212,7 @@ messageRouter.patch('/:messageId', async (req, res, next) => {
 
                         const joinDecisionMessage = new JoinDecision({
                             sendingUser: req.body.decidingUserId,
-                            read: [],
+                            receivingUsers: [foundJoinRequestMessage.sendingUser],
                             acceptanceStatus: req.body.decision,
                             comment: req.body.comment,
                             targetGroup: foundJoinRequestMessage.targetGroup,
@@ -254,6 +238,42 @@ messageRouter.patch('/:messageId', async (req, res, next) => {
 
     } catch (err) {
         console.error(err);
+        res.status(500).send(err.message);
+    }
+});
+
+messageRouter.delete("/:messageId", async (req, res, next) => {//test a message that had multiple receivingUsers (delete one from sender first then from one Receiver then sender then rest of receivers)
+    console.log({query: req.query});
+    const updateObj = {
+        ...(req.query.direction === "received" && {$pull: {receivingUsers: req.query.deletingUserId}}),
+        ...(req.query.direction === "sent" && {$set: {sendingUserDeleted: true}})
+    }
+    console.log({updateObj});
+
+    try {
+        const updatedMessage = await Message.findByIdAndUpdate(req.message._id, updateObj, {new: true});
+        console.log({updatedMessage});
+        
+        let updatedUser;
+        if(req.query.direction === "received") {
+            updatedUser = await User.findByIdAndUpdate(req.query.deletingUserId, {$pull: {"messages.received": req.message._id}}, {new: true});    
+        } else if(req.query.direction === "sent") {
+            updatedUser = await User.findByIdAndUpdate(req.query.deletingUserId, {$pull: {"messages.sent": req.message._id}}, {new: true});
+        } else {
+            throw new Error("invalid direction submitted");
+        }
+        console.log({updatedUser});
+
+        //if sending user and all receivingUsers have deleted the message from their inbox, delete from database
+        if(!updatedMessage.receivingUsers.length && updatedMessage.sendingUserDeleted) {
+            await Message.findByIdAndDelete(req.message._id);
+            res.status(200).send("Successfully deleted");
+        } else {
+            res.status(200).send("message removed from user's messages");
+        }
+        
+    } catch (err) {
+        console.error({err});
         res.status(500).send(err.message);
     }
 });

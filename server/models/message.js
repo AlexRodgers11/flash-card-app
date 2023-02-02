@@ -4,8 +4,15 @@ const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema({
     sendingUser: {type: Schema.Types.ObjectId, ref: "User"},
-    read: [{type: Schema.Types.ObjectId, ref: "User"}]
-
+    receivingUsers: [{type: Schema.Types.ObjectId, ref: "User"}],
+    read: {
+        type: [{type: Schema.Types.ObjectId, ref: "User"}],
+        default: []
+    },
+    sendingUserDeleted: {
+        type: Boolean,
+        default: false
+    }
 }, {discriminatorKey: "messageType", timestamps: true});
 
 const Message = mongoose.model('Message', MessageSchema);

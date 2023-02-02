@@ -163,9 +163,6 @@ userRouter.post("/:userId/decks", async (req, res, next) => {
     }
 });
 
-/////////////////////////////////////////////////////////////Messages///////////////////////////////////////////////////////////////
-
-//////////done/////////////////
 userRouter.get("/:userId/communications", async (req, res, next) => {
     try {
         const foundUser = await User.findById(req.user._id, "messages notifications -_id")
@@ -173,41 +170,6 @@ userRouter.get("/:userId/communications", async (req, res, next) => {
             .populate("messages.sent", "messageType read")
             .populate("notifications", "notificationType read");
         res.status(200).send({messages: foundUser.messages, notifications: foundUser.notifications});
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-////////////////////////////////
-
-
-
-userRouter.post("/:userId/messages", async (req, res, next) => {
-    let newMessage;
-    try {
-        switch(req.body.messageType) {
-            case "DeckSubmission":
-                newMessage = new DeckSubmission({
-                    sendingUser: req.body.sendingUser,
-                    targetDeck: req.body.targetDeck,
-                    targetGroup: req.body.targetGroup
-                });
-                break;
-            case "DeckDecision":
-                newMessage = new DeckDecision({
-                    acceptanceStatus: req.body.acceptanceStatus,
-                    comment: req.body.comment,
-                    targetDeck: req.body.targetDeck,
-                    targetGroup: req.body.targetGroup,
-                    read: [],
-                    sendingUser: req.body.sendingUser
-                });
-                break;
-        }
-        const savedMessage = await newMessage.save();
-
-        await User.findByIdAndUpdate(req.user._id, {$push: {'messages.received': savedMessage}});
-        await User.findByIdAndUpdate(savedMessage.sendingUser, {$push: {'messages.sent': savedMessage}});
-        res.status(200).send(savedMessage);
     } catch (err) {
         res.status(500).send(err.message);
     }

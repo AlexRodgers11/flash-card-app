@@ -219,9 +219,11 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
 
 groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next) => {
     try {
+        const foundGroup = await Group.findById(req.body.targetGroup, "administrators");
         const newMessage = new JoinRequest({
             acceptanceStatus: 'pending',
             sendingUser: req.body.sendingUser,
+            receivingUsers: foundGroup.administrators,
             targetGroup: req.body.targetGroup,
         });
             
@@ -243,14 +245,15 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", async (req, res, ne
         deckCopy.approvedByGroupAdmins = false,
         deckCopy.deckCopiedFrom = req.body.deckToCopy;
         const savedDeckCopy = await deckCopy.save();
+        const foundGroup = await Group.findById(req.body.targetGroup, "administrators");
 
         const newMessage = new DeckSubmission({
             acceptanceStatus: 'pending',
             sendingUser: req.body.sendingUser,
+            receivingUsers: foundGroup.administrators,
             targetDeck: savedDeckCopy._id,
             targetGroup: req.body.targetGroup,
             deckName: savedDeckCopy.name,
-            read: []
         });
         const savedMessage = await newMessage.save();
         await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
@@ -371,50 +374,5 @@ groupRouter.post("/:groupId/members/join-code", async(req, res, next) => {
         res.status(500).send("There was an error with your request");
     }
 });
-
-groupRouter.post("/:groupId/members/request", async(req, res, next) => {
-    try {
-        if(req.group.administrators.includes(req.body.adminId)) {
-            const user = await User.findById(req.body.newMember);
-            await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}}, {new: true});
-            await User.findByIdAndUpdate(user._id, {$addToSet: {groups: req.group._id}});
-            res.status(200).send(user._id);
-            // let newNotification = new JoinDecision({
-            //     decision: "approved", 
-            //     groupTarget: req.group._id
-            // });
-            // newNotification.save((err, savedNotification) => {
-            //     User.findByIdAndUpdate(user._id, {$push: {notifications: savedNotification}});
-            //     res.status(200).send("Member successfully added");
-            // })
-        } else {
-            res.status(400).send("You are not authorized to add a member to this group");
-        }
-        
-    } catch (err) {
-        res.status(500).send("There was an error with your request");
-        throw err;
-    }
-});
-
-// groupRouter.post("/:groupId/members", (req, res, next) => {
-//     User.findById(req.body.user, (err, user) => {
-//         if(err) {
-//             res.status(500).send("There was an error with your request");
-//             throw err;
-//         } else if(!user) {
-//             res.status(404).send("User not found");
-//         } else {
-//             Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}}, (err, group) => {
-//                 if(err) {
-//                     res.status(500).send("There was an error with your request");
-//                     throw err;
-//                 } else {
-//                     res.status(200).send(user._id);
-//                 }
-//             });
-//         }
-//     });
-// });
 
 export default groupRouter;

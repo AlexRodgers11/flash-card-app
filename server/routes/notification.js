@@ -150,4 +150,14 @@ notificationRouter.get("/:notificationId", (req, res, next) => {
     }
 });
 
+notificationRouter.delete("/:notificationId", async (req, res, next) => {
+    try {
+        await Notification.findByIdAndDelete(req.notification._id);
+        res.status(200).send("Successfully deleted");
+    } catch (err) {
+        console.error({err});
+        res.status(500).send(err.message);
+    }
+});
+
 export default notificationRouter;

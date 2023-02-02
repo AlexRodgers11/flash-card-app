@@ -48,6 +48,24 @@ export const markMessageAsRead = createAsyncThunk("login/markMessageAsRead", asy
     }
 });
 
+export const deleteNotification = createAsyncThunk("login/deleteNotification", async ({notificationId}) => {
+    try {
+        await axios.delete(`${baseURL}/notifications/${notificationId}`);
+        return notificationId;
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
+export const deleteMessage = createAsyncThunk("login/deleteMessage", async ({messageId, deletingUserId, direction}) => {
+    try {
+        await axios.delete(`${baseURL}/messages/${messageId}?deletingUserId=${deletingUserId}&direction=${direction}`);
+        return {messageId, direction};
+    } catch (err) {
+        console.error(err.message);
+    }
+});
+
 export const submitDeck = createAsyncThunk("communications/submitDeck", async ({userId, groupId, deckId}) => {
     try {
         let messageData = {
@@ -133,6 +151,12 @@ export const communicationsSlice = createSlice({
                 }
                 return message;
             });
+        });
+        builder.addCase(deleteNotification.fulfilled, (state, action) => {
+            state.notifications = state.notifications.filter(notification => notification._id !== action.payload);
+        });
+        builder.addCase(deleteMessage.fulfilled, (state, action) => {
+            state.messages[action.payload.direction] = state.messages[action.payload.direction].filter(message => message._id !== action.payload.messageId);
         });
         builder.addCase(submitDeck.fulfilled, (state, action) => {
             state.messages.sent = [...state.messages.sent, action.payload]

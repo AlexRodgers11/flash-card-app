@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { markNotificationsAsRead } from "../reducers/communicationsSlice";
+import { fetchCommunications, markNotificationsAsRead } from "../reducers/communicationsSlice";
 import { logout } from "../reducers/loginSlice";
 import Message from "./Message";
 import MessageList from "./MessageList";
@@ -22,6 +22,7 @@ function Header() {
     const [messageType, setMessageType] = useState("");
     const username = useSelector((state) => state.login.login.username);
     const userId = useSelector((state) => state.login.userId);
+    const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
     const profilePic = useSelector((state) => state.login.photo);
     const notifications = useSelector((state) => state.communications.notifications);
     const messages = useSelector((state) => state.communications.messages.received);
@@ -68,7 +69,19 @@ function Header() {
         handleHideModal();
     }
 
-    
+    const firstRender = useRef(true);
+
+    useEffect(() => {
+        if(!firstRender.current) {
+            if(accountSetupStage === "complete") {
+                const communicationsFetchInterval = setInterval(() => dispatch(fetchCommunications({userId})), 10000);
+                return () => clearInterval(communicationsFetchInterval);
+            }
+        } else {
+            firstRender.current = false;
+        }
+
+    }, [dispatch, accountSetupStage, userId]);
     
     return (
         <nav className="navbar navbar-collapse fixed-top navbar-light bg-light" style={{height: "4.5rem", minWidth: "300px", padding: 0}}>

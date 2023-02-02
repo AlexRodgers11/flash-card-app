@@ -12,11 +12,8 @@ const initialState = {
 }
 
 export const fetchCommunications = createAsyncThunk("communications/fetchCommunications", async ({userId}) => {
-    //send request to notifications route
-    //send request to messages route
     try {
         const response = await axios.get(`${baseURL}/users/${userId}/communications`);
-        console.log({response});
 
         return {
             messages: response.data.messages, 

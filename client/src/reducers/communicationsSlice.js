@@ -132,7 +132,6 @@ export const communicationsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchCommunications.fulfilled, (state, action) => {
-            console.log(action.payload.messages.received);
             state.messages.received = action.payload.messages.received;
             state.messages.sent = action.payload.messages.sent;
             state.notifications = action.payload.notifications;

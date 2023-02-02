@@ -73,7 +73,6 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
         const response = await axios.get(`${baseURL}/users/${userId}`);
         //need better protection here
         delete response.data.login.password;
-        console.log({fetchedData: response.data});
         return response.data;
     } catch (err) {
         return err;
@@ -152,7 +151,6 @@ export const loginSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(fetchLoggedInUserData.fulfilled, (state, action) => {
-            console.log({stage: action.payload.accountSetupStage});
             state.userId = action.payload._id;
             state.login.username = action.payload.login.username;
             state.name = action.payload.name;

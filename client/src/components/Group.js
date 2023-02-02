@@ -130,6 +130,8 @@ function Group() {
     const [editMode, toggleEditMode] = useToggle(false);
     const userId = useSelector((state) => state.login.userId);
     const userDecks = useSelector((state) => state.login.decks);
+    const messageCount = useSelector((state) => state.communications.messages.received.length);
+    const notificationCount = useSelector((state) => state.communications.notifications.length);
     const [groupDeletionInProgress, toggleGroupDeletionInProgress] = useToggle(false);
     const storedGroupId = useSelector((state) => state.group.groupId);
     const groupName = useSelector((state) => state.group.name);
@@ -314,6 +316,15 @@ function Group() {
     //             console.error(err);
     //         });
     // }
+
+    const firstRender = useRef(true);
+    useEffect(() => {
+        if(!firstRender.current) {
+            dispatch(fetchGroupData({groupId, userId}));
+        } else {
+            firstRender.current = false;
+        }
+    }, [dispatch, groupId, userId, messageCount, notificationCount]);
 
     useEffect(() => {
         if(!storedGroupId || (storedGroupId !== groupId)) {

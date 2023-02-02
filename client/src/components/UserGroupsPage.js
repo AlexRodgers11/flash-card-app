@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-import { createGroup } from '../reducers/loginSlice';
+import { createGroup, fetchLoggedInUserData } from '../reducers/loginSlice';
 import RegisterJoinGroupsForm from "./RegisterJoinGroupsForm";
 import GroupTile from "./GroupTile";
 import useFormInput from "../hooks/useFormInput";
@@ -12,6 +12,8 @@ function UserGroupsPage() {
     const [groupName, clearGroupNameChange, handleGroupNameChange] = useFormInput("");
     const [modalContent, setModalContent] = useState("");
     const groups = useSelector((state) => state.login.groups);
+    const messageCount = useSelector((state) => state.communications.messages.received.length);
+    const notificationCount = useSelector((state) => state.communications.notifications.length);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -48,6 +50,15 @@ function UserGroupsPage() {
     const selectForm = (evt) => {
         setModalContent(evt.target.dataset.form);
     }
+
+    const firstRender = useRef(true);
+    useEffect(() => {
+        if(!firstRender.current) {
+            dispatch(fetchLoggedInUserData(userId));
+        } else {
+            firstRender.current = false;
+        }
+    }, [dispatch, userId, messageCount, notificationCount]);
     
     return (
         <div>

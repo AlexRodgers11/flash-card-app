@@ -19,7 +19,7 @@ const SpinnerWrapper = styled.div`
             height: calc(100vh - 9.5rem);
         }
     }
-    & div {
+    & div.spinner-border {
         position: relative;
         bottom: calc(30vh - 7.5rem);
         width: 7rem;
@@ -98,18 +98,16 @@ function BrowseDecks() {
     const [decks, setDecks] = useState([]);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
-    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     
     const [criteria, setCriteria] = useState({
         categoryId: "",
         searchString: "",
-        // sort: ""
     });
 
     const [sort, setSort] = useState("");
 
     const handleSortChange = evt => {
-        console.log("In handle sort change");
         switch(evt.target.value) {
             case "a-z":
                 console.log("a-z");
@@ -194,10 +192,15 @@ function BrowseDecks() {
     }
     
     const fetchDecks = async (newCriteria) => {
+        console.log("in fetchDecks");
         let queryString;
         if(!newCriteria) {
+            console.log("no new criteria");
+            console.log({page});
             queryString = new URLSearchParams({searchString: criteria.searchString, categoryId: criteria.categoryId, page}).toString();
+            console.log({queryString});
         } else {
+            console.log("new criteria");
             queryString = new URLSearchParams({searchString: newCriteria.searchString, categoryId: newCriteria.categoryId, page: 1}).toString();
             console.log({queryString});
             setCriteria(newCriteria);
@@ -206,16 +209,16 @@ function BrowseDecks() {
             queryString = "?" + queryString;
         }
         try {
-            setIsLoading(true);
+            setLoading(true);
             const response = await axios.get(`${baseURL}/decks${queryString}`);
             setTimeout(() => {
                 setDecks(decks => newCriteria ? response.data : [...decks, ...response.data]);
-                setPage(page => newCriteria ? 1 : page + 1);
+                setPage(page => newCriteria ? 2 : page + 1);
                 setHasMore(response.data.length === 25)
-                setIsLoading(false);
-            }, 300);
+                setLoading(false);
+            }, 150);
         } catch(err) {
-            setIsLoading(false);
+            setLoading(false);
             console.error(err.message);
         }
     };
@@ -285,7 +288,7 @@ function BrowseDecks() {
                     </SpinnerWrapper>
                 }
                 >
-                    {decks.map(deck => <DeckTile key={deck.deckId} deckId={deck.deckId} />)}
+                        {!loading && decks.map(deck => <DeckTile key={deck.deckId} deckId={deck.deckId} />)}
             </StyledInfiniteScroll>
         </BrowseDecksWrapper>
     )

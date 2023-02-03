@@ -70,7 +70,7 @@ const IndicatorsWrapper = styled.div`
 
 `
 
-const ContentWrapper = styled.p`
+const ContentWrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;

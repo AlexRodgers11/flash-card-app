@@ -139,3 +139,75 @@ export const urlToFile = (url) => {
 
 
 }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const sortDecks = (sortCriteria, array) => {
+  switch(sortCriteria) {
+      case "a-z":
+          return array.slice().sort((a, b) => {
+              if(a.deckName < b.deckName) {
+                  return -1;
+              } else if(a.deckName > b.deckName) {
+                  return 1;
+              } else {
+                  return 0;
+              }
+          })
+      case "z-a": 
+          return array.slice().sort((a, b) => {
+              if(a.deckName > b.deckName) {
+                  return -1;
+              } else if(a.deckName < b.deckName) {
+                  return 1;
+              } else {
+                  return 0;
+              }
+          });
+      case "card-count-up": 
+          return array.slice().sort((a, b) => {
+              if(a.cardCount > b.cardCount) {
+                  return -1;
+              } else if(a.cardCount < b.cardCount) {
+                  return 1;
+              } else {
+                  return 0;
+              }
+          });
+      case "card-count-down": 
+          return array.slice().sort((a, b) => {
+              if(a.cardCount < b.cardCount) {
+                  return -1;
+              } else if(a.cardCount > b.cardCount) {
+                  return 1;
+              } else {
+                  return 0;
+              }
+          });
+      case "newest":
+          return array.slice().sort((a, b) => {
+              let aDate = new Date(a.dateCreated);
+              let bDate = new Date(b.dateCreated);
+              if(aDate < bDate) {
+                  return -1;
+              } else if(aDate > bDate) {
+                  return 1;
+              } else {
+                  return 0;
+              }
+          });
+      case "oldest":
+          return array.slice().sort((a, b) => {
+              let aDate = new Date(a.dateCreated);
+              let bDate = new Date(b.dateCreated);
+              if(aDate > bDate) {
+                  return -1;
+              } else if(aDate < bDate) {
+                  return 1;
+              } else {
+                  return 0;
+              }
+          });
+      default: 
+          return array;
+  }
+}

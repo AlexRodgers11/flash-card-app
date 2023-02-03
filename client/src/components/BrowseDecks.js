@@ -3,6 +3,7 @@ import DeckTile from "./DeckTile";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import styled from "styled-components";
+import { sortDecks } from "../utils";
 
 const baseURL = 'http://localhost:8000';
 
@@ -99,108 +100,25 @@ function BrowseDecks() {
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [sort, setSort] = useState("");
     
     const [criteria, setCriteria] = useState({
         categoryId: "",
         searchString: "",
     });
 
-    const [sort, setSort] = useState("");
 
     const handleSortChange = evt => {
-        switch(evt.target.value) {
-            case "a-z":
-                console.log("a-z");
-                setDecks(decks.slice().sort((a, b) => {
-                    if(a.deckName < b.deckName) {
-                        return -1;
-                    } else if(a.deckName > b.deckName) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }));
-                break;
-            case "z-a": 
-                console.log("z-a");
-                setDecks(decks.slice().sort((a, b) => {
-                    if(a.deckName > b.deckName) {
-                        return -1;
-                    } else if(a.deckName < b.deckName) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }));
-                break;
-            case "card-count-up": 
-                console.log("card-count-up");
-                setDecks(decks.slice().sort((a, b) => {
-                    if(a.cardCount > b.cardCount) {
-                        return -1;
-                    } else if(a.cardCount < b.cardCount) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }));
-                break;
-            case "card-count-down": 
-                console.log("card-count-down");
-                setDecks(decks.slice().sort((a, b) => {
-                    if(a.cardCount < b.cardCount) {
-                        return -1;
-                    } else if(a.cardCount > b.cardCount) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }));
-                break;
-            case "newest":
-                console.log("newest");
-                setDecks(decks.slice().sort((a, b) => {
-                    let aDate = new Date(a.dateCreated);
-                    let bDate = new Date(b.dateCreated);
-                    if(aDate < bDate) {
-                        return -1;
-                    } else if(aDate > bDate) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }));
-                break;
-            case "oldest":
-                console.log("oldest");
-                setDecks(decks.slice().sort((a, b) => {
-                    let aDate = new Date(a.dateCreated);
-                    let bDate = new Date(b.dateCreated);
-                    if(aDate > bDate) {
-                        return -1;
-                    } else if(aDate < bDate) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }));
-                break;
-            default: 
-                break;
-        }
+        setDecks(sortDecks(evt.target.value, decks));
         setSort(evt.target.value);
     }
     
     const fetchDecks = async (newCriteria) => {
-        console.log("in fetchDecks");
         let queryString;
         if(!newCriteria) {
-            console.log("no new criteria");
-            console.log({page});
             queryString = new URLSearchParams({searchString: criteria.searchString, categoryId: criteria.categoryId, page}).toString();
             console.log({queryString});
         } else {
-            console.log("new criteria");
             queryString = new URLSearchParams({searchString: newCriteria.searchString, categoryId: newCriteria.categoryId, page: 1}).toString();
             console.log({queryString});
             setCriteria(newCriteria);
@@ -212,7 +130,7 @@ function BrowseDecks() {
             setLoading(true);
             const response = await axios.get(`${baseURL}/decks${queryString}`);
             setTimeout(() => {
-                setDecks(decks => newCriteria ? response.data : [...decks, ...response.data]);
+                setDecks(decks => newCriteria ? sortDecks(sort, response.data) : [...decks, ...sortDecks(sort, response.data)]);
                 setPage(page => newCriteria ? 2 : page + 1);
                 setHasMore(response.data.length === 25)
                 setLoading(false);

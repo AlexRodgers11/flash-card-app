@@ -82,24 +82,10 @@ const StyledInfiniteScroll = styled(InfiniteScroll)`
     display: grid;
     place-items: center;
 
+    grid-template-columns: repeat(4, 1fr);
 
-    grid-template-columns: repeat(1, 1fr);
-    
-    @media (min-width: 515px) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    @media (min-width: 740px) {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    @media (min-width: 960px) {
-        grid-template-columns: repeat(4, 1fr);
-    }
-    
-    
-    @media (min-width: 1310px) {
-        grid-template-columns: repeat(5, 1fr)
+    @media (min-width: 795px) {
+        grid-template-columns: repeat(5, 1fr);
     }
 
     @media (min-width: 1600px) {

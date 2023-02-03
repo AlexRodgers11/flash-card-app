@@ -11,12 +11,42 @@ const DeckTileWrapper = styled.div`
     text-align: center;  
     justify-content: center;
     position: relative;
-    border: 2px solid black; 
+    border: 1px solid black; 
     border-radius: 1rem; 
-    height: 17rem; 
-    width: 13rem; 
     margin: 1em;
     cursor: pointer;
+    height: 4.25rem;
+    width: 3.25rem;
+    border-radius: .65rem;
+
+    @media (min-width: 475px) {
+        height: 7.5rem;
+        width: 5.75rem;
+        border-radius: .8rem;
+        border-width: 2px;
+    }
+    
+    @media (min-width: 535px) {
+        height: 8.5rem;
+        width: 6.75rem;
+        border-radius: 1rem;
+    }
+
+    @media (min-width: 795px) {
+        height: 11rem; 
+        width: 8rem; 
+    }
+    
+    @media (min-width: 960px) {
+        height: 14rem; 
+        width: 10rem; 
+    }
+
+    @media (min-width: 1310px) {
+        height: 17rem;
+        width: 13rem;
+    }
+    
 `
 
 const IndicatorsWrapper = styled.div`
@@ -27,8 +57,17 @@ const IndicatorsWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: .75rem;
-    paddingBottom: 0rem
+    padding: .45rem;
+    paddingBottom: 0rem;
+    
+    @media (min-width: 535px) {
+        padding: .6rem;
+    }
+
+    @media (min-width: 795px) {
+        padding: .75rem;
+    }
+
 `
 
 const ContentWrapper = styled.p`
@@ -41,10 +80,39 @@ const ContentWrapper = styled.p`
         width: 100%;
     }
     & .large-name {
-        font-size: 2rem;
+        font-size: .6rem;
+        @media (min-width: 475px) {
+            font-size: .75rem;
+        }
+        
+        @media (min-width: 535px) {
+            font-size: 1rem;
+        }
+    
+        @media (min-width: 795px) {
+            font-size: 1.25rem
+        }
+
+        
+        @media (min-width: 960px) {
+            font-size: 2rem;
+        }
     }
     & .medium-name {
-        font-size: 1.5rem;
+        //once I decide size at which to not display image set font-size to be the same as large-name
+        font-size: .45rem;
+        @media (min-width: 475px) {
+            font-size: .5625rem;
+        }
+        @media (min-width: 535px) {
+            font-size: .75rem;
+        }
+        @media (min-width: 795px) {
+            font-size: .8375rem;
+        }
+        @media (min-width: 960px) {
+            font-size: 1.5rem;
+        }
     }
 `
 
@@ -52,12 +120,44 @@ const StyledOpenEye = styled(RxEyeOpen)`
     display: inline-block;
     justify-self: start;
     margin: 0rem;
+    height: .5rem;
+    width: .5rem;
+    @media (min-width: 475px) {
+        height: .75rem;
+        width: .75rem;
+    }
+    
+    @media (min-width: 535px) {
+        height: 1rem;
+        width: 1rem;
+    }
+
+    @media (min-width: 795px) {
+        height: 1.25rem;
+        width: 1.25rem;
+    }
 `
 
 const StyledClosedEye = styled(RxEyeClosed)`
     display: inline-block;
     justify-self: start;
     margin: 0rem;
+    height: .5rem;
+    width: .5rem;
+    @media (min-width: 475px) {
+        height: .75rem;
+        width: .75rem;
+    }
+    
+    @media (min-width: 535px) {
+        height: 1rem;
+        width: 1rem;
+    }
+
+    @media (min-width: 795px) {
+        height: 1.25rem;
+        width: 1.25rem;
+    }
 `
 
 const CardCountWrapper = styled.p`
@@ -66,7 +166,8 @@ const CardCountWrapper = styled.p`
     display: inline-flex;
     align-items: center;
     justify-self: end;
-    font-size: 1.25rem; 
+    font-size: .75rem;
+     
     margin: 0rem;
     & span:nth-of-type(1) {
         padding-right: .1rem;
@@ -75,8 +176,11 @@ const CardCountWrapper = styled.p`
         position: relative; 
         bottom: .15rem;
         display: inline-block;
-        height: 1rem;
-        width: .8rem;
+        // height: 1rem;
+        // width: .8rem;
+        height: .6rem;
+        width: .48rem;
+        bottom: .09rem;
         border: 1px solid black;
         border-radius: .1rem; 
         opacity: 1; 
@@ -85,13 +189,85 @@ const CardCountWrapper = styled.p`
     }
     & span:nth-of-type(3) {
         position: relative;
-        top: .15rem;
-        right: .5rem;
+        // top: .15rem;
+        // right: .5rem;
+        height: .6rem;
+        width: .48rem;
+        top: .09rem;
+        right: .3rem;
         display: inline-block;
-        height: 1rem;
-        width: .8rem;
+        // height: 1rem;
+        // width: .8rem;
         border: 1px solid black; 
         borderRadius: .1rem;
+    }
+    font-size: .5rem;
+    
+    @media (min-width: 475px) {
+        font-size: .75rem;
+        & span:nth-of-type(2) {
+            height: .6rem;
+            width: .48rem;
+            bottom: .09rem;
+        }
+        & span:nth-of-type(3) {
+            height: .6rem;
+            width: .48rem;
+            top: .09rem;
+            right: .3rem;
+        }
+        // & span:nth-of-type(2) {
+        //     height: .5rem;
+        //     width: .4rem;
+        //     bottom: .075rem;
+        // }
+        // & span:nth-of-type(3) {
+        //     height: .5rem;
+        //     width: .4rem;
+        //     top: .075rem;
+        //     right: .25rem;
+        // }
+    }
+    
+    @media (min-width: 535px) {
+        font-size: 1rem;
+        & span:nth-of-type(2) {
+            height: .8rem;
+            width: .64rem;
+            bottom: .12rem;
+        }
+        & span:nth-of-type(3) {
+            height: .8rem;
+            width: .64rem;
+            top: ..12rem;
+            right: .4rem;
+        }
+        // & span:nth-of-type(2) {
+        //     height: .5rem;
+        //     width: .4rem;
+        //     bottom: .075rem;
+        // }
+        // & span:nth-of-type(3) {
+        //     height: .5rem;
+        //     width: .4rem;
+        //     top: .075rem;
+        //     right: .25rem;
+        // }
+    }
+
+    @media (min-width: 795px) {
+        font-size: 1.25rem;
+        & span:nth-of-type(2) {
+            height: 1rem;
+            width: .8rem;
+            bottom: .15rem;
+        }
+        & span:nth-of-type(3) {
+            height: 1rem;
+            width: .8rem;
+            top: .15rem;
+            right: .5rem;
+        }
     }
 `
 
@@ -129,7 +305,7 @@ function DeckTile(props) {
     return (
         <DeckTileWrapper className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
             <IndicatorsWrapper className="IndictorsWrapper">
-                {deckData.publiclyAvailable ? <StyledOpenEye size="1.25rem"/> : <StyledClosedEye size="1.25rem" />}
+                {deckData.publiclyAvailable ? <StyledOpenEye /> : <StyledClosedEye className="StyledClosedEye" />}
                 <CardCountWrapper>
                     <span>{deckData.cardCount}</span>
                     <span />

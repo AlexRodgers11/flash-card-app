@@ -10,12 +10,6 @@ const initialState = {
     publiclyAvailable: false,
     creator: "",
     cards: [],
-    permissions: {
-        view: [],
-        edit: [],
-        copy: false,
-        suggest: false
-    }
 
 }
 
@@ -81,10 +75,6 @@ export const deckSlice = createSlice({
             state.publiclyAvailable = action.payload.publiclyAvailable;
             state.creator = action.payload.creator;
             state.cards = [...action.payload.cards];
-            state.permissions.view = action.payload.permissions.view;
-            state.permissions.edit = action.payload.permissions.edit;
-            state.permissions.copy = action.payload.permissions.copy;
-            state.permissions.suggest = action.payload.permissions.suggest;
         });
         builder.addCase(updateDeck.fulfilled, (state, action) => {
             for(const key in action.payload) {

@@ -11,7 +11,7 @@ import styled from 'styled-components';
 const baseURL = 'http://localhost:8000';
 
 const DeckFormWrapper = styled.div`
-	height: calc(100vh - 4.5rem);
+	height: calc(100vh - 5.5rem);
 	display: flex;
 	flex-direction: column;
 	align-items: center;

@@ -12,9 +12,44 @@ import { IoMailSharp, IoNotificationsSharp } from "react-icons/io5";
 import styled from "styled-components";
 import Logo from "./Logo";
 
+const HeaderWrapper = styled.nav`
+    height: 5.5rem;
+    min-width: 300px;
+    padding: 0;
+    // background-color: #152556 !important;
+    background-color: #051647 !important;
+`;
+
 const DropDownItem = styled.p`
     cursor: pointer;
 `
+
+const StyledIoNotificationsSharp = styled(IoNotificationsSharp)`
+    height: 2.25rem;
+    width: 2.25rem;
+    cursor: pointer;
+    color: white;
+`;
+
+const StyledIoMailSharp = styled(IoMailSharp)`
+    height: 2.25rem;
+    width: 2.25rem;
+    cursor: pointer;
+    color: white;
+`;
+
+const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
+    color: white; 
+    height: 3.5rem;
+    width: 3.5rem;
+`;
+
+const ProfilePic = styled.img`
+    border: 1px solid transparent; 
+    border-radius: 50%;
+    height: 4rem;
+    width: 4rem
+`;
 
 function Header() {
     const [modalContent, setModalContent] = useState("");
@@ -84,7 +119,7 @@ function Header() {
     }, [dispatch, accountSetupStage, userId]);
     
     return (
-        <nav className="navbar navbar-collapse fixed-top navbar-light bg-light" style={{height: "4.5rem", minWidth: "300px", padding: 0}}>
+        <HeaderWrapper className="navbar navbar-collapse fixed-top navbar-light bg-light">
             <div className="container-fluid" style={{height: "100%"}}>
                 <div style={{display: "flex", alignItems: "center", height: "100%"}}>
                     <div className="navbar-brand">
@@ -103,17 +138,17 @@ function Header() {
                     {username && 
                         <div data-source="inbox" onClick={handleButtonClick} className="d-none d-sm-block" style={{position: "relative", left: "1.5rem"}}>
                         {/* <div data-source="inbox" onClick={handleButtonClick} style={{position: "relative", left: "1.5rem"}}> */}
-                            <IoMailSharp size="2.25em" style={{cursor: "pointer"}} />
+                            <StyledIoMailSharp />
                             <div style={{visibility: messages.filter(message => message.read.includes(userId) === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".5rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{messages.filter(message => message.read.includes(userId) === false).length >= 10 ? "9+": messages.filter(message => message.read.includes(userId) === false).length}</div>
                         </div>}
                     {username && 
                         <div data-source="notifications" onClick={handleButtonClick} className="d-none d-sm-block" style={{position: "relative", left: "1rem"}}>
-                            <IoNotificationsSharp size="2.25em" style={{cursor: "pointer"}} />
+                            <StyledIoNotificationsSharp />
                             <div style={{visibility: notifications.filter(notification => notification.read === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".85rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{notifications.filter(notification => notification.read === false).length >= 10 ? "9+": notifications.filter(notification => notification.read === false).length}</div>
                         </div>}
                     <li className="nav-item dropdown">
-                        <div tabIndex={0} className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {profilePic ? <img alt={username} src={profilePic} style={{border: "2px solid black", borderRadius: "50%", height: "3em", width: "3em"}}/> : <HiOutlineUserCircle color="black" size="3em" />}
+                        <div tabIndex={0} className="nav-link dropdown-toggle" href="#" style={{paddingRight: "0"}} id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {profilePic ? <ProfilePic alt={username} src={profilePic} /> : <StyledHiOutlineUserCircle />}
                         </div>
                         <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a className="dropdown-item" onClick={username ? handleLogout : handleLogin} href="/">{username ? "Log out" : "Login"}</a></li>
@@ -145,7 +180,7 @@ function Header() {
                     }
                 </Modal>
             }
-        </nav>
+        </HeaderWrapper>
   )
 }
 

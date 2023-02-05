@@ -18,6 +18,11 @@ const DeckTileWrapper = styled.div`
     height: 4.25rem;
     width: 3.25rem;
     border-radius: .65rem;
+    background-color: white;
+    transition: all 0.3s ease-in-out;
+    &:hover {
+        transform: translateY(-7px);
+    }
 
     @media (min-width: 475px) {
         height: 7.5rem;
@@ -95,7 +100,8 @@ const ContentWrapper = styled.div`
 
         
         @media (min-width: 960px) {
-            font-size: 2rem;
+            // font-size: 2rem;
+            font-size: 100%;
         }
     }
     & .medium-name {
@@ -280,10 +286,10 @@ function DeckTile(props) {
 
     const handleSelection = () => {
         //SEE IF OKAY TO DO THIS WAY- COULD BE UNSAFE AND ALLOW NAVIGATION TO PRIVATE DECKS
-        if(location.pathname.slice(32, 33) === "d" || location.pathname.slice(1, 2) === "u") {
-            navigate(`/decks/${props.deckId}`)
-        } else if(location.pathname.slice(32, 33) === "p") {
+        if(location.pathname.slice(32, 33) === "p") {
             navigate(`/users/${deckData.creatorId}/decks/${props.deckId}/practice-session`);
+        } else if(location.pathname.slice(32, 33) === "d" || location.pathname.slice(1, 2) === "u") {
+            navigate(`/decks/${props.deckId}`)
         } else if(location.pathname.slice(1,2) === "g") {
             navigate(`/decks/${props.deckId}`);
         }

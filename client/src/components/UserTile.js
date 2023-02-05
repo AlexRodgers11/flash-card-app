@@ -17,12 +17,19 @@ const UserTileWrapper = styled.div`
     height: ${props => !props.editMode ? "8rem" : "12rem"};
     width: 6rem; 
 `;
+
+const TitleWrapper = styled.div`
+    height: 1.25rem;
+`
+
 const Button = styled.button`
     font-size: .65rem;
     white-space: normal;
     word-wrap: break-word;
     max-width: 5.5rem;
     display: block;
+    margin-bottom: .15rem;
+
 `;
 
 const EditOptionsWrapper = styled.div`
@@ -31,7 +38,7 @@ const EditOptionsWrapper = styled.div`
 const ImageContainer = styled.div`
     position: relative;
     display: inline-block;
-    margin-top: .15rem;
+    // margin-top: .15rem;
     border-radius: 50%;
     overflow: hidden;
     width: 6rem;
@@ -62,6 +69,9 @@ const InitialsOverlay = styled.div`
 
 const StyledImage = styled.img`
     // display: block;
+    position: relative;
+    top: 0;
+
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -91,7 +101,7 @@ function UserTile(props) {
         dispatch(removeMember({groupId, memberToRemoveId: props.memberId, requesterId: loggedInUserId}));
         //be sure to create notification to let member know what happened
     }
-
+    //////start here- reorder member array after adding/removing from admins--probably do on backend
     const addMemberToAdmins = () => {
         dispatch(grantAdminAuthority({groupId, memberToAuthorizeId: props.memberId, requesterId: loggedInUserId}));
         //need to make notification
@@ -117,7 +127,7 @@ function UserTile(props) {
                     {(loggedInUserId === headAdmin && props.isAdmin) && <Button onClick={removeMemberFromAdmins}>Remove From Administrators</Button>}
                 </EditOptionsWrapper>
                 :
-                <p>{props.memberId === headAdmin ? "Head Admin" : props.isAdmin ? "Admin" : ""}</p>
+                <TitleWrapper>{props.memberId === headAdmin ? "Head Admin" : props.isAdmin ? "Admin" : ""}</TitleWrapper>
             }
             {userData.photo ? 
                 <ImageContainer className="ImageContainer">

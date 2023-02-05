@@ -8,6 +8,9 @@ const UserDecksPageWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: #5197E1;
+
+    min-height: calc(100vh - 5.5rem);
 `;
 
 const StyledButton = styled.button`

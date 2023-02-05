@@ -6,6 +6,29 @@ import RegisterJoinGroupsForm from "./RegisterJoinGroupsForm";
 import GroupTile from "./GroupTile";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
+import styled from "styled-components";
+
+const UserGroupsWrapper = styled.div`
+    // background-color: #ADFF8F;
+    // lime-green
+    // background-color: #C7FFB3;
+    // persian red
+    // background-color: #CC3333;
+    // fuzzy-wuzzy pink
+    // background-color: #DA6C6C;
+    background-color: #E08585;
+    min-height: calc(100vh - 5.5rem);
+    & button {
+        background-color: white;
+    }
+`;
+
+const StyledButton = styled.button`
+    margin: 4rem 1rem 3rem 1rem;
+    width: 14rem;
+    height: 5rem;
+    border-radius: 1rem;
+`;
 
 function UserGroupsPage() {
     const { userId } = useParams(); 
@@ -61,9 +84,11 @@ function UserGroupsPage() {
     }, [dispatch, userId, messageCount, notificationCount]);
     
     return (
-        <div>
-            <div data-form="create" onClick={selectForm} style={{display: "inline-block", textDecoration: "none", color:"inherit", margin: "5em 1em", padding: ".5em 1em", border: "1px solid black", cursor: "pointer"}}>Create New Group</div>
-            <div data-form="search" onClick={selectForm} style={{display: "inline-block", textDecoration: "none", color:"inherit", margin: "5em 1em", padding: ".5em 1em", border: "1px solid black", cursor: "pointer"}}>Search for New Groups to Join</div>
+        <UserGroupsWrapper>
+            <StyledButton data-form="create" onClick={selectForm} >Create New Group</StyledButton>
+            <StyledButton data-form="search" onClick={selectForm} >Search for Groups to Join</StyledButton>
+            {/* <StyledButton data-form="create" onClick={selectForm} style={{display: "inline-block", textDecoration: "none", color:"inherit", margin: "5em 1em", padding: ".5em 1em", border: "1px solid black", cursor: "pointer"}}>Create New Group</StyledButton>
+            <StyledButton data-form="search" onClick={selectForm} style={{display: "inline-block", textDecoration: "none", color:"inherit", margin: "5em 1em", padding: ".5em 1em", border: "1px solid black", cursor: "pointer"}}>Search for New Groups to Join</StyledButton> */}
             {/* <GroupList groupIds={user.groups} /> */}
             <div>
                 {groups.map(groupId => <GroupTile key={groupId} groupId={groupId}/>)}
@@ -75,7 +100,7 @@ function UserGroupsPage() {
                     {displayModalContent()}
                 </Modal>
             } 
-        </div>
+        </UserGroupsWrapper>
     );
 }
 

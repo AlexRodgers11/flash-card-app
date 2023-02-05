@@ -8,7 +8,10 @@ import { sortDecks } from "../utils";
 const baseURL = 'http://localhost:8000';
 
 const BrowseDecksWrapper = styled.div`
-
+    // background-color: #ADC5FF;
+    // background-color: #B8CCFF;
+    // background-color: #C7D7FF;
+    background-color: #5197E1;
 `;
 
 const SpinnerWrapper = styled.div`
@@ -41,7 +44,10 @@ const ControlBarWrapper = styled.form`
     justify-content: space-evenly;
     width: 100%;
     height: 3rem;
-    background-color: #474747;        
+    // background-color: #474747;        
+    background-color: #393939;
+    // background-color: #323232;        
+    // background-color: #252525;        
     color: white;
     font-size: 1.25rem;
     & label {

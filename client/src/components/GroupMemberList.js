@@ -9,7 +9,7 @@ const GroupMemberListWrapper = styled.div`
     width: 98%;
     display: grid;
     place-items: center;
-    border: 1px solid black;
+    // border: 1px solid black;
     margin-bottom: 3rem;
 
     grid-template-columns: repeat(1, 1fr);

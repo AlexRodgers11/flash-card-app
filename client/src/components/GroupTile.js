@@ -2,8 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import PropTypes from 'prop-types';
 import axios from "axios";
+import styled from 'styled-components';
 
 const baseURL = 'http://localhost:8000';
+
+const GroupTileWrapper = styled.div`
+    border: 1px solid black;
+    display: inline-block;
+    margin: 1rem;
+    padding: 1rem;
+    background-color: white;
+`;
 
 function GroupTile(props) {
     const [groupData, setGroupData] = useState({});
@@ -26,11 +35,11 @@ function GroupTile(props) {
     }, [props.groupId]);
   
     return (
-        <div tabIndex={0} onKeyDown={handleViewOnEnter} onClick={handleViewGroup} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
+        <GroupTileWrapper tabIndex={0} onKeyDown={handleViewOnEnter} onClick={handleViewGroup} style={{border: "1px solid black", display: "inline-block", margin: "1em", padding: "1em"}}>
             <h1>{groupData.name}</h1>
             <p>Members: {groupData.memberCount}</p>
             <p>Decks: {groupData.deckCount}</p>
-        </div>
+        </GroupTileWrapper>
     )
 }
 

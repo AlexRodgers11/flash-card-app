@@ -10,6 +10,24 @@ import { GoGraph } from "react-icons/go";
 import { ImSearch } from "react-icons/im";
 import { RiUserSettingsFill } from "react-icons/ri";
 
+const DashboardWrapper = styled.div`
+    display: flex;
+    min-height: calc(100vh - 5.5rem);
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    // background-color: #152556;
+    // background-color: #1D3377;
+    // background-color: #2847A4;
+    // background-color: #2E52BD;
+    // background-color: #1282A2;
+    //yellows
+    // background-color: #FFFB00;
+    // background-color: #FFFC5C;
+    // background-color: #FFFD75;
+    background-color: #FFFD8A;
+`
+
 const StyledLink = styled(Link)`
     display: flex; 
     margin: 5vw;
@@ -20,19 +38,24 @@ const StyledLink = styled(Link)`
     max-width: 280px;
     min-height: 150px;
     min-width: 150px;
-    border: 1px solid black; 
+    border: 3px solid black; 
     border-radius: 5%;
     align-items: center; 
     justify-content: center; 
     text-decoration: none; 
     color: black; 
+    background-color: white;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.16);
     & .hover-text {
         display: none;
         font-size: 1.75rem;
     }
     &:hover {
         background-color: black;
+        border-color: white;
         color: white !important;
+        transform: translateY(-4px);
+        box-shadow: 0px 10px 20px #000000; /
     }    
     &:hover .icon {
         display: none;
@@ -48,6 +71,12 @@ const StyledLink = styled(Link)`
         height: 40vw;
         width: 40vw;
     }
+    // background-color: #00bfff;
+//   box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 5%;
+  box-shadow: 0px 0px 3px #000000; /* adjust the shadow size and color as needed */
+
+  transition: all 0.3s ease-in-out;
 `
 
 const Grid = styled.div`
@@ -66,13 +95,6 @@ const Grid = styled.div`
 //   }
 `;
 
-const DashboardWrapper = styled.div`
-    display: flex;
-    min-height: calc(100vh - 4.5rem);
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-`
 
 function Dashboard() {
     const user = useSelector((state) => state.login);

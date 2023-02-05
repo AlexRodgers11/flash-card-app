@@ -25,6 +25,25 @@ const GroupWrapper = styled.div`
     }
 `;
 
+const TitleSection = styled.section`
+    background-color: #454545;
+    color: white;
+`;
+
+const GroupSection = styled.section`
+    display: flex; 
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    background-color: #E08585;
+    // margin-bottom: 3rem;
+`;
+
+const DeckSection = styled.section`
+    background-color: #5197E1;
+    width: 100%;
+`;
+
 const DeckOptionContainer = styled.div`
     display: flex;
     flex-direction: column;
@@ -345,54 +364,57 @@ function Group() {
     if(groupMemberIds?.includes(userId)) {
         return (
             <GroupWrapper className="GroupWrapper">
-                <Heading>{groupName}</Heading>
-                <GroupEditControlsContainer className="GroupEditControlsContainer">
-                    {administrators?.includes(userId) && <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>}
-                    <button data-modalcontent={userId === headAdmin ? "head-admin-leave-group-confirmation" : "leave-group-confirmation"} onClick={handleSelectModalContent}>Leave Group</button>
-                    {(editMode && userId === headAdmin) && <button data-modalcontent={groupMemberIds.length > 1 ? "delete-group-options" : "delete-group-confirmation"} onClick={handleSelectModalContent}>Delete Group</button>}
-                </GroupEditControlsContainer>
-                {!administrators?.includes(userId) ?
-                    null
-                    :
-                    <>
-                        <JoinOptionContainer className="JoinOptionContainer">
-                            <label htmlFor="join-code-options">Select how new members can join:</label>
-                            <select id="join-code-options" name="join-code-options" onChange={handleChangeJoinOptions}>
-                                <option selected={joinOptions === "invite"} value="invite">Invite Only</option>
-                                <option selected={joinOptions === "code"} value="code">Join Code</option>
-                                <option selected={joinOptions === "request"} value="request">Request by User</option>
-                                <option selected={joinOptions === "code-and-request"} value="code-and-request">Join Code and Request by User</option>
-                            </select>
-                        {joinOptions !== "code" && joinOptions !== "code-and-request" ?
-                            null
-                            :
-                            <JoinCodeContainer>
-                                {!joinCodeVisible ? 
-                                    <button onClick={toggleJoinCodeVisible}>Show Group Join Code</button>
-                                    :
-                                    <div>
-                                        <span>Join Code: {joinCode} </span>
-                                        <button onClick={getNewJoinCode}>Get New Code</button>
-                                        <button onClick={toggleJoinCodeVisible}>Hide Join Code</button>
-                                    </div>
-                                }
-                            </JoinCodeContainer>
-                        }     
-                        </JoinOptionContainer>
+                <TitleSection>
 
-                    </>
-                }                
+                    <Heading>{groupName}</Heading>
+                    <GroupEditControlsContainer className="GroupEditControlsContainer">
+                        {administrators?.includes(userId) && <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>}
+                        <button data-modalcontent={userId === headAdmin ? "head-admin-leave-group-confirmation" : "leave-group-confirmation"} onClick={handleSelectModalContent}>Leave Group</button>
+                        {(editMode && userId === headAdmin) && <button data-modalcontent={groupMemberIds.length > 1 ? "delete-group-options" : "delete-group-confirmation"} onClick={handleSelectModalContent}>Delete Group</button>}
+                    </GroupEditControlsContainer>
+                    {!administrators?.includes(userId) ?
+                        null
+                        :
+                        <>
+                            <JoinOptionContainer className="JoinOptionContainer">
+                                <label htmlFor="join-code-options">Select how new members can join:</label>
+                                <select id="join-code-options" name="join-code-options" onChange={handleChangeJoinOptions}>
+                                    <option selected={joinOptions === "invite"} value="invite">Invite Only</option>
+                                    <option selected={joinOptions === "code"} value="code">Join Code</option>
+                                    <option selected={joinOptions === "request"} value="request">Request by User</option>
+                                    <option selected={joinOptions === "code-and-request"} value="code-and-request">Join Code and Request by User</option>
+                                </select>
+                            {joinOptions !== "code" && joinOptions !== "code-and-request" ?
+                                null
+                                :
+                                <JoinCodeContainer>
+                                    {!joinCodeVisible ? 
+                                        <button onClick={toggleJoinCodeVisible}>Show Group Join Code</button>
+                                        :
+                                        <div>
+                                            <span>Join Code: {joinCode} </span>
+                                            <button onClick={getNewJoinCode}>Get New Code</button>
+                                            <button onClick={toggleJoinCodeVisible}>Hide Join Code</button>
+                                        </div>
+                                    }
+                                </JoinCodeContainer>
+                            }     
+                            </JoinOptionContainer>
+
+                        </>
+                    }                
+                </TitleSection>
                 
-                <section style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                <GroupSection>
                     <SubHeading>Members:</SubHeading>
                     <GroupMemberList editMode={administrators.includes(userId) && editMode} listType="members" groupMemberIds={groupMemberIds} />
-                </section>
+                </GroupSection>
 
                 <section>
                     {/* <ActivityList activityIds={activityIds}/> */}
                 </section>
 
-                <section>
+                <DeckSection>
                     <SubHeading>Decks:</SubHeading>
                     <button data-modalcontent="add-deck" onClick={handleSelectModalContent}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
                     <DeckList listType="group" listId={groupId} />
@@ -403,7 +425,7 @@ function Group() {
                             {displayModalContent()}
                         </Modal>
                     }
-                </section>
+                </DeckSection>
             </GroupWrapper>
       )
     } else {

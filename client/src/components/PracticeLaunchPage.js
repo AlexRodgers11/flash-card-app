@@ -3,6 +3,16 @@ import { Link } from "react-router-dom";
 import DeckList from "./DeckList";
 import styled from "styled-components";
 
+const PracticeLaunchPageWrapper = styled.div`
+    background-color: #5197E1;
+    min-height: calc(100vh - 5.5rem);
+    & h1 {
+        padding: 1rem;
+        color: white;
+        text-shadow: 1px 1px 2px #333;
+    }
+`;
+
 const NoDecksMessage = styled.div`
     margin-top: 2rem;
     font-size: 1.5rem;
@@ -26,9 +36,12 @@ function PracticeLaunchPage() {
     const userId = useSelector((state) => state.login.userId);
 
     return (
-        <div>
+        <PracticeLaunchPageWrapper>
             {decks.length ? 
-                <DeckList listType="user" listId={userId} />
+                <>
+                    <h1>Select a deck to practice</h1>
+                    <DeckList listType="user" listId={userId} />
+                </>
                 :
                 <>
                     <NoDecksMessage>
@@ -37,7 +50,7 @@ function PracticeLaunchPage() {
                     <Link to={`/users/${userId}/decks/new`}><StyledButton>Create New Deck</StyledButton></Link>
                 </>
             }
-        </div>
+        </PracticeLaunchPageWrapper>
     );
 }
 

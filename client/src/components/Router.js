@@ -69,7 +69,7 @@ function Router() {
 
     // console.log("made it past conditional tree");
     return (
-        <div className="Router" style={{minHeight: "calc(100vh - 4.5rem)"}}>
+        <div className="Router" style={{minHeight: "calc(100vh - 5.5rem)"}}>
             <Routes>
                 <Route exact path="/groups/:groupId" element={<Group />} />
                 <Route exact path="/decks/public" element={<BrowseDecks />}/>

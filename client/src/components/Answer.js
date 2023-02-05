@@ -20,10 +20,12 @@ const CardAnswer = styled.div`
     }
     &.Answer_Correct {
         background-color: blue;
+        // background-color: #3333CC;
         color: white;
     }
     &.Answer_Incorrect {
         background-color: red;
+        // background-color: #CC3333;
         color: white;
     }
 `
@@ -53,6 +55,7 @@ function Answer(props) {
                 cardType: activeCard.cardType,
                 datePracticed: Date.now()}));
         }, 2500);
+        // }, 10000);
     }
 
     return (

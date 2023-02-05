@@ -47,7 +47,14 @@ function RegisterCredentialsForm() {
         if(password === verifyPassword) {
             let response = await axios.get(`${baseURL}/users/emails?email=${email}`);
             if(response.data.emailAvailable) {
-                dispatch(signUp({email, password}));
+                dispatch(signUp({email, password}))
+                    .then(action => {
+                        if(!action?.payload?.token === "Unauthorized") {
+                            setErrorMessage("Either your username or password are incorrect");
+                        } else {
+                            localStorage.setItem("token", action.payload.token);
+                        }
+                    });  
                 navigate("/register/email-verification");
             } else {
                 setErrorMessage("An account with this email already exists");

@@ -42,12 +42,10 @@ function Login() {
         evt.preventDefault();
         dispatch(login({usernameOrEmail, password}))
             .then(action => {
-                console.log({action});
-                if(action?.payload?.response?.data === "Unauthorized") {
-                    console.log("equal")
+                if(!action?.payload?.token === "Unauthorized") {
                     setErrorMessage("Either your username or password are incorrect");
                 } else {
-                    console.log("not equal");
+                    localStorage.setItem("token", action.payload.token);
                 }
                 setPassword("");
                 setUsernameOrEmail("");

@@ -8,7 +8,9 @@ const CardAttempt = new Schema({
     question: String,
     correctAnswer: String,
     answeredCorrectly: Boolean,
-    wrongAnswerSelected: String
+    wrongAnswerSelected: String,
+    attempter: {type: Schema.Types.ObjectId, ref: "User"},
+    groupAttemptBelongsTo: {type: Schema.Types.ObjectId, ref: "Group"}
 }, {timestamps: true});
 
 const cardAttemptModel = mongoose.model("CardAttempt", CardAttempt);

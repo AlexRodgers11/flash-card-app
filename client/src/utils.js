@@ -1,3 +1,5 @@
+import axios from "axios";
+
 ////Durstenfeld shuffle, copied from https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 export const shuffleArray = (array) => {
     let arrayCopy = [...array];
@@ -211,3 +213,9 @@ export const sortDecks = (sortCriteria, array) => {
           return array;
   }
 }
+export const client = axios.create({
+    headers: {
+        "Content-Type": 'application/json',
+        "Authorization" : `Bearer ${localStorage.getItem("token")}`
+    },
+});

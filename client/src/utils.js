@@ -213,9 +213,17 @@ export const sortDecks = (sortCriteria, array) => {
           return array;
   }
 }
-export const client = axios.create({
+
+const client = axios.create({
     headers: {
-        "Content-Type": 'application/json',
-        "Authorization" : `Bearer ${localStorage.getItem("token")}`
+        "Content-Type": 'application/json'
     },
 });
+
+client.interceptors.request.use(config => {
+    config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+
+    return config;
+});
+
+export { client };

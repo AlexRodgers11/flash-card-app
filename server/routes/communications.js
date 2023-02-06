@@ -1,8 +1,6 @@
 import express from "express";
 import { getUserIdFromJWTToken } from "../utils.js";
 import User from "../models/user.js";
-import { DeckDecision, DeckSubmission, Message } from "../models/message.js";
-import { Notification } from '../models/notification.js';
 
 const communicationRouter = express.Router();
 

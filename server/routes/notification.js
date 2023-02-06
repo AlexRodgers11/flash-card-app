@@ -1,6 +1,10 @@
 import express from "express";
 const notificationRouter = express.Router();
+
+import { getUserIdFromJWTToken } from "../utils.js";
 import { AdminChangeNotification, DeckAddedNotification, GroupDeletedNotification, HeadAdminChangeNotification, NewMemberJoinedNotification, Notification, RemovedFromGroupNotification }  from "../models/notification.js";
+import User from "../models/user.js";
+
 
 notificationRouter.param("notificationId", (req, res, next, notificationId) => {
     Notification.findById(notificationId, (err, notification) => {
@@ -16,6 +20,22 @@ notificationRouter.param("notificationId", (req, res, next, notificationId) => {
             next();
         }
     });
+});
+
+notificationRouter.patch("/mark-as-read", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        const foundUser = await User.findById(req.userId, "notifications");
+
+        await Notification.updateMany({_id: {$in: foundUser.notifications}}, {$set: {read: true}});
+        let user = await User.findById(req.userId, "notifications")
+            .populate({
+                path: "notifications",
+                select: "read notificationType"
+            })
+        res.status(200).send(user.notifications);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
 notificationRouter.get("/:notificationId", async (req, res, next) => {

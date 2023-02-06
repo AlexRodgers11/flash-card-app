@@ -25,7 +25,7 @@ export const fetchCommunications = createAsyncThunk("communications/fetchCommuni
 
 export const markNotificationsAsRead = createAsyncThunk("communications/markNotificationsAsRead", async({userId}) => {
     try {
-        const response = await axios.patch(`${baseURL}/users/${userId}/notifications/mark-as-read`, {});
+        const response = await client.patch(`${baseURL}/notifications/mark-as-read`, {});
         return response.data;
     } catch (err) {
         console.error(err.message);

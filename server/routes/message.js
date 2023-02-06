@@ -5,6 +5,7 @@ import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import User from "../models/user.js";
 import { DeckAddedNotification, NewMemberJoinedNotification } from "../models/notification.js";
+import { getUserIdFromJWTToken } from "../utils.js";
 
 const baseURL = 'http://localhost:8000';
 
@@ -109,10 +110,15 @@ messageRouter.get("/:messageId", async (req, res, next) => {
     }
 });
 
-messageRouter.patch('/:messageId/add-to-read', async (req, res, next) => {
+messageRouter.patch('/:messageId/add-to-read', getUserIdFromJWTToken, async (req, res, next) => {
     try {
-        const updatedMessage = await Message.findByIdAndUpdate(req.message._id, {$addToSet: {read: req.body.readerId}}, {new: true});
-        res.status(200).send({messageId: updatedMessage._id, read: updatedMessage.read});
+        const foundMessage = await Message.findById(req.message._id, "receivingUsers");
+        if(foundMessage.receivingUsers.includes(req.userId)) {
+            const updatedMessage = await Message.findByIdAndUpdate(req.message._id, {$addToSet: {read: req.body.readerId}}, {new: true});
+            res.status(200).send({messageId: updatedMessage._id, read: updatedMessage.read});
+        } else {
+            res.status(404).send("User is not authorized to update the read array of this message");
+        }
     } catch (err) {
         res.status(500).send(err.message);
     }

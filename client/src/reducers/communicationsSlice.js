@@ -34,10 +34,7 @@ export const markNotificationsAsRead = createAsyncThunk("communications/markNoti
 
 export const markMessageAsRead = createAsyncThunk("communications/markMessageAsRead", async ({messageId, readerId, direction}) => {
     try {
-        const response = await axios.patch(`${baseURL}/messages/${messageId}/add-to-read`, {readerId});
-        console.log("response received");
-        console.log({data: response.data});
-        console.log({direction});
+        const response = await client.patch(`${baseURL}/messages/${messageId}/add-to-read`, {readerId});
         return {...response.data, direction};
     } catch (err) {
         console.error(err.message);

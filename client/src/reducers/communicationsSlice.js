@@ -23,7 +23,7 @@ export const fetchCommunications = createAsyncThunk("communications/fetchCommuni
     }    
 });
 
-export const markNotificationsAsRead = createAsyncThunk("login/markNotificationsAsRead", async({userId}) => {
+export const markNotificationsAsRead = createAsyncThunk("communications/markNotificationsAsRead", async({userId}) => {
     try {
         const response = await axios.patch(`${baseURL}/users/${userId}/notifications/mark-as-read`, {});
         return response.data;
@@ -32,7 +32,7 @@ export const markNotificationsAsRead = createAsyncThunk("login/markNotifications
     }
 });
 
-export const markMessageAsRead = createAsyncThunk("login/markMessageAsRead", async ({messageId, readerId, direction}) => {
+export const markMessageAsRead = createAsyncThunk("communications/markMessageAsRead", async ({messageId, readerId, direction}) => {
     try {
         const response = await axios.patch(`${baseURL}/messages/${messageId}/add-to-read`, {readerId});
         console.log("response received");

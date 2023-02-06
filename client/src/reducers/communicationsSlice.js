@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import { client } from "../utils";
 
 const baseURL = "http://localhost:8000";
 
@@ -13,8 +13,7 @@ const initialState = {
 
 export const fetchCommunications = createAsyncThunk("communications/fetchCommunications", async ({userId}) => {
     try {
-        const response = await axios.get(`${baseURL}/users/${userId}/communications`);
-
+        const response = await client.get(`${baseURL}/communications`);
         return {
             messages: response.data.messages, 
             notifications: response.data.notifications

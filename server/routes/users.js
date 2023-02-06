@@ -1,5 +1,6 @@
 import express from "express";
 const userRouter = express.Router();
+import jwt from "jwt-simple";
 
 import CardAttempt from "../models/cardAttempt.js";
 import User from "../models/user.js";
@@ -29,6 +30,7 @@ userRouter.param("userId", (req, res, next, userId) => {
         }
     });
 });
+
 
 //should probably move this to login
 userRouter.get("/emails", async (req, res, next) => {
@@ -163,17 +165,6 @@ userRouter.post("/:userId/decks", async (req, res, next) => {
     }
 });
 
-userRouter.get("/:userId/communications", async (req, res, next) => {
-    try {
-        const foundUser = await User.findById(req.user._id, "messages notifications -_id")
-            .populate("messages.received", "messageType read")
-            .populate("messages.sent", "messageType read")
-            .populate("notifications", "notificationType read");
-        res.status(200).send({messages: foundUser.messages, notifications: foundUser.notifications});
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
 
 userRouter.delete("/:userId/messages/:messageId", async (req, res, next) => {
     try {

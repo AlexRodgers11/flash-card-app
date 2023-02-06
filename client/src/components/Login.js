@@ -40,6 +40,8 @@ function Login() {
 
     const handleSubmit = evt => {
         evt.preventDefault();
+        localStorage.removeItem("token");
+        
         dispatch(login({usernameOrEmail, password}))
             .then(action => {
                 if(!action?.payload?.token === "Unauthorized") {

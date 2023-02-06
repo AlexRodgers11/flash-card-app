@@ -47,6 +47,7 @@ function RegisterCredentialsForm() {
         if(password === verifyPassword) {
             let response = await axios.get(`${baseURL}/users/emails?email=${email}`);
             if(response.data.emailAvailable) {
+                localStorage.removeItem("token");
                 dispatch(signUp({email, password}))
                     .then(action => {
                         if(!action?.payload?.token === "Unauthorized") {

@@ -1,7 +1,7 @@
 import { FlashCard, MultipleChoiceCard, TrueFalseCard } from "./models/card.js";
 import Deck from "./models/deck.js";
 import mongoose from "mongoose";
-
+import jwt from "jwt-simple";
 import crypto from "crypto";
 
 const characters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','@','#','$','%','&','=','?'];
@@ -102,3 +102,25 @@ export const copyDeck = async (deckId) => {
         console.error(err);
     }
 }
+
+export const getUserIdFromJWTToken = (req, res, next) => {
+    console.log("in getUserIdFromJWTToken");
+    const token = req.headers.authorization;
+    console.log({token});
+
+    if (!token) {
+        return res.status(401).json({
+            message: 'Unauthorized: No token provided'
+        });
+    }
+
+    try {
+        const decoded = jwt.decode(token.slice(7), process.env.TOKEN_KEY);
+        req.userId = decoded.sub;
+        next();
+    } catch (error) {
+        return res.status(401).json({
+            message: 'Unauthorized: Invalid token'
+        });
+    }
+};

@@ -10,11 +10,18 @@ import Group from "./models/group.js";
 import User from "./models/user.js";
 import Activity from "./models/activity.js";
 import CardAttempt from "./models/cardAttempt.js";
+// import getRandomCardType, { generateCode, getRandomJoinOptions } from "./utils.js";
+import getRandomCardType, { generateCode, getRandomJoinOptions, generateRandomFileName } from "./utils.js";
+import * as fs from "fs";
+
+import multer from "multer";
+import { getObjectSignedUrl, uploadFile } from "./s3.js";
 const port = process.env.port || 8000;
 const router = express.Router();
 
 import activityRouter from "./routes/activity.js";
 import attemptRouter from "./routes/attempts.js";
+import cardAttemptRouter from "./routes/cardAttempt.js";
 import cardRouter from "./routes/cards.js";
 import categoryRouter from "./routes/categories.js";
 import communicationRouter from "./routes/communications.js";
@@ -27,16 +34,15 @@ import userRouter from "./routes/users.js"
 
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import jwt from "jwt-simple";
+import jwt from "jwt-simple"; 
 import { ExtractJwt } from "passport-jwt";
 import { Strategy as JwtStrategy } from  "passport-jwt";
 import group from "./models/group.js";
 
 import dotenv from "dotenv";
-import cardAttemptRouter from "./routes/cardAttempt.js";
 dotenv.config();
 
-mongoose.connect("mongodb://localhost/flash-card-app-four", {
+mongoose.connect("mongodb://localhost/flash-card-app-one", {
 // mongoose.connect("mongodb://WOLVES-DEN:27017,WOLVES-DEN:27018,WOLVES-DEN:27019/flash-card?replicaSet=rs", {
     //use MongoDB's new connection string parser instead of the old deprecated one
     useNewUrlParser: true,
@@ -68,70 +74,6 @@ app.use(
 
 app.use(passport.initialize());
 
-// passport.use(
-//     "login",
-//     new LocalStrategy(
-//         {
-//             usernameField: "usernameOrEmail",
-//             passwordField: "password"
-//         },
-//         (usernameOrEmail, password, done) => {
-//         console.log("finding user");
-//         return User.find({
-//             $and: [
-//                 {$or: [
-//                     {"login.username": usernameOrEmail},
-//                     {"email": usernameOrEmail}
-//                 ]},
-//                 {"login.password": password}
-//             ]
-//         }, (err, user) => {
-//             if(err) {
-//                 console.error(err);
-//                 throw err;
-//             }
-//             if(user) {
-//                 console.log("user found");
-//                 return done(null, user);
-//             } else {
-//                 return done(null, false);
-//             }
-//         })
-//     })
-// );
-
-// const jwtOptions = {
-//     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-//     secretOrKey: "kacchan"
-// }
-
-// passport.use(
-//     "jwt",
-//     new JwtStrategy(jwtOptions, (payload, done) => {
-//         console.log("in jwt strategy creation");
-//         return done(null, {});
-//     })
-// );
-
-// const requireSignIn = passport.authenticate("login", {session: false});
-
-// const tokenForUser = user => {
-//     console.log("creating token for user");
-//     return jwt.encode({
-//         sub: user._id,
-//         iat: Math.round(Date.now() / 1000),
-//         //expire after 2 hours
-//         exp: Math.round(Date.now() / 1000 + 2 * 60 * 60)
-//     },
-//     "theblackswordsman");
-// }
-// app.post("/login", requireSignIn, (req, res, next) => {
-//     console.log("POST request received");
-//     res.send({
-//         token: tokenForUser(req.user)
-//     });
-// });
-
 app.use("/activities", activityRouter);
 app.use("/attempts", attemptRouter);
 app.use("/card-attempts", cardAttemptRouter);
@@ -149,6 +91,56 @@ router.get("/test", (req, res, next) => {
     console.log("connected");
     res.status(200).send("connected");
 });
+
+
+
+
+
+
+
+
+
+// const fileFilter = (req, file, callback) => {
+//     if(file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+//         callback(null, true);
+//     } else {
+//         callback(new Error("Only jpeg and png file types may be submitted"), false);
+//     }
+// };
+
+
+
+// const storage = multer.memoryStorage();
+// const upload = multer({
+//     storage: storage,
+//     limits: {
+//         fileSize: 1024 * 1024 * 5
+//     },
+//     fileFilter: fileFilter
+// });
+
+// import deku from "./pic-seed/Deku Profile.png";
+
+const routes = ["./pic-seed/Trunks Profile.PNG", "./pic-seed/Deku-Profile.png", "./pic-seed/Kacchan Profile.PNG", "./pic-seed/Kirito Profile.PNG"];
+
+router.get("/test-seed-photo", async(req, res, next) => {
+    // console.log({mimetype: deku.mimetype});
+    let randomNum = Math.floor(Math.random() * routes.length);  
+    // let photo = fs.readFileSync("./pic-seed/Trunks Profile.png");
+    let photo = fs.readFileSync(routes[randomNum]);
+
+    try {
+        let photoName = generateRandomFileName();
+        await uploadFile(photo, photoName, "image");
+
+        const photoURL = await getObjectSignedUrl(photoName);
+        console.log({photoURL});
+        res.status(200).send(photoURL);
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 
 router.get("/seed-database", async(req, res, next) => {
     try {
@@ -172,6 +164,7 @@ router.get("/seed-database", async(req, res, next) => {
                     codeExpDate: Date.now() + (100 * 60 * 60 * 24 * 3),
                     verified: true
                 };
+                newUser.accountSetupStage = "complete";
                 newUser.save((err, savedUser) => {
                     if(err) {
                         userReject(err);
@@ -286,21 +279,21 @@ router.get("/seed-database", async(req, res, next) => {
                         newDeck.categories.push(categories[i]._id);
                     }
                 }
-                    newDeck.name = faker.hacker.adjective();
-                    newDeck.publiclyAvailable = Math.random() > .7 ? true : false;
-                    let randomNum = Math.floor(Math.random() * users.length);
+                newDeck.name = faker.hacker.adjective();
+                newDeck.publiclyAvailable = Math.random() > .7 ? true : false;
+                let randomNum = Math.floor(Math.random() * users.length);
 
-                    let randomUserId = users[randomNum]._id;
-                    // console.log({randomUserId});
-                    newDeck.creator = randomUserId;
-                    //possibly add categories here
-                    newDeck.save((err, deck) => {
-                        if(err) {
-                            deckReject(err);
-                            throw err;
-                        }
-                        deckResolve(deck);
-                    });
+                let randomUserId = users[randomNum]._id;
+                // console.log({randomUserId});
+                newDeck.creator = randomUserId;
+                //possibly add categories here
+                newDeck.save((err, deck) => {
+                    if(err) {
+                        deckReject(err);
+                        throw err;
+                    }
+                    deckResolve(deck);
+                });
             }));
         }
         let decks = await Promise.all(deckPromises);
@@ -444,7 +437,7 @@ router.get("/seed-database", async(req, res, next) => {
                         //for each deckattempt grab a random deck from the user's decks
                         let currentDeckId = finishedUsers[i].decks[Math.floor(Math.random() * finishedUsers[i].decks.length)];
                         //find the randomly selected deck by its id
-                        
+
                         // const discriminators = Card.discriminators;
 
                         Deck.findById(currentDeckId, async (err, deck) => {
@@ -470,7 +463,7 @@ router.get("/seed-database", async(req, res, next) => {
                                     default:
                                         // fullCard = {};
                                         break;
-                                        }
+                                }
                                 let answeredCorrectly = Math.random() > .25;
                                 if(answeredCorrectly) {
                                     numCorrect++;
@@ -486,7 +479,7 @@ router.get("/seed-database", async(req, res, next) => {
                                 const savedCardAttempt = await cardAttempt.save();
                                 await Card.findByIdAndUpdate(fullCard._id, {$push: {attempts: cardAttempt}});
                                 deckAttempt.cards.push(savedCardAttempt);
-                                    }
+                            }
                             deckAttempt.accuracyRate = Math.round((numCorrect / deck.cards.length) * 100);
                             const savedDeckAttempt = await deckAttempt.save();
                             // await User.findByIdAndUpdate(users[i]._id, {$push: {attempts: newAttempt}});

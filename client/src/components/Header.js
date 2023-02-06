@@ -57,6 +57,7 @@ function Header() {
     const [messageType, setMessageType] = useState("");
     const username = useSelector((state) => state.login.login.username);
     const userId = useSelector((state) => state.login.userId);
+    const token = useSelector((state) => state.login.token);
     const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
     const profilePic = useSelector((state) => state.login.photo);
     const notifications = useSelector((state) => state.communications.notifications);
@@ -101,6 +102,7 @@ function Header() {
     const handleLogout = () => {
         navigate("/");
         dispatch(logout());
+        localStorage.removeItem("token");
         handleHideModal();
     }
 
@@ -108,7 +110,7 @@ function Header() {
 
     useEffect(() => {
         if(!firstRender.current) {
-            if(accountSetupStage === "complete") {
+            if(accountSetupStage === "complete" && token) {
                 const communicationsFetchInterval = setInterval(() => dispatch(fetchCommunications({userId})), 10000);
                 return () => clearInterval(communicationsFetchInterval);
             }
@@ -116,7 +118,7 @@ function Header() {
             firstRender.current = false;
         }
 
-    }, [dispatch, accountSetupStage, userId]);
+    }, [dispatch, accountSetupStage, userId, token]);
     
     return (
         <HeaderWrapper className="navbar navbar-collapse fixed-top navbar-light bg-light">

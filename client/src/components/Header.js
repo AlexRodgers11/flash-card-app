@@ -52,9 +52,10 @@ const ProfilePic = styled.img`
 `;
 
 function Header() {
-    const [modalContent, setModalContent] = useState("");
-    const [messageId, setMessageId]  = useState("");
-    const [messageType, setMessageType] = useState("");
+    const [modalContent, setModalContent] = useState();
+    const [messageId, setMessageId]  = useState();
+    const [messageType, setMessageType] = useState();
+    const [messageDirection, setMessageDirection] = useState();
     const username = useSelector((state) => state.login.login.username);
     const userId = useSelector((state) => state.login.userId);
     const token = useSelector((state) => state.login.token);
@@ -66,10 +67,11 @@ function Header() {
     const navigate = useNavigate();
     
         
-    const expandMessage = (id, type) => {
+    const expandMessage = (id, type, direction) => {
         setModalContent("message");
         setMessageId(id);
         setMessageType(type);
+        setMessageDirection(direction);
     }
 
     const closeMessage = () => {
@@ -177,7 +179,7 @@ function Header() {
                                 :
                                 <>
                                     <button onClick={closeMessage}>Back to Inbox</button>
-                                    <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId} messageType={messageType}/></div>
+                                    <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId} messageType={messageType} direction={messageDirection}/></div>
                                 </>
                     }
                 </Modal>

@@ -13,7 +13,7 @@ function Message(props) {
 	const userId = useSelector((state) => state.login.userId);
 
 	const handleDeleteMessage = () => {
-		dispatch(deleteMessage({messageId: props.messageId, deletingUserId: userId, direction: props.direction}));
+		dispatch(deleteMessage({messageId: props.messageId, direction: props.direction}));
 	}
 	
 	const expandMessage = () => {

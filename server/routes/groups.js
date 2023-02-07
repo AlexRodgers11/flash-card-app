@@ -9,7 +9,7 @@ import Group from "../models/group.js";
 import { DeckSubmission, JoinRequest } from "../models/message.js";
 import { AdminChangeNotification, DeckAddedNotification, GroupDeletedNotification, HeadAdminChangeNotification, NewMemberJoinedNotification, RemovedFromGroupNotification } from "../models/notification.js";
 import User from "../models/user.js";
-import { copyDeck, swapIndexes } from "../utils.js";
+import { copyDeck, getUserIdFromJWTToken, swapIndexes } from "../utils.js";
 
 groupRouter.param("groupId", (req, res, next, groupId) => {
     Group.findById(groupId, (err, group) => {
@@ -237,29 +237,40 @@ groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next)
     }
 });
 
-groupRouter.post("/:groupId/messages/admin/deck-submission", async (req, res, next) => {
+groupRouter.post("/:groupId/messages/admin/deck-submission", getUserIdFromJWTToken, async (req, res, next) => {
     try {
-        //create a copy of the deck that will either be added to the group upon approval or deleted upon rejection (this way original deck edits don't affect submitted)
-        const deckCopy = await copyDeck(req.body.deckToCopy);
-        deckCopy.groupDeckBelongsTo = req.group._id;
-        deckCopy.approvedByGroupAdmins = false,
-        deckCopy.deckCopiedFrom = req.body.deckToCopy;
-        const savedDeckCopy = await deckCopy.save();
-        const foundGroup = await Group.findById(req.body.targetGroup, "administrators");
+        const foundUser = await User.findById(req.userId, "_id decks groups");
+        
+        if(!foundUser.decks.map(deck => deck.toString()).includes(req.body.deckToCopy)) {
+            res.status(403).send("Only the creator of a deck may submit it to a group");
+        } else if(!foundUser.groups.map(group => group.toString()).includes(req.body.targetGroup)) {
+            res.status(403).send("Only a member of a group may submit a deck to be added to it");
+        } else {
 
-        const newMessage = new DeckSubmission({
-            acceptanceStatus: 'pending',
-            sendingUser: req.body.sendingUser,
-            receivingUsers: foundGroup.administrators,
-            targetDeck: savedDeckCopy._id,
-            targetGroup: req.body.targetGroup,
-            deckName: savedDeckCopy.name,
-        });
-        const savedMessage = await newMessage.save();
-        await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
-        await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': savedMessage}});
+            //create a copy of the deck that will either be added to the group upon approval or deleted upon rejection (this way original deck edits don't affect submitted)
+            const deckCopy = await copyDeck(req.body.deckToCopy);
+            deckCopy.groupDeckBelongsTo = req.group._id;
+            deckCopy.approvedByGroupAdmins = false,
+            deckCopy.deckCopiedFrom = req.body.deckToCopy;
+            const savedDeckCopy = await deckCopy.save();
+            const foundGroup = await Group.findById(req.body.targetGroup, "administrators");
 
-        res.status(200).send({_id: savedMessage._id, messageType: "DeckSubmission", read: []});
+            const newMessage = new DeckSubmission({
+                acceptanceStatus: 'pending',
+                // sendingUser: req.body.sendingUser,
+                sendingUser: req.userId,
+                receivingUsers: foundGroup.administrators,
+                targetDeck: savedDeckCopy._id,
+                targetGroup: req.body.targetGroup,
+                deckName: savedDeckCopy.name,
+            });
+            const savedMessage = await newMessage.save();
+            await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
+            // await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': savedMessage}});
+            await User.findByIdAndUpdate(req.userId, {$push: {'messages.sent': savedMessage}});
+
+            res.status(200).send({_id: savedMessage._id, messageType: "DeckSubmission", read: []});
+        }
     } catch (err) {
         res.status(500).send("There was an error updating receiving admins received messages");
         throw err;

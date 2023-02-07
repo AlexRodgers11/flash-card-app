@@ -41,32 +41,31 @@ export const markMessageAsRead = createAsyncThunk("communications/markMessageAsR
     }
 });
 
-export const deleteNotification = createAsyncThunk("login/deleteNotification", async ({notificationId}) => {
+export const deleteNotification = createAsyncThunk("communications/deleteNotification", async ({notificationId}) => {
     try {
-        await axios.delete(`${baseURL}/notifications/${notificationId}`);
+        await client.delete(`${baseURL}/notifications/${notificationId}`);
         return notificationId;
     } catch (err) {
         console.error(err.message);
     }
 });
 
-export const deleteMessage = createAsyncThunk("login/deleteMessage", async ({messageId, deletingUserId, direction}) => {
+export const deleteMessage = createAsyncThunk("communications/deleteMessage", async ({messageId, direction}) => {
     try {
-        await axios.delete(`${baseURL}/messages/${messageId}?deletingUserId=${deletingUserId}&direction=${direction}`);
+        await client.delete(`${baseURL}/messages/${messageId}?direction=${direction}`);
         return {messageId, direction};
     } catch (err) {
         console.error(err.message);
     }
 });
 
-export const submitDeck = createAsyncThunk("communications/submitDeck", async ({userId, groupId, deckId}) => {
+export const submitDeck = createAsyncThunk("communications/submitDeck", async ({groupId, deckId}) => {
     try {
         let messageData = {
-            sendingUser: userId,
             targetGroup: groupId,
             deckToCopy: deckId
         }
-        const response = await axios.post(`${baseURL}/groups/${groupId}/messages/admin/deck-submission`, messageData);
+        const response = await client.post(`${baseURL}/groups/${groupId}/messages/admin/deck-submission`, messageData);
         console.log({response});
         return response.data;
     } catch (err) {
@@ -74,23 +73,15 @@ export const submitDeck = createAsyncThunk("communications/submitDeck", async ({
     }
 }); 
 
-export const makeDeckSubmissionDecision = createAsyncThunk("communications/makeDeckSubmissionDecision", async ({messageId, decision, comment,decidingUserId, groupId, deckId}) => {
+export const makeDeckSubmissionDecision = createAsyncThunk("communications/makeDeckSubmissionDecision", async ({messageId, decision, comment}) => {
     try {
-        const response = await axios.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "DeckSubmission", decidingUserId, groupId, deckId});
-        console.log({response});
+        const response = await client.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "DeckSubmission"});   
 
-        if(!response.data.sentMessage) {
-            return {
-                acceptanceStatus: response.data.acceptanceStatus,
-                deckName: response.data.deckName,
-                ...(response.data.deckId && {deckId: response.data.deckId})
-            }
-        } else {
             return response.data;
-        }
 
     } catch (err) {
-        console.error(err)
+        console.log({err});
+        return err.response.data;
     }
 });
 

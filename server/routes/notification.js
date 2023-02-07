@@ -25,7 +25,7 @@ notificationRouter.param("notificationId", (req, res, next, notificationId) => {
 notificationRouter.patch("/mark-as-read", getUserIdFromJWTToken, async (req, res, next) => {
     try {
         const foundUser = await User.findById(req.userId, "notifications");
-
+        console.log({foundUserId: foundUser._id});
         await Notification.updateMany({_id: {$in: foundUser.notifications}}, {$set: {read: true}});
         let user = await User.findById(req.userId, "notifications")
             .populate({
@@ -170,10 +170,15 @@ notificationRouter.get("/:notificationId", (req, res, next) => {
     }
 });
 
-notificationRouter.delete("/:notificationId", async (req, res, next) => {
+notificationRouter.delete("/:notificationId", getUserIdFromJWTToken, async (req, res, next) => {
     try {
-        await Notification.findByIdAndDelete(req.notification._id);
-        res.status(200).send("Successfully deleted");
+        const foundUser = await User.findById(req.userId, "notifications");
+        if(foundUser.notifications.includes(req.notification._id)) {
+            await Notification.findByIdAndDelete(req.notification._id);
+            res.status(200).send("Successfully deleted");
+        } else {
+            res.status(403).send("Notifications can only be deleted by the user they belong to");
+        }
     } catch (err) {
         console.error({err});
         res.status(500).send(err.message);

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { addMemberSubmittedDeck } from '../reducers/decksSlice';
+import { fetchDecksOfGroup } from '../reducers/decksSlice';
 import { addActivity } from '../reducers/groupSlice';
 import useFormInput from '../hooks/useFormInput';
 import { makeDeckSubmissionDecision } from '../reducers/communicationsSlice';
@@ -11,17 +10,14 @@ import { makeDeckSubmissionDecision } from '../reducers/communicationsSlice';
 const baseURL = 'http://localhost:8000';
 
 function DeckSubmissionMessage(props) {
-	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const userId = useSelector((state) => state.login.userId);
 	const deckListType = useSelector((state) => state.decks.listType);
     const deckListId = useSelector((state) => state.decks.listId);
 	const [sender, setSender] = useState({});
-	const [targetDeck, setTargetDeck] = useState({});
     const [targetGroup, setTargetGroup] = useState({});
     const [deckName, setDeckName] = useState({});
 	const [read, setRead] = useState(false);
-	const [acceptanceStatus, setAcceptanceStatus] = useState("");
     const [decision, setDecision] = useState("");
 	const [comment, clearComment, handleCommentChange, setComment] = useFormInput("");
     const [loading, setLoading] = useState(true);
@@ -35,14 +31,13 @@ function DeckSubmissionMessage(props) {
     }
 
     const submitDeckDecision = () => {
-        dispatch(makeDeckSubmissionDecision({messageId: props.messageId, decision, comment, decidingUserId: userId, groupId: targetGroup._id, deckId: targetDeck._id}))
+        dispatch(makeDeckSubmissionDecision({messageId: props.messageId, decision, comment}))
             .then((response) => {
-                console.log({payload: response.payload});
                 if(!response.payload.sentMessage) {
-                    alert(`This deck has already been ${response.payload.acceptanceStatus}`);
-                } else if((response.payload.acceptanceStatus === "approved" && deckListType === "group") && deckListId === targetGroup._id) {
-                    dispatch(addMemberSubmittedDeck({deckId: targetDeck._id}));
-					// dispatch(addActivity({activityId: payload.newActivity, groupId: targetGroup._id}));
+                    alert(response.payload);
+                } 
+                if((response.payload.acceptanceStatus === "approved" && deckListType === "group") && deckListId === targetGroup._id) {
+                    dispatch(fetchDecksOfGroup({groupId: targetGroup._id}));
                 }
                 props.hideModal();
             });
@@ -65,13 +60,10 @@ function DeckSubmissionMessage(props) {
 				try {
 					const messageRetrievalResponse = await axios.get(`${baseURL}/messages/${props.messageId}?type=DeckSubmission`);
 					let data = messageRetrievalResponse.data;
-                    console.log({data})
 					setSender(data.sendingUser);
 					setRead(data.read.includes(userId));
 					setTargetGroup(data.targetGroup);
-                    setTargetDeck(data.targetDeck);
                     setDeckName(data.deckName);
-                    setAcceptanceStatus(data.acceptanceStatus);
                     setLoading(false);
 				} catch (err) {
 					console.error(err);
@@ -121,6 +113,7 @@ function DeckSubmissionMessage(props) {
 DeckSubmissionMessage.propTypes = {
     fullView: PropTypes.bool,
     messageId: PropTypes.string,
+    messageType: PropTypes.string
 }
 
 export default DeckSubmissionMessage;

@@ -172,8 +172,7 @@ function Group() {
                     setModalContent("");
                 });
         } else {
-            console.log({userId, groupId, deckId: evt.target.id});
-            dispatch(submitDeck({userId, groupId, deckId: evt.target.id}));
+            dispatch(submitDeck({groupId, deckId: evt.target.id}));
             setModalContent("");
         }
     }

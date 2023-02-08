@@ -14,20 +14,21 @@ const BrowseDecksWrapper = styled.div`
     // background-color: #5197E1;
     // background-color: #FF6565;
     background-color: #52B2FF;
+    min-height: calc(100vh - 5.5rem);
 `;
 
 const SpinnerWrapper = styled.div`
     align-items: center;
     & {
         width: 100vw;
-        height: calc(100vh - 7.5rem);
+        height: calc(100vh - 4.5rem);
         @media (max-width: 515px) {
-            height: calc(100vh - 9.5rem);
+            height: calc(100vh - 6.5rem);
         }
     }
     & div.spinner-border {
         position: relative;
-        bottom: calc(30vh - 7.5rem);
+        bottom: calc(20vh - 9.5rem);
         width: 7rem;
         height: 7rem;
         @media (min-width: 800px) and (min-height: 800px) {
@@ -35,12 +36,14 @@ const SpinnerWrapper = styled.div`
             height: 12rem;
         }
         @media (max-height: 630px) {
-            bottom: 0;
+            bottom: 0; 
         }
     }
 `;
 
 const ControlBarWrapper = styled.form`
+    position: fixed;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
@@ -87,11 +90,17 @@ const ControlBarWrapper = styled.form`
 `;
 
 const StyledInfiniteScroll = styled(InfiniteScroll)`
+    position: relative;
+    top: 4rem;
     min-width: 350px;
     display: grid;
     place-items: center;
 
     grid-template-columns: repeat(4, 1fr);
+
+    @media (max-width: 515px) {
+        top: 6rem;
+    }
 
     @media (min-width: 795px) {
         grid-template-columns: repeat(5, 1fr);

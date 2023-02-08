@@ -101,7 +101,8 @@ function Header() {
         navigate("/login");
     }
 
-    const handleLogout = () => {
+    const handleLogout = (evt) => {
+        evt.preventDefault();
         navigate("/");
         dispatch(logout());
         localStorage.removeItem("token");

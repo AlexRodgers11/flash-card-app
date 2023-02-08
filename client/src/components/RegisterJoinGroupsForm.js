@@ -73,7 +73,7 @@ function RegisterJoinGroupsForm(props) {
     }
 
     const sendRequestToJoin = () => {
-        dispatch(sendJoinRequest({userId, groupId: selectedGroupId}))
+        dispatch(sendJoinRequest({groupId: selectedGroupId}))
         .then(result => {
             if(result.meta.requestStatus === "fulfilled") {
                 setContent("success");

@@ -217,19 +217,20 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
     }
 });
 
-groupRouter.post("/:groupId/messages/admin/join-request", async (req, res, next) => {
+groupRouter.post("/:groupId/messages/admin/join-request", getUserIdFromJWTToken, async (req, res, next) => {
     try {
         const foundGroup = await Group.findById(req.body.targetGroup, "administrators");
+        //any need to make sure user not already a user? 
         const newMessage = new JoinRequest({
             acceptanceStatus: 'pending',
-            sendingUser: req.body.sendingUser,
+            sendingUser: req.userId,
             receivingUsers: foundGroup.administrators,
             targetGroup: req.body.targetGroup,
         });
             
         const savedMessage = await newMessage.save();
         await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
-        await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': savedMessage}});
+        await User.findByIdAndUpdate(req.userId, {$push: {'messages.sent': savedMessage}});
 
         res.status(200).send({_id: savedMessage._id, messageType: "JoinRequest", read: []});
     } catch(err) {

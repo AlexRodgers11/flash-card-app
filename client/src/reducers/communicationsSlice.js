@@ -85,29 +85,23 @@ export const makeDeckSubmissionDecision = createAsyncThunk("communications/makeD
     }
 });
 
-export const sendJoinRequest = createAsyncThunk("communications/sendJoinRequest", async ({userId, groupId}) => {
+
+export const sendJoinRequest = createAsyncThunk("communications/sendJoinRequest", async ({groupId}) => {
     try {
-        const response = await axios.post(`${baseURL}/groups/${groupId}/messages/admin/join-request`, {sendingUser: userId, targetGroup: groupId});
+        const response = await client.post(`${baseURL}/groups/${groupId}/messages/admin/join-request`, {targetGroup: groupId});
         return response.data;
     } catch (err) {
         console.error(err);
     }
 });
 
-export const makeJoinRequestDecision = createAsyncThunk("communications/makeJoinRequestDecision", async ({messageId, decision, comment, decidingUserId}) => {
+export const makeJoinRequestDecision = createAsyncThunk("communications/makeJoinRequestDecision", async ({messageId, decision, comment}) => {
     try {
-        const response = await axios.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "JoinRequest", decidingUserId});
-        if(!response.data.sentMessage) {
-            console.log("returning the acceptance status");
-            return {
-                acceptanceStatus: response.data.acceptanceStatus,
-            }
-        } else {
-            console.log("returning new sent message");
+        const response = await client.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "JoinRequest"});
             return response.data;
-        }
     } catch (err) {
-        console.error(err)
+        console.error(err);
+        return err.response.data;
     }
 });
 

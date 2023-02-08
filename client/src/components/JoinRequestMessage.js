@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { addMember } from '../reducers/groupSlice';
+import { addMember, fetchGroupData } from '../reducers/groupSlice';
 import useFormInput from '../hooks/useFormInput';
 import { makeJoinRequestDecision } from '../reducers/communicationsSlice';
 
@@ -16,7 +16,6 @@ function JoinRequestMessage(props) {
 	const [sender, setSender] = useState();
     const [targetGroup, setTargetGroup] = useState({})
 	const [read, setRead] = useState(false);
-	const [acceptanceStatus, setAcceptanceStatus] = useState("");
 	const [decision, setDecision] = useState("");
 	const [comment, clearComment, handleCommentChange, setComment] = useFormInput("");
 	const [loading, setLoading] = useState(true);
@@ -32,7 +31,6 @@ function JoinRequestMessage(props) {
 					setSender(data.sendingUser);
 					setRead(data.read.includes(userId));
 					setTargetGroup(data.targetGroup);
-                    setAcceptanceStatus(data.acceptanceStatus);
 					setLoading(false);
 				} catch (err) {
 					console.error(err);
@@ -51,14 +49,14 @@ function JoinRequestMessage(props) {
 	}
 
 	const submitUserDecision = () => {
-		dispatch(makeJoinRequestDecision({messageId: props.messageId, decision, comment, decidingUserId: userId}))
+		dispatch(makeJoinRequestDecision({messageId: props.messageId, decision, comment}))
 			.then((response) => {
 				if(!response.payload.sentMessage) {
-					alert(`This user has already been ${response.payload.acceptanceStatus}`);
+					alert(response.payload);
 				} else if(response.payload.acceptanceStatus === "approved" && storedGroupId === targetGroup._id) {
-					console.log("should be adding member to group store in real time");
-					dispatch(addMember({groupId: targetGroup._id, userId: sender._id}));
-				}
+                    dispatch(fetchGroupData({userId, groupId: targetGroup._id}));
+                }
+
 				props.hideModal();
 			});
 	}

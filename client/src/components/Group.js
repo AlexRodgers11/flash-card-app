@@ -319,22 +319,6 @@ function Group() {
         setModalContent("");
     }
 
-    // const sendJoinRequest = () => {
-    //     const message = {
-    //         requestType: "JoinRequest",
-    //         sendingUser: userId,
-    //         targetGroup: groupId
-    //     }
-    //     axios.post(`${baseURL}/groups/${groupId}/messages/admin`, message)
-    //         .then(response => {
-    //             dispatch(addMessage({message: response.data._id, direction: 'sent'}));
-    //             //eventually need to make group able to be private (or maybe be private by default. If private, instead of routing to Group show modal stating group is private, with optional join button, if group allows join requests)
-    //         })
-    //         .catch(err => {
-    //             console.error(err);
-    //         });
-    // }
-
     const firstRender = useRef(true);
     useEffect(() => {
         if(!firstRender.current) {

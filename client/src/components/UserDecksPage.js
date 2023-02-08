@@ -8,7 +8,7 @@ const UserDecksPageWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #52B2FF; --blue
+    background-color: #52B2FF; 
     // background-color: #4C4C9D; --darker blue
 
 

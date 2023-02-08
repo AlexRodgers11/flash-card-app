@@ -9,14 +9,7 @@ import Modal from "./Modal";
 import styled from "styled-components";
 
 const UserGroupsWrapper = styled.div`
-    // background-color: #ADFF8F;
-    // lime-green
-    // background-color: #C7FFB3;
-    // persian red
-    // background-color: #CC3333;
-    // fuzzy-wuzzy pink
-    // background-color: #DA6C6C;
-    background-color: #E08585;
+    background-color: #FF6565;
     min-height: calc(100vh - 5.5rem);
     & button {
         background-color: white;

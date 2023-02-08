@@ -4,7 +4,8 @@ import DeckList from "./DeckList";
 import styled from "styled-components";
 
 const PracticeLaunchPageWrapper = styled.div`
-    background-color: #5197E1;
+    background-color: #5197E1; --lighter blue
+    // background-color: #4C4C9D; --darker blue
     min-height: calc(100vh - 5.5rem);
     & h1 {
         padding: 1rem;

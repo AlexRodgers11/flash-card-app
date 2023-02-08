@@ -16,16 +16,7 @@ const DashboardWrapper = styled.div`
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    // background-color: #152556;
-    // background-color: #1D3377;
-    // background-color: #2847A4;
-    // background-color: #2E52BD;
-    // background-color: #1282A2;
-    //yellows
-    // background-color: #FFFB00;
-    // background-color: #FFFC5C;
-    // background-color: #FFFD75;
-    background-color: #FFFD8A;
+    background-color: #FFD549;
 `
 
 const StyledLink = styled(Link)`

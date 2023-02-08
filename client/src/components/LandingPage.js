@@ -22,15 +22,27 @@ const LoginControls = styled.div`
 	justify-content: center;
 	height: 100%;
 	width: 100%;
-	background-color: cornflowerblue;
+	// background-color: cornflowerblue;
+	// background-color: #0AFFED;
+	
+
+	// background-color: #FF6565;
+    // background-color: #9DE59D;
+    background-color: #52B2FF;
+    // background-color: #CC52CC;
 	border-left: 1px solid black;
 	& button {
 		font-size: 2.5rem;
 		width: 65%;
-		height: 20vw;
+		height: 14vw;
+		// width: 65%;
+		// height: 20vw;
 		max-height: 20vh;
 		min-height: 3rem;
-		margin: 1rem;
+		margin: 1.5rem;
+		// background-color: #223843;
+		background-color: black;
+		color: white;
 		@media (max-width: 950px) {
 			width: 25%;
 			max-height: 25%;
@@ -53,7 +65,11 @@ const CarouselWrapper = styled.div`
 	align-items: center;
 	width: 100%;
 	height: 100%;
-	background-color: slategray;
+	// background-color: #223843;
+	// background-color: #053C5E;
+	// background-color: #392F5A;
+	background-color: #333333;
+
 	& div.carousel.slide  {
 		width: 100%;
 		height: 50vmin;
@@ -139,8 +155,8 @@ function LandingPage() {
 				</div> */}
 			</CarouselWrapper>
 			<LoginControls className="LoginControls">
-				<button onClick={openForm} data-location="login" className="btn btn-lg btn-primary">Login</button>
-				<button onClick={openForm} data-location="register/credentials" className="btn btn-lg btn-success">SignUp</button>
+				<button onClick={openForm} data-location="login" className="btn btn-lg">Login</button>
+				<button onClick={openForm} data-location="register/credentials" className="btn btn-lg">SignUp</button>
 			</LoginControls>		
 			{location.pathname !== "/" && <Modal hideModal={location.pathname === "/register/credentials" || location.pathname === "/login" ? goBackToHome : null}><Outlet /></Modal>}
 		</LandingPageWrapper>

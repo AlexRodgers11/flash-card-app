@@ -29,19 +29,7 @@ const PracticeSessionWrapper = styled.div`
     // justify-content: center; 
     width: 100%; 
     height: 100%;
-    // icy blue
-    // background-color: #9EFFFF;
-    // background-color: #FDF581;
-    // pale yellow
-    background-color: #FFFD8A;
-    // neutrals
-    // background-color: #5A5B6C;
-    // background-color: #515276;
-    // background-color: #4F5178;
-    // darker neutrals
-    // background-color: #3E3F5B;
-    // background-color: #252637;
-    // background-color: #4C4C52;
+    background-color: #9DE59D;
 
     min-height: calc(100vh - 5.5rem);
 `

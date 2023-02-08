@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteMessage, markMessageAsRead } from '../reducers/communicationsSlice';
@@ -11,6 +11,7 @@ import { FaTrashAlt } from 'react-icons/fa';
 function Message(props) {
 	const dispatch = useDispatch();
 	const userId = useSelector((state) => state.login.userId);
+	const [messageRendered, setMessageRendered] = useState(false);
 
 	const handleDeleteMessage = () => {
 		dispatch(deleteMessage({messageId: props.messageId, direction: props.direction}));
@@ -31,36 +32,37 @@ function Message(props) {
 			case 'DeckSubmission':
 				return (
 					<div onClick={!props.fullView ? expandMessage : null}>
-						<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} />
+						<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered />
 					</div>
 				);
 			case 'DeckDecision':
 				return (
 					<div onClick={!props.fullView ? expandMessage : null}>
-						<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} />
+						<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered />
 					</div>
 				);
 			case 'JoinRequest':
 				return (
 					<div onClick={!props.fullView ? expandMessage : null}>
-						<JoinRequestMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} />
+						<JoinRequestMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered />
 					</div>
 				);
 			case "JoinDecision":
 				return (
 					<div onClick={!props.fullView ? expandMessage : null}>
-						<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} />
+						<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered />
 					</div>
 				);
 			default:
 				return null;
 		}
 	}
-	
+	// if()
+
 	return (
 		<div>
 			{renderMessage()}
-			<FaTrashAlt onClick={handleDeleteMessage} />
+			{messageRendered && <FaTrashAlt onClick={handleDeleteMessage} />}
 		</div>
 	)
 }

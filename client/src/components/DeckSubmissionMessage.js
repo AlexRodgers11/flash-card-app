@@ -65,13 +65,14 @@ function DeckSubmissionMessage(props) {
 					setTargetGroup(data.targetGroup);
                     setDeckName(data.deckName);
                     setLoading(false);
+                    props.setRendered(true);
 				} catch (err) {
 					console.error(err);
 				}
 
 			})();
 		}
-	}, [loading, props.messageId, userId]);
+	}, [loading, props, userId]);
     
     if(loading) {
         return (
@@ -113,7 +114,8 @@ function DeckSubmissionMessage(props) {
 DeckSubmissionMessage.propTypes = {
     fullView: PropTypes.bool,
     messageId: PropTypes.string,
-    messageType: PropTypes.string
+    messageType: PropTypes.string,
+    setRendered: PropTypes.func
 }
 
 export default DeckSubmissionMessage;

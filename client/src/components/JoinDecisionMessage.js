@@ -29,13 +29,14 @@ function JoinDecisionMessage(props) {
                     setAcceptanceStatus(data.acceptanceStatus);
                     setComment(data.comment);
                     setLoading(false);
+                    props.setRendered(true);
 				} catch (err) {
 					console.error(err.message);
 				}
 
 			})();
 		}
-	}, [loading, props.messageId, userId]);
+	}, [loading, props, userId]);
 
     if(loading) {
         return (
@@ -65,6 +66,8 @@ function JoinDecisionMessage(props) {
 JoinDecisionMessage.propTypes = {
     fullView: PropTypes.bool,
     messageId: PropTypes.string,
+    messageType: PropTypes.string,
+    setRendered: PropTypes.func
 }
 
 export default JoinDecisionMessage;

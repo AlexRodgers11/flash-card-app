@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios';
+import { HiOutlineUserCircle } from "react-icons/hi";
 import { useNavigate, useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { grantAdminAuthority, removeMember, revokeAdminAuthority } from '../reducers/groupSlice';
@@ -73,9 +74,27 @@ const StyledImage = styled.img`
     top: 0;
 
     width: 100%;
-    height: 100%;
+    height: 100%;////might not be doing anything
     object-fit: cover;
 `;
+
+const UserSkeleton = styled.div`
+    position: relative;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 100%;
+    border-radius: 50%;
+    background-color: white;
+`;
+
+const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
+    position: relative;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+`
 
 function UserTile(props) {
     const navigate = useNavigate();
@@ -88,8 +107,10 @@ function UserTile(props) {
     const baseURL = 'http://localhost:8000';
 
     useEffect(() => {
-        axios.get(`${baseURL}/users/${props.memberId}/tile`)
-            .then((response) => setUserData(response.data));
+        setTimeout(() => {
+            axios.get(`${baseURL}/users/${props.memberId}/tile`)
+                .then((response) => setUserData(response.data));
+        }, 0)
     }, [props.memberId]);
 
     const viewUser = evt => {
@@ -118,6 +139,16 @@ function UserTile(props) {
         }
     }
 
+    if(!userData.firstName) {
+        // return <StyledHiOutlineUserCircle fill="white" />;
+        // return <UserSkeleton />;
+        // return (
+        //     <ImageContainer className="ImageContainer">
+        //         <UserSkeleton />
+        //     </ImageContainer>
+        // )
+        return;
+    }
     return (
         <UserTileWrapper className="UserTileWrapper" editMode={props.editMode} tabIndex={0} role="button" onKeyDown={props.editMode ? null : handleViewOnEnter} onClick={props.editMode ? null : viewUser}>
             {(props.editMode && loggedInUserId !== props.memberId) ?

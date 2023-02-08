@@ -36,13 +36,14 @@ function DeckDecisionMessage(props) {
                     setAcceptanceStatus(data.acceptanceStatus);
                     setComment(data.comment);
                     setLoading(false);
+                    props.setRendered(true);
 				} catch (err) {
 					console.error(err.message);
 				}
 
 			})();
 		}
-	}, [loading, userId, props.messageId]);
+	}, [loading, userId, props]);
 
     if(loading) {
         return (
@@ -72,6 +73,8 @@ function DeckDecisionMessage(props) {
 DeckDecisionMessage.propTypes = {
     fullView: PropTypes.bool,
     messageId: PropTypes.string,
+    messageType: PropTypes.string,
+    setRendered: PropTypes.func
 }
 
 export default DeckDecisionMessage;

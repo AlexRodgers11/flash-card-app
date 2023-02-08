@@ -32,13 +32,14 @@ function JoinRequestMessage(props) {
 					setRead(data.read.includes(userId));
 					setTargetGroup(data.targetGroup);
 					setLoading(false);
+					props.setRendered(true);
 				} catch (err) {
 					console.error(err);
 				}
 
 			})();
 		}
-	}, [loading, props.messageId, userId]);
+	}, [loading, props, userId]);
 
 	const acceptUser = () => {
 		setDecision("approved");
@@ -110,6 +111,8 @@ function JoinRequestMessage(props) {
 JoinRequestMessage.propTypes = {
     fullView: PropTypes.bool,
     messageId: PropTypes.string,
+	messageType: PropTypes.string,
+	setRendered: PropTypes.func
 }
 
 

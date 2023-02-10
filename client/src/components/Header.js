@@ -81,7 +81,7 @@ function Header() {
 
     const handleHideModal = () => {
         if(modalContent === "notifications") {
-            dispatch(markNotificationsAsRead({userId}));
+            dispatch(markNotificationsAsRead());
         }
         setModalContent("");
         setMessageId("");
@@ -114,7 +114,7 @@ function Header() {
     useEffect(() => {
         if(!firstRender.current) {
             if(accountSetupStage === "complete" && token) {
-                const communicationsFetchInterval = setInterval(() => dispatch(fetchCommunications({userId})), 10000);
+                const communicationsFetchInterval = setInterval(() => dispatch(fetchCommunications()), 10000);
                 return () => clearInterval(communicationsFetchInterval);
             }
         } else {

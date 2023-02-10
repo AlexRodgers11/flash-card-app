@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+// import axios from "axios";
 import { client } from "../utils";
 
 const baseURL = "http://localhost:8000";
@@ -11,7 +12,7 @@ const initialState = {
     notifications: [],
 }
 
-export const fetchCommunications = createAsyncThunk("communications/fetchCommunications", async ({userId}) => {
+export const fetchCommunications = createAsyncThunk("communications/fetchCommunications", async () => {
     try {
         const response = await client.get(`${baseURL}/communications`);
         return {
@@ -23,7 +24,7 @@ export const fetchCommunications = createAsyncThunk("communications/fetchCommuni
     }    
 });
 
-export const markNotificationsAsRead = createAsyncThunk("communications/markNotificationsAsRead", async({userId}) => {
+export const markNotificationsAsRead = createAsyncThunk("communications/markNotificationsAsRead", async() => {
     try {
         const response = await client.patch(`${baseURL}/notifications/mark-as-read`, {});
         return response.data;
@@ -32,6 +33,7 @@ export const markNotificationsAsRead = createAsyncThunk("communications/markNoti
     }
 });
 
+//come back and remove the readerId from this
 export const markMessageAsRead = createAsyncThunk("communications/markMessageAsRead", async ({messageId, readerId, direction}) => {
     try {
         const response = await client.patch(`${baseURL}/messages/${messageId}/add-to-read`, {readerId});
@@ -76,8 +78,8 @@ export const submitDeck = createAsyncThunk("communications/submitDeck", async ({
 export const makeDeckSubmissionDecision = createAsyncThunk("communications/makeDeckSubmissionDecision", async ({messageId, decision, comment}) => {
     try {
         const response = await client.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "DeckSubmission"});   
-
-            return response.data;
+        
+        return response.data;
 
     } catch (err) {
         console.log({err});

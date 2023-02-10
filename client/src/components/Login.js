@@ -61,7 +61,7 @@ function Login() {
     useEffect(() => {
         if(userId) {
             dispatch(fetchLoggedInUserData(userId));
-            dispatch(fetchCommunications({userId}));
+            dispatch(fetchCommunications());
             navigate("/dashboard");
         }
     }, [userId, dispatch, navigate]);

@@ -288,6 +288,8 @@ function DeckTile(props) {
     const location = useLocation();
     const navigate = useNavigate();
     const rootRef = useRef();
+    const indicatorsRef = useRef();
+    const contentRef = useRef();
 
     const handleSelection = () => {
         //SEE IF OKAY TO DO THIS WAY- COULD BE UNSAFE AND ALLOW NAVIGATION TO PRIVATE DECKS
@@ -303,6 +305,9 @@ function DeckTile(props) {
     const handleResize = useCallback(() => {
         const tile = rootRef.current;
         const words = rootRef.current.querySelectorAll(".word");
+        const content = contentRef.current;
+        const indicators = indicatorsRef.current;
+
         let needsResizing = false;
 
         words.forEach((word) => {
@@ -311,6 +316,10 @@ function DeckTile(props) {
 
             }
         });
+
+        if(content.offsetHeight > tile.offsetHeight - (2 * indicators.offsetHeight)) {
+            needsResizing = true;
+        }
 
         if(needsResizing) {
             setTimeout(() => {
@@ -405,7 +414,7 @@ function DeckTile(props) {
   
     return (
         <DeckTileWrapper ref={rootRef} id="tile" className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
-            <IndicatorsWrapper className="IndictorsWrapper">
+            <IndicatorsWrapper ref={indicatorsRef} className="IndictorsWrapper">
                 {deckData.publiclyAvailable ? <StyledOpenEye /> : <StyledClosedEye className="StyledClosedEye" />}
                 <CardCountWrapper>
                     <span>{deckData.cardCount}</span>
@@ -413,7 +422,7 @@ function DeckTile(props) {
                     <span />
                 </CardCountWrapper>
             </IndicatorsWrapper>
-            <ContentWrapper>
+            <ContentWrapper ref={contentRef}>
                 {deckData.url && <img src={deckData.url} alt="profile-avatar"/>}
                 {/* <p className={deckData.url ? "medium-name" : "large-name"}>{deckData.name}</p> */}
                 <p className={deckData.url ? "medium-name" : "large-name"} style={{...(fontSize && {fontSize: fontSize}), opacity: doneResizing ? 1 : 0}}>{deckData?.name?.split(" ").map(word => <span className="word">{word} </span>)}</p>

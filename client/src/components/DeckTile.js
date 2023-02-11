@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import PropTypes from 'prop-types';
 import axios from "axios";
@@ -80,45 +80,47 @@ const ContentWrapper = styled.div`
     flex-direction: column;
     justify-content: center;
     font-weight: 600;
+    // font-family: Consolas;
+    font-family: monospace;
     & img {
         height: 7rem;
         width: 100%;
     }
     & .large-name {
-        font-size: .6rem;
-        @media (min-width: 475px) {
-            font-size: .75rem;
-        }
+        // font-size: .6rem;
+        // @media (min-width: 475px) {
+        //     font-size: .75rem;
+        // }
         
-        @media (min-width: 535px) {
-            font-size: 1rem;
-        }
+        // @media (min-width: 535px) {
+        //     font-size: 1rem;
+        // }
     
-        @media (min-width: 795px) {
-            font-size: 1.25rem
-        }
+        // @media (min-width: 795px) {
+        //     font-size: 1.25rem
+        // }
 
         
-        @media (min-width: 960px) {
-            // font-size: 2rem;
-            font-size: 100%;
-        }
+        // @media (min-width: 960px) {
+        //     // font-size: 2rem;
+        //     font-size: 100%;
+        // }
     }
     & .medium-name {
         //once I decide size at which to not display image set font-size to be the same as large-name
-        font-size: .45rem;
-        @media (min-width: 475px) {
-            font-size: .5625rem;
-        }
-        @media (min-width: 535px) {
-            font-size: .75rem;
-        }
-        @media (min-width: 795px) {
-            font-size: .8375rem;
-        }
-        @media (min-width: 960px) {
-            font-size: 1.5rem;
-        }
+        // font-size: .45rem;
+        // @media (min-width: 475px) {
+        //     font-size: .5625rem;
+        // }
+        // @media (min-width: 535px) {
+        //     font-size: .75rem;
+        // }
+        // @media (min-width: 795px) {
+        //     font-size: .8375rem;
+        // }
+        // @media (min-width: 960px) {
+        //     font-size: 1.5rem;
+        // }
     }
 `
 
@@ -262,7 +264,7 @@ const CardCountWrapper = styled.p`
     }
 
     @media (min-width: 795px) {
-        font-size: 1.25rem;
+        // font-size: 1.25rem;
         & span:nth-of-type(2) {
             height: 1rem;
             width: .8rem;
@@ -281,8 +283,11 @@ const baseURL = 'http://localhost:8000';
 
 function DeckTile(props) {
     const [deckData, setDeckData] = useState({});
+    const [fontSize, setFontSize] = useState(20);
+    const [doneResizing, setDoneResizing] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
+    const rootRef = useRef();
 
     const handleSelection = () => {
         //SEE IF OKAY TO DO THIS WAY- COULD BE UNSAFE AND ALLOW NAVIGATION TO PRIVATE DECKS
@@ -295,7 +300,29 @@ function DeckTile(props) {
         }
     }
     
+    const handleResize = useCallback(() => {
+        const tile = rootRef.current;
+        const words = rootRef.current.querySelectorAll(".word");
+        let needsResizing = false;
 
+        words.forEach((word) => {
+            if(word.offsetWidth > tile.offsetWidth * .95) {
+                needsResizing = true;
+
+            }
+        });
+
+        if(needsResizing) {
+            setTimeout(() => {
+                setFontSize(fontSize * .9); 
+            }, 0);
+        } else {
+            setDoneResizing(true);
+        }
+
+    }, [fontSize]);
+
+    
     const handleKeyPress = (evt) => {
         if(evt.keyCode === 13) {
             handleSelection();
@@ -307,9 +334,77 @@ function DeckTile(props) {
             .then((response) => setDeckData(response.data))
             .catch((err) => console.log(err));
     }, [props.deckId]);
+
+
+    //check font-size upon data loading
+    useEffect(() => {
+        if(deckData.name) {
+            handleResize();
+        }
+    }, [deckData, handleResize]);
+
+    //re-evaluate font-size upon 
+    useEffect(() => {        
+        let timeoutId;
+        
+        const handleWindowResize = () => {
+            setDoneResizing(false);
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                const width = window.innerWidth;
+                console.log({width});
+                switch(width) {
+                    case width <= 475:
+                        if(deckData.url) {
+                            setFontSize(8);
+                        } else {
+                            setFontSize(10);
+                        } 
+                        break;
+                    case width <= 535:
+                        if(deckData.url) {
+                            setFontSize(9);
+                        } else {
+                            setFontSize(12);
+                        } 
+                        break;
+                    case width <= 795:
+                        if(deckData.url) {
+                            setFontSize(12);
+                        } else {
+                            setFontSize(16);
+                        } 
+                        break;
+                    case width <= 960:
+                        if(deckData.url) {
+                            setFontSize(14);
+                        } else {
+                            setFontSize(24);
+                        } 
+                        break;
+                    default: 
+                    if(deckData.url) {
+                        setFontSize(24);
+                    } else {
+                        setFontSize(32);
+                    } 
+                    break;
+                }
+                // setFontSize(20);
+                handleResize();
+            }, 300);
+        }
+
+        window.addEventListener("resize", handleWindowResize);
+        
+        return () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener("resize", handleWindowResize);
+        };
+      }, [deckData.url, handleResize]);
   
     return (
-        <DeckTileWrapper className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
+        <DeckTileWrapper ref={rootRef} id="tile" className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
             <IndicatorsWrapper className="IndictorsWrapper">
                 {deckData.publiclyAvailable ? <StyledOpenEye /> : <StyledClosedEye className="StyledClosedEye" />}
                 <CardCountWrapper>
@@ -320,7 +415,8 @@ function DeckTile(props) {
             </IndicatorsWrapper>
             <ContentWrapper>
                 {deckData.url && <img src={deckData.url} alt="profile-avatar"/>}
-                <p className={deckData.url ? "medium-name" : "large-name"}>{deckData.name}</p>
+                {/* <p className={deckData.url ? "medium-name" : "large-name"}>{deckData.name}</p> */}
+                <p className={deckData.url ? "medium-name" : "large-name"} style={{...(fontSize && {fontSize: fontSize}), opacity: doneResizing ? 1 : 0}}>{deckData?.name?.split(" ").map(word => <span className="word">{word} </span>)}</p>
             </ContentWrapper>
         </DeckTileWrapper>
     )

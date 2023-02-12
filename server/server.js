@@ -40,6 +40,7 @@ import { Strategy as JwtStrategy } from  "passport-jwt";
 import group from "./models/group.js";
 
 import dotenv from "dotenv";
+import { rateLimit } from "express-rate-limit";
 dotenv.config();
 
 mongoose.connect("mongodb://localhost/flash-card-app-one", {
@@ -53,6 +54,8 @@ const app = express();
 
 //use body-parsing middleware that only parses json
 app.use(bodyParser.json());
+
+
 
 //set response headers
 app.use((req, res, next) => {
@@ -73,6 +76,14 @@ app.use(
 );
 
 app.use(passport.initialize());
+
+const baseRateLimiter = rateLimit({
+    windowMs: 60 * 1000, 
+    max: 100,
+    message: "Too many requests, please try again later"
+});
+
+app.use(baseRateLimiter);
 
 app.use("/activities", activityRouter);
 app.use("/attempts", attemptRouter);

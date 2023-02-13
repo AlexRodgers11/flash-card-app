@@ -31,18 +31,28 @@ const PracticeSessionWrapper = styled.div`
     height: 100%;
     background-color: #9DE59D;
 
+
+
+    // background-color: #8EE18E;
+    // background-color: #7EDD7E;
+
+    // background-color: #0E958F;
+    // background-color: #10A8A0;
     min-height: calc(100vh - 5.5rem);
 `
 
 const CardWrapper = styled.div`
-    border: 1px solid black; 
+    border: 3px solid black; 
     overflow: hidden;
-    border-radius: 3rem;
-    background-color: white;
+    // border-radius: 3rem;
+    border-radius: 10%;
+    // background-color: white;
+    background-color: #2C262C;
     width: 28em;
     height: 32em;
     min-height: 20em;
     // margin-bottom: 10rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 `
 
 
@@ -56,23 +66,43 @@ const StatsColumn = styled.div`
 
 const StatsRow = styled.div`
     height: 5rem;
-    color: white;
+    // color: white;
+    color: #FAF9FA;
+    font-size: 1.5rem;
+    font-weight: 600;
+    & h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+    }
     & .col {
         // margin: 0 .15rem;
         margin: 0 .5rem;
-        background-color: white;
+        // background-color: white;
+        // background-color: #F0F600;
+        // background-color: #F6F4F6;
+        // background-color: #FAF9FA;
+        // background-color: #211C21;
+        background-color: #2C262C;
+        border: 3px solid black;
         &.correct {
-            background-color: #0D6EFD
+            // background-color: blue;
+            color: #FAF9FA;
+            // color: white;
+            background-color: #333FFF;
+            // background-color: #1F1FFF
+            
         }
         &.incorrect {
-            background-color: #DC3545
+            // background-color: red;
+            background-color: #FF3333;
+            // background-color: #FF1F1F;
         }
         &.accuracy-rate {
-            color: black;
+            // color: black;
             // background-color: #198754;
         }
         &.cards-left {
-            color: black;
+            // color: black;
             // background-color: #212529
         }
     }
@@ -171,13 +201,13 @@ function PracticeSession() {
                     createCard(activeCard.cardType) 
                     : 
                     <WrapUpButtonsContainer>
-                        <button className="btn btn-lg btn-success" onClick={handlePracticeDeckAgain}>Practice Deck Again</button>
+                        <button className="btn btn-lg btn-dark" onClick={handlePracticeDeckAgain}>Practice Deck Again</button>
                         {stats.numberWrong ? 
-                            <button className="btn btn-lg btn-danger" onClick={handleRetryMissedCards}>Retry Missed Cards</button>
+                            <button className="btn btn-lg btn-dark" onClick={handleRetryMissedCards}>Retry Missed Cards</button>
                             :
                             null
                         }
-                        <button className="btn btn-lg btn-primary" value="practice" onClick={navigateAway}>Select Another Deck</button>
+                        <button className="btn btn-lg btn-dark" value="practice" onClick={navigateAway}>Select Another Deck</button>
                         <button className="btn btn-lg btn-dark" value="dashboard" onClick={navigateAway}>Home</button>
                     </WrapUpButtonsContainer>
                 }

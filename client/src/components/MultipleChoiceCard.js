@@ -11,6 +11,15 @@ const MultipleChoiceCardWrapper = styled.div`
 const QuestionBox = styled.div`
 	height: 40%;
 	border-bottom: 1px solid black;
+	// background-color: #FFD549;
+	// background-color: #A3A5B8;
+	// background-color: #757895;
+	// background-color: #58355E;
+	// background-color: #6A6E8A;
+	background-color:  #2C262C;
+
+	// color: black;
+	color: white;
 `
 
 const QuestionWrapper = styled.div`

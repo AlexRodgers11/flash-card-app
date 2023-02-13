@@ -36,10 +36,34 @@ const CardWrapper = styled.div`
 	align-items: center;
 	height: 100%;
 	padding: 30% 5%;
+	// background-color: white;
+	background-color:  #2C262C;
+	color: white;
 	& button {
 		margin: .25rem;
 		padding: .5rem 1.25rem;
 	}
+	 & .view-answer {
+		background-color: #E3DEE3;
+		&:hover {
+			background-color: black;
+			color: white;
+		}
+	 }
+	 & .answered-correctly {
+		color: white;
+		background-color: #333FFF;
+		&:hover {
+			background-color: black;
+		}
+	 }
+	 & .answered-incorrectly {
+		color: white;
+		background-color: #FF3333;
+		&:hover {
+			background-color: black;
+		}
+	 }
 `
 
 function FlashCard() {
@@ -80,7 +104,7 @@ function FlashCard() {
 					<CardWrapper>
 						<div>{activeCard.question}</div>
 						<div>
-							<button onClick={toggleAnswered}>View Answer</button>
+							<button className="view-answer" onClick={toggleAnswered}>View Answer</button>
 						</div>
 					</CardWrapper>
 				</>
@@ -90,8 +114,8 @@ function FlashCard() {
 						<div>{activeCard.correctAnswer}</div>
 						<div>
 							<h3>Did you answer correctly?</h3>
-							<button data-answeredcorrectly="true" onClick={submitAnswer}>Yes</button>
-							<button data-answeredcorrectly="false" onClick={submitAnswer}>No</button>
+							<button className="answered-correctly" data-answeredcorrectly="true" onClick={submitAnswer}>Yes</button>
+							<button className="answered-incorrectly" data-answeredcorrectly="false" onClick={submitAnswer}>No</button>
 						</div>
 					</CardWrapper>
 				</>

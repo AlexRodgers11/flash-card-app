@@ -13,19 +13,22 @@ const CardAnswer = styled.div`
     height: 100%;
     width: 100%;
     background-color: white;
+    // background-color: #FAF9FA;
     &:hover {
         background-color: black;
         color: white;
         cursor: pointer;
     }
     &.Answer_Correct {
-        background-color: blue;
+        // background-color: blue;
         // background-color: #3333CC;
+        background-color: #333FFF;
         color: white;
     }
     &.Answer_Incorrect {
-        background-color: red;
+        // background-color: red;
         // background-color: #CC3333;
+        background-color: #FF3333;
         color: white;
     }
 `

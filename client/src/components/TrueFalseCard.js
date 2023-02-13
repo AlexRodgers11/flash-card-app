@@ -15,7 +15,8 @@ const QuestionBox = styled.div`
 	// background-color: white;
 	// background-color: #4C4C52;
 	// background-color: black;
-	background-color: #242424;
+	// background-color: #242424;
+	background-color: #58355E;
 	color: white;
 `
 

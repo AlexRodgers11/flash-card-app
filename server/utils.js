@@ -3,6 +3,7 @@ import Deck from "./models/deck.js";
 import mongoose from "mongoose";
 import jwt from "jwt-simple";
 import crypto from "crypto";
+import { rateLimit } from "express-rate-limit";
 
 const characters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','@','#','$','%','&','=','?'];
 
@@ -124,3 +125,26 @@ export const getUserIdFromJWTToken = (req, res, next) => {
         });
     }
 };
+
+export const baseRateLimiter = rateLimit({
+    max: 300,
+    message: "Too many requests to baseRateLimiter, please try again later"
+});
+
+// modified version of Geelie's answer to this question https://stackoverflow.com/questions/27117337/exclude-route-from-express-middleware
+export const excludingPaths = (pathRegexes, middleware) => {
+    return (req, res, next) =>  {
+        let shouldExclude = false;
+        pathRegexes.forEach((pathRegex) => {
+            if(pathRegex.test(req.path)) {
+                shouldExclude = true;
+            }
+        });
+
+        if(shouldExclude) {
+            return next();
+        } else {
+            return middleware(req, res, next);
+        }
+    }
+}

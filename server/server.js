@@ -11,7 +11,7 @@ import User from "./models/user.js";
 import Activity from "./models/activity.js";
 import CardAttempt from "./models/cardAttempt.js";
 // import getRandomCardType, { generateCode, getRandomJoinOptions } from "./utils.js";
-import getRandomCardType, { generateCode, getRandomJoinOptions, generateRandomFileName } from "./utils.js";
+import getRandomCardType, { generateCode, getRandomJoinOptions, generateRandomFileName, baseRateLimiter, excludingPaths } from "./utils.js";
 import * as fs from "fs";
 
 import multer from "multer";
@@ -40,7 +40,7 @@ import { Strategy as JwtStrategy } from  "passport-jwt";
 import group from "./models/group.js";
 
 import dotenv from "dotenv";
-import { rateLimit } from "express-rate-limit";
+
 dotenv.config();
 
 mongoose.connect("mongodb://localhost/flash-card-app-one", {
@@ -77,13 +77,7 @@ app.use(
 
 app.use(passport.initialize());
 
-const baseRateLimiter = rateLimit({
-    windowMs: 60 * 1000, 
-    max: 100,
-    message: "Too many requests, please try again later"
-});
-
-app.use(baseRateLimiter);
+app.use(excludingPaths([/\/decks\/([0-9A-Za-z]+([A-Za-z]+[0-9A-Za-z]+)+)\/tile/i], baseRateLimiter));
 
 app.use("/activities", activityRouter);
 app.use("/attempts", attemptRouter);

@@ -131,6 +131,11 @@ export const baseRateLimiter = rateLimit({
     message: "Too many requests to baseRateLimiter, please try again later"
 });
 
+export const extendedRateLimiter = rateLimit({
+    max: 2500,
+    message: "Too many requests to extendedRateLimiter, please try again later"
+});
+
 // modified version of Geelie's answer to this question https://stackoverflow.com/questions/27117337/exclude-route-from-express-middleware
 export const excludingPaths = (pathRegexes, middleware) => {
     return (req, res, next) =>  {

@@ -8,6 +8,7 @@ import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import Category from "../models/category.js";
 import User from "../models/user.js";
+import { extendedRateLimiter } from "../utils.js";
 
 deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
@@ -23,6 +24,8 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
         }
     });
 });
+
+deckRouter.use(extendedRateLimiter);
 
 deckRouter.get("/", async (req, res, next) => {
     console.log({query: req.query});
@@ -74,7 +77,7 @@ deckRouter.post("/", (req, res, next) => {
     });
 });
 
-deckRouter.get("/:deckId/tile", (req, res, next) => {
+deckRouter.get("/:deckId/tile", extendedRateLimiter, (req, res, next) => {
     User.findById(req.deck.creator, (err, user) => {
         if(err) {
             res.status(500).send("There was an error with your request");

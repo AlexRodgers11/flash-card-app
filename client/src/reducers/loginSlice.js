@@ -30,6 +30,7 @@ export const login = createAsyncThunk("login/login", async({usernameOrEmail, pas
             usernameOrEmail,
             password
         });
+        document.cookie = `jwt=${response.data.token}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; sameSite=none`;
         return {
             token: response.data.token,
             userId: response.data.userId
@@ -147,7 +148,9 @@ export const loginSlice = createSlice({
         removeGroup: (state, action) => {
             state.groups = state.groups.filter(id => id !== action.payload.groupId);
         },
-        logout: (state) => initialState
+        logout: (state) => {
+            return initialState;
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(fetchLoggedInUserData.fulfilled, (state, action) => {

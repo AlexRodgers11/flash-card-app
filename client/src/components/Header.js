@@ -58,6 +58,7 @@ function Header() {
     const [messageDirection, setMessageDirection] = useState();
     const username = useSelector((state) => state.login.login.username);
     const userId = useSelector((state) => state.login.userId);
+    const name = useSelector((state) => state.login.name);
     const token = useSelector((state) => state.login.token);
     const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
     const profilePic = useSelector((state) => state.login.photo);
@@ -106,6 +107,8 @@ function Header() {
         navigate("/");
         dispatch(logout());
         localStorage.removeItem("token");
+        localStorage.removeItem("persist:login");
+        window.location.reload();
         handleHideModal();
     }
 
@@ -140,27 +143,27 @@ function Header() {
                     </form> */}
                 </div>
                 <div style={{display: "flex", alignItems: "center"}}>
-                    {username && 
+                    {name?.first && 
                         <div data-source="inbox" onClick={handleButtonClick} className="d-none d-sm-block" style={{position: "relative", left: "1.5rem"}}>
                         {/* <div data-source="inbox" onClick={handleButtonClick} style={{position: "relative", left: "1.5rem"}}> */}
                             <StyledIoMailSharp />
                             <div style={{visibility: messages.filter(message => message.read.includes(userId) === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".5rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{messages.filter(message => message.read.includes(userId) === false).length >= 10 ? "9+": messages.filter(message => message.read.includes(userId) === false).length}</div>
                         </div>}
-                    {username && 
+                    {name.first && 
                         <div data-source="notifications" onClick={handleButtonClick} className="d-none d-sm-block" style={{position: "relative", left: "1rem"}}>
                             <StyledIoNotificationsSharp />
                             <div style={{visibility: notifications.filter(notification => notification.read === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".85rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{notifications.filter(notification => notification.read === false).length >= 10 ? "9+": notifications.filter(notification => notification.read === false).length}</div>
                         </div>}
                     <li className="nav-item dropdown">
                         <div tabIndex={0} className="nav-link dropdown-toggle" href="#" style={{paddingRight: "0"}} id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {profilePic ? <ProfilePic alt={username} src={profilePic} /> : <StyledHiOutlineUserCircle />}
+                            {profilePic ? <ProfilePic alt={username || `${name.first} ${name.last}`} src={profilePic} /> : <StyledHiOutlineUserCircle />}
                         </div>
                         <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a className="dropdown-item" onClick={username ? handleLogout : handleLogin} href="/">{username ? "Log out" : "Login"}</a></li>
-                            {!username && <li><a className="dropdown-item" href="register/credentials">Sign Up</a></li>}
-                            {username && <li><hr className="dropdown-divider d-block d-sm-none " /></li>}
-                            {username && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Inbox</DropDownItem></li>}
-                            {username && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Notifications</DropDownItem></li>}
+                            <li><a className="dropdown-item" onClick={name.first ? handleLogout : handleLogin} href="/">{name?.first ? "Log out" : "Login"}</a></li>
+                            {!name.first && <li><a className="dropdown-item" href="register/credentials">Sign Up</a></li>}
+                            {name.first && <li><hr className="dropdown-divider d-block d-sm-none " /></li>}
+                            {name.first && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Inbox</DropDownItem></li>}
+                            {name.first && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Notifications</DropDownItem></li>}
                         </ul>
                     </li>
                 </div>

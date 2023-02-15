@@ -139,11 +139,15 @@ const tokenForUser = user => {
 
 loginRouter.post("/", requireSignIn, (req, res, next) => {
     console.log("POST request received");
+    res.cookie('jwt', tokenForUser(req.user), {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'none'
+    });
     
     res.send({
         token: tokenForUser(req.user),
         userId: req.user._id,
-        
     });
 });
 

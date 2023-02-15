@@ -105,9 +105,8 @@ export const copyDeck = async (deckId) => {
 }
 
 export const getUserIdFromJWTToken = (req, res, next) => {
-    console.log("in getUserIdFromJWTToken");
     const token = req.headers.authorization;
-    console.log({token});
+    // console.log({token});
 
     if (!token) {
         return res.status(401).json({
@@ -125,6 +124,17 @@ export const getUserIdFromJWTToken = (req, res, next) => {
         });
     }
 };
+
+
+export const xhrOnly = (req, res, next) => {
+    if (req.xhr) {
+        res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        next();
+    } else {
+        res.status(400).send("Bad request");
+    }
+}
 
 export const baseRateLimiter = rateLimit({
     max: 300,

@@ -221,9 +221,16 @@ const client = axios.create({
 });
 
 client.interceptors.request.use(config => {
-    config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+    // config.headers["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
+    config.headers["Authorization"] = `Bearer ${getJwtCookie()}`;
 
     return config;
 });
 
 export { client };
+
+export const getJwtCookie = () => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; jwt=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}

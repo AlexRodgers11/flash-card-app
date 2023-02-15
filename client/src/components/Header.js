@@ -106,6 +106,7 @@ function Header() {
         evt.preventDefault();
         navigate("/");
         dispatch(logout());
+        document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
         localStorage.removeItem("token");
         localStorage.removeItem("persist:login");
         window.location.reload();

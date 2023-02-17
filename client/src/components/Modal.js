@@ -73,7 +73,7 @@ function Modal(props) {
 		<ModalWrapper className='Modal_active'>
 			<ModalBackdrop onClick={props.hideModal}></ModalBackdrop>
 			<ModalContent>
-				<ModalClose className="ModalClose" onClick={props.hideModal}>{props.hideModal && <StyledCloseIcon />}</ModalClose>
+				<ModalClose className="ModalClose">{props.hideModal && <StyledCloseIcon role="button" onClick={props.hideModal}/>}</ModalClose>
 				{props.children}
 			</ModalContent>
 		</ModalWrapper>

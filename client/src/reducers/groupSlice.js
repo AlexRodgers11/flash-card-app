@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { client } from "../utils";
 
 const baseURL = "http://localhost:8000";
 
@@ -38,9 +39,11 @@ export const deleteGroup = createAsyncThunk("group/deleteGroup", async ({groupId
     }
 });
 
-export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({groupId, userId}) => {
+export const fetchGroupData = createAsyncThunk("group/fetchGroupData", async ({groupId}) => {
+    console.log("fetching group data");
     try {
-        const response = await axios.get(`${baseURL}/groups/${groupId}?requestingUser=${userId}`);
+        const response = await client.get(`${baseURL}/groups/${groupId}`);
+        console.log({response});
         return {
             groupId: response.data._id,
             name: response.data.name,

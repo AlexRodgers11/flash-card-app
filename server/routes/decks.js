@@ -8,7 +8,7 @@ import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import Category from "../models/category.js";
 import User from "../models/user.js";
-import { extendedRateLimiter } from "../utils.js";
+import { extendedRateLimiter, getUserIdFromJWTToken } from "../utils.js";
 
 deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
@@ -178,22 +178,33 @@ deckRouter.patch("/:deckId", (req, res, next) => {
     });
 });
 
-deckRouter.post("/:deckId/cards", async (req, res, next) => {
+deckRouter.post("/:deckId/cards", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.deck.groupDeckBelongsTo) {
+        const foundGroup = await Group.findById(req.deck.groupDeckBelongsTo, "administrators");
+        if(!foundGroup.administrators.map(admin => admin.toString()).includes(req.userId)) {
+            res.status(403).send("Only this deck's group administrators can add cards to it");
+            return;
+        }
+    } else if(req.userId !== req.deck.creator.toString()) {
+        res.status(403).send("Only this deck's creator can add a card to it");
+        return;
+    }
     let cardType = req.body.cardType;
     delete req.body.cardType;
     let newCard;
     switch(cardType) {
         case "FlashCard":
-            newCard = new FlashCard({...req.body, _id: new mongoose.Types.ObjectId()});
+            newCard = new FlashCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
             break;
         case "TrueFalseCard":
-            newCard = new TrueFalseCard({...req.body, _id: new mongoose.Types.ObjectId()});
+            newCard = new TrueFalseCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
             break;
         case "MultipleChoiceCard":
-            newCard = new MultipleChoiceCard({...req.body, _id: new mongoose.Types.ObjectId()});
+            newCard = new MultipleChoiceCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
             break;
         default:
             res.status(500).send("Invalid card type selected");
+            return;
     }
     try {
         const card = await newCard.save();

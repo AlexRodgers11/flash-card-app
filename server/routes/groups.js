@@ -33,24 +33,26 @@ groupRouter.get("/search", async (req, res, next) => {
     res.status(200).send(filteredGroups);
 });
 
-groupRouter.get("/:groupId", (req, res, next) => {
-    let response;
+groupRouter.get("/:groupId", getUserIdFromJWTToken, (req, res, next) => {
+    if(!req.group.members.includes(req.userId)) {
+        res.status(403).send("You must be a user of a group to retrieve its information");
+        return;
+    }
+    let response;   
     if(req.query.tile) {
         response = {
             name: req.group.name,
-            memberCount: req.group.members.length,
+            // memberCount: req.group.members.length,
+            memberIds: req.group.members,
             deckCount: req.group.decks.length
         }
-    } else if(req.query.requestingUser) {
-        if(!req.group.administrators.includes(req.query.requestingUser)) {
-            req.group.joinCode = 'only admins can view join codes';
-        } else if(!req.group.members.includes(req.query.requestingUser)) {
-            res.status(401).send("Unauthorized: Only members of this group may view its page");
-        }
-        response = req.group;
     } else {
-        res.status(401).send("Unauthorized: Only members of this group may view its page");
-    }
+        response = req.group;
+        if(!req.group.administrators.includes(req.userId)) {
+            delete response.joinCode;
+        } 
+        response = req.group;
+    } 
     res.status(200).send(response);
 });
 
@@ -67,7 +69,7 @@ groupRouter.get("/:groupId/decks", (req, res, next) => {
 
 groupRouter.post("/:groupId/decks", async (req, res, next) => {
     try {
-        const deckCopy = await copyDeck(req.body.deckId);
+        const deckCopy = await copyDeck(req.body.deckId, req.group._id);
         deckCopy.groupDeckBelongsTo = req.group._id;
         deckCopy.approvedByGroupAdmins = true,
         deckCopy.deckCopiedFrom = req.body.deckId;
@@ -86,7 +88,7 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
 
 groupRouter.patch("/:groupId/decks", async (req, res, next) => {
     try {
-        const deckCopy = await copyDeck(req.body.deckId);
+        const deckCopy = await copyDeck(req.body.deckId, req.group._id);
         await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deckCopy}});
         res.status(200).send({submittedDeckId: deckCopy._id, submittedDeckName: deckCopy.name});
     } catch (err) {
@@ -249,7 +251,7 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", getUserIdFromJWTTok
         } else {
 
             //create a copy of the deck that will either be added to the group upon approval or deleted upon rejection (this way original deck edits don't affect submitted)
-            const deckCopy = await copyDeck(req.body.deckToCopy);
+            const deckCopy = await copyDeck(req.body.deckToCopy, req.group._id);
             deckCopy.groupDeckBelongsTo = req.group._id;
             deckCopy.approvedByGroupAdmins = false,
             deckCopy.deckCopiedFrom = req.body.deckToCopy;

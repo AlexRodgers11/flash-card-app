@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { client } from "../utils";
 
 const baseURL = 'http://localhost:8000';
 
@@ -10,12 +11,12 @@ const initialState = {
     publiclyAvailable: false,
     creator: "",
     cards: [],
-
+    groupDeckBelongsTo: ""
 }
 
 export const addCard = createAsyncThunk("deck/addCard", async ({newCard, deckId}) => {
     try {
-        const response = await axios.post(`${baseURL}/decks/${deckId}/cards`, newCard);
+        const response = await client.post(`${baseURL}/decks/${deckId}/cards`, newCard);
         return response.data
     } catch (err) {
         console.error(err);
@@ -23,9 +24,8 @@ export const addCard = createAsyncThunk("deck/addCard", async ({newCard, deckId}
 });
 
 export const deleteCard = createAsyncThunk("deck/deleteCard", async ({cardToDeleteId}) => {
-    //possibly move delete route to deck to match card add route
     try {
-        const response = await axios.delete(`${baseURL}/cards/${cardToDeleteId}`);
+        const response = await client.delete(`${baseURL}/cards/${cardToDeleteId}`);
         return response.data;
     } catch (err) {
         console.error(err);
@@ -75,6 +75,7 @@ export const deckSlice = createSlice({
             state.publiclyAvailable = action.payload.publiclyAvailable;
             state.creator = action.payload.creator;
             state.cards = [...action.payload.cards];
+            state.groupDeckBelongsTo = action.payload.groupDeckBelongsTo;
         });
         builder.addCase(updateDeck.fulfilled, (state, action) => {
             for(const key in action.payload) {

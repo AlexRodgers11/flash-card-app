@@ -45,7 +45,7 @@ export default getRandomCardType;
 
 export const generateRandomFileName = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
 
-export const copyDeck = async (deckId) => {
+export const copyDeck = async (deckId, groupId) => {
     try {
         const foundDeck = await Deck.findById(deckId).populate("cards");
         
@@ -92,7 +92,8 @@ export const copyDeck = async (deckId) => {
                     default: 
                         break;
                     }
-                    copiedCard._id = new mongoose.Types.ObjectId()
+                    copiedCard._id = new mongoose.Types.ObjectId();
+                    copiedCard.groupCardBelongsTo = groupId;
                     const savedCardCopy = await copiedCard.save();
                     return savedCardCopy;
                 }))

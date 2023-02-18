@@ -1,17 +1,75 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router';
-import axios from 'axios';
 import useFormInput from '../hooks/useFormInput';
-import { addCard, deleteCard, updateDeck, fetchDeck, resetDeck } from '../reducers/deckSlice';
+import { addCard, updateDeck, fetchDeck, resetDeck } from '../reducers/deckSlice';
 import { deleteDeck } from '../reducers/decksSlice';
 import useToggle from '../hooks/useToggle';
 import Card from './Card';
 import CardForm from './CardForm';
 import Modal from './Modal';
 import { removeDeckFromUser } from '../reducers/loginSlice';
+import { MdModeEditOutline } from "react-icons/md";
+import styled from 'styled-components';
 
-const baseURL = 'http://localhost:8000';
+const DeckWrapper = styled.div`
+    min-height: calc(100vh - 5.5rem);
+    background-color: #52B2FF; 
+`;
+    
+const NameBlock = styled.div`
+    display: flex;
+    justify-content: center;
+    color: white;
+    padding-top: 1rem;
+    & h1 {
+        font-size: 3.5rem;
+        @media (max-width: 450px) {
+            font-size: 2rem;
+        }
+    }
+`;
+
+const StyledEditIcon = styled(MdModeEditOutline)`
+    cursor: pointer;
+`;
+
+const CardContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
+const AddButton = styled.button`
+    margin: 2rem;
+    // background-color: #00437A;
+    // background-color: #9DE59D;
+    // background-color: #FFD549;
+    background-color: #051647;
+    // color: black;
+    @media (max-width: 450px) {
+        margin: .75rem;        
+        font-size: .75rem;
+        padding: .125rem .75rem;
+    }
+`;
+
+const PublicControls = styled.div`
+    margin-top: .5rem;
+    color: white;
+    font-size: 1.25rem;
+    & label {
+        margin-right: .15rem;
+    }
+    & input:first-of-type {
+        margin-right: .5rem;
+    }
+    @media (max-width: 450px) {
+        font-size: .625rem;
+        margin-top: .25rem;
+        
+    }
+`;
 
 function Deck() {
     const storedDeckId = useSelector((state) => state.deck.deckId);
@@ -19,32 +77,17 @@ function Deck() {
     const [nameEditMode, toggleNameEditMode] = useToggle(false);
     const [editedName, clearEditedName, handleChangeEditedName, setEditedName] = useFormInput('');
     const publiclyAvailable = useSelector((state) => state.deck.publiclyAvailable);
-    const creator = useSelector((state) => state.deck.creator);
     const cards = useSelector((state) => state.deck.cards);
-    const permissions = useSelector((state) => state.deck.permissions);
+    const groupDeckBelongsTo = useSelector((state) => state.deck.groupDeckBelongsTo);
     const [editMode, toggleEditMode] = useToggle(false);
-    
-    const { deckId } = useParams();
-
+    const [modalContent, setModalContent] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const [modalContent, setModalContent] = useState("");
-    const [selectedCardId, setSelectedCardId] = useState("");
     
     const displayModalContent = () => {
         switch(modalContent) {
-            case "edit-card":
-                return <CardForm cardId={selectedCardId} submit={handleSaveCardChanges}/>
             case "add-card":
                 return <CardForm submit={handleAddCard} />
-            case "delete-card":
-                return (
-                    <div>
-                        <h3>Are you sure you want to delete this card? This action cannot be undone.</h3>
-                        <button onClick={() => setModalContent("")}>Cancel</button><button onClick={confirmDeleteCard}>Delete</button>
-                    </div>
-                );
             case "delete-deck-confirmation":
                 return (
                     <div>
@@ -53,19 +96,12 @@ function Deck() {
                         <button onClick={confirmDeleteDeck}>Delete</button>
                     </div>
                 );
-            case "view-card":
-                return <Card cardId={selectedCardId} displayMode={true}/>
             default:
                 return;
         }
     }
-
-    const handleSelectModalContent = (evt) =>  {
-        setModalContent(evt.target.dataset.action);
-        if(evt.target.dataset.card_id) {
-            setSelectedCardId(evt.target.dataset.card_id);
-        }
-    }
+    
+    const { deckId } = useParams();
 
     const confirmDeleteDeck = () => {
         navigate("/dashboard");
@@ -76,43 +112,37 @@ function Deck() {
             });
     };
 
-    const confirmDeleteCard = () => {
-        dispatch(deleteCard({cardToDeleteId: selectedCardId}));
-        hideModal();
+    const handleSelectModalContent = (evt) =>  {
+        setModalContent(evt.target.dataset.action);
     }
 
     const handleAddCard = (newCard) => {
+        if(groupDeckBelongsTo) {
+            newCard.groupCardBelongsTo = groupDeckBelongsTo;
+        }
         dispatch(addCard({newCard, deckId}));
         hideModal();
     }
 
     const hideModal = () => {
         setModalContent("");
-        if(selectedCardId) {
-            setSelectedCardId("");
-        }
-    }
-
-    //worth putting in a reducer? Store state remains unchanged b/c the id stays the same. Really just need to update database and rerender
-    const handleSaveCardChanges = (editedCard) => {
-        axios.put(`${baseURL}/cards/${selectedCardId}`, editedCard)
-			.then(response => {
-                hideModal();
-            })
-			.catch(err => console.error(err));
     }
     
     const handleChangePubliclyAvailable = evt => {
         dispatch(updateDeck({deckId, deckUpdates: {publiclyAvailable: !publiclyAvailable}}));
     }
     
-    const handleToggleNameEditMode = () => {
+    const openNameEditMode = () => {
         setEditedName(name);
         toggleNameEditMode();
     }
 
     const saveDeckNameChange = evt => {
-        dispatch(updateDeck({deckId, deckUpdates: {name: editedName}}));
+        evt.preventDefault();
+        if(editedName !== name) {
+            //use cookie here
+            dispatch(updateDeck({deckId, deckUpdates: {name: editedName}}));
+        }
         clearEditedName();
         toggleNameEditMode();
     }
@@ -124,19 +154,21 @@ function Deck() {
     }, [deckId, dispatch, storedDeckId]);
     
     return (
-        <div className="Deck" >
-            <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button>
+        <DeckWrapper>
+            {/* <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button> */}
             {editMode && <button data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete</button>}
             {!nameEditMode ? 
-                <h1>{name}<span onClick={handleToggleNameEditMode}> Edit</span></h1> 
+                <NameBlock>
+                    <h1>{name}</h1> 
+                    <StyledEditIcon role="button" onClick={openNameEditMode} />
+                </NameBlock>
                 : 
-                <div>
+                <form onSubmit={saveDeckNameChange}>
                     <input type="text" name="name" id="name" value={editedName} onChange={handleChangeEditedName} />
-                    <button type="button" onClick={saveDeckNameChange}>Save</button>
-                </div>
+                    <button type="submit">Save</button>
+                </form>
             }
-            <h3>{creator}</h3>
-            <div>
+            <PublicControls>
                 <label htmlFor='public'>Public</label>
                 <input 
                     type="radio"
@@ -155,30 +187,19 @@ function Deck() {
                     checked={!publiclyAvailable}
                     onChange={handleChangePubliclyAvailable}
                 />
-            </div>
-            <h2>Cards</h2>
-            <button data-action="add-card" onClick={handleSelectModalContent}>Add Card</button>
-            {cards.map(card => 
-                (<div key={card}>
-                    {!editMode ? 
-                        null
-                        :
-                        <div>
-                            <span data-card_id={card} data-action="edit-card" onClick={handleSelectModalContent}>Edit </span>
-                            <span data-card_id={card} data-action="delete-card" onClick={handleSelectModalContent}>Delete </span>
-                        </div>
-                    }
-                    <div>
-                        <span data-card_id={card} data-action="view-card" onClick={handleSelectModalContent}>View </span>
-                        <Card cardId={card} />
-                    </div>
-                </div>))}
-            {modalContent && 
-                <Modal hideModal={hideModal}>
-                    {displayModalContent()}
-                </Modal>
-            }
-        </div>
+            </PublicControls>
+            <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
+            <CardContainer className="CardContainer">
+                {cards.map(card => <Card cardId={card} />
+                )}
+
+                {modalContent && 
+                    <Modal hideModal={hideModal}>
+                        {displayModalContent()}
+                    </Modal>
+                }
+            </CardContainer>
+        </DeckWrapper>
     )
 }
 

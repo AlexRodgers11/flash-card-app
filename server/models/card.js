@@ -10,7 +10,8 @@ const CardSchema = new Schema({
     question: String,
     correctAnswer: String,
     hint: String,
-    attempts: [{type: Schema.Types.ObjectId, ref: "CardAttempt"}]
+    attempts: [{type: Schema.Types.ObjectId, ref: "CardAttempt"}],
+    groupCardBelongsTo: {type: Schema.Types.ObjectId, ref: "Group"}
 }, {discriminatorKey: "cardType", timestamps: true});
 
 const Card = mongoose.model("Card", CardSchema);

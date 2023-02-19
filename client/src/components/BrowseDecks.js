@@ -90,8 +90,7 @@ const ControlBarWrapper = styled.form`
 `;
 
 const StyledInfiniteScroll = styled(InfiniteScroll)`
-    position: relative;
-    top: 4rem;
+    padding-top: 4rem;
     min-width: 350px;
     display: grid;
     place-items: center;

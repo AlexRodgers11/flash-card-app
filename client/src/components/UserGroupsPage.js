@@ -9,6 +9,9 @@ import Modal from "./Modal";
 import styled from "styled-components";
 
 const UserGroupsWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     background-color: #FF6565;
     min-height: calc(100vh - 5.5rem);
     & button {
@@ -16,7 +19,14 @@ const UserGroupsWrapper = styled.div`
     }
 `;
 
+const GroupTilesContainer = styled.div`
+    width: 80%;
+    max-width: 1250px;
+    align-items: center;
+`;
+
 const StyledButton = styled.button`
+    display: inline-block;
     margin: 4rem 1rem 3rem 1rem;
     width: 14rem;
     height: 5rem;
@@ -78,14 +88,13 @@ function UserGroupsPage() {
     
     return (
         <UserGroupsWrapper>
-            <StyledButton data-form="create" onClick={selectForm} >Create New Group</StyledButton>
-            <StyledButton data-form="search" onClick={selectForm} >Search for Groups to Join</StyledButton>
-            {/* <StyledButton data-form="create" onClick={selectForm} style={{display: "inline-block", textDecoration: "none", color:"inherit", margin: "5em 1em", padding: ".5em 1em", border: "1px solid black", cursor: "pointer"}}>Create New Group</StyledButton>
-            <StyledButton data-form="search" onClick={selectForm} style={{display: "inline-block", textDecoration: "none", color:"inherit", margin: "5em 1em", padding: ".5em 1em", border: "1px solid black", cursor: "pointer"}}>Search for New Groups to Join</StyledButton> */}
-            {/* <GroupList groupIds={user.groups} /> */}
             <div>
-                {groups.map(groupId => <GroupTile key={groupId} groupId={groupId}/>)}
+                <StyledButton data-form="create" onClick={selectForm} >Create New Group</StyledButton>
+                <StyledButton data-form="search" onClick={selectForm} >Search for Groups to Join</StyledButton>
             </div>
+            <GroupTilesContainer className="GroupTilesContainer">
+                {groups.map(groupId => <GroupTile key={groupId} groupId={groupId}/>)}
+            </GroupTilesContainer>
             {!modalContent ?
                 null
                 :

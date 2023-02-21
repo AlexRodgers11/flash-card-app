@@ -98,7 +98,7 @@ const StyledInfiniteScroll = styled(InfiniteScroll)`
     grid-template-columns: repeat(4, 1fr);
 
     @media (max-width: 515px) {
-        top: 6rem;
+        padding-top: 6rem;
     }
 
     @media (min-width: 795px) {

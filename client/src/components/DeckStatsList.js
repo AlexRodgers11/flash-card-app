@@ -3,6 +3,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
 import { fetchStatsDeckIds } from "../reducers/attemptsSlice";
 import DeckStatsTile from "./DeckStatsTile";
+import styled from "styled-components";
+
+const DeckStatsListWrapper = styled.div`
+    // position: relative;
+    // top: 3rem;
+    padding-top: 4.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: calc(100vh - 8.5rem);
+    @media (max-width: 515px) {
+        top: 6rem;
+    }
+`;
 
 function DeckStatsList() {
     const deckIds = useSelector((state) => state.attempts.deckIds);
@@ -18,9 +32,9 @@ function DeckStatsList() {
     }, [deckIds, dispatch, userId]);
 
     return (
-        <div>
+        <DeckStatsListWrapper className="DeckStatsListWrapper">
             {deckIds.map(deckId => <DeckStatsTile deckId={deckId}/>)}   
-        </div>
+        </DeckStatsListWrapper>
     );
 }
 

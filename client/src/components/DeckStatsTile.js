@@ -1,8 +1,10 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import useShrinkingFont from "../hooks/useShrinkingFont";
+import { v4 as uuidv4 } from "uuid";
 
 const baseURL = 'http://localhost:8000';
 
@@ -11,6 +13,7 @@ const DeckStatsTileWrapper = styled(Link)`
     background-color: white;
     display: flex;
     width: 80%;
+    height: 6rem;
     border: 1px solid black;
     border-radius: .5rem;
     margin-bottom: 1.5rem;
@@ -21,6 +24,8 @@ const DeckStatsTileWrapper = styled(Link)`
     @media (max-width: 450px) {
         width: 95%;
         border-radius: .75rem;
+        flex-direction: column;
+        height: 8rem;
     }
 `;
 
@@ -31,47 +36,40 @@ const NameSection = styled.section`
     background-color: blue;
     border: 1px solid black;
     padding: .25rem;
-    width: 40%;
+    min-width: 30%;
+    max-width: 30%;
     color: white;
     font-weight: 600;
-    &.vw-responsive {//make sure to make different class for large names and have it also be responsive at same breakpoints
-        font-size: .75rem;
-
-        @media (min-width: 450px) {
-            font-size: 1.5rem;
-        }
-        @media (min-width: 775px) {
-            font-size: 1.85rem;
-        }
-        @media (min-width: 1000px) {
-            font-size: 2rem;
-        }
-        // @media (max-width: 1000px) {
-        //     font-size: 1.85rem;
-        // }
-        // @media (max-width: 775px) {
-        //     font-size: 1.5rem;
-        // }
-        // @media (max-width: 450px) {
-        //     font-size: 1.25rem;
-        // }
-        // font-size: .75rem;
+    @media (max-width: 450px) {
+        max-width: 100%;
+        min-width: 100%;
+        height: 40%;
     }
+
 `;
 
 const InfoSection = styled.div`
     display: flex;    
     justify-content: space-evenly;
     width: 70%;
+    @media (max-width: 450px) {
+        width: 100%;
+        height: 60%;
+    }
 `;
 
 const InfoBlock = styled.div`
     & p {
         display: flex;
         flex-direction: column;
-        justify-content: center; 
+        height: 50%;
         &:first-of-type {
+            justify-content: flex-end;
             font-weight: 700;
+            padding-bottom: 6%;
+        }
+        &:last-of-type {
+            padding-top: 6%;
         }
         @media (max-width: 775px) {
             font-size: .75rem; 
@@ -82,21 +80,26 @@ const InfoBlock = styled.div`
     flex-direction: column;
 `;
 
+const breakpointsAndFonts = [
+    {width: 0, fontSize: 24}, 
+    {width: 450, fontSize: 24}, 
+    {width: 775, fontSize: 30}, 
+    {width: 1000, fontSize: 32}
+];
+
 function DeckStatsTile(props) {
     const [deckData, setDeckData]  = useState({});
-    const [longDeckName, setLongDeckName] = useState(false);
     const { userId } = useParams();
+
+    const NameSectionRef = useRef();
+    const ParagraphTagRef = useRef();
+    const [fontSize, doneResizing] = useShrinkingFont(32, breakpointsAndFonts,NameSectionRef, ParagraphTagRef, deckData.deckName);
 
     useEffect(() => {
         if(!deckData.deckName) {
             axios.get(`${baseURL}/decks/${props.deckId}/tile-stats`)
                 .then((response) => {
                     setDeckData(response.data);
-                    console.log(Math.max(response.data.deckName.split(" ").map(name => name.length)));
-                    if(Math.max(response.data.deckName.split(" ").map(name => name.length)) > 10) {
-                        setLongDeckName(true);
-                        // console.log("too long");
-                    }
                 })
                 .catch((err) => console.error(err.message));
         }
@@ -107,9 +110,12 @@ function DeckStatsTile(props) {
     }
 
     return (
-        <DeckStatsTileWrapper to={`/users/${userId}/statistics/sessions/decks/${props.deckId}`}>
-                <NameSection className={`NameSection ${longDeckName ? "" : "vw-responsive"}`}><p style={{...(longDeckName && {fontSize: "1.25rem"}), wordBreak: longDeckName ? "break-all" : "normal"}}>{deckData.deckName}</p></NameSection>
-                {/* come back and add font-shrinking useEffect here */}
+        <DeckStatsTileWrapper className="DeckStatsTileWrapper" to={`/users/${userId}/statistics/sessions/decks/${props.deckId}`} style={{opacity: doneResizing ? 1 : 0}} >
+                <NameSection className="NameSection" ref={NameSectionRef} >
+                    <p ref={ParagraphTagRef} style={{fontSize: fontSize}}>
+                        {deckData.deckName.split(" ").map(word => <span key={uuidv4()} className="word">{word} </span>)}
+                    </p>
+                </NameSection>
                 <InfoSection>
                     <InfoBlock>
                         <p>Accuracy Rate:</p> 

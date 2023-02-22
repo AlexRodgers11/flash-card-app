@@ -1,32 +1,42 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
-import { fetchStatsCardIds } from "../reducers/attemptsSlice";
+import { fetchCardStatsByDeck } from "../reducers/attemptsSlice";
 import CardStatsTile from "./CardStatsTile";
+import styled from "styled-components";
+
+const CardStatsListWrapper = styled.div`
+    position: relative;
+    top: 4rem;
+
+    @media (max-width: 515px) {
+        top: 6rem;
+    }
+`;
 
 function CardStatsList() {
-    const cardIds = useSelector((state) => state.attempts.cardIds);
+    const cardStatsByDeck = useSelector((state) => state.attempts.cardStatsByDeck);
     const { userId } = useParams();
     const dispatch = useDispatch();
 
     const cardsRetrieved = useRef(false)
     useEffect(() => {
-        if(!cardIds.length && !cardsRetrieved.current) {
+        if(!cardStatsByDeck.length && !cardsRetrieved.current) {
             console.log("condition met")
-            dispatch(fetchStatsCardIds({userId}));
+            dispatch(fetchCardStatsByDeck({userId}));
             cardsRetrieved.current = true;
         }
-    }, [cardIds, dispatch, userId]);
+    }, [cardStatsByDeck, dispatch, userId]);
 
     return (
-        <div>
-            {cardIds.map(card => (
+        <CardStatsListWrapper>
+            {cardStatsByDeck.map(deck => (
                 <div>
-                    <h1>Deck: {card.name}</h1>
-                    {card.cards.map(cardId => <CardStatsTile cardId={cardId} />)}
+                    <h1>Deck: {deck.name}</h1>
+                    {deck.cards.map(cardId => <CardStatsTile key={cardId} cardId={cardId} />)}
                 </div>
             ))}
-        </div>
+        </CardStatsListWrapper>
     );
 }
 

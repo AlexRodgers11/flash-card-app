@@ -11,7 +11,7 @@ import { DeckDecision, DeckSubmission, Message } from "../models/message.js";
 // import { CardDecision, DeckDecision, JoinDecision, Notification } from '../models/notification.js';
 // import { CardDecision, JoinDecision, Notification } from '../models/notification.js';
 import { Notification } from '../models/notification.js';
-import { generateRandomFileName } from "../utils.js";
+import { generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
 
 import multer from "multer";
 import { getObjectSignedUrl, uploadFile } from "../s3.js";
@@ -139,8 +139,12 @@ userRouter.get("/:userId/decks", (req, res, next) => {
     res.status(200).send(JSON.stringify(req.user.decks));
 });
 
-//possibly rename route so it's clear that the name of the decks is being sent back too, that it's really an array of decks of cards rather than an array of cards
-userRouter.get("/:userId/cards", async (req, res, next) => {
+
+userRouter.get("/:userId/card-stats", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.userId !== req.user._id.toString()) {
+        res.status(403).send("Only the user who attempted these cards may retrieve their stats");
+        return;
+    }
     try {
         const populatedUser = await req.user.populate("decks", "name cards -_id");
         res.status(200).send(populatedUser.decks);

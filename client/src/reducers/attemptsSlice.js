@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { client } from "../utils";
 
 const baseURL = 'http://localhost:8000';
 
@@ -9,7 +10,7 @@ const initialState = {
     selectedDeckId: "",
     attemptIdsOfDeck: [],
     selectedCardId: "",
-    cardIds: [],
+    cardStatsByDeck: [],
     cardAttemptIds: [],
     deckIds: [],
     deckStats: {}
@@ -28,8 +29,8 @@ export const fetchDeckAttemptIds = createAsyncThunk("attempts/fetchDeckAttemptId
     }
 });
 
-export const fetchStatsCardIds = createAsyncThunk("attempts/fetchStatsCardIds", async ({userId}) => {
-    const response = await axios.get(`${baseURL}/users/${userId}/cards`);
+export const fetchCardStatsByDeck = createAsyncThunk("attempts/fetchStatsCardIds", async ({userId}) => {
+    const response = await client.get(`${baseURL}/users/${userId}/card-stats`);
     return response.data;
 });
 
@@ -71,8 +72,8 @@ export const attemptsSlice = createSlice({
         builder.addCase(fetchDeckAttemptData.fulfilled, (state, action) => {
             state.deckAttempt = action.payload;
         });
-        builder.addCase(fetchStatsCardIds.fulfilled, (state, action) => {
-            state.cardIds = action.payload;
+        builder.addCase(fetchCardStatsByDeck.fulfilled, (state, action) => {
+            state.cardStatsByDeck = action.payload;
         });
         builder.addCase(fetchStatsDeckIds.fulfilled, (state, action) => {
             state.deckIds = action.payload;

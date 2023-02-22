@@ -4,6 +4,19 @@ import { useParams } from "react-router";
 import { fetchDeckAttemptIds, fetchUserAttemptIds } from "../reducers/attemptsSlice";
 import { resetPracticedSinceAttemptsPulled } from "../reducers/practiceSessionSlice";
 import AttemptTile from "./AttemptTile";
+import styled from "styled-components";
+
+const SessionsWrapper = styled.div`
+    padding-top: 4.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: calc(100vh - 8.5rem);
+
+    @media (max-width: 515px) {
+        padding-top: 6.5rem;
+    }
+`;
 
 function Sessions(props) {
     const attemptIdsOfUser = useSelector((state) => state.attempts.attemptIdsOfUser);
@@ -31,10 +44,10 @@ function Sessions(props) {
     }, [attemptIdsOfUser, deckId, dispatch, practicedSinceAttemptsPulled, props.allDecks, selectedDeckId, userId]);
 
     return (
-        <div>
+        <SessionsWrapper>
             {props.allDecks && attemptIdsOfUser?.map(id => <AttemptTile attemptId={id} />)}
             {!props.allDecks && attemptIdsOfDeck?.map(id => <AttemptTile attemptId={id} />)}
-        </div>
+        </SessionsWrapper>
     );
 }
 

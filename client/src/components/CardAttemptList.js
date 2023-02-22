@@ -3,6 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
 import { fetchCardAttemptIds } from "../reducers/attemptsSlice";
 import CardAttempt from "./CardAttempt";
+import styled from "styled-components";
+
+const CardAttemptListWrapper = styled.div`
+    padding-top: 4rem;
+
+    @media (max-width: 515px) {
+        padding-top: 6rem;
+    }
+`;
 
 function CardAttemptList() {
     const attemptIds = useSelector((state) => state.attempts.cardAttemptIds);
@@ -18,9 +27,9 @@ function CardAttemptList() {
     }, [cardId, selectedCardId, dispatch]);
 
     return (
-        <div>
+        <CardAttemptListWrapper>
             {attemptIds.map(cardAttemptId => <CardAttempt individualCard={true} cardAttemptId={cardAttemptId} />)}
-        </div>
+        </CardAttemptListWrapper>
     );
 }
 

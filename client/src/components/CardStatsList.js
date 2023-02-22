@@ -6,11 +6,29 @@ import CardStatsTile from "./CardStatsTile";
 import styled from "styled-components";
 
 const CardStatsListWrapper = styled.div`
-    position: relative;
-    top: 4rem;
-
+    padding-top: 4.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     @media (max-width: 515px) {
-        top: 6rem;
+        padding-top: 6.5rem;
+    }
+`;
+
+const DeckBox = styled.div`
+    width: 100%;
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
+const DeckHeader = styled.h1`
+    width: 90%;
+    background-color: blue;
+    margin-bottom: .5rem;
+    @media (max-width: 450px) {
+        width: 100%;
     }
 `;
 
@@ -30,12 +48,18 @@ function CardStatsList() {
 
     return (
         <CardStatsListWrapper>
-            {cardStatsByDeck.map(deck => (
-                <div>
-                    <h1>Deck: {deck.name}</h1>
-                    {deck.cards.map(cardId => <CardStatsTile key={cardId} cardId={cardId} />)}
-                </div>
-            ))}
+            {cardStatsByDeck.map(deck => {
+                if(deck.cards.length) {
+                    return (
+                        <DeckBox>
+                            <DeckHeader>Deck: {deck.name}</DeckHeader>
+                            {deck.cards.map(cardId => <CardStatsTile key={cardId} cardId={cardId} />)}
+                        </DeckBox>
+                    );
+                } else {
+                    return <></>
+                }
+            })}
         </CardStatsListWrapper>
     );
 }

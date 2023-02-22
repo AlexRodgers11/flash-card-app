@@ -79,15 +79,16 @@ const CardControls = styled.div`
     }
 `;
 
-
-const CardAnswer = styled.p``;
+const LeftContainer = styled.div`
+    display: flex;
+`;
 
 function Card(props) {
     const [cardData, setCardData] = useState({});
     const [showAnswers, toggleShowAnswers] = useToggle(false);
     const [modalContent, setModalContent] = useState("");
     const dispatch = useDispatch();
-    
+
     const displayModalContent = () => {
         switch(modalContent) {
             case "edit-card":
@@ -104,7 +105,6 @@ function Card(props) {
         }
     }
 
-    //worth putting in a reducer? Store state remains unchanged b/c the id stays the same. Really just need to update database and rerender
     const handleSaveCardChanges = (editedCard) => {
         client.put(`${baseURL}/cards/${props.cardId}`, editedCard)
 			.then(response => {
@@ -134,7 +134,6 @@ function Card(props) {
     }
     
     useEffect(() => {
-        //use cookie here
         client.get(`${baseURL}/cards/${props.cardId}`)
             .then((response) => setCardData(response.data))
             .catch((err) => console.log(err));
@@ -142,11 +141,13 @@ function Card(props) {
 
     return (
         <CardWrapper>
-            <QuestionBlock className={showAnswers ? "answers-visible" : ""}>
-                <CardControls>
-                    {showAnswers ? <BsChevronUp role="button" onClick={toggleShowAnswers} /> : <BsChevronDown role="button" onClick={toggleShowAnswers} />}
-                    <span>{cardData.question}</span>
-                </CardControls>
+            <QuestionBlock className={showAnswers ? "QuestionBlock answers-visible" : "QuestionBlock"}>
+                <LeftContainer>
+                    <CardControls>
+                        {showAnswers ? <BsChevronUp role="button" onClick={toggleShowAnswers} /> : <BsChevronDown role="button" onClick={toggleShowAnswers} />}
+                    </CardControls>
+                    <p>{cardData.question}</p>
+                </LeftContainer>
                 <CardControls>
                     <FaTrashAlt role="button" data-action="delete-card" onClick={handleSelectModalContent}/>
                     <MdModeEditOutline role="button" data-action="edit-card" onClick={handleSelectModalContent}/>
@@ -155,14 +156,14 @@ function Card(props) {
             {showAnswers &&
                 <AnswerBlock>
                     <p>Hint: {cardData.hint || 'No hint given'}</p>
-                    <CardAnswer>Correct Answer: {cardData.correctAnswer}</CardAnswer>
+                    <p>Correct Answer: {cardData.correctAnswer}</p>
                     {cardData.cardType !== 'MultipleChoiceCard' ?
                         null
                         :
                         <>
-                        <CardAnswer>Wrong Answer One: {cardData.wrongAnswerOne}</CardAnswer>
-                        <CardAnswer>Wrong Answer Two: {cardData.wrongAnswerTwo}</CardAnswer>
-                        <CardAnswer>Wrong Answer Three: {cardData.wrongAnswerThree}</CardAnswer>
+                        <p>Wrong Answer One: {cardData.wrongAnswerOne}</p>
+                        <p>Wrong Answer Two: {cardData.wrongAnswerTwo}</p>
+                        <p>Wrong Answer Three: {cardData.wrongAnswerThree}</p>
                         </>
                     }
                 </AnswerBlock>

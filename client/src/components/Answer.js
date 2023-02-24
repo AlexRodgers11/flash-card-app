@@ -62,7 +62,7 @@ function Answer(props) {
     }
 
     return (
-        <CardAnswer onClick={!answered ? checkAnswer : null} className={`${answered ? props.answer === activeCard.correctAnswer ? 'Answer_Correct Answered' : clicked  ? 'Answer_Incorrect Answered' : 'Answered' : 'Answer'}`} >
+        <CardAnswer role="button" onClick={!answered ? checkAnswer : null} className={`${answered ? props.answer === activeCard.correctAnswer ? 'Answer_Correct Answered' : clicked  ? 'Answer_Incorrect Answered' : 'Answered' : 'Answer'}`} >
            {props.answer} 
         </CardAnswer>
     )

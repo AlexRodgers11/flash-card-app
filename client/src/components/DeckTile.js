@@ -19,6 +19,7 @@ const DeckTileWrapper = styled.div`
     width: 3.25rem;
     border-radius: .65rem;
     background-color: white;
+    // box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.12);
     transition: all 0.3s ease-in-out;
     &:hover {
         transform: translateY(-7px);
@@ -413,7 +414,7 @@ function DeckTile(props) {
       }, [deckData.url, handleResize]);
   
     return (
-        <DeckTileWrapper ref={rootRef} id="tile" className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
+        <DeckTileWrapper ref={rootRef} role="button" id="tile" className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
             <IndicatorsWrapper ref={indicatorsRef} className="IndictorsWrapper">
                 {deckData.publiclyAvailable ? <StyledOpenEye /> : <StyledClosedEye className="StyledClosedEye" />}
                 <CardCountWrapper>

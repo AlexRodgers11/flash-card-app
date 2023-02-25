@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
-import { updateUser } from '../reducers/loginSlice';
+import { updateProfilePic, updateUser } from '../reducers/loginSlice';
 
 function RegisterIdentificationForm() {
     const dispatch = useDispatch();
@@ -13,18 +13,29 @@ function RegisterIdentificationForm() {
     const [photo, setPhoto] = useState();
     const userId = useSelector((state) => state.login.userId);
     const name = useSelector((state) => state.login.name);
-    const email = useSelector((state) => state.login.email);
+    const email = useSelector((state) => state.login.login.email);
     const storedPhoto = useSelector((state) => state.login.photo);
 
     const handleSubmit = evt => {
         evt.preventDefault();
-        console.log("about to dispatch register identification action");
-        dispatch(updateUser({userId, userUpdates: {login: {username: username, email: email}, name: {first: firstName, last: lastName}, photo: photo || ""}}))
+        if(photo) {
+            dispatch(updateProfilePic({userId, photo}));
+        }
+        dispatch(updateUser({userId, userUpdates: {login: {username: username, email: email}, name: {first: firstName, last: lastName}}}))
+            .then(() => {
+                if(photo) {
+                    console.log("navigating to profile-pic-crop")
+                    navigate("/register/profile-pic-crop");
+
+                } else {
+                    console.log("navigating to join groups")
+                    navigate("/register/join-groups");
+                }
+            })
         clearUsername();
         clearFirstName();
         clearLastName();
         setPhoto("");
-    
     }
 
     const handlePhotoChange = (evt) => {
@@ -33,11 +44,21 @@ function RegisterIdentificationForm() {
         setPhoto(file);
     }    
 
+    const firstRender = useRef(true);
+
     useEffect(() => {
-        if(storedPhoto) {
-            navigate("/register/profile-pic-crop");
-        } else if(name?.first) {
-            navigate("/register/join-groups");
+        console.log(firstRender.current);
+        if(firstRender.current) {
+            if(storedPhoto) {
+                console.log("photo exists, should navigate to crop");
+                navigate("/register/profile-pic-crop");
+            } else if(name?.first) {
+                console.log("only have name, should skip to join groups");
+                navigate("/register/join-groups");
+            }
+            firstRender.current = false;
+        } else {
+            console.log("should be changing firstRender");
         }
     }, [name?.first, navigate, storedPhoto])
 

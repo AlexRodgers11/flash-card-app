@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { client } from "../utils";
 
 const baseURL = "http://localhost:8000";
 
@@ -15,7 +16,6 @@ const initialState = {
         first: "",
         last: ""
     },
-    email: "",
     photo: "",
     decks: [],
     groups: [],
@@ -101,13 +101,7 @@ export const submitJoinCode = createAsyncThunk("login/submitJoinCode", async({us
 
 export const updateUser = createAsyncThunk("login/updateUser", async ({userId, userUpdates}) => {
     try {
-        const formData = new FormData();
-        formData.append("email", userUpdates.login.email || "");
-        formData.append("username", userUpdates.login.username);
-        formData.append("first", userUpdates.name.first);
-        formData.append("last", userUpdates.name.last);
-        userUpdates.photo && formData.append("photo", userUpdates.photo);
-        const response = await axios.patch(`${baseURL}/users/${userId}`, formData, { headers: {"Content-Type": "multipart/form-data"}});
+        const response = await client.patch(`${baseURL}/users/${userId}`, userUpdates);
         const stateUpdateObj = {};
         for(const key in userUpdates) {
             if(response.data.hasOwnProperty(key)) {
@@ -118,14 +112,16 @@ export const updateUser = createAsyncThunk("login/updateUser", async ({userId, u
             stateUpdateObj.accountSetupStage = response.data.accountSetupStage;
         }
         return stateUpdateObj;
-    } catch (err) {}
+    } catch (err) {
+        console.error(err.message);
+    }
 });
+
 
 export const updateProfilePic = createAsyncThunk("login/updateProfilePic", async({userId, photo}) => {
     const formData = new FormData();
     formData.append("photo", photo);
-    const response = await axios.patch(`${baseURL}/users/${userId}`, formData, { headers: {"Content-Type": "multipart/form-data"}});
-    console.log(response.data);
+    const response = await client.patch(`${baseURL}/users/${userId}`, formData, { headers: {"Content-Type": "multipart/form-data"}});
     return response.data.photo;
 });
 
@@ -187,7 +183,6 @@ export const loginSlice = createSlice({
         });
         builder.addCase(updateUser.fulfilled, (state, action) => {
             for(const key in action.payload) {
-                console.log({key});
                 if(state.hasOwnProperty(key)) {
                     state[key] = action.payload[key];
                 }

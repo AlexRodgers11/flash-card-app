@@ -253,7 +253,10 @@ const upload = multer({
     fileFilter: fileFilter
 });
 
-userRouter.patch("/:userId", upload.single("photo"), async (req, res, next) => {
+userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), async (req, res, next) => {
+    if(req.userId !== req.user._id.toString()) {
+        return res.status(403).send("Users can only update their own information");
+    }
     const patchObj = {};
     
     if(req.file) {
@@ -268,34 +271,49 @@ userRouter.patch("/:userId", upload.single("photo"), async (req, res, next) => {
         await uploadFile(file.buffer, photoName, file.mimetype)
     }
     
-    if(req.body.first || req.body.last) {
-        patchObj.name = {
-            first: req.body.first ? req.body.first : req.user.name.first ? req.user.name.first : "",
-            last: req.body.last ? req.body.last : req.user.name.last ? req.user.name.last : "",
-        }
+    if(req.body.name) {
+        patchObj.name = req.body.name;
     }
     
-    if((req.body.username || req.body.password) || req.body.email) {
+    if(req.body.login) {
         patchObj.login = {
-            username: req.body.username ? req.body.username : req.user.login.username ? req.user.login.username : "",
-            password: req.body.password ? req.body.password : req.user.login.password ? req.user.login.password : "",
-            email: req.body.email ? req.body.email : req.user.login.email ? req.user.login.email : ""
+            username: req.body.login.username ? req.body.login.username : req.user.login.username ? req.user.login.username : "",
+            password: req.body.login.password ? req.body.login.password : req.user.login.password ? req.user.login.password : "",
+            email: req.body.login.email ? req.body.login.email : req.user.login.email ? req.user.login.email : ""
         }
     }
-
+    console.log({patchObj});
     try {
         let user;
         user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
+
         if(user.accountSetupStage !== "complete" && ((user._id && user.name.first) && (user.name.last && user.login.email))) {
             user = await User.findByIdAndUpdate(req.user._id, {accountSetupStage: "complete"}, {new: true});
         }
-        let responseData = user;
 
-        responseData.login = {username: user.login.username};
+        let responseData = {};
+        
+        for(const key in req.body) {
+            console.log({key});
+            console.log({userKey: user[key]});
+            responseData[key] = user[key];
+        }
+
+        responseData.accountSetupStage = user.accountSetupStage;
+
+        if(responseData.login?.password) {
+            let passwordlessLogin = {
+                username: responseData.login.username,
+                email: responseData.login.email
+            }
+            responseData.login = passwordlessLogin;
+        }
+
         if(user.photo) {
             let photoUrl = await getObjectSignedUrl(user.photo);
             responseData.photo = photoUrl;
         }
+        console.log({responseData});
         res.status(200).send(responseData);
     } catch (err) {
         res.status(500).send("There was an error with your request");

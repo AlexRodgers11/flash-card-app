@@ -50,6 +50,7 @@ export const signUp = createAsyncThunk("login/signUp", async({email, password}) 
             password
         });
         console.log({data: response.data});
+        document.cookie = `jwt=${response.data.token}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; sameSite=none`;
         return {
             token: response.data.token,
             userId: response.data.userId,

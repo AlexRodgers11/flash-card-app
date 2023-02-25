@@ -141,7 +141,7 @@ loginRouter.post("/", requireSignIn, (req, res, next) => {
     console.log("POST request received");
     res.cookie('jwt', tokenForUser(req.user), {
         httpOnly: true,
-        secure: false,
+        secure: false, //change this to true once deployed on https
         sameSite: 'none'
     });
     
@@ -154,6 +154,11 @@ loginRouter.post("/", requireSignIn, (req, res, next) => {
 
 
 loginRouter.post("/new", requireRegister, (req, res, next) => { 
+    res.cookie('jwt', tokenForUser(req.user), {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'none'
+    });
     res.status(200).send({
         token: tokenForUser(req.user),
         userId: req.user._id,

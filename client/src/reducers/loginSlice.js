@@ -9,6 +9,7 @@ const initialState = {
     userId: "",
     login: {
         username: "",
+        email: "",
     },
     name: {
         first: "",
@@ -157,7 +158,7 @@ export const loginSlice = createSlice({
             state.userId = action.payload._id;
             state.login.username = action.payload.login.username;
             state.name = action.payload.name;
-            state.email = action.payload.login.email;
+            state.login.email = action.payload.login.email;
             state.photo = action.payload.photo;
             state.decks = action.payload.decks;
             state.groups = action.payload.groups;
@@ -174,7 +175,7 @@ export const loginSlice = createSlice({
         builder.addCase(signUp.fulfilled, (state, action) => {
             state.token = action.payload.token;
             state.userId = action.payload.userId;
-            state.email = action.payload.email;
+            state.login.email = action.payload.email;
             state.accountSetupStage = action.payload.accountSetupStage;
         });
         builder.addCase(submitVerificationCode.fulfilled, (state, action) => {

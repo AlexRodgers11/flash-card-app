@@ -4,14 +4,16 @@ import DeckList from "./DeckList";
 import styled from "styled-components";
 
 const PracticeLaunchPageWrapper = styled.div`
+    display: flex;
+    flex-direction: column;    
     background-color: #5197E1;
     // background-color: #4C4C9D; --darker blue
     min-height: calc(100vh - 5.5rem);
-    & h1 {
-        padding: 1rem;
-        color: white;
-        text-shadow: 1px 1px 2px #333;
-    }
+    // & h1 {
+    //     padding: 1rem;
+    //     color: white;
+    //     text-shadow: 1px 1px 2px #333;
+    // } 
 `;
 
 const NoDecksMessage = styled.div`

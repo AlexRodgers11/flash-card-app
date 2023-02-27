@@ -18,7 +18,6 @@ const s3Client = new S3Client({
 });
 
 export const uploadFile = (fileBuffer, fileName, mimetype) => {
-    console.log({bucketAccessKey});
     const uploadParams = {
         Bucket: bucketName,
         Key: fileName,
@@ -32,9 +31,8 @@ export const uploadFile = (fileBuffer, fileName, mimetype) => {
 export const deleteFile = (fileName) => {
     const deleteParams = {
         Bucket: bucketName,
-        key: fileName
+        Key: fileName
     }
-
     return s3Client.send(new DeleteObjectCommand(deleteParams));
 }
 

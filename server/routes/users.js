@@ -14,7 +14,7 @@ import { Notification } from '../models/notification.js';
 import { generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
 
 import multer from "multer";
-import { getObjectSignedUrl, uploadFile } from "../s3.js";
+import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
 import { Card } from "../models/card.js";
 
 userRouter.param("userId", (req, res, next, userId) => {
@@ -31,8 +31,6 @@ userRouter.param("userId", (req, res, next, userId) => {
     });
 });
 
-
-//should probably move this to login
 userRouter.get("/emails", async (req, res, next) => {
     if(req.query.email) {
         let user = await User.findOne({"login.email": req.query.email});
@@ -302,13 +300,13 @@ userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), asyn
     if(req.file) {
         const file = req.file;
         let photoName;
+        photoName = generateRandomFileName();
+        patchObj.photo = photoName;
+        
+        await uploadFile(file.buffer, photoName, file.mimetype);
         if(req.user.photo) {
-            photoName = req.user.photo;
-        } else {
-            photoName = generateRandomFileName();
-            patchObj.photo = photoName;
+            await deleteFile(req.user.photo);
         }
-        await uploadFile(file.buffer, photoName, file.mimetype)
     }
     
     if(req.body.name) {
@@ -334,8 +332,6 @@ userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), asyn
         let responseData = {};
         
         for(const key in req.body) {
-            console.log({key});
-            console.log({userKey: user[key]});
             responseData[key] = user[key];
         }
 
@@ -349,7 +345,7 @@ userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), asyn
             responseData.login = passwordlessLogin;
         }
 
-        if(user.photo) {
+        if(req.file) {
             let photoUrl = await getObjectSignedUrl(user.photo);
             responseData.photo = photoUrl;
         }

@@ -42,6 +42,15 @@ userRouter.get("/emails", async (req, res, next) => {
     }
 });
 
+userRouter.get("/usernames", async (req, res, next) => {
+    if(req.query.username) {
+        let user = await User.findOne({"login.username": req.query.username});
+        res.status(200).send({usernameAvailable: !user});
+    } else {
+        res.status(400).send("No email submitted");
+    }
+});
+
 userRouter.get("/:userId/identification", async (req, res, next) => {
     let partialData = {
         firstName: req.user.name.first,

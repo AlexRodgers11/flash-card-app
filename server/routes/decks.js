@@ -78,23 +78,14 @@ deckRouter.post("/", (req, res, next) => {
 });
 
 deckRouter.get("/:deckId/tile", extendedRateLimiter, (req, res, next) => {
-    User.findById(req.deck.creator, (err, user) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } 
-        let response = {
-            name: req.deck.name,
-            publiclyAvailable: req.deck.publiclyAvailable,
-            creatorId: user._id,
-            creatorName: user.login.username,
-            createdAt: req.deck.createdAt,
-            cardCount: req.deck.cards.length,
-            permissions: req.deck.permissions
-        };
-        res.status(200).send(JSON.stringify(response));
-        
-    });
+    let response = {
+        name: req.deck.name,
+        publiclyAvailable: req.deck.publiclyAvailable,
+        createdAt: req.deck.createdAt,
+        cardCount: req.deck.cards.length,
+        permissions: req.deck.permissions
+    };
+    res.status(200).send(JSON.stringify(response));
 });
 
 deckRouter.get("/:deckId/tile-stats", async (req, res, next) => {

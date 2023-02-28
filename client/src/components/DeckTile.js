@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import axios from "axios";
 import { RxEyeOpen, RxEyeClosed } from "react-icons/rx";
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 
 const DeckTileWrapper = styled.div`
     display: inline-flex; 
@@ -283,6 +284,7 @@ const CardCountWrapper = styled.p`
 const baseURL = 'http://localhost:8000';
 
 function DeckTile(props) {
+    const userId = useSelector((state) => state.login.userId);
     const [deckData, setDeckData] = useState({});
     const [fontSize, setFontSize] = useState(20);
     const [doneResizing, setDoneResizing] = useState(false);
@@ -295,7 +297,7 @@ function DeckTile(props) {
     const handleSelection = () => {
         //SEE IF OKAY TO DO THIS WAY- COULD BE UNSAFE AND ALLOW NAVIGATION TO PRIVATE DECKS
         if(location.pathname.slice(32, 33) === "p") {
-            navigate(`/users/${deckData.creatorId}/decks/${props.deckId}/practice-session`);
+            navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
         } else if(location.pathname.slice(32, 33) === "d" || location.pathname.slice(1, 2) === "u") {
             navigate(`/decks/${props.deckId}`)
         } else if(location.pathname.slice(1,2) === "g") {

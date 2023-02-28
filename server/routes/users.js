@@ -120,12 +120,43 @@ userRouter.patch("/:userId/verification", async (req, res, next) => {
 userRouter.delete("/:userId", async (req, res, next) => {
     const userId = req.user._id
     try {
-        await Group.updateMany({members: userId}, {$pull: {members: userId}});
-        await Group.updateMany({administrators: userId}, {$pull: {administrators: userId}});
-        await Deck.deleteMany({creator: userId});
-        await Deck.updateMany({"permissions.view": userId}, {$pull: {"permissions.view": userId}});
+        //delete all cards and decks of all groups the user is head admin of, then delete the group itself
+        for(let i = 0; i < req.user.groups.length; i++) {
+            let group = await Group.findById(req.user.groups[i]);
+        
+            if(group.administrators[0] .equals(userId)) {
+                console.log("deleting cards");
+                await Card.deleteMany({groupCardBelongsTo: group._id});
+                console.log("deleting deck");
+                await Deck.deleteMany({groupDeckBelongsTo: group._id});
+                console.log("deleting group");
+                await Group.findByIdAndDelete(group._id);
+            }
+        }
+        
+        //for any remaining groups remove the user from the members array
+        await Group.updateMany({_id: {$in: req.user.groups}}, {$pull: {members: userId}});
+        
+
+        //for any remaining groups remove the user from the members array
+        await Group.updateMany({_id: {$in: req.user.adminOf}}, {$pull: {administrators: userId}});
+
+        //delete all of the user's decks and the cards inside them
+        for (let i = 0; i < req.user.decks.length; i++) {
+            let deck = await Deck.findById(req.user.decks[i]);
+            await Card.deleteMany({_id: {$in: deck.cards}});
+        }
+
+        await Deck.deleteMany({_id: {$in: req.user.decks}});
+        
+        //delete the user
         const deletedUser = await User.findByIdAndDelete(userId);
+        
+        //delete the user's deck attempts
         await DeckAttempt.deleteMany({_id: {$in: deletedUser.deckAttempts}});
+        
+        //add something here to remove the deck from any categories it is associated with. Be sure to do this in groups when deleting groups as well, and in deckRouter when deleting decks
+
         res.status(200).send(userId);
     } catch (err) {
         res.status(500).send("There was an error with your request");

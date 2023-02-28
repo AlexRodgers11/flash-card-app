@@ -47,7 +47,7 @@ const StyledCropContainer = styled(CropContainer)`
 `;
 
     
-function RegisterProfilePicCropForm() {
+function RegisterProfilePicCropForm(props) {
     const photo = useSelector((state) => state.login.photo);
     const [crop, setCrop] = useState({x: 0, y: 0});
     const [zoom, setZoom] = useState(1);
@@ -64,7 +64,7 @@ function RegisterProfilePicCropForm() {
     const saveCroppedImage = useCallback(async () => {
         try {
             const croppedImage = await getCroppedImg(
-                photo,
+                props.photo || photo,
                 croppedAreaPixels,
                 rotation
             );
@@ -74,21 +74,27 @@ function RegisterProfilePicCropForm() {
             console.log(croppedImage instanceof Blob);
             const fileFromURL = urlToFile(croppedImage);
 
-            dispatch(updateProfilePic({userId: userId, photo: fileFromURL}))
-                .then(() => {
-                    navigate("/register/join-groups");
-                });
+            if(props.saveCrop) {
+                props.saveCrop(fileFromURL);
+                console.log("should be done here");
+            } else {
+                dispatch(updateProfilePic({userId: userId, photo: fileFromURL}))
+                    .then(() => {
+                        navigate("/register/join-groups");
+                    });
+            }
+
           
         } catch (e) {
           console.error(e);
         }
-      }, [croppedAreaPixels, rotation, photo]);
+      }, [croppedAreaPixels, rotation, photo, props.photo]);
 
     return (
-        <RegisterProfilePicCropFormWrapper>
+        <RegisterProfilePicCropFormWrapper className="RegisterProfilePicCropFormWrapper">
             <StyledCropContainer>
                 <StyledCropper 
-                    image={photo}
+                    image={props.photo || photo}
                     crop={crop}
                     zoom={zoom}
                     aspect={aspect}

@@ -24,6 +24,7 @@ import CardStatsList from './CardStatsList';
 import CardAttemptList from './CardAttemptList';
 import RegisterProfilePicCropForm from './RegisterProfilePicCropForm';
 import { useSelector } from 'react-redux';
+import UserSettings from './UserSettings';
 
 function Router() {
     const { pathname } = useLocation();
@@ -78,6 +79,7 @@ function Router() {
                 <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
                 <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
                 <Route exact path="/users/:userId/practice" element={<PracticeLaunchPage />} />
+                <Route exact path="/users/:userId/settings" element={<UserSettings />} />
                 <Route exact path="/users/:userId/statistics/" element={<StatisticsPage />}>
                     <Route path="decks" element={<DeckStatsList />} />
                     <Route path="cards" element={<CardStatsList />} />

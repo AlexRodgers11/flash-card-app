@@ -95,7 +95,7 @@ function Dashboard() {
             <Grid>
                 <StyledLink to="/decks/public" ><ImSearch className="icon" size="7rem" /><p className="hover-text">Search Public Decks</p></StyledLink>
                 <StyledLink to={`/users/${user.userId}/decks`} ><HiRectangleStack className="icon" size="7rem" /><p className="hover-text">Your Decks</p></StyledLink>
-                <StyledLink to={`/users/${user.userId}/decks/new`} ><RiUserSettingsFill className="icon" size = "7rem" /><p className="hover-text">Profile Settings</p></StyledLink>
+                <StyledLink to={`/users/${user.userId}/settings`} ><RiUserSettingsFill className="icon" size = "7rem" /><p className="hover-text">Profile Settings</p></StyledLink>
                 <StyledLink to={`/users/${user.userId}/groups`} ><HiUserGroup className="icon" size="7rem"/><p className="hover-text">Your Groups</p></StyledLink>
                 {/* <StyledLink to={`/users/${user.userId}/groups`} ><HiUserGroup className="icon" size="7rem" color="blue"/><p className="hover-text">Your Groups</p></StyledLink> */}
                 <StyledLink to={`/users/${user.userId}/practice`} ><GiBookCover className="icon" size="7rem" /><p className="hover-text">Practice</p></StyledLink>

@@ -125,6 +125,16 @@ export const updateProfilePic = createAsyncThunk("login/updateProfilePic", async
     return response.data.photo;
 });
 
+export const deleteProfile = createAsyncThunk("login/deleteProfile", async({userId}) => {
+    const response = await client.delete(`${baseURL}/users/${userId}`);
+    console.log({data: response.data});
+    if(response.data === userId) {
+        return response.data;
+    } else {
+        console.log("id didn't match");
+    }
+});
+
 export const loginSlice = createSlice({
     name: "login",
     initialState,
@@ -190,6 +200,9 @@ export const loginSlice = createSlice({
         });
         builder.addCase(updateProfilePic.fulfilled, (state, action) => {
             state.photo = action.payload;
+        });
+        builder.addCase(deleteProfile.fulfilled, (state, action) => {
+            return initialState;
         });
     }
 });

@@ -149,9 +149,10 @@ function UserTile(props) {
         // )
         return;
     }
+    
     return (
         <UserTileWrapper className="UserTileWrapper" editMode={props.editMode} tabIndex={0} role="button" onKeyDown={props.editMode ? null : handleViewOnEnter} onClick={props.editMode ? null : viewUser}>
-            {(props.editMode && loggedInUserId !== props.memberId) ?
+            {(props.editMode && (loggedInUserId !== props.memberId && headAdmin !== props.memberId)) ?
                 <EditOptionsWrapper className="EditOptionsWrapper">
                     {(((props.listType==="members") && props.memberId !== headAdmin) && (loggedInUserId === headAdmin || !props.isAdmin)) && <Button onClick={handleRemoveMember}>Remove From Group</Button>}
                     {(!props.isAdmin && props.listType==="members") && <Button onClick={addMemberToAdmins}>Make Administrator</Button>}

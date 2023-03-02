@@ -25,8 +25,6 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
     });
 });
 
-deckRouter.use(extendedRateLimiter);
-
 deckRouter.get("/", async (req, res, next) => {
     console.log({query: req.query});
     try {

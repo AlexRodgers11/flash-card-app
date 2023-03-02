@@ -77,7 +77,7 @@ app.use(
 
 app.use(passport.initialize());
 
-app.use(excludingPaths([/\/decks\/([0-9A-Za-z]+([A-Za-z]+[0-9A-Za-z]+)+)\/tile/i], baseRateLimiter));
+app.use(excludingPaths([/\/decks\/([0-9A-Za-z]+([A-Za-z]+[0-9A-Za-z]+)+)\/tile/i, /\/users\/([0-9A-Za-z]+([A-Za-z]+[0-9A-Za-z]+)+)\/tile/i], baseRateLimiter));
 
 app.use("/activities", activityRouter);
 app.use("/attempts", attemptRouter);

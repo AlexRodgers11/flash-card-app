@@ -11,7 +11,7 @@ import { DeckDecision, DeckSubmission, Message } from "../models/message.js";
 // import { CardDecision, DeckDecision, JoinDecision, Notification } from '../models/notification.js';
 // import { CardDecision, JoinDecision, Notification } from '../models/notification.js';
 import { Notification } from '../models/notification.js';
-import { generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
+import { extendedRateLimiter, generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
 
 import multer from "multer";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
@@ -59,7 +59,7 @@ userRouter.get("/:userId/identification", async (req, res, next) => {
     res.status(200).send(partialData);
 });
 
-userRouter.get("/:userId/tile", async (req, res, next) => {
+userRouter.get("/:userId/tile", extendedRateLimiter, async (req, res, next) => {
     let partialData = {
         firstName: req.user.name.first,
         lastName: req.user.name.last,

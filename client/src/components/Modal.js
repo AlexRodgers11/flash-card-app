@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { IoClose } from "react-icons/io5";
 import styled from 'styled-components';
@@ -68,7 +68,23 @@ const StyledCloseIcon = styled(IoClose)`
 	cursor: pointer;
 `;
 
+
 function Modal(props) {
+	const handleEscape = useCallback((evt) => {
+		console.log({key: evt.key});
+		if(evt.key === "Escape") {
+			props.hideModal();
+		}
+	}, [props]);
+
+	useEffect(() => {
+		console.log("should be adding event listener");
+		window.addEventListener("keydown", handleEscape);
+		return () => {
+			window.removeEventListener("keydown", handleEscape);
+		};
+	}, [handleEscape, props]);
+
 	return (
 		<ModalWrapper className='Modal_active'>
 			<ModalBackdrop onClick={props.hideModal}></ModalBackdrop>

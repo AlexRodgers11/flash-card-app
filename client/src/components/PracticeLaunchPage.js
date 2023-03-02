@@ -6,14 +6,10 @@ import styled from "styled-components";
 const PracticeLaunchPageWrapper = styled.div`
     display: flex;
     flex-direction: column;    
+    align-items: center;
     background-color: #5197E1;
-    // background-color: #4C4C9D; --darker blue
     min-height: calc(100vh - 5.5rem);
-    // & h1 {
-    //     padding: 1rem;
-    //     color: white;
-    //     text-shadow: 1px 1px 2px #333;
-    // } 
+    // background-color: #4C4C9D; --darker blue
 `;
 
 const NoDecksMessage = styled.div`
@@ -27,11 +23,16 @@ const NoDecksMessage = styled.div`
     }
 `;
 
-const StyledButton = styled.button`
+const StyledLink = styled(Link)`
+    font-size: 1rem;
+    padding: 2rem;
     margin: 4rem 0 3rem 0;
     width: 14rem;
-    height: 5rem;
+    // height: 5rem;
     border-radius: 1rem;
+    border: 2px solid black;
+    background-color: lightgrey;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px;
 `;
 
 function PracticeLaunchPage() {
@@ -50,7 +51,7 @@ function PracticeLaunchPage() {
                     <NoDecksMessage>
                         <p>No decks have been created yet</p>
                     </NoDecksMessage>
-                    <Link to={`/users/${userId}/decks/new`}><StyledButton>Create New Deck</StyledButton></Link>
+                    <StyledLink to={`/users/${userId}/decks/new`}>Create New Deck</StyledLink>
                 </>
             }
         </PracticeLaunchPageWrapper>

@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDecksOfCategory, fetchDecksOfGroup, fetchDecksOfUser } from '../reducers/decksSlice';
 import DeckTile from './DeckTile';
 import styled from 'styled-components';
+import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
 
 const DeckListWrapper = styled.div`
     min-width: 350px;
     display: grid;
     place-items: center;
+    position: relative;
 
     grid-template-columns: repeat(4, 1fr);
 
@@ -19,8 +21,6 @@ const DeckListWrapper = styled.div`
     @media (min-width: 1600px) {
         grid-template-columns: repeat(6, 1fr);
     }
-
-
 `
 
 export default function DeckList(props) {
@@ -47,9 +47,18 @@ export default function DeckList(props) {
         }
     }, [deckIds, dispatch, listId, listType, props.listId, props.listType]);
 
+    if(props.listType !== listType || props.listId !== listId) { //why does this conditional not keep DeckList from rendering before useEffect is done aligning the lists?
+        return <></>
+    } 
+    
+    if(!deckIds.length) {
+        return (
+            <EmptyIndicator>No decks created yet</EmptyIndicator>
+        );
+    }
     return (
         <DeckListWrapper className="DeckListWrapper">
-            {props.listType === listType && deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
+            {deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
         </DeckListWrapper>
     )
 }

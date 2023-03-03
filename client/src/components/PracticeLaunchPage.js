@@ -7,20 +7,9 @@ const PracticeLaunchPageWrapper = styled.div`
     display: flex;
     flex-direction: column;    
     align-items: center;
-    background-color: #5197E1;
+    background-color: #52B2FF; 
     min-height: calc(100vh - 5.5rem);
     // background-color: #4C4C9D; --darker blue
-`;
-
-const NoDecksMessage = styled.div`
-    margin-top: 2rem;
-    font-size: 1.5rem;
-    font-style: italic; 
-    color: #616161;
-    margin-bottom: 1rem;
-    @media (max-width: 400px) {
-        font-size: 1.25rem;
-    }
 `;
 
 const StyledLink = styled(Link)`
@@ -36,26 +25,15 @@ const StyledLink = styled(Link)`
 `;
 
 function PracticeLaunchPage() {
-    const decks = useSelector((state) => state.login.decks);
+    const deckIds = useSelector((state) => state.login.decks);
     const userId = useSelector((state) => state.login.userId);
-
+    
     return (
         <PracticeLaunchPageWrapper>
-            {decks.length ? 
-                <>
-                    <h1>Select a deck to practice</h1>
-                    <DeckList listType="user" listId={userId} />
-                </>
-                :
-                <>
-                    <NoDecksMessage>
-                        <p>No decks have been created yet</p>
-                    </NoDecksMessage>
-                    <StyledLink to={`/users/${userId}/decks/new`}>Create New Deck</StyledLink>
-                </>
-            }
+            {!deckIds.length && <StyledLink to={`/users/${userId}/decks/new`}>Create New Deck</StyledLink>}   
+            <DeckList listType="user" listId={userId} />
         </PracticeLaunchPageWrapper>
-    );
+    )
 }
 
 export default PracticeLaunchPage;

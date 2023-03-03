@@ -7,6 +7,7 @@ import GroupTile from "./GroupTile";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
 import styled from "styled-components";
+import { EmptyIndicator } from "./StyledComponents/EmptyIndicator";
 
 const UserGroupsWrapper = styled.div`
     display: flex;
@@ -95,9 +96,8 @@ function UserGroupsPage() {
             <GroupTilesContainer className="GroupTilesContainer">
                 {groups.map(groupId => <GroupTile key={groupId} groupId={groupId}/>)}
             </GroupTilesContainer>
-            {!modalContent ?
-                null
-                :
+            {!groups.length && <EmptyIndicator>You aren't in any groups yet</EmptyIndicator>}
+            {modalContent &&
                 <Modal hideModal={hideModal}>
                     {displayModalContent()}
                 </Modal>

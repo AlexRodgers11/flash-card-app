@@ -222,7 +222,7 @@ function BrowseDecks() {
                     </SpinnerWrapper>
                 }
                 >
-                        {!loading && decks.map(deck => <DeckTile key={deck.deckId} deckId={deck.deckId} />)}
+                        {!loading && decks.map(deck => <DeckTile key={deck.deckId} deckId={deck.deckId} noEdit={true}/>)}
             </StyledInfiniteScroll>
         </BrowseDecksWrapper>
     )

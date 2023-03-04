@@ -6,10 +6,11 @@ import styled from 'styled-components';
 
 const GroupMemberListWrapper = styled.div`
     min-width: 350px;
+    // min-height: calc(100vh - 4.5rem);
+    min-height: 100%;
     width: 98%;
     display: grid;
-    place-items: center;
-    // border: 1px solid black;
+    // place-items: center;
     margin-bottom: 3rem;
 
     grid-template-columns: repeat(1, 1fr);
@@ -74,9 +75,10 @@ const GroupMemberListWrapper = styled.div`
 
 function GroupMemberList(props) {
     const administrators = useSelector((state) => state.group.administrators);
+    const groupMemberIds = useSelector((state) => state.group.memberIds);
     return(
         <GroupMemberListWrapper>
-            {props.groupMemberIds.map(memberId => (
+            {groupMemberIds.map(memberId => (
                 <UserTile key={memberId} memberId={memberId} listType={props.listType} isAdmin={administrators.includes(memberId)} editMode={props.editMode} />
             ))}
         </GroupMemberListWrapper>

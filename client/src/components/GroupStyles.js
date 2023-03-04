@@ -1,32 +1,78 @@
 import styled from "styled-components";
+import { NavLink } from "react-router-dom";
 
 export const GroupWrapper = styled.div`
+    min-height: calc(100vh - 5.5rem);
     display: flex;
     flex-direction: column;
     align-items: center;
-    & section {
-        width: 100%;
+    background-color: #FF6565;
+`;
+
+export const GroupNavbar = styled.div`
+    position: fixed;
+    top: 5.5rem;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    min-width: 350px;
+    width: 100%;
+    height: 3rem;
+    background-color: #393939;
+    color: white;
+    font-size: 1.25rem;
+    @media (max-width: 960px) {
+        font-size: 1rem;       
+    @media (max-width: 790px) {
+        font-size: .85rem;
+    }
+    @media (max-width: 690px) {
+        font-size: .75rem;
+    }
+    @media (max-width: 625px) {
+        font-size: .65rem;
+    }
+    @media (max-width: 515px) {
+        font-size: .85rem;
+        height: 5rem;
+        flex-direction: column;
+        justify-content: center;
     }
 `;
 
-
-export const TitleSection = styled.section`
-    background-color: #454545;
-    color: white;
-`;
-
-export const GroupSection = styled.section`
-    display: flex; 
-    width: 100%;
+export const OutletContainer = styled.div`
+    min-height: calc(100vh - 8.5rem);
+    padding-top: 4.5rem;
+    display: flex;
     flex-direction: column;
-    align-items: center;
-    background-color: #E08585;
-    // margin-bottom: 3rem;
+    @media (max-width: 515px) {
+        padding-top: 6.5rem;
+    }
 `;
 
-export const DeckSection = styled.section`
-    background-color: #5197E1;
-    width: 100%;
+export const StyledNavLink = styled(NavLink)`
+    color: white !important;
+`;
+
+export const GroupTitle = styled.h1`
+    color: white;
+    font-weight: 700;
+    font-size: 4.5rem;
+    line-height: 6.6rem;
+`;
+
+export const StyledLeaveButton = styled.button`
+    display: inline-flex;
+    align-self: end;
+    position: relative;
+    top: 4rem;
+    @media (max-width: 515px) {
+        top: 6rem;
+    }
+    right: 1rem;
+    background-color: black;
+    color: white;
 `;
 
 export const DeckOptionContainer = styled.div`
@@ -86,40 +132,5 @@ export const JoinOptionContainer = styled.div`
     }
     @media (max-width: 500px) {
         font-size: .85rem;
-    }
-`;
-
-export const GroupEditControlsContainer = styled.div`
-    display: inline-block;
-    & button {
-        display: inline-block;
-        margin: 1rem .25rem;
-    }
-`;
-
-export const JoinCodeContainer = styled.div`
-    // margin-bottom: 3rem;
-    & button {
-        display: inline-block;
-    }
-`;
-
-export const Heading = styled.p`
-    margin: 2rem;
-    font-size: 3.5rem;
-    font-weight: 600;
-    @media (max-width: 500px) {
-        margin: 1rem;
-        font-size: 1.5rem;
-    }
-`;
-
-export const SubHeading = styled.p`
-    font-size: 2.25rem;
-    margin-bottom: 1rem !important;
-    @media (max-width: 500px) {
-        margin-bottom: .5rem !important;
-        font-size: 1.25rem;
-        font-weight: 500;
     }
 `;

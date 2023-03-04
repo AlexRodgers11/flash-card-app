@@ -388,12 +388,17 @@ function DeckTile(props) {
             return;
         }
         //SEE IF OKAY TO DO THIS WAY- COULD BE UNSAFE AND ALLOW NAVIGATION TO PRIVATE DECKS
-        if(location.pathname.slice(32, 33) === "p") {
-            navigate();
-        } else if(location.pathname.slice(32, 33) === "d" || location.pathname.slice(1, 2) === "u") {
-            navigate(`/decks/${props.deckId}`)
-        } else if(location.pathname.slice(1,2) === "g") {
+        // if(location.pathname.slice(32, 33) === "p") {
+        //     navigate();
+        // } else if(location.pathname.slice(32, 33) === "d" || location.pathname.slice(1, 2) === "u") {
+        //     navigate(`/decks/${props.deckId}`)
+        // } else if(location.pathname.slice(1,2) === "g") {
+        //     navigate(`/groups/${groupId}/decks/${props.deckId}`);
+        // }
+        if(location.pathname.includes("group")) {
             navigate(`/groups/${groupId}/decks/${props.deckId}`);
+        } else {
+            navigate(`/decks/${props.deckId}`);
         }
     }
 

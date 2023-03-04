@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { addCard, updateDeck, fetchDeck, resetDeck } from '../reducers/deckSlice';
 import { deleteDeck } from '../reducers/decksSlice';
@@ -13,6 +13,9 @@ import { MdModeEditOutline } from "react-icons/md";
 import styled from 'styled-components';
 
 const DeckWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     min-height: calc(100vh - 5.5rem);
     background-color: #52B2FF; 
 `;
@@ -21,11 +24,17 @@ const NameBlock = styled.div`
     display: flex;
     justify-content: center;
     color: white;
-    padding-top: 1rem;
+    padding-top: 1.5rem;
+    &.name-only {
+        margin-bottom: 2rem;
+    }
     & h1 {
         font-size: 3.5rem;
+        @media (max-width: 750px) {
+            font-size: 2.75rem;
+        }
         @media (max-width: 450px) {
-            font-size: 2rem;
+            font-size: 1.5rem;
         }
     }
 `;
@@ -41,6 +50,8 @@ const CardContainer = styled.div`
 `;
 
 const AddButton = styled.button`
+    // display: inline-block;
+    width: 50%;
     margin: 2rem;
     // background-color: #00437A;
     // background-color: #9DE59D;
@@ -71,18 +82,48 @@ const PublicControls = styled.div`
     }
 `;
 
+export const DeleteButton = styled.button`
+    display: inline-flex;
+    align-self: end;
+    position: relative;
+    top: 1rem;
+    right: 1rem;
+    background-color: black;
+    color: white;
+    @media (max-width: 750px) {
+        font-size: .8rem;
+    }
+    @media (max-width: 450px) {
+        font-size: .71rem;
+    }
+`;
+
 function Deck() {
+    const userId = useSelector((state) => state.login.userId);
     const storedDeckId = useSelector((state) => state.deck.deckId);
+    const userDecks = useSelector((state) => state.login.decks);
     const name = useSelector((state) => state.deck.name);
     const [nameEditMode, toggleNameEditMode] = useToggle(false);
+    const administrators = useSelector((state) => state.group.administrators)
     const [editedName, clearEditedName, handleChangeEditedName, setEditedName] = useFormInput('');
     const publiclyAvailable = useSelector((state) => state.deck.publiclyAvailable);
     const cards = useSelector((state) => state.deck.cards);
     const groupDeckBelongsTo = useSelector((state) => state.deck.groupDeckBelongsTo);
-    const [editMode, toggleEditMode] = useToggle(false);
     const [modalContent, setModalContent] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { deckId } = useParams();
+    const location = useLocation();
+
+    const unlockControl = () => {
+        if(location.pathname.includes("group")) {
+            return administrators.includes(userId);
+        } else {
+            console.log(userDecks.map(deck => deck._id));
+            console.log({deckId});
+            return userDecks.map(deck => deck._id).includes(deckId);
+        }
+    }
     
     const displayModalContent = () => {
         switch(modalContent) {
@@ -101,7 +142,6 @@ function Deck() {
         }
     }
     
-    const { deckId } = useParams();
 
     const confirmDeleteDeck = () => {
         navigate("/dashboard");
@@ -155,56 +195,74 @@ function Deck() {
 
     if(storedDeckId !== deckId) {
         return <></>;
+    } else if(unlockControl()) {
+        return (
+            <DeckWrapper>
+                <DeleteButton data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>
+                {!nameEditMode ? 
+                    <NameBlock>
+                        <h1>{name}</h1> 
+                        <StyledEditIcon role="button" onClick={openNameEditMode} />
+                    </NameBlock>
+                    : 
+                    <form onSubmit={saveDeckNameChange}>
+                        <input type="text" name="name" id="name" value={editedName} onChange={handleChangeEditedName} />
+                        <button type="submit">Save</button>
+                    </form>
+                }
+                <PublicControls>
+                    <label htmlFor='public'>Public</label>
+                    <input 
+                        type="radio"
+                        id="public"
+                        name="publicly-available"
+                        value="true"
+                        checked={publiclyAvailable}
+                        onChange={handleChangePubliclyAvailable}
+                    />
+                    <label htmlFor='private'>Private</label>
+                    <input 
+                        type="radio"
+                        id="private"
+                        name="publicly-available"
+                        value="false"
+                        checked={!publiclyAvailable}
+                        onChange={handleChangePubliclyAvailable}
+                    />
+                </PublicControls>
+                <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
+                <CardContainer className="CardContainer">
+                    {cards.map(card => <Card cardId={card} />
+                    )}
+    
+                    {modalContent && 
+                        <Modal hideModal={hideModal}>
+                            {displayModalContent()}
+                        </Modal>
+                    }
+                </CardContainer>
+            </DeckWrapper>
+        )
+    } else {
+        return (
+            <DeckWrapper>
+                <NameBlock className="name-only">
+                    <h1>{name}</h1> 
+                </NameBlock>
+                <CardContainer className="CardContainer">
+                    {cards.map(card => <Card cardId={card} />
+                    )}
+    
+                    {modalContent && 
+                        <Modal hideModal={hideModal}>
+                            {displayModalContent()}
+                        </Modal>
+                    }
+                </CardContainer>
+            </DeckWrapper>
+        )
     }
     
-    return (
-        <DeckWrapper>
-            {/* <button onClick={toggleEditMode}>{editMode ? "Done" : "Edit"}</button> */}
-            {editMode && <button data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete</button>}
-            {!nameEditMode ? 
-                <NameBlock>
-                    <h1>{name}</h1> 
-                    <StyledEditIcon role="button" onClick={openNameEditMode} />
-                </NameBlock>
-                : 
-                <form onSubmit={saveDeckNameChange}>
-                    <input type="text" name="name" id="name" value={editedName} onChange={handleChangeEditedName} />
-                    <button type="submit">Save</button>
-                </form>
-            }
-            <PublicControls>
-                <label htmlFor='public'>Public</label>
-                <input 
-                    type="radio"
-                    id="public"
-                    name="publicly-available"
-                    value="true"
-                    checked={publiclyAvailable}
-                    onChange={handleChangePubliclyAvailable}
-                />
-                <label htmlFor='private'>Private</label>
-                <input 
-                    type="radio"
-                    id="private"
-                    name="publicly-available"
-                    value="false"
-                    checked={!publiclyAvailable}
-                    onChange={handleChangePubliclyAvailable}
-                />
-            </PublicControls>
-            <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
-            <CardContainer className="CardContainer">
-                {cards.map(card => <Card cardId={card} />
-                )}
-
-                {modalContent && 
-                    <Modal hideModal={hideModal}>
-                        {displayModalContent()}
-                    </Modal>
-                }
-            </CardContainer>
-        </DeckWrapper>
-    )
 }
 
 export default Deck

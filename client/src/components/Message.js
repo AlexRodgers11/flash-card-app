@@ -31,33 +31,32 @@ function Message(props) {
 				return null;
 			case 'DeckSubmission':
 				return (
-					<div onClick={!props.fullView ? expandMessage : null}>
-						<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered />
+					<div role="button" onClick={!props.fullView ? expandMessage : null}>
+						<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 					</div>
 				);
 			case 'DeckDecision':
 				return (
-					<div onClick={!props.fullView ? expandMessage : null}>
-						<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered />
+					<div role="button" onClick={!props.fullView ? expandMessage : null}>
+						<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 					</div>
 				);
 			case 'JoinRequest':
 				return (
-					<div onClick={!props.fullView ? expandMessage : null}>
-						<JoinRequestMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered />
+					<div role="button" onClick={!props.fullView ? expandMessage : null}>
+						<JoinRequestMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 					</div>
 				);
 			case "JoinDecision":
 				return (
-					<div onClick={!props.fullView ? expandMessage : null}>
-						<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered />
+					<div role="button" onClick={!props.fullView ? expandMessage : null}>
+						<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 					</div>
 				);
 			default:
 				return null;
 		}
 	}
-	// if()
 
 	return (
 		<div>

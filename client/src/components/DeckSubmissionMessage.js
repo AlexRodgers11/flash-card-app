@@ -65,7 +65,7 @@ function DeckSubmissionMessage(props) {
 					setTargetGroup(data.targetGroup);
                     setDeckName(data.deckName);
                     setLoading(false);
-                    props.setRendered(true);
+                    props.setMessageRendered(true);
 				} catch (err) {
 					console.error(err);
 				}
@@ -115,7 +115,7 @@ DeckSubmissionMessage.propTypes = {
     fullView: PropTypes.bool,
     messageId: PropTypes.string,
     messageType: PropTypes.string,
-    setRendered: PropTypes.func
+    setMessageRendered: PropTypes.func
 }
 
 export default DeckSubmissionMessage;

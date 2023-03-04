@@ -32,7 +32,7 @@ function JoinRequestMessage(props) {
 					setRead(data.read.includes(userId));
 					setTargetGroup(data.targetGroup);
 					setLoading(false);
-					props.setRendered(true);
+					props.setMessageRendered(true);
 				} catch (err) {
 					console.error(err);
 				}
@@ -112,7 +112,7 @@ JoinRequestMessage.propTypes = {
     fullView: PropTypes.bool,
     messageId: PropTypes.string,
 	messageType: PropTypes.string,
-	setRendered: PropTypes.func
+	setMessageRendered: PropTypes.func
 }
 
 

@@ -36,7 +36,7 @@ function DeckDecisionMessage(props) {
                     setAcceptanceStatus(data.acceptanceStatus);
                     setComment(data.comment);
                     setLoading(false);
-                    props.setRendered(true);
+                    props.setMessageRendered(true);
 				} catch (err) {
 					console.error(err.message);
 				}
@@ -74,7 +74,7 @@ DeckDecisionMessage.propTypes = {
     fullView: PropTypes.bool,
     messageId: PropTypes.string,
     messageType: PropTypes.string,
-    setRendered: PropTypes.func
+    setMessageRendered: PropTypes.func
 }
 
 export default DeckDecisionMessage;

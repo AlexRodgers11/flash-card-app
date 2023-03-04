@@ -152,6 +152,10 @@ function Deck() {
             dispatch(fetchDeck(deckId));
         }
     }, [deckId, dispatch, storedDeckId]);
+
+    if(storedDeckId !== deckId) {
+        return <></>;
+    }
     
     return (
         <DeckWrapper>

@@ -82,6 +82,7 @@ function Router() {
                     <Route exact path="/groups/:groupId/members" element={<GroupMemberListNew listType="members"/>} />
                     <Route exact path="/groups/:groupId/decks" element={<GroupDecksSection />} />
                 </Route>
+                <Route exact path="/groups/:groupId/decks/:deckId" element={<Deck />} />
                 <Route exact path="/decks/public" element={<BrowseDecks />}/>
                 <Route exact path="/decks/:deckId" element={<Deck />} />
                 <Route exact path="/users/:userId/decks/new" element={<DeckForm />} />

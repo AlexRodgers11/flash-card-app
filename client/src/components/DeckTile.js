@@ -375,6 +375,7 @@ function DeckTile(props) {
     const [doneResizing, setDoneResizing] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     const administrators = useSelector((state) => state.group.administrators);
+    const groupId = useSelector((state) => state.group.groupId);
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -392,7 +393,7 @@ function DeckTile(props) {
         } else if(location.pathname.slice(32, 33) === "d" || location.pathname.slice(1, 2) === "u") {
             navigate(`/decks/${props.deckId}`)
         } else if(location.pathname.slice(1,2) === "g") {
-            navigate(`/decks/${props.deckId}`);
+            navigate(`/groups/${groupId}/decks/${props.deckId}`);
         }
     }
 

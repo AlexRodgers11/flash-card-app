@@ -11,6 +11,7 @@ import Modal from './Modal';
 import { removeDeckFromUser } from '../reducers/loginSlice';
 import { MdModeEditOutline } from "react-icons/md";
 import styled from 'styled-components';
+import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
 
 const DeckWrapper = styled.div`
     display: flex;
@@ -232,6 +233,7 @@ function Deck() {
                 </PublicControls>
                 <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
                 <CardContainer className="CardContainer">
+                    {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}
                     {cards.map(card => <Card cardId={card} />
                     )}
     
@@ -247,9 +249,10 @@ function Deck() {
         return (
             <DeckWrapper>
                 <NameBlock className="name-only">
-                    <h1>{name}</h1> 
+                    <h1>{name}</h1>
                 </NameBlock>
                 <CardContainer className="CardContainer">
+                    {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}
                     {cards.map(card => <Card cardId={card} />
                     )}
     

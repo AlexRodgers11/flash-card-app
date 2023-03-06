@@ -55,7 +55,7 @@ function GroupMemberOption(props) {
     });
 
     return (
-        <GroupMemberOptionWrapper>
+        <GroupMemberOptionWrapper role="button">
             {memberData && 
             <>
                 <ImageContainer>

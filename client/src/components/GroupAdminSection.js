@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import styled from "styled-components"
 import GroupDecksSection from "./GroupDecksSection";
-import GroupMemberListNew from "./GroupMemberListNew";
+import GroupMemberList from "./GroupMemberList";
 import { JoinOptionContainer } from "./GroupStyles";
 import { generateJoinCode } from '../utils';
 import useToggle from "../hooks/useToggle";
@@ -89,7 +89,7 @@ export function GroupAdminSection() {
                     </JoinOptionContainer>
                 {/* } */}
             </GroupEditControlsContainer>
-            <GroupMemberListNew editMode={true} listType="members"/>
+            <GroupMemberList editMode={true} listType="members"/>
             <GroupDecksSection></GroupDecksSection>
         </GroupAdminSectionWrapper>
     )

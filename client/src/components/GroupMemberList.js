@@ -76,10 +76,12 @@ const GroupMemberListWrapper = styled.div`
 function GroupMemberList(props) {
     const administrators = useSelector((state) => state.group.administrators);
     const groupMemberIds = useSelector((state) => state.group.memberIds);
+    const userId = useSelector((state) => state.login.userId);
+    
     return(
         <GroupMemberListWrapper>
             {groupMemberIds.map(memberId => (
-                <UserTile key={memberId} memberId={memberId} listType={props.listType} isAdmin={administrators.includes(memberId)} editMode={props.editMode} />
+                <UserTile key={memberId} memberId={memberId} listType={props.listType} isAdmin={administrators.includes(memberId)} editMode={props.editMode && administrators.includes(userId)} />
             ))}
         </GroupMemberListWrapper>
     )

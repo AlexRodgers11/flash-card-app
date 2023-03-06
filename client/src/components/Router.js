@@ -26,8 +26,6 @@ import RegisterProfilePicCropForm from './RegisterProfilePicCropForm';
 import { useSelector } from 'react-redux';
 import UserSettings from './UserSettings';
 import GroupMemberList from './GroupMemberList';
-import GroupMemberListNew from './GroupMemberListNew';
-import DeckList from './DeckList';
 import GroupDecksSection from './GroupDecksSection';
 import { GroupAdminSection } from './GroupAdminSection';
 
@@ -79,7 +77,7 @@ function Router() {
             <Routes>
                 <Route exact path="/groups/:groupId" element={<Group />} >
                     <Route exact path="/groups/:groupId/admin-controls" element={<GroupAdminSection />} />
-                    <Route exact path="/groups/:groupId/members" element={<GroupMemberListNew listType="members"/>} />
+                    <Route exact path="/groups/:groupId/members" element={<GroupMemberList listType="members"/>} />
                     <Route exact path="/groups/:groupId/decks" element={<GroupDecksSection />} />
                 </Route>
                 <Route exact path="/groups/:groupId/decks/:deckId" element={<Deck />} />

@@ -4,7 +4,6 @@ import PracticeLaunchPage from './PracticeLaunchPage';
 import BrowseDecks from './BrowseDecks';
 import Dashboard from './Dashboard';
 import Deck from './Deck';
-import DeckForm from './DeckForm';
 import Group from './Group';
 import LandingPage from './LandingPage';
 import Login from './Login';
@@ -83,7 +82,6 @@ function Router() {
                 <Route exact path="/groups/:groupId/decks/:deckId" element={<Deck />} />
                 <Route exact path="/decks/public" element={<BrowseDecks />}/>
                 <Route exact path="/decks/:deckId" element={<Deck />} />
-                <Route exact path="/users/:userId/decks/new" element={<DeckForm />} />
                 <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
                 <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
                 <Route exact path="/users/:userId/practice" element={<PracticeLaunchPage />} />

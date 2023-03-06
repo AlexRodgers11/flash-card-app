@@ -51,14 +51,10 @@ const CardContainer = styled.div`
 `;
 
 const AddButton = styled.button`
-    // display: inline-block;
     width: 50%;
     margin: 2rem;
-    // background-color: #00437A;
-    // background-color: #9DE59D;
-    // background-color: #FFD549;
+    border: none;
     background-color: #051647;
-    // color: black;
     @media (max-width: 450px) {
         margin: .75rem;        
         font-size: .75rem;

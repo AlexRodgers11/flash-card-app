@@ -1,8 +1,9 @@
 import { useSelector } from "react-redux";
-import { useParams } from "react-router";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
+import useToggle from "../hooks/useToggle";
+import DeckForm from "./DeckForm";
 import DeckList from "./DeckList";
+import Modal from "./Modal";
 
 const UserDecksPageWrapper = styled.div`
     display: flex;
@@ -13,24 +14,30 @@ const UserDecksPageWrapper = styled.div`
     min-height: calc(100vh - 5.5rem);
 `;
 
-const StyledLink = styled(Link)`
-    font-size: 1rem;
-    padding: 2rem;
-    margin: 4rem 0 3rem 0;
-    width: 14rem;
-    // height: 5rem;
-    border-radius: 1rem;
-    border: 2px solid black;
-    background-color: lightgrey;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px;
+const AddButton = styled.button`
+    width: 50%;
+    margin: 2rem;
+    background-color: #051647;
+    border: none;
+    @media (max-width: 450px) {
+        margin: .75rem;        
+        font-size: .75rem;
+        padding: .125rem .75rem;
+    }
 `;
 
 function UserDecksPage() {
-    const { userId } = useParams(); 
+    const userId = useSelector((state) => state.login.userId);
+    const [showDeckForm, toggleShowDeckForm] = useToggle(false);
     return (
         <UserDecksPageWrapper className="UserDecksPageWrapper">
-            <StyledLink to={`/users/${userId}/decks/new`}>Create New Deck</StyledLink>
+            <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={toggleShowDeckForm}>Create New Deck</AddButton>
             <DeckList listType="user" listId={userId} />
+            {showDeckForm && 
+                <Modal hideModal={toggleShowDeckForm}>
+                    <DeckForm />
+                </Modal>
+            }
         </UserDecksPageWrapper>
     );
 }

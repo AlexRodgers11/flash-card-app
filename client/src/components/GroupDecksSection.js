@@ -7,7 +7,7 @@ import { addAdminDeck } from '../reducers/decksSlice';
 import { submitDeck } from "../reducers/communicationsSlice";
 import styled from 'styled-components';
 import useToggle from '../hooks/useToggle';
-import { useNavigate } from 'react-router';
+import DeckForm from './DeckForm';
 
 const GroupDecksSectionWrapper = styled.section`
     display: flex;
@@ -18,9 +18,6 @@ const GroupDecksSectionWrapper = styled.section`
 const AddButton = styled.button`
     width: 50%;
     margin: 2rem;
-    // background-color: #00437A;
-    // background-color: #9DE59D;
-    // background-color: #FFD549;
     background-color: #051647;
     border: none;
     @media (max-width: 450px) {
@@ -36,12 +33,8 @@ export default function GroupDecksSection() {
     const administrators = useSelector((state) => state.group.administrators);
     const userDecks = useSelector((state) => state.login.decks);
     const [showAddModal, toggleShowAddModal] = useToggle(false);
-    const navigate = useNavigate();
+    const [showDeckFormModal, toggleShowDeckFormModal] = useToggle(false);
     const dispatch = useDispatch();
-
-    const goToCreateNew = () => {
-        navigate(`/users/${userId}/decks/new`);
-    }
 
     const chooseDeck = evt => {
         if(administrators?.includes(userId)) {
@@ -53,6 +46,11 @@ export default function GroupDecksSection() {
             dispatch(submitDeck({groupId, deckId: evt.target.id}));
             toggleShowAddModal();
         }
+    }
+
+    const handleCreateNew = () => {
+        toggleShowAddModal();
+        toggleShowDeckFormModal();
     }
 
     return (
@@ -68,8 +66,13 @@ export default function GroupDecksSection() {
                                     {deck.name}
                                 </DeckOption>
                             )}
-                            <button onClick={goToCreateNew}>Create new deck</button>
+                            <button onClick={handleCreateNew}>Create new deck</button>
                         </DeckOptionContainer>
+                    </Modal>
+                }
+                {showDeckFormModal && 
+                    <Modal hideModal={toggleShowDeckFormModal}>
+                        <DeckForm />
                     </Modal>
                 }
         </GroupDecksSectionWrapper>

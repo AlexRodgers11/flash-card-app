@@ -11,7 +11,7 @@ const DeckListWrapper = styled.div`
     display: grid;
     place-items: center;
     position: relative;
-
+    border-top: 2px solid black;
     grid-template-columns: repeat(4, 1fr);
 
     @media (min-width: 795px) {

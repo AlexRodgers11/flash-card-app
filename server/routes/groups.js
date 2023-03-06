@@ -62,8 +62,14 @@ groupRouter.get("/:groupId/join-options", (req, res, next) => {
     })
 });
 
-groupRouter.get("/:groupId/decks", (req, res, next) => {
-    res.status(200).send(JSON.stringify(req.group.decks));
+groupRouter.get("/:groupId/decks", getUserIdFromJWTToken, async (req, res, next) => {
+    if(!req.group.members.map(id => id.toString()).includes(req.userId)) {
+        const populatedGroup = await req.group.populate("decks", "publiclyAvailable");
+        const publicDecks = populatedGroup.decks.filter(deck => deck.publiclyAvailable).map(deck => deck._id);
+        res.status(200).send(publicDecks); 
+    } else {
+        res.status(200).send(req.group.decks);
+    }
 });
 
 

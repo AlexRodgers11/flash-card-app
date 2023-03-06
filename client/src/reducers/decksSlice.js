@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk }from "@reduxjs/toolkit";
 import axios from "axios";
+import { client } from "../utils";
 
 const baseURL = 'http://localhost:8000';
 
@@ -37,7 +38,7 @@ export const fetchDecksOfUser = createAsyncThunk("decks/fetchDecksOfUser", async
     console.log("in fetchDecksOfUser");
     console.log(baseURL + "/users/" + userId + "/decks");
     try {
-        const response = await axios.get(baseURL + "/users/" + userId + "/decks");
+        const response = await client.get(baseURL + "/users/" + userId + "/decks");
         return {
             listType: "user", 
             listId: userId,
@@ -63,7 +64,7 @@ export const fetchDecksOfCategory = createAsyncThunk("decks/fetchDecksOfCategory
 
 export const fetchDecksOfGroup = createAsyncThunk("decks/fetchDecksOfGroup", async (groupId) => {
     try {
-        const response = await axios.get(baseURL + "/groups/" + groupId + "/decks");
+        const response = await client.get(baseURL + "/groups/" + groupId + "/decks");
         return {
             listType: "group",
             listId: groupId,

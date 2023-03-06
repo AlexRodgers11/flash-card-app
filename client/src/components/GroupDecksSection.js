@@ -15,6 +15,21 @@ const GroupDecksSectionWrapper = styled.section`
     align-items: center;
 `;
 
+const AddButton = styled.button`
+    width: 50%;
+    margin: 2rem;
+    // background-color: #00437A;
+    // background-color: #9DE59D;
+    // background-color: #FFD549;
+    background-color: #051647;
+    border: none;
+    @media (max-width: 450px) {
+        margin: .75rem;        
+        font-size: .75rem;
+        padding: .125rem .75rem;
+    }
+`;
+
 export default function GroupDecksSection() {
     const userId = useSelector((state) => state.login.userId);
     const groupId = useSelector((state) => state.group.groupId);
@@ -42,7 +57,7 @@ export default function GroupDecksSection() {
 
     return (
         <GroupDecksSectionWrapper>
-            <button data-modalcontent="add-deck" onClick={toggleShowAddModal}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</button>
+            <AddButton className="btn btn-primary btn-lg" data-modalcontent="add-deck" onClick={toggleShowAddModal}>{!administrators?.includes(userId) ? 'Submit Deck To Be Added' : 'Add Deck'}</AddButton>
                 <DeckList listType="group" listId={groupId} />
                 {showAddModal &&
                     <Modal hideModal={toggleShowAddModal}>

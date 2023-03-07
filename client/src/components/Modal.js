@@ -13,12 +13,6 @@ const ModalWrapper = styled.div`
 	height: 100vh;
 	width: 100%;
 	z-index: 2;
-	& button {
-		margin: 1.5rem .15rem .25rem .15rem;
-		@media (max-width: 500px) {
-			margin: .15rem .15rem;
-		}
-	}
 `;
 
 const ModalBackdrop = styled.div`
@@ -37,37 +31,39 @@ const ModalContent = styled.div`
 	border: 3px solid black;
 	border-radius: 1rem;
 	padding: 4rem 4rem 4rem 4rem;
+	@media (max-width: 450px) {
+        padding: 2rem;
+    }
+	@media (max-width: 375px) {
+        padding: 1rem;
+    }
 	overflow: scroll;
 	max-height: 70%;
 	scrollbar-width: none;
 	&::-web-kit-scrollbar {
 		display: none;
 	}
-	& input {
-
-	}
-	& button {
-		margin-top: 3.5rem;
-	}
 `;
-
-const ModalClose = styled.p`
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-	margin: 0;
-	padding-top: 0.25rem;
-`;
-
 
 const StyledCloseIcon = styled(IoClose)`
-	position: relative;
-	left: 3.75rem;
-	bottom: 4rem;
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	@media (max-width: 450px) {
+		top: .5rem;
+		right: .5rem;
+		height: 1.75rem;
+		width: 1.75rem;
+	}
+	@media (max-width: 375px) {
+		top: .25rem;
+		right: .25rem;
+		height: 1.25rem;
+		width: 1.25rem;
+	}
 	font-size: 2rem;
 	cursor: pointer;
 `;
-
 
 function Modal(props) {
 	const handleEscape = useCallback((evt) => {
@@ -89,7 +85,7 @@ function Modal(props) {
 		<ModalWrapper className='Modal_active'>
 			<ModalBackdrop onClick={props.hideModal}></ModalBackdrop>
 			<ModalContent>
-				<ModalClose className="ModalClose">{props.hideModal && <StyledCloseIcon role="button" onClick={props.hideModal}/>}</ModalClose>
+				{props.hideModal && <StyledCloseIcon role="button" onClick={props.hideModal}/>}
 				{props.children}
 			</ModalContent>
 		</ModalWrapper>

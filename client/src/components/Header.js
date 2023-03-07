@@ -136,12 +136,6 @@ function Header() {
                             <Logo />
                         </Link>
                     </div>
-                    {/* Clicking the anchor tag resets state */}
-                    {/* <a className="navbar-brand" href={username ? "/dashboard" : "/"}>Logo</a> */}
-                    {/* <form className="d-none d-md-flex">
-                        <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                        <button className="btn btn-outline-success" type="submit">Search</button>
-                    </form> */}
                 </div>
                 <div style={{display: "flex", alignItems: "center"}}>
                     {name?.first && 
@@ -169,24 +163,22 @@ function Header() {
                     </li>
                 </div>
             </div>
-            {!modalContent ?
-                null
-                :
+            {modalContent === "inbox" &&
                 <Modal hideModal={handleHideModal}>
-                    {modalContent === "inbox" ?
-                        <MessageList expandMessage={expandMessage} hideModal={handleHideModal} setModalContent={handleSetModalContent}/>
-                        :
-                        modalContent === "deck" ? 
-                            <p>Deck Info will go here</p>
-                            :
-                            modalContent === "notifications" ?
-                                <div><NotificationList hideModal={handleHideModal} /></div>
-                                :
-                                <>
-                                    <button onClick={closeMessage}>Back to Inbox</button>
-                                    <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId} messageType={messageType} direction={messageDirection}/></div>
-                                </>
-                    }
+                    <MessageList expandMessage={expandMessage} hideModal={handleHideModal} setModalContent={handleSetModalContent}/>
+                </Modal>
+            }
+            {modalContent === "notifications" &&
+                <Modal hideModal={handleHideModal}>
+                    <NotificationList hideModal={handleHideModal} />
+                </Modal>
+            }
+            {modalContent === "message" &&
+                <Modal hideModal={handleHideModal}>
+                    <>
+                        <button onClick={closeMessage}>Back to Inbox</button>
+                        <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId} messageType={messageType} direction={messageDirection}/></div>
+                    </>
                 </Modal>
             }
         </HeaderWrapper>

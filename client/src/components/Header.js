@@ -51,6 +51,20 @@ const ProfilePic = styled.img`
     width: 4rem
 `;
 
+const StyledButton = styled.button`
+	padding: .25rem .5rem;
+	margin: 0 .5rem 1rem 0;
+	@media (max-width: 475px) {
+		padding: .2rem .4rem;
+		margin: 0 .4rem .8rem 0;
+	}
+	@media (max-width: 375px) {
+		padding: .15rem .3rem;
+		margin: 0 .25rem .5rem 0rem;
+		font-size: .75rem;
+	}
+`;
+
 function Header() {
     const [modalContent, setModalContent] = useState();
     const [messageId, setMessageId]  = useState();
@@ -176,7 +190,7 @@ function Header() {
             {modalContent === "message" &&
                 <Modal hideModal={handleHideModal}>
                     <>
-                        <button onClick={closeMessage}>Back to Inbox</button>
+                        <StyledButton onClick={closeMessage}>Back to Inbox</StyledButton>
                         <div><Message fullView={true} hideModal={handleHideModal} messageId={messageId} messageType={messageType} direction={messageDirection}/></div>
                     </>
                 </Modal>

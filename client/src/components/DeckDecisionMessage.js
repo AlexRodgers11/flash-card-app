@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-
+import { MessageContentContainer } from './StyledComponents/MessageContentContainer';
+import { MessagePreviewContent } from './StyledComponents/MessagePreviewContent';
 
 const baseURL = 'http://localhost:8000';
 
@@ -51,7 +52,7 @@ function DeckDecisionMessage(props) {
         );
     } else {
         return (
-            <div>
+            <MessageContentContainer>
                 {props.fullView ? 
                     <div>
                         {props.direction === "received" ? <p>From: {sender?.login.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetUser?.login.username || targetUser ? `${targetUser.name.first} ${targetUser.name.last}` : "deleted user"}</p>}
@@ -59,13 +60,13 @@ function DeckDecisionMessage(props) {
                         {comment && <p>Comment: "{comment}"</p>}
                     </div>
                     :
-                    <div>
+                    <MessagePreviewContent>
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetUser?.login?.username || targetUser ? `${targetUser.name.first} ${targetUser.name.last}` : "deleted user"}</p>}
                         <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> {acceptanceStatus} your request to add deck: {deckName || "deleted deck"} to <span>{targetGroup?.name || "deleted group"}</span></p>
-                        <hr />
-                    </div>
+                        {/* <hr /> */}
+                    </MessagePreviewContent>
                 }
-            </div>
+            </MessageContentContainer>
         )
     }
 }

@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addMember, fetchGroupData } from '../reducers/groupSlice';
 import useFormInput from '../hooks/useFormInput';
 import { makeJoinRequestDecision } from '../reducers/communicationsSlice';
+import { MessageContentContainer } from './StyledComponents/MessageContentContainer';
+import { MessagePreviewContent } from './StyledComponents/MessagePreviewContent';
 
 
 const baseURL = 'http://localhost:8000';
@@ -78,7 +80,7 @@ function JoinRequestMessage(props) {
 		);
 	} else {		
 		return (
-			<div>
+			<MessageContentContainer>
                 {props.fullView ? 
                     <div>
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup?.name || "deleted group"} admins</p>}
@@ -97,13 +99,13 @@ function JoinRequestMessage(props) {
                         
                     </div>
                     :
-                    <div>
-                        {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup?.name || "deleted user"} admins</p>}
-                        <p><span>{read ? 'Read': 'Unread'}: </span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to join: {targetGroup?.name || "deleted group"}</p>
-                        <hr />
-                    </div>
+                    <MessagePreviewContent>
+                        {props.direction === "received" ? <p className="MessageContent">From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p className="MessageContent">To: {targetGroup?.name || "deleted user"} admins</p>}
+                        <p className="MessageContent"><span>{read ? 'Read': 'Unread'}: </span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to join: {targetGroup?.name || "deleted group"}</p>
+                        {/* <hr /> */}
+                    </MessagePreviewContent>
                 }
-            </div>
+            </MessageContentContainer>
 		)
 	}
 }

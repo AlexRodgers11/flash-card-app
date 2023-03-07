@@ -7,6 +7,34 @@ import DeckDecisionMessage from './DeckDecisionMessage';
 import JoinRequestMessage from './JoinRequestMessage';
 import JoinDecisionMessage from './JoinDecisionMessage';
 import { FaTrashAlt } from 'react-icons/fa';
+import styled from 'styled-components';
+
+const MessageWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	text-align: left;
+	padding: .75rem 1.25rem;
+	border: 1px solid black;
+	border-bottom: none;
+	cursor: ${(props) => props.fullView ? "default" : "pointer"};
+	&:last-of-type {
+		border-bottom: 1px solid black;
+	}
+	&:hover {
+		background-color: ${(props) => props.fullView ? "inherit" : "black"};
+		color: ${(props) => props.fullView ? "inherit" : "white"};
+	}
+`;
+
+const StyledTrashAlt = styled(FaTrashAlt)`
+	height: 1.25rem;
+	width: 1.25rem; 
+	@media (max-width: 450px) {
+		height: 1rem;
+		width: 1rem;
+	}
+`;
 
 function Message(props) {
 	const dispatch = useDispatch();
@@ -31,27 +59,19 @@ function Message(props) {
 				return null;
 			case 'DeckSubmission':
 				return (
-					<div role="button" onClick={!props.fullView ? expandMessage : null}>
-						<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
-					</div>
+					<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 				);
 			case 'DeckDecision':
 				return (
-					<div role="button" onClick={!props.fullView ? expandMessage : null}>
-						<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
-					</div>
+					<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 				);
 			case 'JoinRequest':
 				return (
-					<div role="button" onClick={!props.fullView ? expandMessage : null}>
-						<JoinRequestMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
-					</div>
+					<JoinRequestMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 				);
 			case "JoinDecision":
 				return (
-					<div role="button" onClick={!props.fullView ? expandMessage : null}>
-						<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
-					</div>
+					<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 				);
 			default:
 				return null;
@@ -59,10 +79,12 @@ function Message(props) {
 	}
 
 	return (
-		<div>
-			{renderMessage()}
-			{messageRendered && <FaTrashAlt onClick={handleDeleteMessage} />}
-		</div>
+		<MessageWrapper fullView={props.fullView}>
+			<div role={props.fullView ? "" : "button"} onClick={!props.fullView ? expandMessage : null}>
+				{renderMessage()}
+			</div>
+			{messageRendered && <StyledTrashAlt onClick={handleDeleteMessage} />}
+		</MessageWrapper>
 	)
 }
 

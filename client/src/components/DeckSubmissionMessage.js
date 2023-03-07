@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDecksOfGroup } from '../reducers/decksSlice';
-import { addActivity } from '../reducers/groupSlice';
 import useFormInput from '../hooks/useFormInput';
 import { makeDeckSubmissionDecision } from '../reducers/communicationsSlice';
+import { MessageContentContainer } from './StyledComponents/MessageContentContainer';
+import { MessagePreviewContent } from './StyledComponents/MessagePreviewContent';
 
 const baseURL = 'http://localhost:8000';
 
@@ -80,7 +81,7 @@ function DeckSubmissionMessage(props) {
         );
     } else {
         return (
-            <div>
+            <MessageContentContainer>
                 {props.fullView ? 
                     <div>
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup.name} admins</p>}
@@ -99,13 +100,13 @@ function DeckSubmissionMessage(props) {
                         
                     </div>
                     :
-                    <div>
+                    <MessagePreviewContent>
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup?.name || "deleted group"} admins</p>}
                         <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to add deck: {deckName} to <span>{targetGroup?.name || "deleted group"}</span></p>
-                        <hr />
-                    </div>
+                        {/* <hr /> */}
+                    </MessagePreviewContent>
                 }
-            </div>
+            </MessageContentContainer>
         )
     }
 

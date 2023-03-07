@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios';
+import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
 const baseURL = 'http://localhost:8000';
 
@@ -21,13 +22,12 @@ function GroupDeletedNotification(props) {
     }, [groupName, props.notificationId]);
 	
     if(!groupName) {
-        return <>Loading</>
+        return <></>
     } else {
         return (
-            <div>
+            <NotificationContentContainer>
                 <p>Group {groupName} has been deleted</p>
-                <hr />
-            </div>
+            </NotificationContentContainer>
         );
     }
 }

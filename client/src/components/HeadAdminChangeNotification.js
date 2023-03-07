@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
+import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
 const baseURL = 'http://localhost:8000';
 
@@ -17,12 +18,9 @@ function HeadAdminChangeNotification(props) {
 
     useEffect(() => {
         if(loading) {
-            console.log("No action");
             (async () => {
                 try {
-                    console.log("in try block");
                     const notificationRetrievalResponse = await axios.get(`${baseURL}/notifications/${props.notificationId}?type=HeadAdminChange`);
-                    console.log({data:notificationRetrievalResponse.data});
                     setGroup(notificationRetrievalResponse.data.targetGroup);
                     setpreviousHeadAdmin(notificationRetrievalResponse.data.previousHeadAdmin);
                     setNewHeadAdmin(notificationRetrievalResponse.data.newHeadAdmin);
@@ -54,7 +52,7 @@ function HeadAdminChangeNotification(props) {
         return <>Loading</>
     } else {
         return (
-            <div>
+            <NotificationContentContainer>
                 {newHeadAdmin._id === userId ?
                     <p><NavigationSpan onClick={previousHeadAdmin?.name ? goTopreviousHeadAdminPage : null}>{previousHeadAdmin?.login?.username || (previousHeadAdmin?.name?.first && previousHeadAdmin?.name?.last ? `${previousHeadAdmin.name.first} ${previousHeadAdmin.name.last}` : "deleted user")}</NavigationSpan> has made you the new head admin of group <NavigationSpan onClick={group?.name ? goToGroupPage : null}>{group.name || "deleted group"}</NavigationSpan></p>
                     :
@@ -62,8 +60,7 @@ function HeadAdminChangeNotification(props) {
                         Group <NavigationSpan onClick={group?.name ? goToGroupPage : null}>{group.name || "deleted group"}</NavigationSpan> has a new head admin, <NavigationSpan onClick={newHeadAdmin?.name ? goToNewHeadAdminPage : null}>{newHeadAdmin?.login?.username || (newHeadAdmin?.name?.first && newHeadAdmin?.name?.last ? `${newHeadAdmin.name.first} ${newHeadAdmin.name.last}` : "deleted user")}</NavigationSpan>
                     </p>
                 }
-                <hr />
-            </div>
+            </NotificationContentContainer>
         );
     }
 }

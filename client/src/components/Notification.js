@@ -8,8 +8,21 @@ import RemovedFromGroupNotification from "./RemovedFromGroupNotification";
 import GroupDeletedNotification from "./GroupDeletedNotification";
 import HeadAdminChangeNotification from "./HeadAdminChangeNotification";
 import { FaTrashAlt } from "react-icons/fa";
-import styled from "styled-components";
 import { deleteNotification } from "../reducers/communicationsSlice";
+import styled from "styled-components";
+
+const NotificationWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	text-align: left;
+	padding: .75rem 1.25rem;
+	border: 1px solid black;
+	border-bottom: none;
+	&:last-of-type {
+		border-bottom: 1px solid black;
+	}
+`;
 
 
 function Notification(props) {
@@ -39,10 +52,10 @@ function Notification(props) {
 	}
 
 	return (
-		<div>
+		<NotificationWrapper>
 			{renderNotification()}
-			<FaTrashAlt onClick={handleDeleteNotification} />
-		</div>
+			<FaTrashAlt role="button" onClick={handleDeleteNotification} />
+		</NotificationWrapper>
 	)
 }
 

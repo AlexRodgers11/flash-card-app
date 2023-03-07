@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
+import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
 const baseURL = 'http://localhost:8000';
 
@@ -15,7 +16,6 @@ function NewMemberJoinedNotification(props) {
 
     useEffect(() => {
         if(loading) {
-            console.log("retrieving data");
             (async () => {
                 try {
                     const notificationRetrievalResponse = await axios.get(`${baseURL}/notifications/${props.notificationId}?type=NewMemberJoined`);
@@ -26,14 +26,11 @@ function NewMemberJoinedNotification(props) {
                     console.error(err);
                 }
             })();
-        } else {
-            console.log("not retrieving data");
         }
     }, [loading, props.notificationId]);
 
 
     const goToNewMemberPage = () => {
-        console.log()
         navigate(`/users/${newMember._id}`);
         props.hideModal();
     }
@@ -47,10 +44,9 @@ function NewMemberJoinedNotification(props) {
         return <></>
     } else {
         return (
-            <div>
+            <NotificationContentContainer>
                 <p><NavigationSpan onClick={newMember?._id && goToNewMemberPage}>{newMember?.login?.username || (newMember?.name?.first && newMember?.name?.last ? `${newMember.name.first} ${newMember.name.last}` : "Deleted User")}</NavigationSpan> joined group <NavigationSpan onClick={group?._id && goToGroupPage}>{group?.name || "Deleted Group"}</NavigationSpan></p>
-                <hr />
-            </div>
+            </NotificationContentContainer>
         );
     }
 }

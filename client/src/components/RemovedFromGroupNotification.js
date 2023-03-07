@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
+import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
 const baseURL = 'http://localhost:8000';
 
@@ -14,7 +15,6 @@ function RemovedFromGroupNotification(props) {
 
     useEffect(() => {
         if(loading) {
-            console.log("loading");
             (async () => {
                 try {
                     const notificationRetrievalResponse = await axios.get(`${baseURL}/notifications/${props.notificationId}?type=RemovedFromGroup`);
@@ -38,10 +38,9 @@ function RemovedFromGroupNotification(props) {
         return <>Loading</>
     } else {
         return (
-            <div>
+            <NotificationContentContainer>
                 <p><NavigationSpan onClick={decidingUser?._id && goToDecidingUserPage}>{decidingUser?.login?.username || (decidingUser?.name?.first && decidingUser?.name?.last ? `${decidingUser.name.first} ${decidingUser.name.last}` : "Deleted User")}</NavigationSpan> has removed you from group {groupName || "Deleted Group"}</p>
-                <hr />
-            </div>
+            </NotificationContentContainer>
         );
     }
 }

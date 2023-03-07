@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
+import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
 const baseURL = 'http://localhost:8000';
 
@@ -42,10 +43,9 @@ function DeckAddedNotification(props) {
         return <>Loading</>
     } else {
         return (
-            <div>
+            <NotificationContentContainer>
                 <p>Deck <NavigationSpan onClick={newDeck?._id && goToNewDeckPage}>{newDeck?.name || "Deleted Deck"}</NavigationSpan> was added to group <NavigationSpan onClick={group?._id && goToGroupPage}>{group?.name || "Deleted Group"}</NavigationSpan></p>
-                <hr />
-            </div>
+            </NotificationContentContainer>
         );
     }
 }

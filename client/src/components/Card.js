@@ -15,13 +15,22 @@ const baseURL = 'http://localhost:8000';
 
 const CardWrapper = styled.div`
     position: relative;
-    width: 60%;
+    width: 55%;
     border: 1px solid black;
     border-radius: 1rem;
     margin-bottom: 1.5rem;
     background-color: white;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.12);
     overflow: hidden;
+    @media (max-width: 1625px) {
+        width: 65%;
+    }
+    @media (max-width: 1500px) {
+        width: 70%
+    }
+    @media (max-width: 1000px) {
+        width: 75%
+    }
     @media (max-width: 850px) {
         width: 85%;
     }
@@ -35,6 +44,7 @@ const QuestionBlock = styled.div`
     display: flex;
     text-align: left;
     justify-content: space-between;
+    // width: 100%;
     align-items: center;
     font-size: 1.5rem;
     font-weight: 600;
@@ -140,7 +150,7 @@ function Card(props) {
     }, [props]);
 
     return (
-        <CardWrapper>
+        <CardWrapper className="CardWrapper">
             <QuestionBlock className={showAnswers ? "QuestionBlock answers-visible" : "QuestionBlock"}>
                 <LeftContainer>
                     <CardControls>

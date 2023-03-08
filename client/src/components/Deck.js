@@ -48,6 +48,7 @@ const CardContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 `;
 
 const AddButton = styled.button`

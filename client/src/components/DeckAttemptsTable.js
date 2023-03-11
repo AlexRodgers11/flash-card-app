@@ -145,11 +145,14 @@ export default function DeckAttemptsTable(props) {
                             (deckAttempts.length ? 
                                 deckAttempts.map(attempt => (
                                     <DeckAttemptRow>
-                                        <DeckAttemptCell>Test Cell</DeckAttemptCell>
+                                        <DeckAttemptCell>{attempt.datePracticed}</DeckAttemptCell>
+                                        <DeckAttemptCell>{attempt.deck.name}</DeckAttemptCell>
+                                        <DeckAttemptCell>{attempt.accuracyRate}%</DeckAttemptCell>
+                                        <DeckAttemptCell><StyledLinkIcon data-sessionId={attempt._id} onClick={handleSelectSession}/></DeckAttemptCell>
                                     </DeckAttemptRow>
                                 ))
                                 :
-                                <EmptyIndicator marginTop={3}>No decks have been practiced yet</EmptyIndicator>
+                                <EmptyIndicator marginTop={3}>This deck hasn't been practiced</EmptyIndicator>
                             )
                         }
                     </tbody>

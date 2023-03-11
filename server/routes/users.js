@@ -433,8 +433,21 @@ userRouter.delete("/:userId/decks/:deckId/attempts", async (req, res, next) => {
     }
 });
 
-userRouter.get("/:userId/attempts", (req, res, next) => {
-    res.status(200).send(req.user.deckAttempts);
+userRouter.get("/:userId/attempts", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.userId !== req.user._id.toString()) {
+        return res.status(401).send("Only the user who made these attempts may access their data");
+    }
+
+    const populatedUser = await req.user.populate({
+        path: "deckAttempts",
+        select: "datePracticed accuracyRate",
+        populate: {
+            path: "deck",
+            select: "name"
+        }
+    });
+    console.log({attempts: populatedUser.deckAttempts});
+    res.status(200).send(populatedUser.deckAttempts);
 });
 
 export default userRouter;

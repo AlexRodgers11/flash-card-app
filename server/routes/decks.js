@@ -205,8 +205,20 @@ deckRouter.post("/:deckId/cards", getUserIdFromJWTToken, async (req, res, next) 
     }
 });
 
-deckRouter.get("/:deckId/attempts", (req, res, next) => {
-    res.status(200).send(req.deck.attempts);
+deckRouter.get("/:deckId/attempts", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.userId !== req.deck.creator.toString()) {
+        return res.status(401).send("Only the user who made these attempts may access their data");
+    }
+
+    const populatedDeck = await req.deck.populate({
+        path: "attempts",
+        select: "datePracticed accuracyRate",
+        populate: {
+            path: "deck",
+            select: "name"
+        }
+    });
+    res.status(200).send(populatedDeck.attempts);
 });
 
 export default deckRouter;

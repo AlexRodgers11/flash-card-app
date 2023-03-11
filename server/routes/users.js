@@ -363,7 +363,14 @@ userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), asyn
     }
 });
 
-userRouter.post("/:userId/attempts", async (req, res, next) => {
+userRouter.post("/:userId/attempts", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.userId !== req.user._id.toString()) {
+        console.log({1: req.userId});
+        console.log({2: req.user._id});
+        console.log({3: typeof req.userId});
+        console.log({4: typeof req.user._id});
+        return res.status(401).send("Unauthorized. A user may only add an attempt to their own statistics");
+    }
     try {
         const cardAttempts = [];
         for(let i = 0; i < req.body.cardAttempts?.length; i++) {
@@ -387,7 +394,8 @@ userRouter.post("/:userId/attempts", async (req, res, next) => {
             deck: req.body.deck,
             datePracticed: req.body.datePracticed,
             accuracyRate: req.body.accuracyRate,
-            cards: cardAttempts
+            cards: cardAttempts,
+            attempter: req.user._id
         });
         const savedDeckAttempt = await newDeckAttempt.save();
         await User.findByIdAndUpdate(req.user._id, {$push: {deckAttempts: savedDeckAttempt}});

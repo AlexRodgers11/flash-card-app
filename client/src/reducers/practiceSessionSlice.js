@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { shuffleArray } from "../utils";
+import { client, shuffleArray } from "../utils";
 
 const baseURL = "http://localhost:8000";
 
@@ -57,7 +57,7 @@ export const fetchDeck = createAsyncThunk("practiceSession/fetchDeck", async(dec
 const saveAttempts = async (deckId, userId, cardAttempts, accuracyRate) => {
     console.log("saving attempts");
     try {
-        await axios.post(`${baseURL}/users/${userId}/attempts`, {
+        await client.post(`${baseURL}/users/${userId}/attempts`, {
             user: userId,
             deck: deckId,
             datePracticed: Date.now(),

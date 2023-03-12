@@ -97,7 +97,7 @@ export default function DeckAttemptsTable(props) {
     const userAttemptsRetrieved = useRef(false);
 
     const handleSelectSession = (evt) => {
-        navigate(`/users/${userId}/statistics/sessions/${evt.target.dataset.sessionId}`);
+        navigate(`/users/${userId}/statistics/sessions/${evt.target.dataset.sessionid}`);
     } 
 
     useEffect(() => {
@@ -134,7 +134,7 @@ export default function DeckAttemptsTable(props) {
                                         <DeckAttemptCell>{attempt.datePracticed}</DeckAttemptCell>
                                         <DeckAttemptCell>{attempt.deck.name}</DeckAttemptCell>
                                         <DeckAttemptCell>{attempt.accuracyRate}%</DeckAttemptCell>
-                                        <DeckAttemptCell><StyledLinkIcon data-sessionId={attempt._id} onClick={handleSelectSession}/></DeckAttemptCell>
+                                        <DeckAttemptCell><StyledLinkIcon data-sessionid={attempt._id} onClick={handleSelectSession}/></DeckAttemptCell>
                                     </DeckAttemptRow>
                                 ))
                                 :
@@ -148,7 +148,7 @@ export default function DeckAttemptsTable(props) {
                                         <DeckAttemptCell>{attempt.datePracticed}</DeckAttemptCell>
                                         <DeckAttemptCell>{attempt.deck.name}</DeckAttemptCell>
                                         <DeckAttemptCell>{attempt.accuracyRate}%</DeckAttemptCell>
-                                        <DeckAttemptCell><StyledLinkIcon data-sessionId={attempt._id} onClick={handleSelectSession}/></DeckAttemptCell>
+                                        <DeckAttemptCell><StyledLinkIcon data-sessionid={attempt._id} onClick={handleSelectSession}/></DeckAttemptCell>
                                     </DeckAttemptRow>
                                 ))
                                 :

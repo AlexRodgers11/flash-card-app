@@ -186,12 +186,44 @@ userRouter.get("/:userId/decks", getUserIdFromJWTToken, async (req, res, next) =
 
 userRouter.get("/:userId/card-stats", getUserIdFromJWTToken, async (req, res, next) => {
     if(req.userId !== req.user._id.toString()) {
-        res.status(403).send("Only the user who attempted these cards may retrieve their stats");
-        return;
+        return res.status(403).send("Only the user who attempted these cards may retrieve their stats");
     }
     try {
-        const populatedUser = await req.user.populate("decks", "name cards -_id");
-        res.status(200).send(populatedUser.decks);
+        const populatedUser = await req.user.populate(
+            [
+                {
+                    path: "decks",
+                    select: "name cards",
+                    populate: {
+                        path: "cards",
+                        select: "question attempts",
+                        populate: {
+                            path: "attempts",
+                            select: "createdAt answeredCorrectly"
+                        }
+                    }
+                }
+            ]
+        );
+        const responseObj = populatedUser.decks.map(deck => {
+            return {
+                _id: deck._id,
+                name: deck.name,
+                cards: deck.cards.map(card => {
+                    return {
+                        _id: card._id,
+                        cardQuestion: card.question,
+                        dateLastPracticed: card.attempts[0]?.createdAt,
+                        attemptCount: card.attempts.length,
+                        accuracyRate: card.attempts.length > 0 ? Math.round(card.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / card.attempts.length) : undefined,
+                        // cardType: card.cardType,
+                    }
+
+                })
+            }
+        })
+
+        res.status(200).send(responseObj);
     } catch (err) {
         res.status(500).send(err.message);
     }

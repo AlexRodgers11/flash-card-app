@@ -48,7 +48,7 @@ export const fetchCardAttemptIds = createAsyncThunk("attempts/fetchCardAttemptId
 });
 
 export const fetchDeckAttemptData = createAsyncThunk("attempts/fetchDeckAttemptData" , async ({attemptId}) => {
-    const response = await axios.get(`${baseURL}/attempts/${attemptId}`);
+    const response = await client.get(`${baseURL}/attempts/${attemptId}`);
     return response.data;
 });
 

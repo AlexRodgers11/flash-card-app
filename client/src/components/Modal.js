@@ -67,14 +67,12 @@ const StyledCloseIcon = styled(IoClose)`
 
 function Modal(props) {
 	const handleEscape = useCallback((evt) => {
-		console.log({key: evt.key});
 		if(evt.key === "Escape") {
 			props.hideModal();
 		}
 	}, [props]);
 
 	useEffect(() => {
-		console.log("should be adding event listener");
 		window.addEventListener("keydown", handleEscape);
 		return () => {
 			window.removeEventListener("keydown", handleEscape);

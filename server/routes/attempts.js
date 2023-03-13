@@ -26,7 +26,7 @@ attemptRouter.get("/:attemptId", getUserIdFromJWTToken, async (req, res, next) =
         const deckAttempt = await req.deckAttempt.populate([
             {
                 path: "cards",
-                select: "cardType question correctAnswer answeredCorrectly wrongAnswerSelected"
+                select: "cardType cardId question correctAnswer answeredCorrectly wrongAnswerSelected"
             },
             {
                 path: "deck",

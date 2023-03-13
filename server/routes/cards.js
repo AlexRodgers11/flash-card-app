@@ -101,7 +101,7 @@ cardRouter.get("/:cardId/tile-stats", async (req, res, next) => {
         let populatedCard = await req.card.populate("attempts", "createdAt answeredCorrectly");
         const responseObj = {
             cardQuestion: req.card.question,
-            dateLastPracticed: populatedCard.attempts[0]?.createdAt || "Not practiced yet",
+            dateLastPracticed: populatedCard.attempts[0]?.createdAt,
             attemptCount: populatedCard.attempts.length,
             accuracyRate: populatedCard.attempts.length > 0 ? Math.round(populatedCard.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / populatedCard.attempts.length) : undefined
         }
@@ -111,8 +111,32 @@ cardRouter.get("/:cardId/tile-stats", async (req, res, next) => {
     }
 });
 
-cardRouter.get("/:cardId/attempts", (req, res, next) => {
-    res.status(200).send(req.card.attempts);
+cardRouter.get("/:cardId/attempts", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.userId !== req.card.creator.toString()) {
+        return res.status(401).send("Unauthorized. Users may only view their own card attempts");
+    }
+    try {
+        const populatedCard = await req.card.populate({
+            path: "attempts",
+            select: "datePracticed answeredCorrectly fullDeckAttempt wrongAnswerSelected"
+        });
+        let responseObj = {
+            attempts: populatedCard.attempts,
+            selectedCard: {
+                _id: req.card._id,
+                cardType: req.card.cardType,
+                question: req.card.question,
+                answer: req.card.correctAnswer
+            }
+        } 
+        
+        res.status(200).send(responseObj);
+    } catch (err) {
+        res.status(500).send("There was an error with your request");
+    }
 });
+// cardRouter.get("/:cardId/attempts", (req, res, next) => {
+//     res.status(200).send({attemptIds: req.card.attempts, question: req.card.question, answer: req.card.correctAnswer});
+// });
 
 export default cardRouter;

@@ -84,7 +84,8 @@ function DeckAttemptCardsTable() {
     const navigate = useNavigate();
 
     const handleSelectCard = (evt) => {
-        navigate(`/users/${userId}/statistics/sessions/${evt.target.dataset.cardid}`);
+        // navigate(`/users/${userId}/statistics/sessions/${evt.currentTarget.dataset.cardid}`);
+        navigate(`/users/${userId}/statistics/cards/${evt.currentTarget.dataset.cardid}`);
     }     
 
     return (
@@ -97,16 +98,17 @@ function DeckAttemptCardsTable() {
                         <Header>Card Type</Header>
                         <Header>Answer given</Header>
                         <Header>Correct</Header>
-                        <Header>View Card Stats</Header>
+                        {/* <Header>View Card Stats</Header>- come back and make CardStats Page that includes both the average stats and a list of past card attempts */}
+                        <Header>View Card Attempts</Header>
                     </HeaderBlock>
                     <tbody>
-                        {deckAttempt.cards.map(card => (
-                            <CardAttemptRow key={card._id}>
-                                <CardAttemptCell>{card.question}</CardAttemptCell>
-                                <CardAttemptCell>{card.cardType === "FlashCard" ? "Flash" : card.cardType === "TrueFalseCard" ? "True/False" : "Multiple Choice"}</CardAttemptCell>
-                                <CardAttemptCell>{card.answeredCorrectly ? card.correctAnswer : card.cardType !== "FlashCard" ? card.wrongAnswerSelected : "N/A"}</CardAttemptCell>
-                                <CardAttemptCell>{card.answeredCorrectly ? <FaCheck /> : <FaTimes />}</CardAttemptCell>
-                                <CardAttemptCell><StyledLinkIcon data-cardId={card._id} onClick={handleSelectCard}/></CardAttemptCell>
+                        {deckAttempt.cards.map(cardAttempt => (
+                            <CardAttemptRow key={cardAttempt._id}>
+                                <CardAttemptCell>{cardAttempt.question}</CardAttemptCell>
+                                <CardAttemptCell>{cardAttempt.cardType === "FlashCard" ? "Flash" : cardAttempt.cardType === "TrueFalseCard" ? "True/False" : "Multiple Choice"}</CardAttemptCell>
+                                <CardAttemptCell>{cardAttempt.answeredCorrectly ? cardAttempt.correctAnswer : cardAttempt.cardType !== "FlashCard" ? cardAttempt.wrongAnswerSelected : "N/A"}</CardAttemptCell>
+                                <CardAttemptCell>{cardAttempt.answeredCorrectly ? <FaCheck /> : <FaTimes />}</CardAttemptCell>
+                                <CardAttemptCell><StyledLinkIcon data-cardid={cardAttempt.cardId} onClick={handleSelectCard}/></CardAttemptCell>
                             </CardAttemptRow>
                         ))}
                     </tbody>

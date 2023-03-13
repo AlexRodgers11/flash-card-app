@@ -404,34 +404,47 @@ userRouter.post("/:userId/attempts", getUserIdFromJWTToken, async (req, res, nex
         return res.status(401).send("Unauthorized. A user may only add an attempt to their own statistics");
     }
     try {
+        const newDeckAttempt = new DeckAttempt({
+            deck: req.body.deck,
+            datePracticed: req.body.datePracticed,
+            accuracyRate: req.body.accuracyRate,
+            attempter: req.user._id
+        });
+
+        const savedDeckAttempt = await newDeckAttempt.save();
         const cardAttempts = [];
         for(let i = 0; i < req.body.cardAttempts?.length; i++) {
             const attemptData = req.body.cardAttempts[i];
 
             const newCardAttempt = new CardAttempt({
+                cardId: attemptData.cardId,
                 datePracticed: attemptData.datePracticed,
                 cardType: attemptData.cardType,
                 question: attemptData.question,
                 correctAnswer: attemptData.correctAnswer,
                 answeredCorrectly: attemptData.answeredCorrectly,
-                wrongAnswerSelected: attemptData.wrongAnswerSelected
+                wrongAnswerSelected: attemptData.wrongAnswerSelected,
+                fullDeckAttempt: savedDeckAttempt._id
             });
             const savedCardAttempt = await newCardAttempt.save();
 
             await Card.findByIdAndUpdate(attemptData.cardId, {$push: {attempts: savedCardAttempt}});
             cardAttempts.push(savedCardAttempt._id);
         }
+        const finishedDeckAttempt = await DeckAttempt.findByIdAndUpdate(savedDeckAttempt._id,{$set: {cards: cardAttempts}});
         console.log({cardAttempts});
-        const newDeckAttempt = new DeckAttempt({
-            deck: req.body.deck,
-            datePracticed: req.body.datePracticed,
-            accuracyRate: req.body.accuracyRate,
-            cards: cardAttempts,
-            attempter: req.user._id
-        });
-        const savedDeckAttempt = await newDeckAttempt.save();
-        await User.findByIdAndUpdate(req.user._id, {$push: {deckAttempts: savedDeckAttempt}});
-        await Deck.findByIdAndUpdate(req.body.deck, {$push: {attempts: savedDeckAttempt}});
+        // const newDeckAttempt = new DeckAttempt({
+        //     deck: req.body.deck,
+        //     datePracticed: req.body.datePracticed,
+        //     accuracyRate: req.body.accuracyRate,
+        //     cards: cardAttempts,
+        //     attempter: req.user._id
+        // });
+        // const savedDeckAttempt = await newDeckAttempt.save();
+        // await User.findByIdAndUpdate(req.user._id, {$push: {deckAttempts: savedDeckAttempt}});
+        // await Deck.findByIdAndUpdate(req.body.deck, {$push: {attempts: savedDeckAttempt}});
+        await User.findByIdAndUpdate(req.user._id, {$push: {deckAttempts: finishedDeckAttempt}});
+        await Deck.findByIdAndUpdate(req.body.deck, {$push: {attempts: finishedDeckAttempt}});
         res.status(200).send(savedDeckAttempt);
     } catch (err) {
         res.status(500).send(err.message);

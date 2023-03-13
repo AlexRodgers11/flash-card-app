@@ -104,7 +104,7 @@ function DeckAttemptCardsTable() {
                             <CardAttemptRow key={card._id}>
                                 <CardAttemptCell>{card.question}</CardAttemptCell>
                                 <CardAttemptCell>{card.cardType === "FlashCard" ? "Flash" : card.cardType === "TrueFalseCard" ? "True/False" : "Multiple Choice"}</CardAttemptCell>
-                                <CardAttemptCell>{card.answeredCorrectly ? card.correctAnswer : card.wrongAnswerSelected}</CardAttemptCell>
+                                <CardAttemptCell>{card.answeredCorrectly ? card.correctAnswer : card.cardType !== "FlashCard" ? card.wrongAnswerSelected : "N/A"}</CardAttemptCell>
                                 <CardAttemptCell>{card.answeredCorrectly ? <FaCheck /> : <FaTimes />}</CardAttemptCell>
                                 <CardAttemptCell><StyledLinkIcon data-cardId={card._id} onClick={handleSelectCard}/></CardAttemptCell>
                             </CardAttemptRow>

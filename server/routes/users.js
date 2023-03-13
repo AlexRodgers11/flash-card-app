@@ -503,4 +503,33 @@ userRouter.get("/:userId/attempts", getUserIdFromJWTToken, async (req, res, next
     res.status(200).send(populatedUser.deckAttempts);
 });
 
+userRouter.get("/:userId/decks/statistics", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        if(req.userId !== req.user._id.toString()) {
+            return res.status(401).send("Unauthorized. Users may only access the statistics for their own decks");
+        }
+        const populatedUser = await req.user.populate({
+            path: "decks",
+            select: "name",
+            populate: {
+                path: "attempts",
+                select: "datePracticed accuracyRate"
+            }
+        });
+        
+        const responseArr = populatedUser.decks.map(deck => {
+            return {
+                name: deck.name,
+                _id: deck._id,
+                dateLastPracticed: deck.attempts[0]?.datePracticed || undefined,
+                accuracyRate: deck.attempts.length > 0 ? Math.round(deck.attempts.reduce((acc, curr) => acc + curr.accuracyRate, 0) / deck.attempts.length) : undefined,
+            }
+        });
+        // console.log({responseArr});
+        res.status(200).send(responseArr);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 export default userRouter;

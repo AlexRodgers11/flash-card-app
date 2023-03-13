@@ -16,10 +16,7 @@ import User from './User';
 import UserDecksPage from './UserDecksPage';
 import UserGroupsPage from './UserGroupsPage';
 import StatisticsPage from './StatisticsPage';
-import DeckStatsList from './DeckStatsList';
-import Sessions from './Sessions';
 import DeckAttempt from './DeckAttempt';
-import CardAttemptList from './CardAttemptList';
 import RegisterProfilePicCropForm from './RegisterProfilePicCropForm';
 import { useSelector } from 'react-redux';
 import UserSettings from './UserSettings';
@@ -27,6 +24,11 @@ import GroupMemberList from './GroupMemberList';
 import GroupDecksSection from './GroupDecksSection';
 import { GroupAdminSection } from './GroupAdminSection';
 import CardStatsTable from './CardStatsTable';
+import CardSessionsTable from './CardAttemptsTable';
+import CardAttemptsTable from './CardAttemptsTable';
+import DeckAttemptsTable from './DeckAttemptsTable';
+import DeckStats from './DeckStats';
+import DeckAttemptCardsTable from './DeckAttemptCardsTable';
 
 function Router() {
     const { pathname } = useLocation();
@@ -87,15 +89,14 @@ function Router() {
                 <Route exact path="/users/:userId/practice" element={<PracticeLaunchPage />} />
                 <Route exact path="/users/:userId/settings" element={<UserSettings />} />
                 <Route exact path="/users/:userId/statistics/" element={<StatisticsPage />}>
+                    <Route exact path="decks" element={<DeckStats />} />
+                    <Route exact path="decks/:deckId" element />
                     <Route exact path="cards" element={<CardStatsTable />} />
-                </Route>
-                {/* <Route exact path="/users/:userId/statistics/" element={<StatisticsPage />}>
-                    <Route exact path="decks" element={<DeckStatsList />} />
-                    <Route exact path="sessions/decks/:deckId" element={<Sessions />} />
-                    <Route exact path="cards/:cardId" element={<CardAttemptList />} />
+                    <Route exact path="sessions/decks/:deckId" element={<DeckAttemptsTable />} />
+                    <Route exact path="cards/:cardId" element={<CardAttemptsTable />} />
                     <Route exact path="sessions/:sessionId" element={<DeckAttempt />} />
-                    <Route exact path="sessions" element={<Sessions allDecks={true}/>} />
-                </Route> */}
+                    <Route exact path="sessions" element={<DeckAttemptsTable allDecks={true}/>} />
+                </Route>
                 <Route exact path="/users/:userId" element={<User />} />
                 <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
                 <Route exact path="/dashboard" element={<Dashboard />} />

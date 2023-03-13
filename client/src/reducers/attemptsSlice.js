@@ -9,13 +9,16 @@ const initialState = {
     deckAttempt: {},
     selectedDeckId: "",
     deckAttempts: [],
-    selectedCardId: "",
-    selectedCardQuestion: "",
-    selectedCardAnswer: "",
+    selectedCard: {},
+    // selectedCardId: "",
+    // selectedCardQuestion: "",
+    // selectedCardAnswer: "",
     cardStatsByDeck: [],
-    cardAttemptIds: [],
+    // cardAttemptIds: [],
+    cardAttempts: [],
     deckIds: [],
-    deckStats: {}
+    // deckStats: {}
+    decksStats: [],
 }
 
 export const fetchUserAttempts = createAsyncThunk("attempts/fetchUserAttempts", async ({userId}) => {
@@ -37,26 +40,45 @@ export const fetchCardStatsByDeck = createAsyncThunk("attempts/fetchStatsCardIds
     return response.data;
 });
 
-export const fetchCardAttemptIds = createAsyncThunk("attempts/fetchCardAttemptIds", async ({cardId}) => {
+export const fetchCardAttempts = createAsyncThunk("attempts/fetchCardAttempts", async ({cardId}) => {
     const response = await client.get(`${baseURL}/cards/${cardId}/attempts`);
     return {
-        attempts: response.data.attemptIds,
-        cardId: cardId,
-        cardQuestion: response.data.question,
-        cardAnswer: response.data.answer
+        attempts: response.data.attempts,
+        // cardId: cardId,
+        // cardQuestion: response.data.question,
+        // cardAnswer: response.data.answer,
+        // cardType: response.data.cardType
+        selectedCard: response.data.selectedCard
     }
 });
+
+// export const fetchCardAttemptIds = createAsyncThunk("attempts/fetchCardAttemptIds", async ({cardId}) => {
+//     const response = await client.get(`${baseURL}/cards/${cardId}/attempts`);
+//     return {
+//         attempts: response.data.attemptIds,
+//         cardId: cardId,
+//         cardQuestion: response.data.question,
+//         cardAnswer: response.data.answer
+//     }
+// });
 
 export const fetchDeckAttemptData = createAsyncThunk("attempts/fetchDeckAttemptData" , async ({attemptId}) => {
     const response = await client.get(`${baseURL}/attempts/${attemptId}`);
     return response.data;
 });
 
-export const fetchStatsDeckIds = createAsyncThunk("attempts/fetchStatsDeckIds", async ({userId}) => {
-    const response = await axios.get(`${baseURL}/users/${userId}/decks`);//this makes no sense route-wise
-    console.log({data: response.data});
+export const fetchAllDecksStats = createAsyncThunk("attempts/fetchAllDecksStats", async ({userId}) => {
+    // const response = await axios.get(`${baseURL}/users/${userId}/decks`);
+    const response = await client.get(`${baseURL}/users/${userId}/decks/statistics`);
+    // console.log({data: response.data});
     return response.data;
 });
+
+// export const fetchStatsDeckIds = createAsyncThunk("attempts/fetchStatsDeckIds", async ({userId}) => {
+//     const response = await axios.get(`${baseURL}/users/${userId}/decks`);//this makes no sense route-wise
+//     console.log({data: response.data});
+//     return response.data;
+// });
 
 export const attemptsSlice = createSlice({
     name: "attempts",
@@ -66,12 +88,19 @@ export const attemptsSlice = createSlice({
         builder.addCase(fetchUserAttempts.fulfilled, (state, action) => {
             state.userAttempts = action.payload;
         });
-        builder.addCase(fetchCardAttemptIds.fulfilled, (state, action)=> {
-            state.cardAttemptIds = action.payload.attempts;
-            state.selectedCardId = action.payload.cardId;
-            state.selectedCardQuestion = action.payload.cardQuestion;
-            state.selectedCardAnswer = action.payload.cardAnswer;
+        builder.addCase(fetchCardAttempts.fulfilled, (state, action)=> {
+            state.cardAttempts = action.payload.attempts;
+            state.selectedCard = action.payload.selectedCard;
+            // state.selectedCardId = action.payload.cardId;
+            // state.selectedCardQuestion = action.payload.cardQuestion;
+            // state.selectedCardAnswer = action.payload.cardAnswer;
         });
+        // builder.addCase(fetchCardAttemptIds.fulfilled, (state, action)=> {
+        //     state.cardAttemptIds = action.payload.attempts;
+        //     state.selectedCardId = action.payload.cardId;
+        //     state.selectedCardQuestion = action.payload.cardQuestion;
+        //     state.selectedCardAnswer = action.payload.cardAnswer;
+        // });
         builder.addCase(fetchDeckAttempts.fulfilled, (state, action) => {
             state.deckAttempts = action.payload.attempts;
             state.selectedDeckId = action.payload.deckId;
@@ -82,9 +111,12 @@ export const attemptsSlice = createSlice({
         builder.addCase(fetchCardStatsByDeck.fulfilled, (state, action) => {
             state.cardStatsByDeck = action.payload;
         });
-        builder.addCase(fetchStatsDeckIds.fulfilled, (state, action) => {
-            state.deckIds = action.payload;
+        builder.addCase(fetchAllDecksStats.fulfilled, (state, action) => {
+            state.decksStats = action.payload;
         });
+        // builder.addCase(fetchStatsDeckIds.fulfilled, (state, action) => {
+        //     state.deckIds = action.payload;
+        // });
     }
 });
 

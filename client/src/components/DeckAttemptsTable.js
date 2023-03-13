@@ -97,7 +97,7 @@ export default function DeckAttemptsTable(props) {
     const userAttemptsRetrieved = useRef(false);
 
     const handleSelectSession = (evt) => {
-        navigate(`/users/${userId}/statistics/sessions/${evt.target.dataset.sessionid}`);
+        navigate(`/users/${userId}/statistics/sessions/${evt.currentTarget.dataset.sessionid}`);
     } 
 
     useEffect(() => {

@@ -86,23 +86,24 @@ deckRouter.get("/:deckId/tile", extendedRateLimiter, (req, res, next) => {
     res.status(200).send(JSON.stringify(response));
 });
 
-deckRouter.get("/:deckId/tile-stats", async (req, res, next) => {
-    console.log({deck: req.deck});
-    try {
-        let populatedDeck = await req.deck.populate("attempts", "datePracticed accuracyRate");
+//moved to users route
+// deckRouter.get("/:deckId/tile-stats", async (req, res, next) => {
+//     console.log({deck: req.deck});
+//     try {
+//         let populatedDeck = await req.deck.populate("attempts", "datePracticed accuracyRate");
                 
-        let responseObj = {
-            deckName: req.deck.name,
-            dateLastPracticed: populatedDeck.attempts[0]?.datePracticed || undefined,
-            timesPracticed: populatedDeck.attempts.length,
-            accuracyRate: populatedDeck.attempts.length > 0 ? Math.round(populatedDeck.attempts.reduce((acc, curr) => acc + curr.accuracyRate, 0) / populatedDeck.attempts.length) : undefined,
-            cardCount: req.deck.cards.length
-        };
-        res.status(200).send(responseObj);
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
+//         let responseObj = {
+//             deckName: req.deck.name,
+//             dateLastPracticed: populatedDeck.attempts[0]?.datePracticed || undefined,
+//             timesPracticed: populatedDeck.attempts.length,
+//             accuracyRate: populatedDeck.attempts.length > 0 ? Math.round(populatedDeck.attempts.reduce((acc, curr) => acc + curr.accuracyRate, 0) / populatedDeck.attempts.length) : undefined,
+//             cardCount: req.deck.cards.length
+//         };
+//         res.status(200).send(responseObj);
+//     } catch (err) {
+//         res.status(500).send(err.message);
+//     }
+// });
 
 deckRouter.get("/:deckId/practice", (req, res, next) => {
     Deck.findById(req.deck._id)

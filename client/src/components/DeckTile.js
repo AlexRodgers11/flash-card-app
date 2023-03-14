@@ -397,6 +397,8 @@ function DeckTile(props) {
         // }
         if(location.pathname.includes("group")) {
             navigate(`/groups/${groupId}/decks/${props.deckId}`);
+        } else if(location.pathname.includes("practice")) {
+            navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
         } else {
             navigate(`/decks/${props.deckId}`);
         }

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
 import { fetchGroupData } from '../reducers/groupSlice';
-import { GroupMemberOptionsContainer, GroupWrapper, GroupNavbar, GroupTitle, OutletContainer, StyledLeaveButton, StyledNavLink } from './GroupStyles';
+import { GroupMemberOptionsContainer, GroupWrapper, GroupNavbar, GroupTitle, OutletContainer, StyledLeaveButton, StyledNavLink } from './StyledComponents/GroupStyles';
 import useToggle from '../hooks/useToggle';
 import GroupMemberOption from './GroupMemberOption';
 import { removeMember, replaceHeadAdmin } from '../reducers/groupSlice';

@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Modal from './Modal';
 import DeckList from './DeckList';
-import { DeckOption, DeckOptionContainer } from './GroupStyles';
+import { DeckOption, DeckOptionContainer } from './StyledComponents/GroupStyles';
 import { addAdminDeck } from '../reducers/decksSlice';
 import { submitDeck } from "../reducers/communicationsSlice";
 import styled from 'styled-components';

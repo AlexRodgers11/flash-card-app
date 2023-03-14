@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import styled from "styled-components"
 import GroupDecksSection from "./GroupDecksSection";
 import GroupMemberList from "./GroupMemberList";
-import { JoinOptionContainer } from "./GroupStyles";
+import { JoinOptionContainer } from "./StyledComponents/GroupStyles";
 import { generateJoinCode } from '../utils';
 import useToggle from "../hooks/useToggle";
 import { updateGroup } from "../reducers/groupSlice";

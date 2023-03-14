@@ -1,10 +1,10 @@
 import express from "express";
-const attemptRouter = express.Router();
+const deckAttemptRouter = express.Router();
 
 import DeckAttempt from "../models/deckAttempt.js"
 import { getUserIdFromJWTToken } from "../utils.js";
 
-attemptRouter.param("attemptId", (req, res, next, attemptId) => {
+deckAttemptRouter.param("attemptId", (req, res, next, attemptId) => {
     DeckAttempt.findById(attemptId, (err, deckAttempt) => {
         if(err) {
             res.status(500).send(err.message);
@@ -18,7 +18,7 @@ attemptRouter.param("attemptId", (req, res, next, attemptId) => {
     });
 });
 
-attemptRouter.get("/:attemptId", getUserIdFromJWTToken, async (req, res, next) => {
+deckAttemptRouter.get("/:attemptId", getUserIdFromJWTToken, async (req, res, next) => {
     if(req.userId !== req.deckAttempt.attempter.toString()) {
         return res.send("Unauthorized. Users may only access information about their own practice sessions");
     }
@@ -41,7 +41,7 @@ attemptRouter.get("/:attemptId", getUserIdFromJWTToken, async (req, res, next) =
     }
 });
 
-attemptRouter.get("/:attemptId/tile", async (req, res, next) => {
+deckAttemptRouter.get("/:attemptId/tile", async (req, res, next) => {
     try {
         const populatedDeckAttempt = await req.deckAttempt.populate("deck", "name");
         const response = {
@@ -56,4 +56,4 @@ attemptRouter.get("/:attemptId/tile", async (req, res, next) => {
     }
 });
 
-export default attemptRouter;
+export default deckAttemptRouter;

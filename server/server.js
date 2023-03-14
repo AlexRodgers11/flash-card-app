@@ -20,8 +20,8 @@ const port = process.env.port || 8000;
 const router = express.Router();
 
 import activityRouter from "./routes/activity.js";
-import attemptRouter from "./routes/attempts.js";
-import cardAttemptRouter from "./routes/cardAttempt.js";
+import deckAttemptRouter from "./routes/deckAttempts.js";
+import cardAttemptRouter from "./routes/cardAttempts.js";
 import cardRouter from "./routes/cards.js";
 import categoryRouter from "./routes/categories.js";
 import communicationRouter from "./routes/communications.js";
@@ -80,7 +80,7 @@ app.use(passport.initialize());
 app.use(excludingPaths([/\/decks\/([0-9A-Za-z]+([A-Za-z]+[0-9A-Za-z]+)+)\/tile/i, /\/users\/([0-9A-Za-z]+([A-Za-z]+[0-9A-Za-z]+)+)\/tile/i], baseRateLimiter));
 
 app.use("/activities", activityRouter);
-app.use("/attempts", attemptRouter);
+app.use("/attempts", deckAttemptRouter);
 app.use("/card-attempts", cardAttemptRouter);
 app.use("/cards", cardRouter);
 app.use("/categories", categoryRouter);

@@ -8,7 +8,6 @@ import Category from "./models/category.js";
 import Deck from "./models/deck.js";
 import Group from "./models/group.js";
 import User from "./models/user.js";
-import Activity from "./models/activity.js";
 import CardAttempt from "./models/cardAttempt.js";
 // import getRandomCardType, { generateCode, getRandomJoinOptions } from "./utils.js";
 import getRandomCardType, { generateCode, getRandomJoinOptions, generateRandomFileName, baseRateLimiter, excludingPaths } from "./utils.js";
@@ -19,7 +18,6 @@ import { getObjectSignedUrl, uploadFile } from "./s3.js";
 const port = process.env.port || 8000;
 const router = express.Router();
 
-import activityRouter from "./routes/activity.js";
 import deckAttemptRouter from "./routes/deckAttempts.js";
 import cardAttemptRouter from "./routes/cardAttempts.js";
 import cardRouter from "./routes/cards.js";

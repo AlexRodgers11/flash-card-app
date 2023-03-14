@@ -2,7 +2,6 @@ import express from "express";
 const groupRouter = express.Router();
 import mongoose from "mongoose";
 
-import Activity from "../models/activity.js";
 import { Card } from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
@@ -317,43 +316,6 @@ groupRouter.delete("/:groupId", async (req, res, next) => {
         throw err
     }
 });
-
-// groupRouter.delete("/:groupId", (req, res, next) => {
-//     Group.findByIdAndDelete(req.group._id, (err, group) => {
-//         if(err) {
-//             res.status(500).send("There was an error with your request");
-//             throw err
-//         }
-//         else {
-//             Deck.deleteMany({_id: {$in: req.group.decks}}, (err, deckDeleteResponse) => {
-//                 if(err) {
-//                     res.status(500).send("There was an error deleting group's decks");
-//                     throw err;
-//                 }
-//                 //change activity to activities
-//                 Activity.deleteMany({_id: {$in: req.group.activity}}, (err, activityDeleteResponse) => {
-//                     if(err) {
-//                         res.status(500).send("There was an error deleting group's activities")
-//                         throw err;
-//                     }
-//                     User.updateMany({_id: {$in: req.group.members}}, {$pull: {groups: req.group._id}}, (err, memberDeleteResponse) => {
-//                         if(err) {
-//                             res.status(500).send("There was an error removing the group from its member's groups arrays");
-//                             throw err;
-//                         }
-//                         User.updateMany({_id: {$in: req.group.administrators}}, {$pull: {adminOf: req.group._id}}, (err, adminDeleteResponse) => {
-//                             if(err) {
-//                                 res.status(500).send("There was an error removing the group from its administrators' adminOf arrays");
-//                                 throw err;
-//                             }
-//                         });
-//                     });
-//                 });
-//             })
-//             res.status(200).send(group);
-//         }
-//     });
-// });
 
 groupRouter.put("/:groupId", (req, res, next) => {
     Group.findByIdAndUpdate(req.group._id, req.body, {new:true}, (err, group) => {

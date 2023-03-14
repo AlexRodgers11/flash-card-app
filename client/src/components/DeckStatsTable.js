@@ -124,7 +124,6 @@ function DeckStatsTable() {
                     </tbody>
                 </StatsTable>
             </DeckStatsTableContainer>
-            {/* {decksStats.length ? decksStats.map(deckId => <DeckStatsTile deckId={deckId}/>) : <EmptyIndicator marginTop={3}>No decks have been practiced yet</EmptyIndicator>}    */}
         </DeckStatsTableWrapper>
     );
 }

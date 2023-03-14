@@ -178,7 +178,6 @@ function Deck() {
     const saveDeckNameChange = evt => {
         evt.preventDefault();
         if(editedName !== name) {
-            //use cookie here
             dispatch(updateDeck({deckId, deckUpdates: {name: editedName}}));
         }
         clearEditedName();

@@ -74,6 +74,9 @@ const AnswerBlock = styled.div`
             font-size: .75rem;
             padding: .25rem 1.5rem .25rem 1.5rem;
         }
+        & span.label {
+            font-weight: 600;
+        }
     }
 `;
 
@@ -165,15 +168,15 @@ function Card(props) {
             </QuestionBlock>
             {showAnswers &&
                 <AnswerBlock>
-                    <p>Hint: {cardData.hint || 'No hint given'}</p>
-                    <p>Correct Answer: {cardData.correctAnswer}</p>
+                    <p><span className="label">Hint: </span>{cardData.hint || 'No hint given'}</p>
+                    <p><span className="label">Correct Answer: </span>{cardData.correctAnswer}</p>
                     {cardData.cardType !== 'MultipleChoiceCard' ?
                         null
                         :
                         <>
-                        <p>Wrong Answer One: {cardData.wrongAnswerOne}</p>
-                        <p>Wrong Answer Two: {cardData.wrongAnswerTwo}</p>
-                        <p>Wrong Answer Three: {cardData.wrongAnswerThree}</p>
+                        <p><span className="label">Wrong Answer One: </span>{cardData.wrongAnswerOne}</p>
+                        <p><span className="label">Wrong Answer Two: </span>{cardData.wrongAnswerTwo}</p>
+                        <p><span className="label">Wrong Answer Three: </span>{cardData.wrongAnswerThree}</p>
                         </>
                     }
                 </AnswerBlock>

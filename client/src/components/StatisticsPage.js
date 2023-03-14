@@ -1,4 +1,6 @@
-import { Outlet, useParams } from "react-router";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
@@ -43,7 +45,16 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 function StatisticsPage() {
-    const { userId } = useParams();
+    const userId = useSelector((state) => state.login.userId);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if((!location.pathname.slice(42).includes("decks") && !location.pathname.slice(42).includes("cards")) && !location.pathname.slice(42).includes("sessions")) {
+            console.log(location.pathname.slice(42));
+            navigate(`/users/${userId}/statistics/sessions`);
+        }
+    }, [location.pathname, userId, navigate]);
     
     return (
         <StatisticsWrapper>

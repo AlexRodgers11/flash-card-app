@@ -71,7 +71,7 @@ function GroupTile(props) {
     const navigate = useNavigate();
     
     const handleViewGroup = (evt) => {
-        navigate(`/groups/${props.groupId}`);
+        navigate(`/groups/${props.groupId}/decks`);
     }
 
     const handleViewOnEnter = (evt) => {

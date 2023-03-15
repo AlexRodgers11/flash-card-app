@@ -44,18 +44,17 @@ cardRouter.get("/:cardId", getUserIdFromJWTToken, async (req, res, next) => {
 });
 
 cardRouter.put("/:cardId", getUserIdFromJWTToken, async (req, res, next) => {
-    if(req.card.groupCardBelongsTo) {
-        const foundGroup = await Group.findById(req.card.groupCardBelongsTo, "administrators");
-        if(!foundGroup.administrators.map(admin => admin.toString()).includes(req.userId)) {
-            res.status(403).send("Only this card's group administrators can update this card");
-            return
-        }
-    } else if(req.userId !== req.card.creator.toString()) {
-        res.status(403).send("Only this card's creator can update it");
-        return;
-    }
     try {
-        // const foundCard = await Card.findById(req.card._id);
+        if(req.card.groupCardBelongsTo) {
+            const foundGroup = await Group.findById(req.card.groupCardBelongsTo, "administrators");
+            if(!foundGroup.administrators.map(admin => admin.toString()).includes(req.userId)) {
+               return res.status(403).send("Only this card's group administrators can update this card");
+                
+            }
+        } else if(req.userId !== req.card.creator.toString()) {
+            return res.status(403).send("Only this card's creator can update it");
+        }
+        
         let updatedCard;
 
         switch(req.body.cardType) {
@@ -96,36 +95,21 @@ cardRouter.put("/:cardId", getUserIdFromJWTToken, async (req, res, next) => {
 });
 
 cardRouter.delete("/:cardId", getUserIdFromJWTToken, async (req, res, next) => {
-    if(req.card.groupCardBelongsTo) {
-        const foundGroup = await Group.findById(req.card.groupCardBelongsTo, "administrators");
-        if(!foundGroup.administrators.map(admin => admin.toString).includes(req.userId)) {
-            res.status(403).send("Only this card's group administrators can delete it");
+    try {
+        if(req.card.groupCardBelongsTo) {
+            const foundGroup = await Group.findById(req.card.groupCardBelongsTo, "administrators");
+            if(!foundGroup.administrators.map(admin => admin.toString).includes(req.userId)) {
+                res.status(403).send("Only this card's group administrators can delete it");
+                return;
+            }
+        } else if(req.userId !== req.card.creator.toString()) {
+            res.status(403).send("Only this card's creator can delete it");
             return;
         }
-    } else if(req.userId !== req.card.creator.toString()) {
-        res.status(403).send("Only this card's creator can delete it");
-        return;
-    }
-    try {
+
         const card = await Card.findByIdAndDelete(req.card._id);
         const deck = await Deck.findOneAndUpdate({cards: card._id}, {$pull: {cards: card._id}});
         res.status(200).send(card._id);
-    } catch (err) {
-        res.status(500).send("There was an error with your request");
-        throw err;
-    }
-});
-
-cardRouter.get("/:cardId/tile-stats", async (req, res, next) => {
-    try {
-        let populatedCard = await req.card.populate("attempts", "createdAt answeredCorrectly");
-        const responseObj = {
-            cardQuestion: req.card.question,
-            dateLastPracticed: populatedCard.attempts[0]?.createdAt,
-            attemptCount: populatedCard.attempts.length,
-            accuracyRate: populatedCard.attempts.length > 0 ? Math.round(populatedCard.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / populatedCard.attempts.length) : undefined
-        }
-        res.status(200).send(responseObj);
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -155,8 +139,6 @@ cardRouter.get("/:cardId/attempts", getUserIdFromJWTToken, async (req, res, next
         res.status(500).send("There was an error with your request");
     }
 });
-// cardRouter.get("/:cardId/attempts", (req, res, next) => {
-//     res.status(200).send({attemptIds: req.card.attempts, question: req.card.question, answer: req.card.correctAnswer});
-// });
+
 
 export default cardRouter;

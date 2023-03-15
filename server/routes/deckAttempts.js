@@ -34,23 +34,7 @@ deckAttemptRouter.get("/:attemptId", getUserIdFromJWTToken, async (req, res, nex
             }
         ]);
 
-        console.log({deckAttempt});
         res.status(200).send(deckAttempt);
-    } catch (err) {
-        res.status(err.status || 500).send(err.message || "There was an error with your request");
-    }
-});
-
-deckAttemptRouter.get("/:attemptId/tile", async (req, res, next) => {
-    try {
-        const populatedDeckAttempt = await req.deckAttempt.populate("deck", "name");
-        const response = {
-            //possibly rework model to store deckName instead of id- not sure if good or bad feature for changes to deck name to change the name of deck associated with a session
-            deckName: populatedDeckAttempt.deck.name,
-            datePracticed: req.deckAttempt.datePracticed,
-            accuracyRate: req.deckAttempt.accuracyRate
-        }
-        res.status(200).send(response);
     } catch (err) {
         res.status(err.status || 500).send(err.message || "There was an error with your request");
     }

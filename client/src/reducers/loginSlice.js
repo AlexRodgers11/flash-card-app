@@ -73,9 +73,7 @@ export const submitVerificationCode = createAsyncThunk("login/submitVerification
 
 export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserData", async (userId) => {
     try {
-        const response = await axios.get(`${baseURL}/users/${userId}`);
-        //need better protection here
-        delete response.data.login.password;
+        const response = await client.get(`${baseURL}/users/${userId}`);
         return response.data;
     } catch (err) {
         return err;

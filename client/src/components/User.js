@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { client } from '../utils';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import DeckList from './DeckList';
@@ -104,7 +104,7 @@ function User() {
         if(userData._id !== userId) {
             (async () => {
                 try {
-                    const userDataResponse = await axios.get(`${baseURL}/users/${userId}`);
+                    const userDataResponse = await client.get(`${baseURL}/users/${userId}?public_info=true`);
                     setUserData(userDataResponse.data);
                 } catch (err) {
                     console.error(err);

@@ -71,13 +71,21 @@ userRouter.get("/:userId/tile", extendedRateLimiter, async (req, res, next) => {
     res.status(200).send(partialData);
 });
 
-userRouter.get("/:userId", async (req, res, next) => {
+userRouter.get("/:userId", getUserIdFromJWTToken, async (req, res, next) => {
     try {
-        let userData = await User.findById(req.user._id)
-            .populate("decks", "name")
-        userData.photo = req.user.photo ? !req.user.photo.includes(".") ? await getObjectSignedUrl(req.user.photo) : req.user.photo : "",
-        
-        res.status(200).send(userData);          
+        if(req.query.public_info === "true") {
+            const populatedUser = await User.findById(req.user._id, "login.username login.email name.first name.last photo");
+            populatedUser.photo = populatedUser.photo ? !populatedUser.photo.includes(".") ? await getObjectSignedUrl(populatedUser.photo) : populatedUser.photo : "",
+            res.status(200).send(populatedUser);
+        } else {
+            if(req.userId !== req.user._id.toString()) {
+                return res.status(401).send("Unauthorized");
+            }
+            //possibly remove decks here, make sure related actions in loginSlice make sense if so
+            let userData = await User.findById(req.user._id, "-login.password -verification");
+            userData.photo = req.user.photo ? !req.user.photo.includes(".") ? await getObjectSignedUrl(req.user.photo) : req.user.photo : "",
+            res.status(200).send(userData);          
+        }
     } catch (err) {
         res.status(500).send("There was an error with your request");
         throw err;

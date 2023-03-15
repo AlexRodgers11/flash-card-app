@@ -227,26 +227,6 @@ router.get("/seed-database", async(req, res, next) => {
         }
         console.log("Done setting adminOf property of admins and adding groups to members' groups array");
 
-        console.log("Creating activities and adding them to groups");
-        // for await (const group of Group.find()) {
-        // for (const group of groups) {
-        for (let i = 0; i < groups.length; i++) {
-            // console.log({i});
-            let newActivity = new Activity();
-            // console.log("Activity created");
-            newActivity.actor = groups[i].creator;
-            newActivity.type = 'create-group';
-            newActivity.content = '';
-            newActivity.groupTarget = groups[i]._id;
-            const savedActivity = await newActivity.save();
-            // console.log("Activity saved");
-            console.log("Updating groups");
-            // console.log(`savedActivityId: ${savedActivity._id}`);
-            // console.log(groups[i]._id);
-            await Group.findByIdAndUpdate(groups[i]._id, {$set: {activities: [savedActivity._id]}});
-            console.log("Done updating groups");
-        }
-        console.log("Done creating activities and adding them to groups");
 
         console.log("Creating categories");
         const categoryPromises = [];

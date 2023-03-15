@@ -2,6 +2,7 @@ import express from "express";
 const cardRouter = express.Router();
 
 import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
+import User from "../models/user.js"
 import Deck from "../models/deck.js";
 import { getUserIdFromJWTToken } from "../utils.js";
 
@@ -19,8 +20,27 @@ cardRouter.param("cardId", (req, res, next, cardId) => {
     });
 });
 
-cardRouter.get("/:cardId", (req, res, next) => {
-    res.status(200).send(req.card);
+cardRouter.get("/:cardId", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        if(req.userId !== req.card.creator.toString()) {
+            const user = await User.findById(req.userId, "groups")
+                .populate({
+                    path: "groups",
+                    select: "decks",
+                    populate: {
+                        path: "decks",
+                        select: "cards"
+                    }
+                });
+            if(!req.card.groupCardBelongsTo || !user.groups.some(group => group._id.toString() === req.card.groupCardBelongsTo.toString())) {
+                return res.status(401).send("You are not authorized to view this card");
+            }
+        }
+        res.status(200).send(req.card);
+    } catch (err) {
+        res.status(500).send(err.message);
+        console.log(err.message);
+    }
 });
 
 cardRouter.put("/:cardId", getUserIdFromJWTToken, async (req, res, next) => {

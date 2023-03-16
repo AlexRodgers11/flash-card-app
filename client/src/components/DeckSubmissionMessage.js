@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDecksOfGroup } from '../reducers/decksSlice';
 import useFormInput from '../hooks/useFormInput';
 import { makeDeckSubmissionDecision } from '../reducers/communicationsSlice';
 import { MessageContentContainer } from './StyledComponents/MessageContentContainer';
 import { MessagePreviewContent } from './StyledComponents/MessagePreviewContent';
+import { client } from '../utils';
 
 const baseURL = 'http://localhost:8000';
 
@@ -59,7 +59,7 @@ function DeckSubmissionMessage(props) {
 		if(loading) {
 			(async () => {
 				try {
-					const messageRetrievalResponse = await axios.get(`${baseURL}/messages/${props.messageId}?type=DeckSubmission`);
+					const messageRetrievalResponse = await client.get(`${baseURL}/messages/${props.messageId}?type=DeckSubmission`);
 					let data = messageRetrievalResponse.data;
 					setSender(data.sendingUser);
 					setRead(data.read.includes(userId));

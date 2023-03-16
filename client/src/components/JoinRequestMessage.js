@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMember, fetchGroupData } from '../reducers/groupSlice';
@@ -8,6 +7,7 @@ import useFormInput from '../hooks/useFormInput';
 import { makeJoinRequestDecision } from '../reducers/communicationsSlice';
 import { MessageContentContainer } from './StyledComponents/MessageContentContainer';
 import { MessagePreviewContent } from './StyledComponents/MessagePreviewContent';
+import { client } from '../utils';
 
 
 const baseURL = 'http://localhost:8000';
@@ -28,7 +28,7 @@ function JoinRequestMessage(props) {
 		if(loading) {
 			(async () => {
 				try {
-					const messageRetrievalResponse = await axios.get(`${baseURL}/messages/${props.messageId}?type=JoinRequest`);
+					const messageRetrievalResponse = await client.get(`${baseURL}/messages/${props.messageId}?type=JoinRequest`);
 					let data = messageRetrievalResponse.data;
 					setSender(data.sendingUser);
 					setRead(data.read.includes(userId));

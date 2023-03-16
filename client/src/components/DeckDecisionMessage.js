@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { MessageContentContainer } from './StyledComponents/MessageContentContainer';
 import { MessagePreviewContent } from './StyledComponents/MessagePreviewContent';
+import { client } from '../utils';
 
 const baseURL = 'http://localhost:8000';
 
@@ -23,7 +23,7 @@ function DeckDecisionMessage(props) {
 		if(loading) {
             (async () => {
                 try {
-					const messageRetrievalResponse = await axios.get(`${baseURL}/messages/${props.messageId}?type=DeckDecision`);
+					const messageRetrievalResponse = await client.get(`${baseURL}/messages/${props.messageId}?type=DeckDecision`);
 					let data = messageRetrievalResponse.data;
 					setSender(data.sendingUser);
                     setRead(data.read.includes(userId));

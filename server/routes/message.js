@@ -1,18 +1,23 @@
 import express from "express";
 const messageRouter = express.Router();
-import { DeckDecision, DeckSubmission, DirectMessage, JoinDecision, JoinRequest, Message } from "../models/message.js";
+import { DeckDecision, DeckSubmission, JoinDecision, JoinRequest, Message } from "../models/message.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import User from "../models/user.js";
-import { DeckAddedNotification, NewMemberJoinedNotification } from "../models/notification.js";
+import { DeckAddedNotification } from "../models/notification.js";
 import { getUserIdFromJWTToken } from "../utils.js";
 
-const baseURL = 'http://localhost:8000';
+const checkMessageOwnership = (req, res, next) => {
+    if(req.message.sendingUser.toString() !== req.userId && !req.message.receivingUsers.some(id => id.toString() === req.userId)) {
+        return res.status(401).send("Unauthorized");
+    }
+    next();
+}
 
 messageRouter.param("messageId", (req, res, next, messageId) => {
     Message.findById(messageId, (err, message) => {
         if(err) {
-            res.status(500).send("There wasn an error with your request");
+            res.status(500).send("There was an error with your request");
         } else {
             if(!message) {
                 res.status(404).send("Message not found");
@@ -24,7 +29,7 @@ messageRouter.param("messageId", (req, res, next, messageId) => {
     })
 });
 
-messageRouter.get("/:messageId", async (req, res, next) => {
+messageRouter.get("/:messageId", getUserIdFromJWTToken, checkMessageOwnership, async (req, res, next) => {
     try {
         let populatedMessage;
         switch(req.query.type) {
@@ -110,7 +115,7 @@ messageRouter.get("/:messageId", async (req, res, next) => {
     }
 });
 
-messageRouter.patch('/:messageId/add-to-read', getUserIdFromJWTToken, async (req, res, next) => {
+messageRouter.patch('/:messageId/add-to-read', getUserIdFromJWTToken, checkMessageOwnership, async (req, res, next) => {
     try {
         const foundMessage = await Message.findById(req.message._id, "receivingUsers");
         if(foundMessage.receivingUsers.includes(req.userId)) {
@@ -203,70 +208,66 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                 res.status(200).send({sentMessage: {_id: savedDeckDecisionMessage._id, read: savedDeckDecisionMessage.read, messageType: savedDeckDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
                 
                 break;
-                case 'JoinRequest':
-                    const foundJoinRequestMessage = await JoinRequest.findById(req.message._id);
+            case 'JoinRequest':
+                const foundJoinRequestMessage = await JoinRequest.findById(req.message._id);
 
-                    // then make sure the deciding user is an admin of the group (may have initially been when message sent but then removed)
-                    const foundGroupToJoin = await Group.findById(foundJoinRequestMessage.targetGroup, "administrators");
-                    if(!foundGroupToJoin.administrators.includes(foundUser._id)) {
-                        res.status(403).send("Only group administrators may approve or deny join requests");
-                        return;
-                    }
+                // then make sure the deciding user is an admin of the group (may have initially been when message sent but then removed)
+                const foundGroupToJoin = await Group.findById(foundJoinRequestMessage.targetGroup, "administrators");
+                if(!foundGroupToJoin.administrators.includes(foundUser._id)) {
+                    res.status(403).send("Only group administrators may approve or deny join requests");
+                    return;
+                }
+                
+                
+                if(foundJoinRequestMessage.acceptanceStatus !== "pending") {
+                    res.status(409).send(`This user's request has already been ${foundJoinRequestMessage.acceptanceStatus}`);
+                    return;
+                } 
+                await JoinRequest.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
+
+                if(req.body.decision === "approved") {
+                    const foundGroup = await Group.findById(foundJoinRequestMessage.targetGroup, "members");
+                    await Group.findByIdAndUpdate(foundJoinRequestMessage.targetGroup, {$addToSet: {members: foundJoinRequestMessage.sendingUser}});
+                    await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$addToSet: {groups: foundJoinRequestMessage.targetGroup}});
+                
+                    const otherGroupMembers = foundGroup.members.filter(memberId => memberId !== foundUser._id);
+
+                    const joinRequestBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
+                        const notification = await DeckAddedNotification.create({
+                            member: foundJoinRequestMessage.sendingUser, 
+                            targetGroup: foundJoinRequestMessage.targetGroup, 
+                            read: false
+                        });
+
+                        return {
+                            updateOne: {
+                                filter: {_id: memberId},
+                                update: {$push: {notifications: notification}}
+                            }
+                        };
+                    }));
                     
-                    
-                    if(foundJoinRequestMessage.acceptanceStatus !== "pending") {
-                        res.status(409).send(`This user's request has already been ${foundJoinRequestMessage.acceptanceStatus}`);
-                        return;
-                    } 
-                    await JoinRequest.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
+                    await User.bulkWrite(joinRequestBulkOperations);
+                }  
 
-                    if(req.body.decision === "approved") {
-                        const foundGroup = await Group.findById(foundJoinRequestMessage.targetGroup, "members");
-                        await Group.findByIdAndUpdate(foundJoinRequestMessage.targetGroup, {$addToSet: {members: foundJoinRequestMessage.sendingUser}});
-                        await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$addToSet: {groups: foundJoinRequestMessage.targetGroup}});
-                    
-                        const otherGroupMembers = foundGroup.members.filter(memberId => memberId !== foundUser._id);
+                const joinDecisionMessage = new JoinDecision({
+                    sendingUser: foundUser._id,
+                    receivingUsers: [foundJoinRequestMessage.sendingUser],
+                    acceptanceStatus: req.body.decision,
+                    comment: req.body.comment,
+                    targetGroup: foundJoinRequestMessage.targetGroup,
+                    targetUser: foundJoinRequestMessage.sendingUser
+                });
 
-                        const joinRequestBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
-                            const notification = await DeckAddedNotification.create({
-                                member: foundJoinRequestMessage.sendingUser, 
-                                targetGroup: foundJoinRequestMessage.targetGroup, 
-                                read: false
-                            });
-    
-                            return {
-                                updateOne: {
-                                    filter: {_id: memberId},
-                                    update: {$push: {notifications: notification}}
-                                }
-                            };
-                        }));
-                        
-                        await User.bulkWrite(joinRequestBulkOperations);
-                    }  
+                const savedJoinDecisionMessage = await joinDecisionMessage.save();
 
-                    const joinDecisionMessage = new JoinDecision({
-                        sendingUser: foundUser._id,
-                        receivingUsers: [foundJoinRequestMessage.sendingUser],
-                        acceptanceStatus: req.body.decision,
-                        comment: req.body.comment,
-                        targetGroup: foundJoinRequestMessage.targetGroup,
-                        targetUser: foundJoinRequestMessage.sendingUser
-                    });
-
-                    const savedJoinDecisionMessage = await joinDecisionMessage.save();
-
-                    await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$push: {"messages.received": savedJoinDecisionMessage}});
-                    await User.findByIdAndUpdate(foundUser._id, {$push: {"messages.sent": savedJoinDecisionMessage}});
+                await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$push: {"messages.received": savedJoinDecisionMessage}});
+                await User.findByIdAndUpdate(foundUser._id, {$push: {"messages.sent": savedJoinDecisionMessage}});
 
 
-                    res.status(200).send({sentMessage: {_id: savedJoinDecisionMessage._id, read: savedJoinDecisionMessage.read, messageType: savedJoinDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
-                    
-                    break;
-                    
-                case 'DirectMessage':
-                    // await DirectMessage.findByIdAndUpdate(req.message._id, updateObj, options);
-                    break;
+                res.status(200).send({sentMessage: {_id: savedJoinDecisionMessage._id, read: savedJoinDecisionMessage.read, messageType: savedJoinDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
+                
+                break;
             default:
                 break;
         }    
@@ -276,38 +277,33 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
     }
 });
 
-messageRouter.delete("/:messageId", getUserIdFromJWTToken, async (req, res, next) => {
+messageRouter.delete("/:messageId", getUserIdFromJWTToken, checkMessageOwnership, async (req, res, next) => {
     try {
         const deletingUser = await User.findById(req.userId, "_id messages");
 
-        if(deletingUser?.messages[req.query.direction].includes(req.message._id)) {
-            const updateObj = {
-                ...(req.query.direction === "received" && {$pull: {receivingUsers: deletingUser._id}}),
-                ...(req.query.direction === "sent" && {$set: {sendingUserDeleted: true}})
-            }
-            const updatedMessage = await Message.findByIdAndUpdate(req.message._id, updateObj, {new: true});
-            console.log({updatedMessage});
-            
-            let updatedUser;
-            if(req.query.direction === "received") {
-                updatedUser = await User.findByIdAndUpdate(deletingUser._id, {$pull: {"messages.received": req.message._id}}, {new: true});    
-            } else if(req.query.direction === "sent") {
-                updatedUser = await User.findByIdAndUpdate(deletingUser._id, {$pull: {"messages.sent": req.message._id}}, {new: true});
-            } else {
-                throw new Error("invalid direction submitted");
-            }
+        const updateObj = {
+            ...(req.query.direction === "received" && {$pull: {receivingUsers: deletingUser._id}}),
+            ...(req.query.direction === "sent" && {$set: {sendingUserDeleted: true}})
+        }
+        const updatedMessage = await Message.findByIdAndUpdate(req.message._id, updateObj, {new: true});
+        console.log({updatedMessage});
         
-    
-            //if sending user and all receivingUsers have deleted the message from their inbox, delete from database
-            if(!updatedMessage.receivingUsers.length && updatedMessage.sendingUserDeleted) {
-                await Message.findByIdAndDelete(req.message._id);
-                res.status(200).send("Successfully deleted");
-            } else {
-                res.status(200).send("message removed from user's messages");
-            }
-
+        let updatedUser;
+        if(req.query.direction === "received") {
+            updatedUser = await User.findByIdAndUpdate(deletingUser._id, {$pull: {"messages.received": req.message._id}}, {new: true});    
+        } else if(req.query.direction === "sent") {
+            updatedUser = await User.findByIdAndUpdate(deletingUser._id, {$pull: {"messages.sent": req.message._id}}, {new: true});
         } else {
-            res.status(403).send("Only recipients of a message may deleted it");
+            throw new Error("invalid direction submitted");
+        }
+    
+
+        //if sending user and all receivingUsers have deleted the message from their inbox, delete from database
+        if(!updatedMessage.receivingUsers.length && updatedMessage.sendingUserDeleted) {
+            await Message.findByIdAndDelete(req.message._id);
+            res.status(200).send("Successfully deleted");
+        } else {
+            res.status(200).send("message removed from user's messages");
         }
         
     } catch (err) {

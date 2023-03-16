@@ -5,6 +5,9 @@
 
 #notes
 /notes.txt
+/StillToDo.txt
+/Requests.txt
+/Routes.txt
 
 #environment variables
 .env

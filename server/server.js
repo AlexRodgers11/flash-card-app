@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import faker from "faker";
@@ -63,6 +64,7 @@ app.use((req, res, next) => {
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
     );
+    res.header("Access-Control-Allow-Credentials", "true");
     next();
 });
 
@@ -72,6 +74,8 @@ app.use(
         extended: true
     })
 );
+
+app.use(cookieParser());
 
 app.use(passport.initialize());
 
@@ -225,7 +229,7 @@ router.get("/seed-database", async(req, res, next) => {
             await User.updateMany({_id: {$in: groups[i].members}}, {$push: {groups: groups[i]._id}})
         }
         console.log("Done setting adminOf property of admins and adding groups to members' groups array");
-
+        
 
         console.log("Creating categories");
         const categoryPromises = [];

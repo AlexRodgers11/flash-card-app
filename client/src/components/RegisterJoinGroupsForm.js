@@ -7,6 +7,7 @@ import { fetchGroupJoinOptions } from '../reducers/groupSlice';
 import { submitJoinCode } from '../reducers/loginSlice';
 import { sendJoinRequest } from "../reducers/communicationsSlice";
 import { addGroup } from '../reducers/loginSlice';
+import { client } from '../utils';
 
 const baseURL = "http://localhost:8000";
 
@@ -149,7 +150,7 @@ function RegisterJoinGroupsForm(props) {
     
     useEffect(() => {
         if(searchField.length >= 3) {
-            axios.get(`${baseURL}/groups/search?entry=${searchField}&id=${userId}`)
+            client.get(`${baseURL}/groups/search?entry=${searchField}`)
                 .then((response) => setFoundGroups(response.data))
                 .catch(err => console.log(err));
         } else {

@@ -15,9 +15,9 @@ const initialState = {
     hasMore: true,
 };
 
-export const addAdminDeck = createAsyncThunk("decks/addAdminDeck", async ({deckId, groupId, adminId}) => {
+export const addAdminDeck = createAsyncThunk("decks/addAdminDeck", async ({deckId, groupId}) => {
     try {
-        const response = await axios.post(`${baseURL}/groups/${groupId}/decks`, {deckId, groupId, adminId});
+        const response = await client.post(`${baseURL}/groups/${groupId}/decks`, {deckId, groupId});
         return response.data;
     } catch (err) {
         console.error(err);

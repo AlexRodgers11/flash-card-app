@@ -23,36 +23,45 @@ groupRouter.param("groupId", (req, res, next, groupId) => {
     });
 });
 
-groupRouter.get("/search", async (req, res, next) => {
-    const regex = new RegExp(req.query.entry, 'i');
-    const user = await User.findById(req.query.id, "groups messages.sent");
-    let populatedUser = await user.populate("messages.sent");
-    let groups = await Group.find({name: {$regex: regex}});
-    let filteredGroups = groups.filter(group => !populatedUser.groups.includes(group._id) && !populatedUser.messages.sent.map(message => message.targetGroup.toString()).includes(group._id.toString()));
-    res.status(200).send(filteredGroups);
+groupRouter.get("/search", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        const regex = new RegExp(req.query.entry, 'i');
+        const user = await User.findById(req.userId, "groups messages.sent");
+        const populatedUser = await user.populate("messages.sent");
+        const groups = await Group.find({name: {$regex: regex}});
+        const filteredGroups = groups.filter(group => !populatedUser.groups.includes(group._id) && !populatedUser.messages.sent.map(message => message.targetGroup.toString()).includes(group._id.toString()));
+        res.status(200).send(filteredGroups);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
 });
 
-groupRouter.get("/:groupId", getUserIdFromJWTToken, (req, res, next) => {
-    if(!req.group.members.includes(req.userId)) {
-        res.status(403).send("You must be a user of a group to retrieve its information");
-        return;
-    }
-    let response;   
-    if(req.query.tile) {
-        response = {
-            name: req.group.name,
-            // memberCount: req.group.members.length,
-            memberIds: req.group.members,
-            deckCount: req.group.decks.length
+groupRouter.get("/:groupId", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        if(!req.group.members.includes(req.userId)) {
+            res.status(403).send("You must be a user of a group to retrieve its information");
+            return;
         }
-    } else {
-        response = req.group;
-        if(!req.group.administrators.includes(req.userId)) {
-            delete response.joinCode;
+        let response;   
+        if(req.query.tile) {
+            response = {
+                name: req.group.name,
+                memberIds: req.group.members,
+                deckCount: req.group.decks.length
+            }
+        } else {
+            if(!req.group.administrators.includes(req.userId)) {
+                response = await Group.findById(req.group._id, "-joinCode");
+            } else {
+                response = req.group;
+            }
         } 
-        response = req.group;
-    } 
-    res.status(200).send(response);
+        res.status(200).send(response);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send(err.message);
+    }
 });
 
 groupRouter.get("/:groupId/join-options", (req, res, next) => {
@@ -62,27 +71,34 @@ groupRouter.get("/:groupId/join-options", (req, res, next) => {
 });
 
 groupRouter.get("/:groupId/decks", getUserIdFromJWTToken, async (req, res, next) => {
-    if(!req.group.members.map(id => id.toString()).includes(req.userId)) {
-        const populatedGroup = await req.group.populate("decks", "publiclyAvailable");
-        const publicDecks = populatedGroup.decks.filter(deck => deck.publiclyAvailable).map(deck => deck._id);
-        res.status(200).send(publicDecks); 
-    } else {
-        res.status(200).send(req.group.decks);
+    try {
+        if(!req.group.members.some(id => id.toString() === req.userId)) {
+            const populatedGroup = await req.group.populate("decks", "publiclyAvailable");
+            const publicDecks = populatedGroup.decks.filter(deck => deck.publiclyAvailable).map(deck => deck._id);
+            res.status(200).send(publicDecks); 
+        } else {
+            res.status(200).send(req.group.decks);
+        }
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send(err.message);
     }
 });
 
 
-groupRouter.post("/:groupId/decks", async (req, res, next) => {
+groupRouter.post("/:groupId/decks", getUserIdFromJWTToken, async (req, res, next) => {
     try {
+        if(!req.group.administrators.some(id => id.toString() === req.userId.toString())) {
+            res.status(401).send("Only group admins may add decks directly to the group. If you are a member please submit the deck to the admins for approval");
+        }
         const deckCopy = await copyDeck(req.body.deckId, req.group._id);
         deckCopy.groupDeckBelongsTo = req.group._id;
         deckCopy.approvedByGroupAdmins = true,
         deckCopy.deckCopiedFrom = req.body.deckId;
         const savedDeckCopy = await deckCopy.save();
         const updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$push: {decks: savedDeckCopy}}); 
-        //possibly exclude the approver's id
 
-        const otherGroupMembers = updatedGroup.members.filter(memberId => memberId.toString() !== req.body.adminId);
+        const otherGroupMembers = updatedGroup.members.filter(memberId => memberId.toString() !== req.userId.toString());
 
         await User.updateMany({_id: {$in: otherGroupMembers}}, {$push: {notifications: await DeckAddedNotification.create({targetDeck: savedDeckCopy._id, targetGroup: updatedGroup._id, read: false})}});
         res.status(200).send(savedDeckCopy._id);
@@ -91,23 +107,15 @@ groupRouter.post("/:groupId/decks", async (req, res, next) => {
     }
 });
 
-groupRouter.patch("/:groupId/decks", async (req, res, next) => {
+groupRouter.patch("/:groupId/head-admin", getUserIdFromJWTToken, async (req, res, next) => {
     try {
-        const deckCopy = await copyDeck(req.body.deckId, req.group._id);
-        await Group.findByIdAndUpdate(req.group._id, {$push: {decks: deckCopy}});
-        res.status(200).send({submittedDeckId: deckCopy._id, submittedDeckName: deckCopy.name});
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-
-
-groupRouter.patch("/:groupId/head-admin", async (req, res, next) => {
-    try {
+        if(req.group.administrators[0].toString() !== req.userId.toString()) {
+            return res.status(401).send("Unauthorized. Only the group's current head administrator can designate a new one");
+        }
         const newHeadAdminIdx = req.group.administrators.indexOf(req.body.newAdminId);
         const newAdministrators = req.group.administrators.slice();
         const prevAdminId = req.group.administrators[0];
-        if(newHeadAdminIdx > 0) {//start here- make sure if mbr wasn't an admin making them head admin places them at the front of the member list and admin list
+        if(newHeadAdminIdx > 0) {
             swapIndexes(newAdministrators, 0, newHeadAdminIdx);
             newAdministrators.splice(newHeadAdminIdx, 1);
         } else {
@@ -173,8 +181,8 @@ groupRouter.patch("/:groupId/members", getUserIdFromJWTToken, async (req, res, n
     }
 });
 
-groupRouter.patch("/:groupId/admins", async (req, res, next) => {
-    if(req.group.administrators.includes(req.body.adminId)) {
+groupRouter.patch("/:groupId/admins", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.group.administrators.some(id => id.toString() === req.userId.toString())) {
         try {
             let user = await User.findById(req.body.memberId);
             if(user && req.group.members.includes(user._id)) {
@@ -207,7 +215,7 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
                 
                 await Group.findByIdAndUpdate(req.group._id, {members: reorderedGroupMembers});
 
-                await User.findByIdAndUpdate(user._id, {$push: {notifications: await AdminChangeNotification.create({targetGroup: req.group._id, decidingUser: req.body.adminId, action: req.body.action, read: false})}});
+                await User.findByIdAndUpdate(user._id, {$push: {notifications: await AdminChangeNotification.create({targetGroup: req.group._id, decidingUser: req.userId, action: req.body.action, read: false})}});
 
                 res.status(200).send({userId: updatedUser._id, members: reorderedGroupMembers});
             } else {
@@ -218,7 +226,7 @@ groupRouter.patch("/:groupId/admins", async (req, res, next) => {
             throw err;
         }
     } else {
-        res.status(403).send("Only authorized users can designate adminstrator authority");
+        res.status(401).send("Only authorized users can designate adminstrator authority");
     }
 });
 
@@ -263,7 +271,6 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", getUserIdFromJWTTok
 
             const newMessage = new DeckSubmission({
                 acceptanceStatus: 'pending',
-                // sendingUser: req.body.sendingUser,
                 sendingUser: req.userId,
                 receivingUsers: foundGroup.administrators,
                 targetDeck: savedDeckCopy._id,
@@ -272,7 +279,6 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", getUserIdFromJWTTok
             });
             const savedMessage = await newMessage.save();
             await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
-            // await User.findByIdAndUpdate(req.body.sendingUser, {$push: {'messages.sent': savedMessage}});
             await User.findByIdAndUpdate(req.userId, {$push: {'messages.sent': savedMessage}});
 
             res.status(200).send({_id: savedMessage._id, messageType: "DeckSubmission", read: []});
@@ -283,9 +289,9 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", getUserIdFromJWTTok
     }
 });
 
-groupRouter.delete("/:groupId", async (req, res, next) => {
+groupRouter.delete("/:groupId", getUserIdFromJWTToken, async (req, res, next) => {
     try {
-        if(req.query.requestingUser === req.group.administrators[0].toString()) {
+        if(req.userId.toString() === req.group.administrators[0].toString()) {
             const group = await Group.findByIdAndDelete(req.group._id);
 
             for (let i = 0; i < req.group.decks.length; i++) {
@@ -300,7 +306,7 @@ groupRouter.delete("/:groupId", async (req, res, next) => {
 
             await User.updateMany({_id: {$in: req.group.administrators}}, {$pull: {adminOf: req.group._id}});
 
-            const otherGroupMembers = req.group.members.filter(memberId => memberId.toString() !== req.query.requestingUser);
+            const otherGroupMembers = req.group.members.filter(memberId => memberId.toString() !== req.userId.toString());
 
             await User.updateMany({_id: {$in: otherGroupMembers}}, {$push: {notifications: await GroupDeletedNotification.create({groupName: req.group.name, read: false})}});
 
@@ -311,31 +317,8 @@ groupRouter.delete("/:groupId", async (req, res, next) => {
     } catch (err) {
         console.error(err);
         res.status(500).send("There was an error with your request");
-        throw err
     }
 });
-
-groupRouter.put("/:groupId", (req, res, next) => {
-    Group.findByIdAndUpdate(req.group._id, req.body, {new:true}, (err, group) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } else {
-            res.status(200).send(group);
-        }
-    });
-});
-
-// groupRouter.post("/:groupId/members", async (req, res, next) => {
-//     try {
-//         const user = await User.findById(req.body.userId);
-//         await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}});
-//         res.status(200).send(user._id);
-//     } catch (err) {
-//         res.status(500).send("There was an error with your request");
-//         throw err;
-//     }
-// });
 
 groupRouter.post("/:groupId/members/join-code", async(req, res, next) => {
     try {
@@ -355,4 +338,17 @@ groupRouter.post("/:groupId/members/join-code", async(req, res, next) => {
     }
 });
 
+groupRouter.patch("/:groupId", getUserIdFromJWTToken, (req, res, next) => {
+    if(!req.group.administrators.some(id => id.toString() === req.userId.toString())) {
+        return res.status(401).send("YOu are not authorized to make this change. Only a group administrator may make this change");
+    }
+    Group.findByIdAndUpdate(req.group._id, req.body, {new:true}, (err, group) => {
+        if(err) {
+            res.status(500).send("There was an error with your request");
+            throw err;
+        } else {
+            res.status(200).send(group);
+        }
+    });
+});
 export default groupRouter;

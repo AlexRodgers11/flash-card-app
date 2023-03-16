@@ -38,7 +38,7 @@ export default function GroupDecksSection() {
 
     const chooseDeck = evt => {
         if(administrators?.includes(userId)) {
-            dispatch(addAdminDeck({deckId: evt.target.dataset.id, adminId: userId, groupId}))
+            dispatch(addAdminDeck({deckId: evt.target.dataset.id, groupId}))
                 .then(() => {
                     toggleShowAddModal();
                 });

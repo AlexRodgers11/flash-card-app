@@ -21,6 +21,7 @@ const UserTileWrapper = styled.div`
 
 const TitleWrapper = styled.div`
     height: 1.25rem;
+    font-weight: 600;
 `
 
 const Button = styled.button`
@@ -76,6 +77,8 @@ const StyledImage = styled.img`
     width: 100%;
     height: 100%;////might not be doing anything
     object-fit: cover;
+    border: 2px solid black;
+    border-radius: 50%;
 `;
 
 const UserSkeleton = styled.div`
@@ -124,12 +127,12 @@ function UserTile(props) {
     }
     //////start here- reorder member array after adding/removing from admins--probably do on backend
     const addMemberToAdmins = () => {
-        dispatch(grantAdminAuthority({groupId, memberToAuthorizeId: props.memberId, requesterId: loggedInUserId}));
+        dispatch(grantAdminAuthority({groupId, memberToAuthorizeId: props.memberId}));
         //need to make notification
     }
 
     const removeMemberFromAdmins = () => {
-        dispatch(revokeAdminAuthority({groupId, memberToDeauthorizeId: props.memberId, requesterId: loggedInUserId}));
+        dispatch(revokeAdminAuthority({groupId, memberToDeauthorizeId: props.memberId}));
         //need to make notification
     }
 

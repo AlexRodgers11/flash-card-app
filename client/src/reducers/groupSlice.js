@@ -16,22 +16,11 @@ const initialState = {
     joinCode: ""
 };
 
-// export const addMember = createAsyncThunk("group/addMember", async({groupId, userId}) => {
-//     try {
-//         const response = await axios.post(`${baseURL}/groups/${groupId}/members`, {userId});
-//         return {
-//             memberId: response.data,
-//         }
-//     } catch (err) {
-//         console.error(err);
-//         return err;
-//     }
-// });
-
-export const deleteGroup = createAsyncThunk("group/deleteGroup", async ({groupId, requesterId}) => {
+//need to ad this to Group component
+export const deleteGroup = createAsyncThunk("group/deleteGroup", async ({groupId}) => {
     try {
         //maybe create separate admin auth token and send that instead of id
-        const response = await axios.delete(`${baseURL}/groups/${groupId}?requestingUser=${requesterId}`);
+        const response = await client.delete(`${baseURL}/groups/${groupId}`);
         return response.data;
     } catch (err) {
         console.error(err);
@@ -70,9 +59,9 @@ export const fetchGroupJoinOptions = createAsyncThunk("group/fetchGroupJoinOptio
     }
 });
 
-export const grantAdminAuthority = createAsyncThunk("group/grantAdminAuthority", async ({groupId, memberToAuthorizeId, requesterId}) => {
+export const grantAdminAuthority = createAsyncThunk("group/grantAdminAuthority", async ({groupId, memberToAuthorizeId}) => {
     try {
-        const response = await axios.patch(`${baseURL}/groups/${groupId}/admins`, {groupId, memberId: memberToAuthorizeId, adminId: requesterId, action: "grant"});
+        const response = await client.patch(`${baseURL}/groups/${groupId}/admins`, {groupId, memberId: memberToAuthorizeId, action: "grant"});
         // return response.data;
         console.log({response: response.data})
         return {userId: response.data.userId, memberIds: response.data.members};
@@ -82,9 +71,9 @@ export const grantAdminAuthority = createAsyncThunk("group/grantAdminAuthority",
     }
 });
 
-export const revokeAdminAuthority = createAsyncThunk("group/revokeAdminAuthority", async ({groupId, memberToDeauthorizeId, requesterId}) => {
+export const revokeAdminAuthority = createAsyncThunk("group/revokeAdminAuthority", async ({groupId, memberToDeauthorizeId}) => {
     try {
-        const response = await axios.patch(`${baseURL}/groups/${groupId}/admins`, {groupId, memberId: memberToDeauthorizeId, adminId: requesterId, action: "revoke"});
+        const response = await client.patch(`${baseURL}/groups/${groupId}/admins`, {groupId, memberId: memberToDeauthorizeId, action: "revoke"});
         // return response.data;
         console.log({response: response.data})
         return {userId: response.data.userId, memberIds: response.data.members};
@@ -106,11 +95,11 @@ export const removeMember = createAsyncThunk("group/removeMember", async({groupI
 
 export const replaceHeadAdmin = createAsyncThunk("group/replaceHeadAdmin", async({groupId, newAdminId}) => {
     try {
-        const response = await axios.patch(`${baseURL}/groups/${groupId}/head-admin`, {newAdminId});
+        const response = await client.patch(`${baseURL}/groups/${groupId}/head-admin`, {newAdminId});
         return {
             administrators: response.data.administrators,
             members: response.data.members,
-            headAdmin: response.data.administrators
+            headAdmin: response.data.administrators[0]
         }
     } catch (err) {
         console.error(err);
@@ -120,7 +109,7 @@ export const replaceHeadAdmin = createAsyncThunk("group/replaceHeadAdmin", async
 
 export const updateGroup = createAsyncThunk("group/updateGroup", async({groupId, groupUpdates}) => {
     try {
-        const response = await axios.put(`${baseURL}/groups/${groupId}`, groupUpdates);
+        const response = await client.patch(`${baseURL}/groups/${groupId}`, groupUpdates);
         let stateUpdateObj = {};
         for(const key in groupUpdates) {
             if(response.data.hasOwnProperty(key)) {

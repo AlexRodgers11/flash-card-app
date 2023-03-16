@@ -26,7 +26,7 @@ export const addAdminDeck = createAsyncThunk("decks/addAdminDeck", async ({deckI
 
 export const deleteDeck = createAsyncThunk("decks/deleteDeck", async (deckId) => {
     try {
-        const response = await axios.delete(`${baseURL}/decks/${deckId}`);
+        const response = await client.delete(`${baseURL}/decks/${deckId}`);
         return response.data;
     } catch (err) {
         console.error(err);

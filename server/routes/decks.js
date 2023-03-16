@@ -120,18 +120,45 @@ deckRouter.get("/:deckId", (req, res, next) => {
     res.status(200).send(req.deck);
 });
 
-deckRouter.delete("/:deckId", async (req, res, next) => {
+deckRouter.delete("/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
     try {
-        await Group.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}});
+        if(req.deck.creator.toString() !== req.userId.toString()) {
+            const user = await User.findById(req.userId, "groups");
+            if(!req.deck.groupDeckBelongsTo || !user.adminOf.some(group => group._id.toString() === req.deck.groupDeckBelongsTo.toString())) {
+                return res.status(401).send("You are not authorized to delete this deck");
+            }
+        }
+
+        if(req.deck.groupDeckBelongsTo) {
+            //remove the deck from the group it is in (if applicable)
+            const updatedGroup = await Group.findOneAndUpdate({decks: req.deck._id}, {$pull: {decks: req.deck._id}});    
+            //remove the deck from the adminOf array of any admins 
+            await User.updateMany({adminOf: updatedGroup}, {$pull: {adminOf: req.deck._id}});
+        }
+
+        //remove the deck from any category it is in
         await Category.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}});
+
+        //remove the deck from the decks array of the creator
         await User.findByIdAndUpdate(req.deck.creator, {$pull: {decks: req.deck._id}});
+
+        const deckAttempts = await DeckAttempt.find({deck: req.deck._id})
+        //delete all card attempts for the cards in the deck
+        await CardAttempt.deleteMany({fullDeckAttempt: {$in: deckAttempts}});
+
+        //delete all deck attempts where this deck was attempted
         await DeckAttempt.deleteMany({deck: req.deck._id});
-        const deck = await Deck.findByIdAndDelete(req.deck._id);
+
+        //delete all cards that were in this deck
         await Card.deleteMany({_id: {$in: req.deck.cards}});
+
+        //delete the deck itself
+        const deck = await Deck.findByIdAndDelete(req.deck._id);
+        
         res.status(200).send(deck._id);
     } catch (err) {
-        res.status(500).send("There was an error with your request");
-        throw err;
+        console.error(err.message);
+        res.status(500).send(err.message);
     } 
 });
 

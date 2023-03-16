@@ -119,7 +119,7 @@ function UserTile(props) {
     }
 
     const handleRemoveMember = () => {
-        dispatch(removeMember({groupId, memberToRemoveId: props.memberId, requesterId: loggedInUserId}));
+        dispatch(removeMember({groupId, memberToRemoveId: props.memberId}));
         //be sure to create notification to let member know what happened
     }
     //////start here- reorder member array after adding/removing from admins--probably do on backend

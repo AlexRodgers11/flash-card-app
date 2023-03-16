@@ -94,9 +94,9 @@ export const revokeAdminAuthority = createAsyncThunk("group/revokeAdminAuthority
     }
 });
 
-export const removeMember = createAsyncThunk("group/removeMember", async({groupId, memberToRemoveId, requesterId}) => {
+export const removeMember = createAsyncThunk("group/removeMember", async({groupId, memberToRemoveId}) => {
     try {
-        const response = await axios.patch(`${baseURL}/groups/${groupId}/members`, {memberToRemoveId, requesterId});
+        const response = await client.patch(`${baseURL}/groups/${groupId}/members`, {memberToRemoveId});
         return response.data;
     } catch (err) {
         console.error(err);

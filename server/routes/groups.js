@@ -146,25 +146,23 @@ groupRouter.patch("/:groupId/head-admin", async (req, res, next) => {
     }
 });
 
-//Patch? Delete? If Patch should I use the same route for adding and removing members and do logic to decide whether to push or pull in update obj?
-groupRouter.patch("/:groupId/members", async (req, res, next) => {
+groupRouter.patch("/:groupId/members", getUserIdFromJWTToken, async (req, res, next) => {
     //necessary to do this check since it would take Postman or something to send a request with a member Id not in the group?
     if(req.group.members.includes(req.body.memberToRemoveId)) {
-        //Is this truly secure? Admin ids are exposed in devtools...
         try {
             let updatedUser;
-            //process the removalif either the requesting user is the one to be deleted or the requesting user is a group admin
-            if(req.body.requesterId === req.body.memberToRemoveId || req.group.members.includes(mongoose.Types.ObjectId(req.body.requesterId))) {
+            //process the removal if either the requesting user is the one to be deleted or the requesting user is a group admin
+            if(req.userId.toString() === req.body.memberToRemoveId || req.group.administrators.some(id => id.toString() === req.userId.toString())) {
                 await Group.findByIdAndUpdate(req.group._id, {$pull: {members: req.body.memberToRemoveId, administrators: req.body.memberToRemoveId}});
                 updatedUser = await User.findByIdAndUpdate(req.body.memberToRemoveId, {$pull: {groups: req.group._id, adminOf: req.group._id}});
                 
                 //if the user is being removed by an admin (other than an admin removing themselves) send a notification to the removed user
-                if(req.body.requesterId !== req.body.memberToRemoveId) {
-                    await User.findByIdAndUpdate(updatedUser._id, {$push: {notifications: await RemovedFromGroupNotification.create({targetGroup: req.group._id, decidingUser: req.body.requesterId, read: false})}});
+                if(req.userId.toString() !== req.body.memberToRemoveId) {
+                    await User.findByIdAndUpdate(updatedUser._id, {$push: {notifications: await RemovedFromGroupNotification.create({targetGroup: req.group._id, decidingUser: req.userId, read: false})}});
                 }
                 res.status(200).send(updatedUser._id);
             } else {
-                res.status(403).send("You do not have the authority to remove this member");
+                res.status(401).send("You do not have the authority to remove this member");
             }
         } catch (err) {
             console.error(err);

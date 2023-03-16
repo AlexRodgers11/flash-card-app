@@ -12,6 +12,8 @@ const GroupMemberListWrapper = styled.div`
     display: grid;
     // place-items: center;
     margin-bottom: 3rem;
+    border: ${(props) => props.extraStyling ? "2px solid black" : "none"};
+    background-color: ${(props) => props.extraStyling ? "#e3e3e3" : "inherit"};
 
     grid-template-columns: repeat(1, 1fr);
     
@@ -79,7 +81,7 @@ function GroupMemberList(props) {
     const userId = useSelector((state) => state.login.userId);
     
     return(
-        <GroupMemberListWrapper>
+        <GroupMemberListWrapper extraStyling={props.extraStyling}>
             {groupMemberIds.map(memberId => (
                 <UserTile key={memberId} memberId={memberId} listType={props.listType} isAdmin={administrators.includes(memberId)} editMode={props.editMode && administrators.includes(userId)} />
             ))}

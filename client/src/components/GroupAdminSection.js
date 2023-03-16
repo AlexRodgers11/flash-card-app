@@ -89,7 +89,7 @@ export function GroupAdminSection() {
                     </JoinOptionContainer>
                 {/* } */}
             </GroupEditControlsContainer>
-            <GroupMemberList editMode={true} listType="members"/>
+            <GroupMemberList editMode={true} listType="members" extraStyling={true}/>
             <GroupDecksSection></GroupDecksSection>
         </GroupAdminSectionWrapper>
     )

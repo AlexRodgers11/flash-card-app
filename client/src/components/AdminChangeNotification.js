@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import axios from 'axios';
+import { client } from '../utils';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
@@ -18,7 +18,7 @@ function AdminChangeNotification(props) {
         if(loading) {
             (async () => {
                 try {
-                    const notificationRetrievalResponse = await axios.get(`${baseURL}/notifications/${props.notificationId}?type=AdminChange`);
+                    const notificationRetrievalResponse = await client.get(`${baseURL}/notifications/${props.notificationId}?type=AdminChange`);
                     setGroup(notificationRetrievalResponse.data.targetGroup);
                     setDecidingUser(notificationRetrievalResponse.data.decidingUser);
                     setAction(notificationRetrievalResponse.data.action);

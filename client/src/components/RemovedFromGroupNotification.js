@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import axios from 'axios';
+import { client } from '../utils';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
@@ -17,7 +17,7 @@ function RemovedFromGroupNotification(props) {
         if(loading) {
             (async () => {
                 try {
-                    const notificationRetrievalResponse = await axios.get(`${baseURL}/notifications/${props.notificationId}?type=RemovedFromGroup`);
+                    const notificationRetrievalResponse = await client.get(`${baseURL}/notifications/${props.notificationId}?type=RemovedFromGroup`);
                     console.log({data: notificationRetrievalResponse.data});
                     setGroupName(notificationRetrievalResponse.data.targetGroup?.name);
                     setDecidingUser(notificationRetrievalResponse.data.decidingUser);

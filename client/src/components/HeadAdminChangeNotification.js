@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import axios from 'axios';
+import { client } from '../utils';
 import { useNavigate } from 'react-router';
 import { useSelector } from 'react-redux';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
@@ -20,7 +20,7 @@ function HeadAdminChangeNotification(props) {
         if(loading) {
             (async () => {
                 try {
-                    const notificationRetrievalResponse = await axios.get(`${baseURL}/notifications/${props.notificationId}?type=HeadAdminChange`);
+                    const notificationRetrievalResponse = await client.get(`${baseURL}/notifications/${props.notificationId}?type=HeadAdminChange`);
                     setGroup(notificationRetrievalResponse.data.targetGroup);
                     setpreviousHeadAdmin(notificationRetrievalResponse.data.previousHeadAdmin);
                     setNewHeadAdmin(notificationRetrievalResponse.data.newHeadAdmin);

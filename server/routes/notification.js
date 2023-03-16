@@ -5,6 +5,13 @@ import { getUserIdFromJWTToken } from "../utils.js";
 import { AdminChangeNotification, DeckAddedNotification, GroupDeletedNotification, HeadAdminChangeNotification, NewMemberJoinedNotification, Notification, RemovedFromGroupNotification }  from "../models/notification.js";
 import User from "../models/user.js";
 
+const checkNotificationOwnership = async (req, res, next) => {
+    const user = await User.findById(req.userId, "notifications");
+    if(!user.notifications.some(id => id.toString() === req.notification._id.toString())) {
+        return res.status(401).send("Unauthorized");
+    }
+    next();
+}
 
 notificationRouter.param("notificationId", (req, res, next, notificationId) => {
     Notification.findById(notificationId, (err, notification) => {
@@ -25,7 +32,6 @@ notificationRouter.param("notificationId", (req, res, next, notificationId) => {
 notificationRouter.patch("/mark-as-read", getUserIdFromJWTToken, async (req, res, next) => {
     try {
         const foundUser = await User.findById(req.userId, "notifications");
-        console.log({foundUserId: foundUser._id});
         await Notification.updateMany({_id: {$in: foundUser.notifications}}, {$set: {read: true}});
         let user = await User.findById(req.userId, "notifications")
             .populate({
@@ -38,7 +44,7 @@ notificationRouter.patch("/mark-as-read", getUserIdFromJWTToken, async (req, res
     }
 });
 
-notificationRouter.get("/:notificationId", async (req, res, next) => {
+notificationRouter.get("/:notificationId", getUserIdFromJWTToken, checkNotificationOwnership, async (req, res, next) => {
     let notificationResponse;
     try {
         switch(req.query.type) {
@@ -134,51 +140,10 @@ notificationRouter.get("/:notificationId", async (req, res, next) => {
     }
 });
 
-notificationRouter.get("/:notificationId", (req, res, next) => {
+notificationRouter.delete("/:notificationId", getUserIdFromJWTToken, checkNotificationOwnership, async (req, res, next) => {
     try {
-        Notification.findById(req.notification._id, async (err, notification) => {
-            let response;
-            if(err) {
-                res.status(500).send(err.message);
-                throw err;
-            }
-            switch(notification.notificationType) {
-                case 'JoinDecision':
-                    let foundJoinDecisionNotification = await JoinDecision.findById(notification._id);
-                    let populatedJoinDecisionNotification = await foundJoinDecisionNotification.populate(
-                        [
-                            {
-                                path: 'actor',
-                                select: 'login.username name.first name.last'
-                            },
-                            {
-                                path: 'groupTarget',
-                                select: 'name'
-                            }
-                        ]
-                    );
-                    response = populatedJoinDecisionNotification;
-                    break;
-                default:
-                    res.status(400).send("You are attempting to retrieve an invalid type of notification");
-                    break;
-            }
-            res.status(200).send(response);
-        });
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
-
-notificationRouter.delete("/:notificationId", getUserIdFromJWTToken, async (req, res, next) => {
-    try {
-        const foundUser = await User.findById(req.userId, "notifications");
-        if(foundUser.notifications.includes(req.notification._id)) {
-            await Notification.findByIdAndDelete(req.notification._id);
-            res.status(200).send("Successfully deleted");
-        } else {
-            res.status(403).send("Notifications can only be deleted by the user they belong to");
-        }
+        await Notification.findByIdAndDelete(req.notification._id);
+        res.status(200).send("Successfully deleted");
     } catch (err) {
         console.error({err});
         res.status(500).send(err.message);

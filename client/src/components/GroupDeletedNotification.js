@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import axios from 'axios';
+import { client } from '../utils';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
 const baseURL = 'http://localhost:8000';
@@ -12,7 +12,7 @@ function GroupDeletedNotification(props) {
         if(!groupName) {
             (async () => {
                 try {
-                    const notificationRetrievalResponse = await axios.get(`${baseURL}/notifications/${props.notificationId}?type=GroupDeleted`);
+                    const notificationRetrievalResponse = await client.get(`${baseURL}/notifications/${props.notificationId}?type=GroupDeleted`);
                     setGroupName(notificationRetrievalResponse.data.groupName);
                 } catch (err) {
                     console.error(err);

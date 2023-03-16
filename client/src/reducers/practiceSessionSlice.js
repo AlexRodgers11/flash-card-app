@@ -30,7 +30,7 @@ const initialState = {
 
 export const fetchDeck = createAsyncThunk("practiceSession/fetchDeck", async(deckId) => {
     try {
-        const response = await axios.get(`${baseURL}/decks/${deckId}/practice`);
+        const response = await client.get(`${baseURL}/decks/${deckId}/practice`);
         const cards = response.data.cards;
 
         const practiceSet = shuffleArray(response.data.cards).map(card => {

@@ -2,6 +2,7 @@ import express from "express";
 const deckRouter = express.Router();
 import mongoose from "mongoose";
 
+import CardAttempt from "../models/cardAttempt.js";
 import DeckAttempt from "../models/deckAttempt.js";
 import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
 import Deck from "../models/deck.js";
@@ -26,31 +27,24 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
 });
 
 deckRouter.get("/", async (req, res, next) => {
-    console.log({query: req.query});
     try {
         const page = req.query.page || 1;
         const limit = 25;
         if(req.query.categoryId) {
-            console.log("There is a category Id")
-            
             let categoryId = mongoose.Types.ObjectId(req.query.categoryId);
             if(req.query.searchString) {
-                console.log("There is a category and search string");
                 let regExp = new RegExp(req.query.searchString, "i");
                 const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}, {categories: {$in: [categoryId]}}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
                 res.status(200).send(decks.map(deck => {
                     return {cardCount: deck.cards.length, dateCreated: deck.createdAt, deckId: deck._id, deckName: deck.name}
                 }));
             } else {
-                console.log("There is only a category");
                 const decks = await Deck.find({$and: [{publiclyAvailable: true}, {categories: {$in: [categoryId]}}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
                 res.status(200).send(decks.map(deck => {
                     return {cardCount: deck.cards.length, dateCreated: deck.createdAt, deckId: deck._id, deckName: deck.name}
                 }));
             }
         } else {
-            console.log("only search");
-            
             let regExp = new RegExp(req.query.searchString, "i");            
             const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
             res.status(200).send(decks.map(deck => {
@@ -63,61 +57,61 @@ deckRouter.get("/", async (req, res, next) => {
     }   
 });
 
-deckRouter.post("/", (req, res, next) => {
-    let newDeck = new Deck(req.body);
-    newDeck.save((err, deck) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } else {
-            res.status(200).send(deck);
+deckRouter.get("/:deckId/tile", getUserIdFromJWTToken, extendedRateLimiter, async (req, res, next) => {
+    try {
+        if(req.deck.creator.toString() !== req.userId.toString() && !req.deck.publiclyAvailable) {
+            const user = await User.findById(req.userId, "groups");
+            if(!req.deck.groupDeckBelongsTo || !user.groups.some(group => group._id.toString() === req.deck.groupDeckBelongsTo.toString())) {
+                return res.status(401).send("You are not authorized to view this deck");
+            }
         }
-    });
+
+        let response = {
+            name: req.deck.name,
+            publiclyAvailable: req.deck.publiclyAvailable,
+            createdAt: req.deck.createdAt,
+            cardCount: req.deck.cards.length,
+            permissions: req.deck.permissions
+        };
+        res.status(200).send(JSON.stringify(response));
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send(err.message);
+    }
+    
 });
 
-deckRouter.get("/:deckId/tile", extendedRateLimiter, (req, res, next) => {
-    let response = {
-        name: req.deck.name,
-        publiclyAvailable: req.deck.publiclyAvailable,
-        createdAt: req.deck.createdAt,
-        cardCount: req.deck.cards.length,
-        permissions: req.deck.permissions
-    };
-    res.status(200).send(JSON.stringify(response));
+deckRouter.get("/:deckId/practice", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        if(req.deck.creator.toString() !== req.userId.toString() && !req.deck.publiclyAvailable) {
+            const user = await User.findById(req.userId, "groups");
+            if(!req.deck.groupDeckBelongsTo || !user.groups.some(group => group._id.toString() === req.deck.groupDeckBelongsTo.toString())) {
+                return res.status(401).send("You are not authorized to view this deck");
+            }
+        }
+        const deck = await Deck.findById(req.deck._id, "cards")
+            .populate("cards");
+        res.status(200).send(deck);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send(err.message);
+    }
 });
 
-//moved to users route
-// deckRouter.get("/:deckId/tile-stats", async (req, res, next) => {
-//     console.log({deck: req.deck});
-//     try {
-//         let populatedDeck = await req.deck.populate("attempts", "datePracticed accuracyRate");
-                
-//         let responseObj = {
-//             deckName: req.deck.name,
-//             dateLastPracticed: populatedDeck.attempts[0]?.datePracticed || undefined,
-//             timesPracticed: populatedDeck.attempts.length,
-//             accuracyRate: populatedDeck.attempts.length > 0 ? Math.round(populatedDeck.attempts.reduce((acc, curr) => acc + curr.accuracyRate, 0) / populatedDeck.attempts.length) : undefined,
-//             cardCount: req.deck.cards.length
-//         };
-//         res.status(200).send(responseObj);
-//     } catch (err) {
-//         res.status(500).send(err.message);
-//     }
-// });
-
-deckRouter.get("/:deckId/practice", (req, res, next) => {
-    Deck.findById(req.deck._id)
-            .populate({
-                path: "cards"
-            })
-            .catch(err => {
-                throw err;
-            })
-            .then(deck => res.status(200).send(deck));
-});
-
-deckRouter.get("/:deckId", (req, res, next) => {
-    res.status(200).send(req.deck);
+deckRouter.get("/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        if(req.deck.creator.toString() !== req.userId.toString() && !req.deck.publiclyAvailable) {
+            const user = await User.findById(req.userId, "groups");
+            if(!req.deck.groupDeckBelongsTo || !user.groups.some(group => group._id.toString() === req.deck.groupDeckBelongsTo.toString())) {
+                return res.status(401).send("You are not authorized to view this deck");
+            }
+        }
+        res.status(200).send(req.deck);
+    } catch(err) {
+        console.error(err.message);
+        res.status(500).send(err.message);
+    }
 });
 
 deckRouter.delete("/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
@@ -154,7 +148,7 @@ deckRouter.delete("/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
 
         //delete the deck itself
         const deck = await Deck.findByIdAndDelete(req.deck._id);
-        
+
         res.status(200).send(deck._id);
     } catch (err) {
         console.error(err.message);
@@ -162,29 +156,18 @@ deckRouter.delete("/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
     } 
 });
 
-// deckRouter.delete("/:deckId", async (req, res, next) => {
-//     const session = await mongoose.startSession();
-//     session.startTransaction();
-//     try {
-//         await Group.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}}, {session: session});
-//         await Category.updateMany({decks: req.deck._id}, {$pull: {decks: req.deck._id}}, {session: session});
-//         await User.findByIdAndUpdate(req.deck.creator, {$pull: {decks: req.deck._id}}, {session: session});
-//         await Attempt.deleteMany({deck: req.deck._id}, {session: session});
-//         await Deck.findByIdAndDelete(req.deck._id, {session: session});//make sure middle arg not necessary
-//         await Card.deleteMany({_id: {$in: req.deck.cards}}, {session: session});
-//         await session.commitTransaction();
-//         res.status(200).send(req.deck._id);
-//     } catch (err) {
-//         await session.abortTransaction();
-//         res.status(500).send("There was an error with your request");
-//         throw err;
-//     } finally {
-//         session.endSession();
-//     }
-// });
-
-
-deckRouter.patch("/:deckId", (req, res, next) => {
+deckRouter.patch("/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        if(req.deck.creator.toString() !== req.userId.toString()) {
+            const user = await User.findById(req.userId, "groups");
+            if(!req.deck.groupDeckBelongsTo || !user.adminOf.some(group => group._id.toString() === req.deck.groupDeckBelongsTo.toString())) {
+                return res.status(401).send("You are not authorized to delete this deck");
+            }
+        }
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send(err.message);
+    }
     Deck.findByIdAndUpdate(req.deck._id, req.body, {new: true}, (err, deck) => {
         if(err) {
             res.status(500).send("There was an error with your request");
@@ -196,34 +179,35 @@ deckRouter.patch("/:deckId", (req, res, next) => {
 });
 
 deckRouter.post("/:deckId/cards", getUserIdFromJWTToken, async (req, res, next) => {
-    if(req.deck.groupDeckBelongsTo) {
-        const foundGroup = await Group.findById(req.deck.groupDeckBelongsTo, "administrators");
-        if(!foundGroup.administrators.map(admin => admin.toString()).includes(req.userId)) {
-            res.status(403).send("Only this deck's group administrators can add cards to it");
+    try {
+        if(req.deck.groupDeckBelongsTo) {
+            const foundGroup = await Group.findById(req.deck.groupDeckBelongsTo, "administrators");
+            if(!foundGroup.administrators.map(admin => admin.toString()).includes(req.userId)) {
+                res.status(403).send("Only this deck's group administrators can add cards to it");
+                return;
+            }
+        } else if(req.userId !== req.deck.creator.toString()) {
+            res.status(403).send("Only this deck's creator can add a card to it");
             return;
         }
-    } else if(req.userId !== req.deck.creator.toString()) {
-        res.status(403).send("Only this deck's creator can add a card to it");
-        return;
-    }
-    let cardType = req.body.cardType;
-    delete req.body.cardType;
-    let newCard;
-    switch(cardType) {
-        case "FlashCard":
-            newCard = new FlashCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
-            break;
-        case "TrueFalseCard":
-            newCard = new TrueFalseCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
-            break;
-        case "MultipleChoiceCard":
-            newCard = new MultipleChoiceCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
-            break;
-        default:
-            res.status(500).send("Invalid card type selected");
-            return;
-    }
-    try {
+        let cardType = req.body.cardType;
+        delete req.body.cardType;
+        let newCard;
+        switch(cardType) {
+            case "FlashCard":
+                newCard = new FlashCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
+                break;
+            case "TrueFalseCard":
+                newCard = new TrueFalseCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
+                break;
+            case "MultipleChoiceCard":
+                newCard = new MultipleChoiceCard({...req.body, creator: req.userId, ...(req.deck.groupDeckBelongsTo && {groupCardBelongsTo: req.deck.groupDeckBelongsTo}), _id: new mongoose.Types.ObjectId()});
+                break;
+            default:
+                res.status(500).send("Invalid card type selected");
+                return;
+        }
+    
         const card = await newCard.save();
         await Deck.findByIdAndUpdate(req.deck._id, {$push: {cards: card}});
         res.status(200).send(card._id);

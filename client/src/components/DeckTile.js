@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { client } from '../utils';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import PropTypes from 'prop-types';
-import axios from "axios";
 import { RxEyeOpen, RxEyeClosed } from "react-icons/rx";
 import { SlOptions } from "react-icons/sl";
 import styled from 'styled-components';
@@ -503,7 +503,7 @@ function DeckTile(props) {
     }, [showOptions, setShowOptions]);
 
     useEffect(() => {
-        axios.get(`${baseURL}/decks/${props.deckId}/tile`)
+        client.get(`${baseURL}/decks/${props.deckId}/tile`)
             .then((response) => setDeckData(response.data))
             .catch((err) => console.log(err));
     }, [props.deckId]);

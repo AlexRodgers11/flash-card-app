@@ -34,7 +34,7 @@ export const deleteCard = createAsyncThunk("deck/deleteCard", async ({cardToDele
 
 export const fetchDeck = createAsyncThunk("deck/fetchDeck", async (deckId) => {
     try {
-        const response = await axios.get(`${baseURL}/decks/${deckId}`);
+        const response = await client.get(`${baseURL}/decks/${deckId}`);
         return {
             ...response.data
         }
@@ -45,7 +45,7 @@ export const fetchDeck = createAsyncThunk("deck/fetchDeck", async (deckId) => {
 
 export const updateDeck = createAsyncThunk("deck/updateDeck", async ({deckId, deckUpdates}) => {
     try {
-        const response = await axios.patch(`${baseURL}/decks/${deckId}`, deckUpdates );
+        const response = await client.patch(`${baseURL}/decks/${deckId}`, deckUpdates );
         const stateUpdateObj = {};
         for(const key in deckUpdates) {
             if(response.data.hasOwnProperty(key)) {

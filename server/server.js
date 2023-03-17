@@ -2,6 +2,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
+import { dirname, join }from "path";
+import { fileURLToPath } from "url";
 import { baseRateLimiter, excludingPaths } from "./utils.js";
 
 const port = process.env.port || 8000;
@@ -25,7 +27,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-mongoose.connect("mongodb://localhost/flash-card-app-one", {
+mongoose.connect("mongodb://localhost/flash-card-app-two", {
     //use MongoDB's new connection string parser instead of the old deprecated one
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -35,7 +37,6 @@ const app = express();
 
 //use body-parsing middleware that only parses json
 app.use(bodyParser.json());
-
 
 
 //set response headers
@@ -58,6 +59,8 @@ app.use(
 );
 
 app.use(cookieParser());
+
+app.use(express.static(join(dirname(fileURLToPath(import.meta.url)), "../client/build")));
 
 app.use(passport.initialize());
 

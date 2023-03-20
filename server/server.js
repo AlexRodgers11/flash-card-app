@@ -27,8 +27,16 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-mongoose.connect("mongodb://localhost/flash-card-app-two", {
-    //use MongoDB's new connection string parser instead of the old deprecated one
+// mongoose.connect("mongodb://localhost/flash-card-app-two", {
+//     //use MongoDB's new connection string parser instead of the old deprecated one
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// });
+
+mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
     useNewUrlParser: true,
     useUnifiedTopology: true
 });

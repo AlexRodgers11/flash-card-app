@@ -2,11 +2,9 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
-import { dirname, join }from "path";
-import { fileURLToPath } from "url";
 import { baseRateLimiter, excludingPaths } from "./utils.js";
 
-const port = process.env.port || 8000;
+const port = process.env.PORT || 8000;
 const router = express.Router();
 
 import deckAttemptRouter from "./routes/deckAttempts.js";
@@ -41,7 +39,7 @@ const database = async () => {
     }
 }
 
-// mongoose.connect("mongodb://localhost/flash-card-app-two", {
+// mongoose.connect("mongodb://localhost/flash-card-app-one", {
 //     //use MongoDB's new connection string parser instead of the old deprecated one
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true
@@ -56,7 +54,7 @@ app.use(bodyParser.json());
 
 //set response headers
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Origin", process.env.CLIENT_ORIGIN || "http://localhost:3000");
     res.header("Access-Control-Allow-Methods", "GET, PATCH, PUT, POST, DELETE");
     res.header(
         "Access-Control-Allow-Headers",
@@ -74,8 +72,6 @@ app.use(
 );
 
 app.use(cookieParser());
-
-app.use(express.static(join(dirname(fileURLToPath(import.meta.url)), "../client/build")));
 
 app.use(passport.initialize());
 

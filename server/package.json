@@ -2,11 +2,12 @@
   "name": "flish-flash",
   "version": "1.0.0",
   "description": "",
-  "main": "server/server.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/server.js"
+    "start": "node server.js",
+    "build": "echo 'No build step required for the server'"
   },
   "author": "",
   "license": "ISC",

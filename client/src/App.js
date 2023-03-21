@@ -2,6 +2,11 @@ import Header from './components/Header';
 import Router from './components/Router';
 import styled from 'styled-components';
 import Footer from './components/Footer';
+import { disableReactDevTools } from "@fvilers/disable-react-devtools";
+
+if(process.env.NODE_ENV === "production") {
+	disableReactDevTools();
+}
 
 const AppWrapper = styled.div`
 	text-align: center;

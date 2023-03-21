@@ -27,19 +27,26 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const database = async () => {
+    const connectionParams = {
+        useNewUrlParser: true,
+        useUnifiedTopology: true    
+    }
+
+    try {
+        mongoose.connect(process.env.MONGODB_CONNECTION_STRING, connectionParams);
+        console.log("Database connected succesfully");
+    } catch (err) {
+        console.error(err.message);
+    }
+}
+
 // mongoose.connect("mongodb://localhost/flash-card-app-two", {
 //     //use MongoDB's new connection string parser instead of the old deprecated one
 //     useNewUrlParser: true,
 //     useUnifiedTopology: true
 // });
 
-mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
 
 const app = express();
 
@@ -92,3 +99,5 @@ app.use(router);
 app.listen(port, () => {
     console.log(`Node.js listening on port ${port}`);
 });
+
+database();

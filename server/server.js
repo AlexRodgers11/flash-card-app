@@ -24,6 +24,8 @@ import passport from "passport";
 import dotenv from "dotenv";
 
 dotenv.config();
+console.log("CLIENT_ORIGIN:", process.env.CLIENT_ORIGIN);
+console.log("PORT:", process.env.PORT);
 
 const database = async () => {
     const connectionParams = {

@@ -107,7 +107,7 @@ function UserTile(props) {
     const [userData, setUserData] = useState({});
     const headAdmin = useSelector((state) => state.group.headAdmin);
     
-    const baseURL = 'http://localhost:8000';
+    const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
     useEffect(() => {
         setTimeout(() => {

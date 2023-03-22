@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import axios from 'axios';
 import useFormInput from '../hooks/useFormInput';
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function CardForm(props) {
 	const [isLoaded, setIsLoaded] = useState(false);

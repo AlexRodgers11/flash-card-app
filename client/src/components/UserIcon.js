@@ -41,7 +41,7 @@ const StyledImage = styled.img`
 function UserIcon(props) {
     const [userData, setUserData] = useState({});
     
-    const baseURL = 'http://localhost:8000';
+    const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
     useEffect(() => {
         client.get(`${baseURL}/users/${props.memberId}/tile`)

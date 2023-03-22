@@ -9,7 +9,7 @@ import Modal from "./Modal";
 import RegisterProfilePicCropForm from "./RegisterProfilePicCropForm"; //probably rename all of these to exclude the word "Register"
 import axios from "axios";
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 const UserSettingsWrapper = styled.div`
     display: flex;

@@ -16,7 +16,7 @@ const FormWrapper = styled.form`
 `;
 
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function RegisterCredentialsForm() {
     const dispatch = useDispatch();

@@ -11,7 +11,7 @@ import CardForm from './CardForm';
 import Modal from './Modal';
 import { client } from "../utils";
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 const CardWrapper = styled.div`
     position: relative;

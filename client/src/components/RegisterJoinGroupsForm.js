@@ -9,7 +9,7 @@ import { sendJoinRequest } from "../reducers/communicationsSlice";
 import { addGroup } from '../reducers/loginSlice';
 import { client } from '../utils';
 
-const baseURL = "http://localhost:8000";
+const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 function RegisterJoinGroupsForm(props) {
     const dispatch = useDispatch();

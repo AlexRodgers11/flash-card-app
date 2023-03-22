@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { client } from "../utils";
 
-const baseURL = "http://localhost:8000";
+const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 const initialState = {
     groupId: "",

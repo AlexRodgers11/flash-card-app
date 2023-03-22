@@ -8,7 +8,7 @@ import { addMemberSubmittedDeck } from '../reducers/decksSlice';
 import { addDeckToUser } from '../reducers/loginSlice';
 import styled from 'styled-components';
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 const RadioWrapper = styled.div`
 	display: flex;

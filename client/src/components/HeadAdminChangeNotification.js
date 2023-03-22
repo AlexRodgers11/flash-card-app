@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function HeadAdminChangeNotification(props) {
     const userId = useSelector((state) => state.login.userId);

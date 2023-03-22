@@ -8,7 +8,7 @@ import { MessageContentContainer } from './StyledComponents/MessageContentContai
 import { MessagePreviewContent } from './StyledComponents/MessagePreviewContent';
 import { client } from '../utils';
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function DeckSubmissionMessage(props) {
 	const dispatch = useDispatch();

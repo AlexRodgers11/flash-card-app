@@ -98,7 +98,7 @@ function User() {
     const { userId } = useParams(); 
     const [userData, setUserData] = useState({});
     
-    const baseURL = 'http://localhost:8000';
+    const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
     useEffect(() => {
         if(userData._id !== userId) {

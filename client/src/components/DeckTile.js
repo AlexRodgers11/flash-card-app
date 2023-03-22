@@ -364,7 +364,7 @@ const RightBlock = styled.div`
 
 `;
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function DeckTile(props) {
     const userId = useSelector((state) => state.login.userId);

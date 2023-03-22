@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { client } from '../utils';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function GroupDeletedNotification(props) {
     const [groupName, setGroupName] = useState();

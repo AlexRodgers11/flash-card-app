@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
 
-const baseURL = 'http://localhost:8000';
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 
 function NewMemberJoinedNotification(props) {

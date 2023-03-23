@@ -8,11 +8,20 @@ import { JoinOptionContainer } from "./StyledComponents/GroupStyles";
 import { generateJoinCode } from '../utils';
 import useToggle from "../hooks/useToggle";
 import { updateGroup } from "../reducers/groupSlice";
+import { BsClipboardPlus } from "react-icons/bs";
 
 const GroupAdminSectionWrapper = styled.section`
     display: flex;
     flex-direction: column;
     align-items: center;
+`;
+
+const CopyButton = styled.button`
+    display: inline-flex;
+    align-items: center;
+    & svg {
+        margin-left: .25rem;
+    }
 `;
 
 const GroupEditControlsContainer = styled.div`
@@ -63,6 +72,14 @@ export function GroupAdminSection() {
         dispatch(updateGroup({groupId, groupUpdates: {joinCode: newJoinCode}}));
     }
 
+    const copyCode = async () => {
+        try {
+            await navigator.clipboard.writeText(joinCode);
+        } catch (err) {
+            console.error("Failed to copy text:", err.message)
+        }
+    }
+
     return (
         <GroupAdminSectionWrapper>
             <GroupEditControlsContainer>
@@ -81,6 +98,7 @@ export function GroupAdminSection() {
                                 :
                                 <div>
                                     <span>Join Code: {joinCode} </span>
+                                    <CopyButton onClick={copyCode}>Copy Code <BsClipboardPlus /></CopyButton>
                                     <button onClick={getNewJoinCode}>Get New Code</button>
                                     <button onClick={toggleJoinCodeVisible}>Hide Join Code</button>
                                 </div>

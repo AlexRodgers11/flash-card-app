@@ -41,11 +41,6 @@ const database = async () => {
     }
 }
 
-// mongoose.connect("mongodb://localhost/flash-card-app-one", {
-//     //use MongoDB's new connection string parser instead of the old deprecated one
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// });
 
 
 const app = express();
@@ -61,7 +56,7 @@ app.use((req, res, next) => {
     res.header(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
+        );
     res.header("Access-Control-Allow-Credentials", "true");
     next();
 });
@@ -98,4 +93,11 @@ app.listen(port, () => {
     console.log(`Node.js listening on port ${port}`);
 });
 
-database();
+if(process.env.NODE_ENV === "development") {
+    mongoose.connect("mongodb://localhost/flash-card-app-one", {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+} else {
+    database();
+}

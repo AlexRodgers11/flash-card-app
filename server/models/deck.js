@@ -12,6 +12,7 @@ const Deck = new Schema({
     categories: [{type: Schema.Types.ObjectId, ref: "Category"}],
     groupDeckBelongsTo: {type: Schema.Types.ObjectId, ref: "Group"},
     approvedByGroupAdmins: Boolean,
+    allowCopies: Boolean,
     deckCopiedFrom: {type: Schema.Types.ObjectId, ref: "Deck"}
 }, {timestamps: true});
 

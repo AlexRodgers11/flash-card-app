@@ -8,6 +8,8 @@ import styled from 'styled-components';
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { removeDeckFromUser } from '../reducers/loginSlice';
 import { deleteDeck } from '../reducers/decksSlice';
+import { copyDeck } from '../reducers/loginSlice';
+import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
 
 const DeckTileWrapper = styled.div`
     display: inline-flex; 
@@ -441,6 +443,14 @@ function DeckTile(props) {
                     dispatch(removeDeckFromUser(props.deckId));
                 });
                 break;
+            case "copy":
+                dispatch(copyDeck({deckId: props.deckId, userId: userId}))
+                    .then(action => {
+                        if(listType === "user") {
+                            dispatch(addDeckToCurrentDeckList({deckId: action.payload._id}));
+                        }
+                    });
+                break;
             default:
                 break;
         }
@@ -594,6 +604,7 @@ function DeckTile(props) {
                     <Options>
                         <Option role="button" data-option="practice" onClick={handleOptionSelection}>Practice</Option>
                         <Option role="button" data-option="view" onClick={handleOptionSelection}>View</Option>
+                        {deckData.allowCopies && <Option role="button" data-option="copy" onClick={handleOptionSelection}>Copy</Option>}
                         {(!props.noEdit && displayOption()) && <Option role="button" data-option="edit" onClick={handleOptionSelection}>Edit</Option>}
                         {(!props.noEdit && displayOption()) && <Option role="button" data-option="delete" onClick={handleOptionSelection}>Delete</Option>}
                     </Options>

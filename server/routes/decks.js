@@ -69,6 +69,7 @@ deckRouter.get("/:deckId/tile", getUserIdFromJWTToken, extendedRateLimiter, asyn
         let response = {
             name: req.deck.name,
             publiclyAvailable: req.deck.publiclyAvailable,
+            allowCopies: req.deck.allowCopies || false,
             createdAt: req.deck.createdAt,
             cardCount: req.deck.cards.length,
             permissions: req.deck.permissions

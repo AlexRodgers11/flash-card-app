@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { resetDeck } from '../reducers/deckSlice';
-import { addMemberSubmittedDeck } from '../reducers/decksSlice';
+import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
 import { addDeckToUser } from '../reducers/loginSlice';
 import styled from 'styled-components';
 
@@ -44,6 +44,7 @@ const ButtonWrapper = styled.div`
 function DeckForm() {
 	const [nameInput, clearNameInput, handleNameInputChange] = useFormInput('');
   	const [publiclyAvailable, clearPubliclyAvailable, handlePubliclyAvailableChange] = useFormInput("false");
+	const [allowCopies, clearAllowCopies, handleAllowCopiesChange] = useFormInput("false");
 	const listType = useSelector((state) => state.decks.listType);
 	const userId = useSelector((state) => state.login.userId);
 	const dispatch = useDispatch();
@@ -55,11 +56,13 @@ function DeckForm() {
 		let newDeck = {
 			deckName: nameInput,
 			publiclyAvailable: publiclyAvailable === "true",
+			allowCopies: allowCopies === "true" && publiclyAvailable === "true",
 			creator: userId,
 			dateCreated: new Date().toString()
 		}
 		clearNameInput();
 		clearPubliclyAvailable();
+		clearAllowCopies();
 		dispatch(resetDeck());
 		console.log(`${baseURL}/users/${userId}/decks`);
 		console.log({newDeck});
@@ -68,7 +71,7 @@ function DeckForm() {
 				console.log({response});
 				dispatch(addDeckToUser({_id: response.data._id, name: response.data.name}));
 				if(listType === "user") {
-					dispatch(addMemberSubmittedDeck({deckId: response.data._id}));//this will be handled in dispatched action from decksSlice, or renamed if dispatched elsewhere
+					dispatch(addDeckToCurrentDeckList({deckId: response.data._id}));
 				}
 				navigate(`/decks/${response.data._id}`);
 			})
@@ -92,6 +95,14 @@ function DeckForm() {
 				<label className="form-label" htmlFor="private">Private</label>
 				<input checked={publiclyAvailable==="false"} type="radio" id="private" name="publiclyAvailable" value="false" onChange={handlePubliclyAvailableChange} />
 			</RadioWrapper>
+			{publiclyAvailable==="true" &&
+				<RadioWrapper>
+					<label className="form-label" htmlFor="allow-copies">Allow Copies</label>
+					<input checked={allowCopies==="true"} type="radio" id="allow-copies" name="allow-copies" value="true" onChange={handleAllowCopiesChange} />
+					<label className="form-label" htmlFor="prevent-copies">Prohibit Copies</label>
+					<input checked={allowCopies==="false"} type="radio" id="prevent-copies" name="prevent-copies" value="false" onChange={handleAllowCopiesChange} />
+				</RadioWrapper>
+			}
 			<ButtonWrapper>
 				<button className="btn btn-danger" onClick={handleCancelCreateDeck}>Cancel</button>
 				<button className="btn btn-primary" type="submit">Create</button>

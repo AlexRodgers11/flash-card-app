@@ -80,6 +80,15 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
     }
 });
 
+export const copyDeck = createAsyncThunk("decks/copyDeck", async ({deckId, userId}) => {
+    try {
+        const response = await client.post(`${baseURL}/users/${userId}/decks/copy/${deckId}`);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 export const createGroup = createAsyncThunk("login/createGroup", async({creator, name}) => {
     try {
         const response = await axios.post(`${baseURL}/users/${creator}/groups`, {creator, name, administrators: [creator], members: [creator]});
@@ -169,6 +178,9 @@ export const loginSlice = createSlice({
             state.groups = action.payload.groups;
             state.attempts = action.payload.attempts;
             state.accountSetupStage = action.payload.accountSetupStage;
+        });
+        builder.addCase(copyDeck.fulfilled, (state, action) => {
+            state.decks = [...state.decks, action.payload];
         });
         builder.addCase(createGroup.fulfilled, (state, action) => {
             state.groups = [...state.groups, action.payload];

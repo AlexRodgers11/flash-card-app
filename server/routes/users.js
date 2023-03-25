@@ -11,11 +11,12 @@ import { DeckDecision, DeckSubmission, Message } from "../models/message.js";
 // import { CardDecision, DeckDecision, JoinDecision, Notification } from '../models/notification.js';
 // import { CardDecision, JoinDecision, Notification } from '../models/notification.js';
 import { Notification } from '../models/notification.js';
-import { extendedRateLimiter, generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
+import { copyDeck, extendedRateLimiter, generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
 
 import multer from "multer";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
 import { Card } from "../models/card.js";
+import deck from "../models/deck.js";
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
@@ -241,8 +242,9 @@ userRouter.post("/:userId/decks", async (req, res, next) => {
     try {
         let newDeck = new Deck({
             name: req.body.deckName,
-            publiclyAvailable: req.body.publiclyAvailable,
+            publiclyAvailable: req.body.publiclyAvailable || false,
             creator: req.body.creator,
+            allowCopies: req.body.allowCopies || false
         });
         const deck = await newDeck.save();
         await User.findByIdAndUpdate(req.user._id, {$push: {decks: deck}});
@@ -253,6 +255,21 @@ userRouter.post("/:userId/decks", async (req, res, next) => {
     }
 });
 
+userRouter.post("/:userId/decks/copy/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.user._id.toString() !== req.userId.toString()) {
+        return res.status(401).send("Only the user whose deck list this would be copied to may make a copy");
+    }
+    try {
+        let newDeck = await copyDeck(req.params.deckId, req.userId);
+        newDeck.copiedFrom = req.params.deckId;
+        const savedDeckCopy = await newDeck.save();
+        console.log({savedDeckCopy});
+        await User.findByIdAndUpdate(req.user._id, {$push: {decks: savedDeckCopy}});
+        res.status(200).send({_id: savedDeckCopy._id, name: savedDeckCopy.name});
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
 
 userRouter.delete("/:userId/messages/:messageId", async (req, res, next) => {
     try {

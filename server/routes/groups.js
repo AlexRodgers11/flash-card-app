@@ -3,6 +3,7 @@ const groupRouter = express.Router();
 import mongoose from "mongoose";
 
 import { Card } from "../models/card.js";
+import deck from "../models/deck.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import { DeckSubmission, JoinRequest } from "../models/message.js";
@@ -91,7 +92,7 @@ groupRouter.post("/:groupId/decks", getUserIdFromJWTToken, async (req, res, next
         if(!req.group.administrators.some(id => id.toString() === req.userId.toString())) {
             res.status(401).send("Only group admins may add decks directly to the group. If you are a member please submit the deck to the admins for approval");
         }
-        const deckCopy = await copyDeck(req.body.deckId, req.group._id);
+        const deckCopy = await copyDeck(req.body.deckId, req.userId, req.group._id);
         deckCopy.groupDeckBelongsTo = req.group._id;
         deckCopy.approvedByGroupAdmins = true,
         deckCopy.deckCopiedFrom = req.body.deckId;
@@ -262,7 +263,7 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", getUserIdFromJWTTok
         } else {
 
             //create a copy of the deck that will either be added to the group upon approval or deleted upon rejection (this way original deck edits don't affect submitted)
-            const deckCopy = await copyDeck(req.body.deckToCopy, req.group._id);
+            const deckCopy = await copyDeck(req.body.deckToCopy, req.userId, req.group._id);
             deckCopy.groupDeckBelongsTo = req.group._id;
             deckCopy.approvedByGroupAdmins = false,
             deckCopy.deckCopiedFrom = req.body.deckToCopy;

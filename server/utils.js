@@ -45,14 +45,14 @@ export default getRandomCardType;
 
 export const generateRandomFileName = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
 
-export const copyDeck = async (deckId, groupId) => {
+export const copyDeck = async (deckId, userId, groupId) => {
     try {
         const foundDeck = await Deck.findById(deckId).populate("cards");
         
         const deckCopy = new Deck({
             name: foundDeck.name,
             publiclyAvailable: false,
-            creator: foundDeck.creator,
+            creator: userId,
             attempts: [],
             categories: foundDeck.categories.slice(),
             cards: await Promise.all(foundDeck.cards.map(async card => {
@@ -60,7 +60,7 @@ export const copyDeck = async (deckId, groupId) => {
                 switch(card.cardType) {
                     case "FlashCard":
                         copiedCard = new FlashCard({
-                            creator: card.creator,
+                            creator: userId,
                             question: card.question,
                             correctAnswer: card.correctAnswer,
                             hint: card.hint,
@@ -69,7 +69,7 @@ export const copyDeck = async (deckId, groupId) => {
                         break;
                         case "TrueFalseCard":
                             copiedCard = new TrueFalseCard({
-                            creator: card.creator,
+                            creator: userId,
                             question: card.question,
                             correctAnswer: card.correctAnswer,
                             wrongAnswerOne: card.wrongAnswerOne,
@@ -79,7 +79,7 @@ export const copyDeck = async (deckId, groupId) => {
                         break;
                     case "MultipleChoiceCard":
                         copiedCard = new MultipleChoiceCard({
-                            creator: card.creator,
+                            creator: userId,
                             question: card.question,
                             correctAnswer: card.correctAnswer,
                             wrongAnswerOne: card.wrongAnswerOne,
@@ -93,7 +93,7 @@ export const copyDeck = async (deckId, groupId) => {
                         break;
                     }
                     copiedCard._id = new mongoose.Types.ObjectId();
-                    copiedCard.groupCardBelongsTo = groupId;
+                    copiedCard.groupCardBelongsTo = groupId || null;
                     const savedCardCopy = await copiedCard.save();
                     return savedCardCopy;
                 }))

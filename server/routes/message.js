@@ -286,7 +286,6 @@ messageRouter.delete("/:messageId", getUserIdFromJWTToken, checkMessageOwnership
             ...(req.query.direction === "sent" && {$set: {sendingUserDeleted: true}})
         }
         const updatedMessage = await Message.findByIdAndUpdate(req.message._id, updateObj, {new: true});
-        console.log({updatedMessage});
         
         let updatedUser;
         if(req.query.direction === "received") {

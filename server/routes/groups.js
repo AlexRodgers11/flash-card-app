@@ -1,9 +1,7 @@
 import express from "express";
 const groupRouter = express.Router();
-import mongoose from "mongoose";
 
 import { Card } from "../models/card.js";
-import deck from "../models/deck.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import { DeckSubmission, JoinRequest } from "../models/message.js";

@@ -16,8 +16,4 @@ cardAttemptRouter.param("cardAttemptId", (req, res, next, cardAttemptId) => {
     });
 });
 
-// cardAttemptRouter.get("/:cardAttemptId", async(req, res, next) => {
-//     res.status(200).send(req.cardAttempt);
-// });
-
 export default cardAttemptRouter;

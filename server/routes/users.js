@@ -1,22 +1,19 @@
 import express from "express";
 const userRouter = express.Router();
-import jwt from "jwt-simple";
 
 import CardAttempt from "../models/cardAttempt.js";
 import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
-import { DeckDecision, DeckSubmission, Message } from "../models/message.js";
-// import { CardDecision, DeckDecision, JoinDecision, Notification } from '../models/notification.js';
-// import { CardDecision, JoinDecision, Notification } from '../models/notification.js';
+import { Message } from "../models/message.js";
 import { Notification } from '../models/notification.js';
 import { copyDeck, extendedRateLimiter, generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
 
 import multer from "multer";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
 import { Card } from "../models/card.js";
-import deck from "../models/deck.js";
+
 
 userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
@@ -132,11 +129,8 @@ userRouter.delete("/:userId", async (req, res, next) => {
             let group = await Group.findById(req.user.groups[i]);
         
             if(group.administrators[0] .equals(userId)) {
-                console.log("deleting cards");
                 await Card.deleteMany({groupCardBelongsTo: group._id});
-                console.log("deleting deck");
                 await Deck.deleteMany({groupDeckBelongsTo: group._id});
-                console.log("deleting group");
                 await Group.findByIdAndDelete(group._id);
             }
         }
@@ -263,7 +257,6 @@ userRouter.post("/:userId/decks/copy/:deckId", getUserIdFromJWTToken, async (req
         let newDeck = await copyDeck(req.params.deckId, req.userId);
         newDeck.copiedFrom = req.params.deckId;
         const savedDeckCopy = await newDeck.save();
-        console.log({savedDeckCopy});
         await User.findByIdAndUpdate(req.user._id, {$push: {decks: savedDeckCopy}});
         res.status(200).send({_id: savedDeckCopy._id, name: savedDeckCopy.name});
     } catch (err) {
@@ -383,7 +376,6 @@ userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), asyn
             email: req.body.login.email ? req.body.login.email : req.user.login.email ? req.user.login.email : ""
         }
     }
-    console.log({patchObj});
     try {
         let user;
         user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
@@ -412,7 +404,6 @@ userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), asyn
             let photoUrl = await getObjectSignedUrl(user.photo);
             responseData.photo = photoUrl;
         }
-        console.log({responseData});
         res.status(200).send(responseData);
     } catch (err) {
         res.status(500).send("There was an error with your request");
@@ -422,10 +413,6 @@ userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), asyn
 
 userRouter.post("/:userId/attempts", getUserIdFromJWTToken, async (req, res, next) => {
     if(req.userId !== req.user._id.toString()) {
-        console.log({1: req.userId});
-        console.log({2: req.user._id});
-        console.log({3: typeof req.userId});
-        console.log({4: typeof req.user._id});
         return res.status(401).send("Unauthorized. A user may only add an attempt to their own statistics");
     }
     try {
@@ -457,17 +444,6 @@ userRouter.post("/:userId/attempts", getUserIdFromJWTToken, async (req, res, nex
             cardAttempts.push(savedCardAttempt._id);
         }
         const finishedDeckAttempt = await DeckAttempt.findByIdAndUpdate(savedDeckAttempt._id,{$set: {cards: cardAttempts}});
-        console.log({cardAttempts});
-        // const newDeckAttempt = new DeckAttempt({
-        //     deck: req.body.deck,
-        //     datePracticed: req.body.datePracticed,
-        //     accuracyRate: req.body.accuracyRate,
-        //     cards: cardAttempts,
-        //     attempter: req.user._id
-        // });
-        // const savedDeckAttempt = await newDeckAttempt.save();
-        // await User.findByIdAndUpdate(req.user._id, {$push: {deckAttempts: savedDeckAttempt}});
-        // await Deck.findByIdAndUpdate(req.body.deck, {$push: {attempts: savedDeckAttempt}});
         await User.findByIdAndUpdate(req.user._id, {$push: {deckAttempts: finishedDeckAttempt}});
         await Deck.findByIdAndUpdate(req.body.deck, {$push: {attempts: finishedDeckAttempt}});
         res.status(200).send(savedDeckAttempt);
@@ -524,7 +500,6 @@ userRouter.get("/:userId/attempts", getUserIdFromJWTToken, async (req, res, next
             select: "name"
         }
     });
-    console.log({attempts: populatedUser.deckAttempts});
     res.status(200).send(populatedUser.deckAttempts);
 });
 
@@ -550,7 +525,6 @@ userRouter.get("/:userId/decks/statistics", getUserIdFromJWTToken, async (req, r
                 accuracyRate: deck.attempts.length > 0 ? Math.round(deck.attempts.reduce((acc, curr) => acc + curr.accuracyRate, 0) / deck.attempts.length) : undefined,
             }
         });
-        // console.log({responseArr});
         res.status(200).send(responseArr);
     } catch (err) {
         res.status(500).send(err.message);

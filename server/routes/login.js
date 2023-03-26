@@ -66,7 +66,6 @@ passport.use(
             passwordField: "password"
         },
         (usernameOrEmail, password, done) => {
-        console.log("finding user");
         User.findOne({
             $and: [
                 {$or: [
@@ -81,7 +80,6 @@ passport.use(
                 throw err;
             }
             if(user) {
-                console.log("user found");
                 return done(null, user);
             } else {
                 return done(null, false);
@@ -127,7 +125,6 @@ const requireSignIn = passport.authenticate("login", {session: false});
 const requireRegister = passport.authenticate("register", {session: false});
 
 const tokenForUser = user => {
-    console.log("creating token for user");
     return jwt.encode({
         sub: user._id,
         iat: Math.round(Date.now() / 1000),
@@ -138,7 +135,6 @@ const tokenForUser = user => {
 }
 
 loginRouter.post("/", requireSignIn, (req, res, next) => {
-    console.log("POST request received");
     res.cookie('jwt', tokenForUser(req.user), {
         httpOnly: true,
         secure: false, //change this to true once deployed on https

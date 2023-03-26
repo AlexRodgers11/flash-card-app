@@ -67,7 +67,6 @@ cardRouter.put("/:cardId", getUserIdFromJWTToken, async (req, res, next) => {
                     await Card.findByIdAndDelete(req.card._id);
                     let newCard = new TrueFalseCard({...req.body, _id: req.card._id});;
                     updatedCard = await newCard.save();
-                    console.log({updatedCard});
                 }
                 break;
             case "MultipleChoiceCard":

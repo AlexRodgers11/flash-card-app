@@ -38,13 +38,14 @@ const StyledImage = styled.img`
     border-radius: 50%;
 `;
 
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+
 function UserIcon(props) {
     const [userData, setUserData] = useState({});
     
-    const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
     useEffect(() => {
-        client.get(`${baseURL}/users/${props.memberId}/tile`)
+        client.get(`${baseURL}/users/${props.memberId}/identification`)
             .then((response) => setUserData(response.data));
     }, [props.memberId]);
 
@@ -60,14 +61,6 @@ function UserIcon(props) {
             <InitialsOverlay style={{fontSize: `${props.width / 2}rem`}} className="initials-overlay">{`${userData.firstName[0]}.${userData.lastName[0]}.`}</InitialsOverlay>
         </UserIconWrapper>
     )
-    // return (
-    //     <UserIconWrapper style={{height: "90%", width: "90%"}} className="ImageContainer">
-    //         {userData.photo && 
-    //             <StyledImage className="StyledImage" src={userData.photo} alt="profile-icon" />
-    //         } 
-    //         <InitialsOverlay style={{fontSize: `${props.width / 2}rem`}} className="initials-overlay">{`${userData.firstName[0]}.${userData.lastName[0]}.`}</InitialsOverlay>
-    //     </UserIconWrapper>
-    // )
 }
 
 

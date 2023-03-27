@@ -57,18 +57,6 @@ userRouter.get("/:userId/identification", async (req, res, next) => {
     res.status(200).send(partialData);
 });
 
-userRouter.get("/:userId/tile", extendedRateLimiter, async (req, res, next) => {
-    let partialData = {
-        firstName: req.user.name.first,
-        lastName: req.user.name.last,
-        login: req.user.login,
-        // password: req.user.login.password, /////////////////////////delete this once testing is done
-        email: req.user.email,
-        photo: req.user.photo ? !req.user.photo.includes(".") ? await getObjectSignedUrl(req.user.photo) : req.user.photo : "",
-    }
-    res.status(200).send(partialData);
-});
-
 userRouter.get("/:userId", getUserIdFromJWTToken, async (req, res, next) => {
     try {
         if(req.query.public_info === "true") {

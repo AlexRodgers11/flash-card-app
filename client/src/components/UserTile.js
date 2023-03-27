@@ -98,6 +98,7 @@ const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
     height: 100%;
 
 `
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function UserTile(props) {
     const navigate = useNavigate();
@@ -107,11 +108,10 @@ function UserTile(props) {
     const [userData, setUserData] = useState({});
     const headAdmin = useSelector((state) => state.group.headAdmin);
     
-    const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
     useEffect(() => {
         setTimeout(() => {
-            axios.get(`${baseURL}/users/${props.memberId}/tile`)
+            axios.get(`${baseURL}/users/${props.memberId}/identification`)
                 .then((response) => setUserData(response.data));
         }, 0)
     }, [props.memberId]);
@@ -125,7 +125,6 @@ function UserTile(props) {
         dispatch(removeMember({groupId, memberToRemoveId: props.memberId}));
         //be sure to create notification to let member know what happened
     }
-    //////start here- reorder member array after adding/removing from admins--probably do on backend
     const addMemberToAdmins = () => {
         dispatch(grantAdminAuthority({groupId, memberToAuthorizeId: props.memberId}));
         //need to make notification

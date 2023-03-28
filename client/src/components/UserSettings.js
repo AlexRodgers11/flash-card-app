@@ -221,7 +221,7 @@ function UserSettings() {
 
         switch(evt.currentTarget.dataset.editfield) {
             case "email":
-                let emailResponse = await axios.get(`${baseURL}/users/emails?email=${emailInputValue}`);
+                let emailResponse = await axios.get(`${baseURL}/login/emails?email=${emailInputValue}`);
                 if(emailResponse.data.emailAvailable) {
                     dispatch(updateUser({userId, userUpdates: {login: {email: emailInputValue}}}));
                     setEditField("");
@@ -231,7 +231,7 @@ function UserSettings() {
                 }
                 break;
             case "username":
-                let usernameResponse = await axios.get(`${baseURL}/users/usernames?username=${usernameInputValue}`);
+                let usernameResponse = await axios.get(`${baseURL}/login/usernames?username=${usernameInputValue}`);
                 if(usernameResponse.data.usernameAvailable) {
                     dispatch(updateUser({userId, userUpdates: {login: {username: usernameInputValue}}}));
                     setEditField("");

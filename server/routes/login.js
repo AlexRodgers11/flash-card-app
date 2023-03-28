@@ -1,25 +1,11 @@
 import express from "express";
 const loginRouter = express.Router();
 import passport from "passport";
-import { Strategy, ExtractJwt } from "passport-jwt";
 import { Strategy as LocalStrategy } from "passport-local";
 import jwt from "jwt-simple";
 import User from "../models/user.js";
 import { generateCode } from "../utils.js";
 
-// const jwtOptions = {
-//     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-//     secretOrKey: "Kacchan"
-// }
-
-// passport.use(
-//     "loginWithJwt",
-//     new Strategy(jwtOptions, function(payload, done) {
-//         return done(null, {});
-//     })
-// );
-
-// const requireJwt = passport.authenticate("loginWithJwt", {session: false});
 
 import {createTransport} from "nodemailer";
 
@@ -161,6 +147,24 @@ loginRouter.post("/new", requireRegister, (req, res, next) => {
         email: req.user.email,
         accountSetupStage: req.user.accountSetupStage,
     });
+});
+
+loginRouter.get("/emails", async (req, res, next) => {
+    if(req.query.email) {
+        let user = await User.findOne({"login.email": req.query.email});
+        res.status(200).send({emailAvailable: !user});
+    } else {
+        res.status(400).send("No email submitted");
+    }
+});
+
+loginRouter.get("/usernames", async (req, res, next) => {
+    if(req.query.username) {
+        let user = await User.findOne({"login.username": req.query.username});
+        res.status(200).send({usernameAvailable: !user});
+    } else {
+        res.status(400).send("No email submitted");
+    }
 });
 
 export default loginRouter;

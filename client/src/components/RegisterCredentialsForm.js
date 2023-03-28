@@ -45,7 +45,7 @@ function RegisterCredentialsForm() {
     const handleSubmit = async (evt) => {
         evt.preventDefault();
         if(password === verifyPassword) {
-            let response = await axios.get(`${baseURL}/users/emails?email=${email}`);
+            let response = await axios.get(`${baseURL}/login/emails?email=${email}`);
             if(response.data.emailAvailable) {
                 localStorage.removeItem("token");
                 dispatch(signUp({email, password}))

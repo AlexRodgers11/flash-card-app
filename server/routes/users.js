@@ -6,9 +6,7 @@ import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
-import { Message } from "../models/message.js";
-import { Notification } from '../models/notification.js';
-import { copyDeck, extendedRateLimiter, generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
+import { copyDeck, generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
 
 import multer from "multer";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
@@ -78,25 +76,12 @@ userRouter.get("/:userId", getUserIdFromJWTToken, async (req, res, next) => {
     }
 });
 
-userRouter.get("/:userId/groups", (req, res, next) => {
-    Group.find({members: req.user._id}, (err, groups) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } else {
-            //should probably come back and map groups to a smaller object needed to render the page
-            res.status(200).send(groups);
-        }
-    });
-});
-
 userRouter.patch("/:userId/verification", async (req, res, next) => {
     try {
         if(Date.now() < req.user.verification.codeExpDate) {
             if(req.user.verification.code === req.body.code) {
                 await User.findByIdAndUpdate(req.user._id, {"verification.verified": true});
                 const updatedUser = await User.findByIdAndUpdate(req.user._id, { accountSetupStage: "verified"}, {new: true});
-                // res.status(200).send({verificationResponse: "verified"});
                 res.status(200).send({accountSetupStage: updatedUser.accountSetupStage});
             } else {
                 res.status(401).send({verificationResponse: "invalid"})
@@ -152,28 +137,6 @@ userRouter.delete("/:userId", async (req, res, next) => {
         throw err;
     }
 });
-
-userRouter.put("/:userId", (req, res, next) => {
-    User.findByIdAndUpdate(req.user._id, req.body, {new: true}, (err, user) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        } else {
-            res.status(200).send(user)
-        }
-    });
-});
-
-userRouter.get("/:userId/decks", getUserIdFromJWTToken, async (req, res, next) => {
-    if(req.userId !== req.user._id.toString()) {
-        const populatedUser = await req.user.populate("decks", "publiclyAvailable");
-        const publicDecks = populatedUser.decks.filter(deck => deck.publiclyAvailable).map(deck => deck._id);
-        res.status(200).send(publicDecks);
-    } else {
-        res.status(200).send(req.user.decks);
-    }
-});
-
 
 userRouter.get("/:userId/card-stats", getUserIdFromJWTToken, async (req, res, next) => {
     if(req.userId !== req.user._id.toString()) {
@@ -252,49 +215,6 @@ userRouter.post("/:userId/decks/copy/:deckId", getUserIdFromJWTToken, async (req
     }
 });
 
-userRouter.delete("/:userId/messages/:messageId", async (req, res, next) => {
-    try {
-        const messageId = req.params.messageId;
-        if(req.user.messages.sent.findIndex(messageId) > -1) {
-            await User.findByIdAndUpdate(req.user._id, {$pull: {'messages.sent': messageId}});
-        } else if (req.user.messages.received.findIndex(messageId) > -1) {
-            await User.findByIdAndUpdate(req.user._id, {$pull: {'messages.received': messageId}});
-        } else {
-            res.status(404).send("Message not found in user's messages");
-            throw err;
-        } 
-        await Message.findByIdAndDelete(messageId);
-        res.status(200).send(messageId);
-    } catch (err) {
-        res.status(500).send("There was an error with your request");
-        throw err;
-    }
-});
-
-userRouter.post("/:userId/notifications", async (req, res, next) => {
-    try {
-        let newNotification;
-        switch(req.body.notificationType) {
-            case CardDecision: 
-                newNotification = CardDecision(req.body);
-                break;
-            //this needs to be a message
-            // case "JoinDecision":
-            //     newNotification = JoinDecision(req.body);
-            //     break;
-            default: 
-                res.status(400).send("Invalid notification type");
-                break;
-        }
-        const savedNotification = await newNotification.save();
-        await User.findByIdAndUpdate(req.user._id, {$push: {notifications: savedNotification}});
-        res.status(200).send(savedNotification);
-    } catch (err) {
-        res.status(500).send(err.message);
-        throw err;
-    }
-});
-
 userRouter.post("/:userId/groups", async (req, res, next) => {
     try {
         let newGroup = new Group(req.body);
@@ -305,16 +225,6 @@ userRouter.post("/:userId/groups", async (req, res, next) => {
         res.status(500).send(err.message);
         console.error(err);
     }
-});
-
-userRouter.put("/:userId/notifications", (req, res, next) => {
-    Notification.updateMany({_id: {$in: req.user.notifications}}, {$set: {read: true}})
-        //may not need to send anything back here, may need to send back certain number of notifications
-        .then(res.status(200).send())
-        .catch(err => {
-            res.status(500).send("There was an error with your request");
-            throw err;
-        });
 });
 
 const fileFilter = (req, file, callback) => {
@@ -438,28 +348,6 @@ userRouter.post("/:userId/attempts", getUserIdFromJWTToken, async (req, res, nex
     } catch (err) {
         res.status(500).send(err.message);
         throw err;
-    }
-});
-
-userRouter.delete("/:userId/attempts/:attemptId", async (req, res, next) => {
-    const attemptId = req.params.attemptId;
-    try {
-        await User.findByIdAndUpdate(req.user._id, {$pull: {deckAttempts: attemptId}});
-        await DeckAttempt.findByIdAndDelete(attemptId);
-        res.status(200).send(attemptId);
-    } catch (err) {
-        res.status(500).send("There was an error with your request");
-        throw err;
-    }
-});
-
-userRouter.delete("/:userId/attempts", async (req, res, next) => {
-    try {
-        const deletedAttempts = await DeckAttempt.deleteMany({_id: req.user.deckAttempts});
-        await User.findByIdAndUpdate(req.user._id, {$set: {deckAttempts: []}});
-        res.status(200).send(deletedAttempts.deletedCount);
-    } catch (err) {
-        res.status(500).send("There was an error with your request");
     }
 });
 

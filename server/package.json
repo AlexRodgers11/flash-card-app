@@ -23,15 +23,12 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "express-rate-limit": "^6.7.0",
-    "faker": "^5.5.3",
     "fs": "^0.0.1-security",
-    "jwt-decode": "^3.1.2",
     "jwt-simple": "^0.5.6",
     "mongoose": "^6.5.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.8.0",
     "passport": "^0.6.0",
-    "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7"
   }

@@ -80,7 +80,7 @@ export const fetchLoggedInUserData = createAsyncThunk("login/fetchLoggedInUserDa
     }
 });
 
-export const copyDeck = createAsyncThunk("decks/copyDeck", async ({deckId, userId}) => {
+export const copyDeck = createAsyncThunk("login/copyDeck", async ({deckId, userId}) => {
     try {
         const response = await client.post(`${baseURL}/users/${userId}/decks/copy/${deckId}`);
         return response.data;

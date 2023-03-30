@@ -64,7 +64,7 @@ export const signUp = createAsyncThunk("login/signUp", async({email, password}) 
 
 export const submitVerificationCode = createAsyncThunk("login/submitVerificationCode", async({userId, verificationCode}) => {
     try {
-        const response = await axios.patch(`${baseURL}/users/${userId}/verification`, {code: verificationCode});
+        const response = await client.patch(`${baseURL}/users/${userId}/verification`, {code: verificationCode});
         return response.data;
     } catch (err) {
         console.error(err);

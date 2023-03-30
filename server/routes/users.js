@@ -27,7 +27,14 @@ userRouter.param("userId", (req, res, next, userId) => {
     });
 });
 
-
+userRouter.param("protectedUserId", getUserIdFromJWTToken, async (req, res, next, protectedUserId) => {
+    const user = await User.findById(protectedUserId);
+    if(user._id.toString() !== req.userId.toString()) {
+        res.status(403).send("Unauthorized");
+    } else {
+        req.user = user;
+    }
+});
 
 userRouter.get("/:userId/identification", async (req, res, next) => {
     let partialData = {
@@ -60,7 +67,7 @@ userRouter.get("/:userId", getUserIdFromJWTToken, async (req, res, next) => {
     }
 });
 
-userRouter.patch("/:userId/verification", async (req, res, next) => {
+userRouter.patch("/:protectedUserId/verification", async (req, res, next) => {
     try {
         if(Date.now() < req.user.verification.codeExpDate) {
             if(req.user.verification.code === req.body.code) {
@@ -78,7 +85,7 @@ userRouter.patch("/:userId/verification", async (req, res, next) => {
     }
 });
 
-userRouter.delete("/:userId", async (req, res, next) => {
+userRouter.delete("/:protectedUserId", async (req, res, next) => {
     const userId = req.user._id
     try {
         //delete all cards and decks of all groups the user is head admin of, then delete the group itself
@@ -122,10 +129,7 @@ userRouter.delete("/:userId", async (req, res, next) => {
     }
 });
 
-userRouter.get("/:userId/card-stats", getUserIdFromJWTToken, async (req, res, next) => {
-    if(req.userId !== req.user._id.toString()) {
-        return res.status(403).send("Only the user who attempted these cards may retrieve their stats");
-    }
+userRouter.get("/:protectedUserId/card-stats", async (req, res, next) => {
     try {
         const populatedUser = await req.user.populate(
             [
@@ -154,7 +158,6 @@ userRouter.get("/:userId/card-stats", getUserIdFromJWTToken, async (req, res, ne
                         dateLastPracticed: card.attempts[0]?.createdAt,
                         attemptCount: card.attempts.length,
                         accuracyRate: card.attempts.length > 0 ? Math.round(card.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / card.attempts.length) : undefined,
-                        // cardType: card.cardType,
                     }
 
                 })
@@ -167,7 +170,7 @@ userRouter.get("/:userId/card-stats", getUserIdFromJWTToken, async (req, res, ne
     }
 });
 
-userRouter.post("/:userId/decks", async (req, res, next) => {
+userRouter.post("/:protectedUserId/decks", async (req, res, next) => {
     try {
         let newDeck = new Deck({
             name: req.body.deckName,
@@ -184,10 +187,7 @@ userRouter.post("/:userId/decks", async (req, res, next) => {
     }
 });
 
-userRouter.post("/:userId/decks/copy/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
-    if(req.user._id.toString() !== req.userId.toString()) {
-        return res.status(401).send("Only the user whose deck list this would be copied to may make a copy");
-    }
+userRouter.post("/:protectedUserId/decks/copy/:deckId", async (req, res, next) => {
     try {
         let newDeck = await copyDeck(req.params.deckId, req.userId);
         newDeck.copiedFrom = req.params.deckId;
@@ -199,11 +199,11 @@ userRouter.post("/:userId/decks/copy/:deckId", getUserIdFromJWTToken, async (req
     }
 });
 
-userRouter.post("/:userId/groups", async (req, res, next) => {
+userRouter.post("/:protectedUserId/groups", async (req, res, next) => {
     try {
         let newGroup = new Group(req.body);
         await newGroup.save();
-        const updatedUser = await User.findByIdAndUpdate(req.user._id, {$push: {groups: newGroup._id, adminOf: newGroup._id}});
+        await User.findByIdAndUpdate(req.user._id, {$push: {groups: newGroup._id, adminOf: newGroup._id}});
         res.status(200).send(newGroup._id);
     } catch (err) {
         res.status(500).send(err.message);
@@ -229,10 +229,8 @@ const upload = multer({
     fileFilter: fileFilter
 });
 
-userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), async (req, res, next) => {
-    if(req.userId !== req.user._id.toString()) {
-        return res.status(403).send("Users can only update their own information");
-    }
+//protected
+userRouter.patch("/:protectedUserId", getUserIdFromJWTToken, upload.single("photo"), async (req, res, next) => {
     const patchObj = {};
     
     if(req.file) {
@@ -293,10 +291,7 @@ userRouter.patch("/:userId", getUserIdFromJWTToken, upload.single("photo"), asyn
     }
 });
 
-userRouter.post("/:userId/attempts", getUserIdFromJWTToken, async (req, res, next) => {
-    if(req.userId !== req.user._id.toString()) {
-        return res.status(401).send("Unauthorized. A user may only add an attempt to their own statistics");
-    }
+userRouter.post("/:protectedUserId/attempts", async (req, res, next) => {
     try {
         const newDeckAttempt = new DeckAttempt({
             deck: req.body.deck,
@@ -335,7 +330,8 @@ userRouter.post("/:userId/attempts", getUserIdFromJWTToken, async (req, res, nex
     }
 });
 
-userRouter.delete("/:userId/decks/:deckId/attempts", async (req, res, next) => {
+userRouter.delete("/:protectedUserId/decks/:deckId/attempts", async (req, res, next) => {
+    //need to add logic to remove related card attempts
     try {
         const deckAttempts = await DeckAttempt.find({$and: [{_id: {$in: req.user.deckAttempts}}, {deck: req.params.deckId}]});
         let deckAttemptIds = deckAttempts.map(attempt => attempt._id);
@@ -347,11 +343,7 @@ userRouter.delete("/:userId/decks/:deckId/attempts", async (req, res, next) => {
     }
 });
 
-userRouter.get("/:userId/attempts", getUserIdFromJWTToken, async (req, res, next) => {
-    if(req.userId !== req.user._id.toString()) {
-        return res.status(401).send("Only the user who made these attempts may access their data");
-    }
-
+userRouter.get("/:protectedUserId/attempts", async (req, res, next) => {
     const populatedUser = await req.user.populate({
         path: "deckAttempts",
         select: "datePracticed accuracyRate",
@@ -363,11 +355,8 @@ userRouter.get("/:userId/attempts", getUserIdFromJWTToken, async (req, res, next
     res.status(200).send(populatedUser.deckAttempts);
 });
 
-userRouter.get("/:userId/decks/statistics", getUserIdFromJWTToken, async (req, res, next) => {
+userRouter.get("/:protectedUserId/decks/statistics", async (req, res, next) => {
     try {
-        if(req.userId !== req.user._id.toString()) {
-            return res.status(401).send("Unauthorized. Users may only access the statistics for their own decks");
-        }
         const populatedUser = await req.user.populate({
             path: "decks",
             select: "name",

@@ -100,7 +100,7 @@ export const createDeck = createAsyncThunk("login/createDeck", async ({deck, use
 
 export const createGroup = createAsyncThunk("login/createGroup", async({creator, name}) => {
     try {
-        const response = await axios.post(`${baseURL}/users/${creator}/groups`, {creator, name, administrators: [creator], members: [creator]});
+        const response = await client.post(`${baseURL}/users/${creator}/groups`, {creator, name, administrators: [creator], members: [creator]});
         return response.data;
     } catch (err) {
         console.error(err);

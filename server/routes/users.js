@@ -380,4 +380,14 @@ userRouter.get("/:protectedUserId/decks/statistics", async (req, res, next) => {
     }
 });
 
+userRouter.get("/:userId/decks", getUserIdFromJWTToken, async (req, res, next) => {
+    if(req.userId !== req.user._id.toString()) {
+        const populatedUser = await req.user.populate("decks", "publiclyAvailable");
+        const publicDecks = populatedUser.decks.filter(deck => deck.publiclyAvailable).map(deck => deck._id);
+        res.status(200).send(publicDecks);
+    } else {
+        res.status(200).send(req.user.decks);
+    }
+});
+
 export default userRouter;

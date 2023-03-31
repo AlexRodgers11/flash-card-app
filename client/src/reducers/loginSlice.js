@@ -89,11 +89,22 @@ export const copyDeck = createAsyncThunk("login/copyDeck", async ({deckId, userI
     }
 });
 
+export const createDeck = createAsyncThunk("login/createDeck", async ({deck, userId}) => {
+    try {
+        const response = await client.post(`${baseURL}/users/${userId}/decks`, deck);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 export const createGroup = createAsyncThunk("login/createGroup", async({creator, name}) => {
     try {
         const response = await axios.post(`${baseURL}/users/${creator}/groups`, {creator, name, administrators: [creator], members: [creator]});
         return response.data;
-    } catch (err) {}    
+    } catch (err) {
+        console.error(err);
+    }    
 });
 
 export const submitJoinCode = createAsyncThunk("login/submitJoinCode", async({userId, groupId, joinCode}) => {
@@ -149,11 +160,6 @@ export const loginSlice = createSlice({
         setGroups: (state, action) => {
             state.groups = action.payload;
         },
-        addDeckToUser: (state, action) => {
-            console.log("in addDeckToUser");
-            console.log(action.payload);
-            state.decks = [...state.decks, action.payload];
-        },
         removeDeckFromUser: (state, action) => {
             state.decks = state.decks.filter(deck => deck._id !== action.payload.deckId)
         },
@@ -180,6 +186,9 @@ export const loginSlice = createSlice({
             state.accountSetupStage = action.payload.accountSetupStage;
         });
         builder.addCase(copyDeck.fulfilled, (state, action) => {
+            state.decks = [...state.decks, action.payload];
+        });
+        builder.addCase(createDeck.fulfilled, (state, action) => {
             state.decks = [...state.decks, action.payload];
         });
         builder.addCase(createGroup.fulfilled, (state, action) => {
@@ -217,5 +226,5 @@ export const loginSlice = createSlice({
     }
 });
 
-export const { addDeckToUser, addGroup, logout, removeDeckFromUser, removeGroup, setGroups } = loginSlice.actions;
+export const { addGroup, logout, removeDeckFromUser, removeGroup, setGroups } = loginSlice.actions;
 export default loginSlice.reducer;

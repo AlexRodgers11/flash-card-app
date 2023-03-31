@@ -1,11 +1,10 @@
-import axios from 'axios';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import useFormInput from '../hooks/useFormInput';
 import { resetDeck } from '../reducers/deckSlice';
 import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
-import { addDeckToUser } from '../reducers/loginSlice';
+import { createDeck } from '../reducers/loginSlice';
 import styled from 'styled-components';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
@@ -66,17 +65,15 @@ function DeckForm() {
 		dispatch(resetDeck());
 		console.log(`${baseURL}/users/${userId}/decks`);
 		console.log({newDeck});
-		axios.post(`${baseURL}/users/${userId}/decks`, newDeck)
-			.then((response) => {
-				console.log({response});
-				dispatch(addDeckToUser({_id: response.data._id, name: response.data.name}));
+
+		dispatch(createDeck({deck: newDeck, userId}))
+			.then((action) => {
 				if(listType === "user") {
-					dispatch(addDeckToCurrentDeckList({deckId: response.data._id}));
+					dispatch(addDeckToCurrentDeckList({deckId: action.payload._id}));
 				}
-				navigate(`/decks/${response.data._id}`);
+				navigate(`/decks/${action.payload._id}`);
 			})
 			.catch(err => console.error(err));
-
 	}
 
 	const handleCancelCreateDeck = () => {
@@ -98,9 +95,9 @@ function DeckForm() {
 			{publiclyAvailable==="true" &&
 				<RadioWrapper>
 					<label className="form-label" htmlFor="allow-copies">Allow Copies</label>
-					<input checked={allowCopies==="true"} type="radio" id="allow-copies" name="allow-copies" value="true" onChange={handleAllowCopiesChange} />
+					<input checked={allowCopies==="true"} type="radio" id="allow-copies" name="allowCopies" value="true" onChange={handleAllowCopiesChange} />
 					<label className="form-label" htmlFor="prevent-copies">Prohibit Copies</label>
-					<input checked={allowCopies==="false"} type="radio" id="prevent-copies" name="prevent-copies" value="false" onChange={handleAllowCopiesChange} />
+					<input checked={allowCopies==="false"} type="radio" id="prevent-copies" name="allowCopies" value="false" onChange={handleAllowCopiesChange} />
 				</RadioWrapper>
 			}
 			<ButtonWrapper>

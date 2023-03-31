@@ -6,10 +6,8 @@ import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
-import { copyDeck, generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
+import { copyDeck, generateRandomFileName, getUserIdFromJWTToken, storage, upload, fileFilter } from "../utils.js";
 import jwt from "jwt-simple";
-
-import multer from "multer";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
 import { Card } from "../models/card.js";
 
@@ -231,25 +229,6 @@ userRouter.post("/:protectedUserId/groups", async (req, res, next) => {
     }
 });
 
-const fileFilter = (req, file, callback) => {
-    if(file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-        callback(null, true);
-    } else {
-        callback(new Error("Only jpeg and png file types may be submitted"), false);
-    }
-};
-
-//figure out how to handle errors for fileSize, etc
-const storage = multer.memoryStorage();
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 1024 * 1024 * 5
-    },
-    fileFilter: fileFilter
-});
-
-//protected
 userRouter.patch("/:protectedUserId", getUserIdFromJWTToken, upload.single("photo"), async (req, res, next) => {
     const patchObj = {};
     

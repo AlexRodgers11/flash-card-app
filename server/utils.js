@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import jwt from "jwt-simple";
 import crypto from "crypto";
 import { rateLimit } from "express-rate-limit";
+import multer from "multer";
 
 const characters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','@','#','$','%','&','=','?'];
 
@@ -164,3 +165,21 @@ export const excludingPaths = (pathRegexes, middleware) => {
         }
     }
 }
+
+export const fileFilter = (req, file, callback) => {
+    if(file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+        callback(null, true);
+    } else {
+        callback(new Error("Only jpeg and png file types may be submitted"), false);
+    }
+};
+
+//figure out how to handle errors for fileSize, etc
+export const storage = multer.memoryStorage();
+export const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5
+    },
+    fileFilter: fileFilter
+});

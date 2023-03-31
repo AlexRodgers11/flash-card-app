@@ -229,7 +229,7 @@ userRouter.post("/:protectedUserId/groups", async (req, res, next) => {
     }
 });
 
-userRouter.patch("/:protectedUserId", getUserIdFromJWTToken, upload.single("photo"), async (req, res, next) => {
+userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, next) => {
     const patchObj = {};
     
     if(req.file) {

@@ -7,6 +7,7 @@ import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
 import { copyDeck, generateRandomFileName, getUserIdFromJWTToken } from "../utils.js";
+import jwt from "jwt-simple";
 
 import multer from "multer";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
@@ -27,14 +28,33 @@ userRouter.param("userId", (req, res, next, userId) => {
     });
 });
 
-userRouter.param("protectedUserId", getUserIdFromJWTToken, async (req, res, next, protectedUserId) => {
-    const user = await User.findById(protectedUserId);
-    if(user._id.toString() !== req.userId.toString()) {
-        res.status(403).send("Unauthorized");
-    } else {
-        req.user = user;
+userRouter.param("protectedUserId", async (req, res, next, protectedUserId) => {
+    try {
+        const token = req.headers.authorization;
+
+        if (!token) {
+            return res.status(401).json({
+                message: 'Unauthorized: No token provided'
+            });
+        }
+
+        const decoded = jwt.decode(token.slice(7), process.env.TOKEN_KEY);
+        req.userId = decoded.sub;
+
+        const user = await User.findById(protectedUserId);
+
+        if (user._id.toString() !== req.userId.toString()) {
+            res.status(403).send("Unauthorized");
+        } else {
+            req.user = user;
+            next();
+        }
+    } catch (err) {
+        res.status(500).send("There was an error with your request");
+        throw err;
     }
 });
+
 
 userRouter.get("/:userId/identification", async (req, res, next) => {
     let partialData = {
@@ -182,7 +202,7 @@ userRouter.post("/:protectedUserId/decks", async (req, res, next) => {
         await User.findByIdAndUpdate(req.user._id, {$push: {decks: deck}});
         res.status(200).send({_id: deck._id, name: deck.name});
     } catch (err) {
-        res.status(500).send("There was an error with your request");
+        res.status(500).send(err.message);
         throw err;
     }
 });

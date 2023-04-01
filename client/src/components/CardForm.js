@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios';
 import useFormInput from '../hooks/useFormInput';
+import { client } from '../utils';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -39,7 +40,7 @@ function CardForm(props) {
 
 	useEffect(() => {
 		if(!isLoaded && props.cardId) {
-			axios.get(`${baseURL}/cards/${props.cardId}`)
+			client.get(`${baseURL}/cards/${props.cardId}`)
 				.then((response) => {
 					let card = response.data;
 					setCardType(card.cardType);

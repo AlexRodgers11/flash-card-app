@@ -126,17 +126,21 @@ userRouter.delete("/:protectedUserId", async (req, res, next) => {
 
         //delete all of the user's decks and the cards inside them
         for (let i = 0; i < req.user.decks.length; i++) {
-            let deck = await Deck.findById(req.user.decks[i]);
+            const deck = await Deck.findById(req.user.decks[i]);
             await Card.deleteMany({_id: {$in: deck.cards}});
         }
 
         await Deck.deleteMany({_id: {$in: req.user.decks}});
         
+        //delete the user's card attempts
+        for(let i = 0; i < req.user.deckAttempts.length; i++) {
+            await CardAttempt.deleteMany({fullDeckAttempt: {$in: req.user.deckAttempts}, groupAttemptBelongsTo: ""});
+        }
+        //delete the user's deck attempts
+        await DeckAttempt.deleteMany({_id: {$in: req.user.deckAttempts}, groupAttemptBelongsTo: ""});
+        
         //delete the user
         const deletedUser = await User.findByIdAndDelete(userId);
-        
-        //delete the user's deck attempts
-        await DeckAttempt.deleteMany({_id: {$in: deletedUser.deckAttempts}});
         
         //add something here to remove the deck from any categories it is associated with. Be sure to do this in groups when deleting groups as well, and in deckRouter when deleting decks
 

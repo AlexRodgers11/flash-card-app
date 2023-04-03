@@ -117,12 +117,15 @@ function UserSettings() {
     const profilePic = useSelector((state) => state.login.photo);
     const [errorField, setErrorField] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-
+    
     const [emailInputValue, clearEmailInputValue, handleEmailInputValueChange, setEmailInputValue] = useFormInput(email);
     const [usernameInputValue, clearUsernameInputValue, handleUsernameInputValueChange, setUsernameInputValue] = useFormInput(username);
     const [passwordInputValue, clearPasswordInputValue, handlePasswordInputValueChange, setPasswordInputValue] = useFormInput("");
     const [passwordConfirmInputValue, clearPasswordConfirmInputValue, handlePasswordConfirmInputValueChange, setPasswordConfirmInputValue] = useFormInput("");
     const [photoInputValue, setPhotoInputValue] = useState();
+    
+    const statisticsTracking = useSelector((state) => state.login.statisticsTracking);
+    const [statisticsTrackingSelectedValue, setStatisticsTrackingSelectedValue] = useState("");
 
     const dispatch = useDispatch();
 
@@ -150,12 +153,19 @@ function UserSettings() {
                 setPasswordInputValue("");
                 setPasswordConfirmInputValue("");
                 break;
-            // case "profile-pic":
-
+            case "stats-track":
+                if(statisticsTracking !== statisticsTrackingSelectedValue) {
+                    setStatisticsTrackingSelectedValue(statisticsTracking);
+                }
+                break;
             default: 
                 break;
         }
         setEditField(evt.currentTarget.dataset.editfield);
+    }
+
+    const handleStatisticsTrackingSelectedValueChange = (evt) => {
+        setStatisticsTrackingSelectedValue(evt.target.value);
     }
 
     const showDeleteConfirmation = (evt) => {
@@ -168,7 +178,6 @@ function UserSettings() {
         input.type = "file";
         input.click();
         input.addEventListener("change", (evt) => {
-            console.log("testing change"); 
             setPhotoInputValue(evt.target.files[0]);
             setModalContent("profile-pic");
         });
@@ -178,13 +187,11 @@ function UserSettings() {
         dispatch(updateProfilePic({userId: userId, photo: file}));
         setPhotoInputValue("");
         setModalContent("");
-        console.log("done with handleSaveCrop");
     }
 
     const displayModalContent = () => {
         switch(modalContent) {
             case "profile-pic":
-                console.log("profile-pic in modal");
                 return <RegisterProfilePicCropForm photo={URL.createObjectURL(photoInputValue)} saveCrop={handleSaveCrop}/>
             case "delete-profile-confirmation":
                 return (
@@ -195,7 +202,6 @@ function UserSettings() {
                     </div>
                 );
             default: 
-                console.log("default");
                 break;
         }
     }
@@ -249,8 +255,13 @@ function UserSettings() {
                     setErrorMessage("The passwords don't match");
                 }
                 break;
+            case "stats-track":
+                dispatch(updateUser({userId, userUpdates: {statisticsTracking: statisticsTrackingSelectedValue}}))
+                .then(() => {
+                    setEditField("");
+                });
+                break;
             default:       
-                console.log("In default case, shouldn't be here");
                 break;
         }
     }
@@ -327,10 +338,10 @@ function UserSettings() {
                                     <span>Confirm: </span><span style={{opacity: 0}}>d</span>
                                     <input type="password" value={passwordConfirmInputValue} onChange={handlePasswordConfirmInputValueChange} />
                                 </div>
-                                    <div>
-                                        <button data-editfield="password" onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="password" onClick={handleSave}>Save</button>
-                                    </div>
+                                <div>
+                                    <button data-editfield="password" onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="password" onClick={handleSave}>Save</button>
+                                </div>
                         
                             </SettingCategoryOption>
                             {(errorMessage && errorField === "password") && 
@@ -340,6 +351,31 @@ function UserSettings() {
                             }
                             </>
                         }
+                    </SettingsCategoryOptions>
+                </SettingsSection>
+                <SettingsSection>
+                    <SettingsCategoryLabel>Statistics</SettingsCategoryLabel>
+                    <SettingsCategoryOptions>
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Track: </span>
+                                    {editField !== "stats-track" && <span>{statisticsTracking === "all" ? "My Decks and Group Decks" : statisticsTracking === "user-only" ? "My Decks Only" : "Don't Track"}</span>}
+                                    {editField === "stats-track" && 
+                                        <select name="stats-track-select" id="stats-track-select" value={statisticsTrackingSelectedValue} onChange={handleStatisticsTrackingSelectedValueChange} >
+                                            <option value="all">My Decks and Group Decks</option>
+                                            <option value="user-only">My Decks Only</option>
+                                            <option value="none">Don't Track</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "stats-track" && <StyledEditIcon role="button" data-editfield="stats-track" onClick={handleEditSelection}/>}
+                                {editField === "stats-track" && 
+                                    <div>
+                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="stats-track" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>
                 <StyledButton onClick={showDeleteConfirmation}>Delete Account</StyledButton>

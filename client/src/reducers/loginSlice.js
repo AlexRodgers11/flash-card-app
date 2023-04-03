@@ -20,7 +20,8 @@ const initialState = {
     decks: [],
     groups: [],
     attempts: "",
-    accountSetupStage: ""
+    accountSetupStage: "",
+    StatisticsTracking: "none",
 }
 
 export const login = createAsyncThunk("login/login", async({usernameOrEmail, password}) => {
@@ -184,6 +185,7 @@ export const loginSlice = createSlice({
             state.groups = action.payload.groups;
             state.attempts = action.payload.attempts;
             state.accountSetupStage = action.payload.accountSetupStage;
+            state.statisticsTracking = action.payload.statisticsTracking;
         });
         builder.addCase(copyDeck.fulfilled, (state, action) => {
             state.decks = [...state.decks, action.payload];

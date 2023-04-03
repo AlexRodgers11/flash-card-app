@@ -255,6 +255,10 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
             email: req.body.login.email ? req.body.login.email : req.user.login.email ? req.user.login.email : ""
         }
     }
+    if(req.body.statisticsTracking) {
+        patchObj.statisticsTracking = req.body.statisticsTracking;
+    }
+
     try {
         let user;
         user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
@@ -264,7 +268,7 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
         }
 
         let responseData = {};
-        
+
         for(const key in req.body) {
             responseData[key] = user[key];
         }

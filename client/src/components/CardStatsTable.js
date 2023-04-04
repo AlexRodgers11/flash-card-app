@@ -26,7 +26,6 @@ const CardStatsTableContainer = styled.div`
     width: 80%;
     flex-direction: column;
     align-items: center;
-    background-color: red;
     &:-webkit-scrollbar {
         display: auto;
     }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useToggle from '../hooks/useToggle';
 import { addCardAttempt } from '../reducers/practiceSessionSlice';
@@ -67,13 +67,15 @@ const CardWrapper = styled.div`
 `
 
 function FlashCard() {
-	const [answered, toggleAnswered] = useToggle(false);
+	const [answered, setAnswered] = useState(false);
+	const [showAnswer, setShowAnswer] = useState(false);
 	const activeCard = useSelector((state) => state.practiceSession.activeCard);
 	const [showHint, toggleShowHint] = useToggle(false);
 	const dispatch = useDispatch();
 
 	const submitAnswer = (evt) => {
 		let answeredCorrectly = evt.target.dataset.answeredcorrectly === "true" ? true : false;  
+		setAnswered(true);
 		setTimeout(() => {
 			dispatch(addCardAttempt({
 				answeredCorrectly, 
@@ -84,13 +86,14 @@ function FlashCard() {
 				cardType: "FlashCard",
 				datePracticed: Date.now()
 			}));
-			toggleAnswered();
+			setShowAnswer(false);
+			setAnswered(false);
 		}, 1000);
 	}
 
 	return (
 		<>
-			{!answered ?
+			{!showAnswer ?
 				<>	
 					{activeCard?.hint? 
 						<HintBox>
@@ -104,7 +107,8 @@ function FlashCard() {
 					<CardWrapper>
 						<div>{activeCard.question}</div>
 						<div>
-							<button className="view-answer" onClick={toggleAnswered}>View Answer</button>
+							{/* <button className="view-answer" onClick={toggleShowAnswer}>View Answer</button> */}
+							<button className="view-answer" onClick={() => setShowAnswer(true)}>View Answer</button>
 						</div>
 					</CardWrapper>
 				</>
@@ -114,8 +118,8 @@ function FlashCard() {
 						<div>{activeCard.correctAnswer}</div>
 						<div>
 							<h3>Did you answer correctly?</h3>
-							<button className="answered-correctly" data-answeredcorrectly="true" onClick={submitAnswer}>Yes</button>
-							<button className="answered-incorrectly" data-answeredcorrectly="false" onClick={submitAnswer}>No</button>
+							<button className="answered-correctly" data-answeredcorrectly="true" onClick={!answered ? submitAnswer : undefined}>Yes</button>
+							<button className="answered-incorrectly" data-answeredcorrectly="false" onClick={!answered ? submitAnswer : undefined}>No</button>
 						</div>
 					</CardWrapper>
 				</>

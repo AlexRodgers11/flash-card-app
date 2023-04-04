@@ -139,7 +139,6 @@ function PracticeSession() {
     useEffect(() => {
         if(!activeCard?.cardType && firstRender.current) {
             firstRender.current = false;
-            //eventually need to add something to this, either userId or token to make sure user has authorization to access the deck
             dispatch(fetchDeck(deckId));
         }
     }, [activeCard, deckId, dispatch])
@@ -175,7 +174,6 @@ function PracticeSession() {
 
     return (
         <PracticeSessionWrapper>
-            {/* <div className="centered-display"> */}
             <StatsWrapper className="container">
                 <StatsRow className="row">
                     <StatsColumn className="col correct">
@@ -188,7 +186,7 @@ function PracticeSession() {
                     </StatsColumn>
                     <StatsColumn className="col accuracy-rate">
                         <h3>Accuracy Rate</h3>
-                        <p>{stats.numberCorrect || stats.numberWrong ? stats.numberCorrect * 100 / (stats.numberCorrect + stats.numberWrong) + "%" : "%"}</p>
+                        <p>{stats.numberCorrect || stats.numberWrong ? (stats.numberCorrect * 100 / (stats.numberCorrect + stats.numberWrong)).toFixed() + "%" : "0%"}</p>
                     </StatsColumn>
                     <StatsColumn className="col cards-left">
                         <h3>Cards Left</h3>
@@ -212,7 +210,6 @@ function PracticeSession() {
                     </WrapUpButtonsContainer>
                 }
             </CardWrapper>
-            {/* </div> */}
         </PracticeSessionWrapper>
     )
 }

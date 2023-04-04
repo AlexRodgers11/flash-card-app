@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router";
 import { fetchCardStatsByDeck } from "../reducers/attemptsSlice";
 import styled from "styled-components";
 import { HiOutlineExternalLink } from "react-icons/hi";
-import { EmptyIndicator } from "./StyledComponents/EmptyIndicator";
 
 const CardStatsTableWrapper = styled.div`
     width: 100vw;
@@ -171,7 +170,15 @@ function CardStatsTable() {
                     })}
                 </StatsTable>
             </CardStatsTableContainer>
-            {!cardStatsByDeck.map(deck => deck.cards).flat().length && <EmptyIndicator marginTop={3}>No cards have been practiced yet</EmptyIndicator>}
+            {!cardStatsByDeck.map(deck => deck.cards).flat().length && (
+                <TableRow className="TableRow">
+                <RowHeader className="RowHeader">--</RowHeader>
+                <TableCell className="TableCell">--%</TableCell>
+                <TableCell className="TableCell">--</TableCell>
+                <TableCell className="TableCell">--</TableCell>
+                <TableCell className="TableCell">N/A</TableCell>
+            </TableRow>
+            )}
         </CardStatsTableWrapper>
     );
 }

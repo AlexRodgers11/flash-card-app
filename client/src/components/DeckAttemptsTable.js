@@ -1,11 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
-// import { fetchDeckAttemptIds, fetchUserAttemptIds } from "../reducers/attemptsSlice";
 import { fetchDeckAttempts, fetchUserAttempts } from "../reducers/attemptsSlice";
 import { resetPracticedSinceAttemptsPulled } from "../reducers/practiceSessionSlice";
 import styled from "styled-components";
-import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
 import { HiOutlineExternalLink } from "react-icons/hi";
 
 const DeckAttemptsTableWrapper = styled.div`
@@ -138,7 +136,12 @@ export default function DeckAttemptsTable(props) {
                                     </DeckAttemptRow>
                                 ))
                                 :
-                                <EmptyIndicator marginTop={3}>No decks have been practiced yet</EmptyIndicator>
+                                <DeckAttemptRow>
+                                    <DeckAttemptCell>--</DeckAttemptCell>
+                                    <DeckAttemptCell>--</DeckAttemptCell>
+                                    <DeckAttemptCell>--%</DeckAttemptCell>
+                                    <DeckAttemptCell>N/A</DeckAttemptCell>
+                                </DeckAttemptRow>
                             )
                         }
                         {!props.allDecks && 
@@ -152,7 +155,12 @@ export default function DeckAttemptsTable(props) {
                                     </DeckAttemptRow>
                                 ))
                                 :
-                                <EmptyIndicator marginTop={3}>This deck hasn't been practiced</EmptyIndicator>
+                                <DeckAttemptRow>
+                                    <DeckAttemptCell>--</DeckAttemptCell>
+                                    <DeckAttemptCell>--</DeckAttemptCell>
+                                    <DeckAttemptCell>--%</DeckAttemptCell>
+                                    <DeckAttemptCell>N/A</DeckAttemptCell>
+                                </DeckAttemptRow>
                             )
                         }
                     </tbody>

@@ -300,13 +300,14 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
 
 userRouter.post("/:protectedUserId/attempts", async (req, res, next) => {
     try {
+        const practicedDeck = await Deck.findById(req.body.deck);
         const newDeckAttempt = new DeckAttempt({
             deck: req.body.deck,
             datePracticed: req.body.datePracticed,
             accuracyRate: req.body.accuracyRate,
-            attempter: req.user._id
+            attempter: req.user._id,
+            groupAttemptBelongsTo: practicedDeck.groupDeckBelongsTo || undefined
         });
-
         const savedDeckAttempt = await newDeckAttempt.save();
         const cardAttempts = [];
         for(let i = 0; i < req.body.cardAttempts?.length; i++) {
@@ -320,7 +321,8 @@ userRouter.post("/:protectedUserId/attempts", async (req, res, next) => {
                 correctAnswer: attemptData.correctAnswer,
                 answeredCorrectly: attemptData.answeredCorrectly,
                 wrongAnswerSelected: attemptData.wrongAnswerSelected,
-                fullDeckAttempt: savedDeckAttempt._id
+                fullDeckAttempt: savedDeckAttempt._id,
+                groupAttemptBelongsTo: practicedDeck.groupDeckBelongsTo || undefined
             });
             const savedCardAttempt = await newCardAttempt.save();
 

@@ -117,7 +117,7 @@ function DeckStatsTable() {
                             <DeckStatsRow key={deck._id}>
                                 <DeckStatsCell>{deck.name}</DeckStatsCell>
                                 <DeckStatsCell>{deck.dataLastPracticed || "--"}</DeckStatsCell>
-                                <DeckStatsCell>{deck.accuracyRate || "--"}%</DeckStatsCell>
+                                <DeckStatsCell>{typeof deck.accuracyRate === "number" ? deck.accuracyRate : "--"}%</DeckStatsCell>
                                 <DeckStatsCell><StyledLinkIcon data-deckid={deck._id} onClick={handleSelectDeck}/></DeckStatsCell>
                             </DeckStatsRow>
                         ))}

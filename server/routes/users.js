@@ -399,4 +399,14 @@ userRouter.get("/:userId/decks", getUserIdFromJWTToken, async (req, res, next) =
     }
 });
 
+userRouter.delete("/:protectedUserId/attempts", async (req, res, next) => {
+    //delete the user's card attempts
+    const deckAttemptsToRemoveFromUser = await DeckAttempt.find({_id: {$in: req.user.deckAttempts}, groupAttemptBelongsTo: {$exists: false}});
+    await CardAttempt.deleteMany({fullDeckAttempt: {$in: deckAttemptsToRemoveFromUser}});
+    //delete the user's deck attempts
+    await DeckAttempt.deleteMany({_id: {$in: deckAttemptsToRemoveFromUser}});
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, {$pull: {deckAttempts: {$in: deckAttemptsToRemoveFromUser}}}, {new: true});
+    res.status(200).send(updatedUser.deckAttempts);
+});
+
 export default userRouter;

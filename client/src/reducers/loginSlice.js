@@ -144,6 +144,11 @@ export const updateProfilePic = createAsyncThunk("login/updateProfilePic", async
     return response.data.photo;
 });
 
+export const resetAllStatistics = createAsyncThunk("practiceSession/resetAllStatistics", async({userId}) => {
+    const response = await client.delete(`${baseURL}/users/${userId}/attempts`);
+    return response.data;
+});
+
 export const deleteProfile = createAsyncThunk("login/deleteProfile", async({userId}) => {
     const response = await client.delete(`${baseURL}/users/${userId}`);
     console.log({data: response.data});
@@ -221,6 +226,9 @@ export const loginSlice = createSlice({
         });
         builder.addCase(updateProfilePic.fulfilled, (state, action) => {
             state.photo = action.payload;
+        });
+        builder.addCase(resetAllStatistics.fulfilled, (state, action) => {
+            state.attempts = action.payload; 
         });
         builder.addCase(deleteProfile.fulfilled, (state, action) => {
             return initialState;

@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { MdModeEditOutline } from "react-icons/md";
 import { RiImageEditFill } from "react-icons/ri";
-import { deleteProfile, updateProfilePic, updateUser } from "../reducers/loginSlice";
+import { deleteProfile, resetAllStatistics, updateProfilePic, updateUser } from "../reducers/loginSlice";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
 import RegisterProfilePicCropForm from "./RegisterProfilePicCropForm"; //probably rename all of these to exclude the word "Register"
 import axios from "axios";
+import { resetStats } from "../reducers/attemptsSlice";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -172,6 +173,11 @@ function UserSettings() {
         evt.preventDefault();
         setModalContent("delete-profile-confirmation");
     }
+
+    const showResetAllStatsConfirmation = (evt) => {
+        evt.preventDefault();
+        setModalContent("reset-stats-confirmation");
+    }
     
     const openImageSelector = () => {
         const input = document.createElement("input");
@@ -201,6 +207,15 @@ function UserSettings() {
                         <button onClick={confirmDeleteProfile}>Delete</button>
                     </div>
                 );
+            case "reset-stats-confirmation":
+                return (
+                    <div>
+                        <h3>Are you sure you want to delete statistics for all of your previous practice sessions of your own decks ? This action cannot be undone.</h3>
+                        <p><em>(Note: statistics for practice sessions of group decks can only be reset or deleted by the group's administrators)</em></p>
+                        <button onClick={hideModal}>Cancel</button>
+                        <button onClick={confirmResetAllStats}>Delete</button>
+                    </div>
+                );
             default: 
                 break;
         }
@@ -208,6 +223,15 @@ function UserSettings() {
 
     const confirmDeleteProfile = () => {
         dispatch(deleteProfile({userId}));
+        hideModal();
+    }
+    
+    const confirmResetAllStats = () => {
+        dispatch(resetAllStatistics({userId}))
+            .then(() => {
+                dispatch(resetStats());
+            });
+        hideModal();
     }
 
     const handleCancel = (evt) => {
@@ -375,6 +399,13 @@ function UserSettings() {
                                         <button data-editfield="stats-track" onClick={handleSave}>Save</button>
                                     </div>
                                 }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Reset all stats:</span>
+                                </div>
+                                <button  onClick={showResetAllStatsConfirmation}>Reset</button>
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>

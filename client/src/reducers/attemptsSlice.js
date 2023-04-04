@@ -83,7 +83,9 @@ export const fetchAllDecksStats = createAsyncThunk("attempts/fetchAllDecksStats"
 export const attemptsSlice = createSlice({
     name: "attempts",
     initialState,
-    reducers: {},
+    reducers: {
+        resetStats: (state) => initialState
+    },
     extraReducers: (builder) => {
         builder.addCase(fetchUserAttempts.fulfilled, (state, action) => {
             state.userAttempts = action.payload;
@@ -120,4 +122,5 @@ export const attemptsSlice = createSlice({
     }
 });
 
+export const { resetStats } = attemptsSlice.actions;
 export default attemptsSlice.reducer;

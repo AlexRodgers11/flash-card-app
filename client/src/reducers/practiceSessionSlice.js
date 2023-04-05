@@ -5,6 +5,7 @@ import { client, shuffleArray } from "../utils";
 const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 const initialState = {
+    deckType: "",
     practicedSinceAttemptsPulled: false,
     cards: [],
     activeCard: {
@@ -69,22 +70,22 @@ const saveAttempts = async (deckId, userId, cardAttempts, accuracyRate) => {
     }
 }
 
-export const practiceDeckAgain = createAsyncThunk("practiceSession/practiceDeckAgain", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate}) => {
-    if(!retryStatus) {
+export const practiceDeckAgain = createAsyncThunk("practiceSession/practiceDeckAgain", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate, trackSession}) => {
+    if(!retryStatus && trackSession) {
         await saveAttempts(deckId, userId, cardAttempts, accuracyRate)
     }
     return [];
 });
 
-export const retryMissedCards = createAsyncThunk("practiceSession/retryMissedCards", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate}) => {
-    if(!retryStatus) {
+export const retryMissedCards = createAsyncThunk("practiceSession/retryMissedCards", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate, trackSession}) => {
+    if(!retryStatus && trackSession) {
         await saveAttempts(deckId, userId, cardAttempts, accuracyRate);
     }
     return [];
 });
 
-export const endPractice = createAsyncThunk("practiceSession/endPractice", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate}) => {
-    if(!retryStatus) {
+export const endPractice = createAsyncThunk("practiceSession/endPractice", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate, trackSession}) => {
+    if(!retryStatus && trackSession) {
         await saveAttempts(deckId, userId, cardAttempts, accuracyRate);
     }
     return [];
@@ -122,7 +123,10 @@ export const practiceSessionSlice = createSlice({
         resetPracticedSinceAttemptsPulled: (state) => {
             state.practicedSinceAttemptsPulled = false;
         },
-        resetSession: (state) => initialState
+        resetSession: (state) => initialState,
+        setPracticeDeckType: (state, action) => {
+            state.deckType = action.payload.deckType;
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(endPractice.fulfilled, () => {
@@ -166,5 +170,5 @@ export const practiceSessionSlice = createSlice({
     }
 });
 
-export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession } = practiceSessionSlice.actions;
+export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession, setPracticeDeckType } = practiceSessionSlice.actions;
 export default practiceSessionSlice.reducer;

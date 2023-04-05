@@ -10,6 +10,7 @@ import { removeDeckFromUser } from '../reducers/loginSlice';
 import { deleteDeck } from '../reducers/decksSlice';
 import { copyDeck } from '../reducers/loginSlice';
 import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
+import { setPracticeDeckType } from '../reducers/practiceSessionSlice';
 
 const DeckTileWrapper = styled.div`
     display: inline-flex; 
@@ -401,6 +402,7 @@ function DeckTile(props) {
             navigate(`/groups/${groupId}/decks/${props.deckId}`);
         } else if(location.pathname.includes("practice")) {
             navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
+            dispatch(setPracticeDeckType({deckType: listType}))
         } else {
             navigate(`/decks/${props.deckId}`);
         }
@@ -535,7 +537,6 @@ function DeckTile(props) {
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 const width = window.innerWidth;
-                console.log({width});
                 switch(width) {
                     case width <= 475:
                         if(deckData.url) {

@@ -126,11 +126,26 @@ const WrapUpButtonsContainer = styled.div`
     }
 `;
 
+const sessionShouldBeSaved = (deckType, statsPreference) => {
+    console.log({deckType});
+    console.log(({statsPreference}));
+    if(deckType === "user") {
+        return statsPreference === "all" || statsPreference === "user-only";
+    } else if (deckType === "group") {
+        return statsPreference === "all" || statsPreference === "group-only";
+    } else {
+        console.log("incorrect deck type selected");
+        return false;
+    }
+}
+
 function PracticeSession() {
     let { deckId, userId } = useParams();
     const activeCard = useSelector((state) => state.practiceSession.activeCard);
     const stats = useSelector((state) => state.practiceSession.stats);
     const numCards = useSelector((state) => state.practiceSession.numCards);
+    const deckType = useSelector((state) => state.practiceSession.deckType);
+    const statisticsTracking = useSelector((state) => state.login.statisticsTracking);
     let retryStatus = useSelector((state) => state.practiceSession.retryStatus);
     let dispatch = useDispatch();
     let navigate = useNavigate();
@@ -151,18 +166,18 @@ function PracticeSession() {
     }, [dispatch]);
 
     const handlePracticeDeckAgain = () => {
-            const cardAttempts = store.getState().practiceSession.cardAttempts;
-            dispatch(practiceDeckAgain({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100}));
+        const cardAttempts = store.getState().practiceSession.cardAttempts;
+        dispatch(practiceDeckAgain({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: sessionShouldBeSaved(deckType, statisticsTracking)}));
     }
     
     const handleRetryMissedCards = () => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
-        dispatch(retryMissedCards({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100}));
+        dispatch(retryMissedCards({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: sessionShouldBeSaved(deckType, statisticsTracking)}));
     }
 
     const navigateAway = (evt) => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
-        dispatch(endPractice({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100}))
+        dispatch(endPractice({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: sessionShouldBeSaved(deckType, statisticsTracking)}))
             .then(() => {
                 if(evt.target.value === "dashboard") {
                     navigate("/dashboard");

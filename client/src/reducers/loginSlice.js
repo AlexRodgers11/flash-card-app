@@ -21,7 +21,7 @@ const initialState = {
     groups: [],
     attempts: "",
     accountSetupStage: "",
-    StatisticsTracking: "none",
+    statisticsTracking: "",
 }
 
 export const login = createAsyncThunk("login/login", async({usernameOrEmail, password}) => {

@@ -58,7 +58,7 @@ function PracticeLaunchPage() {
             {!deckIds.length && 
                 <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={toggleShowDeckForm}>Create New Deck</AddButton>
             }
-            {deckIds.length && 
+            {deckIds.length > 0 && 
                 <Title>Select a Deck to Practice</Title>
             }   
             <DeckList listType="user" listId={userId} />

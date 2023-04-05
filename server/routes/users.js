@@ -90,8 +90,8 @@ userRouter.patch("/:protectedUserId/verification", async (req, res, next) => {
         if(Date.now() < req.user.verification.codeExpDate) {
             if(req.user.verification.code === req.body.code) {
                 await User.findByIdAndUpdate(req.user._id, {"verification.verified": true});
-                const updatedUser = await User.findByIdAndUpdate(req.user._id, { accountSetupStage: "verified"}, {new: true});
-                res.status(200).send({accountSetupStage: updatedUser.accountSetupStage});
+                const updatedUser = await User.findByIdAndUpdate(req.user._id, { accountSetupStage: "verified", statisticsTracking: "all"}, {new: true});
+                res.status(200).send({accountSetupStage: updatedUser.accountSetupStage, statisticsTracking: updatedUser.statisticsTracking});
             } else {
                 res.status(401).send({verificationResponse: "invalid"})
             }

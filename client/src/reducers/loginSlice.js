@@ -213,6 +213,7 @@ export const loginSlice = createSlice({
         });
         builder.addCase(submitVerificationCode.fulfilled, (state, action) => {
             state.accountSetupStage = action.payload.accountSetupStage;
+            state.statisticsTracking = action.payload.statisticsTracking;
         });
         builder.addCase(submitJoinCode.fulfilled, (state, action) => {
             state.groups = action.payload ? [...state.groups, action.payload] : [...state.groups];

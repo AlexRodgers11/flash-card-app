@@ -383,11 +383,12 @@ function UserSettings() {
                         <SettingCategoryOption>
                                 <div>
                                     <span>Track: </span>
-                                    {editField !== "stats-track" && <span>{statisticsTracking === "all" ? "My Decks and Group Decks" : statisticsTracking === "user-only" ? "My Decks Only" : "Don't Track"}</span>}
+                                    {editField !== "stats-track" && <span>{statisticsTracking === "all" ? "My Decks and Group Decks" : statisticsTracking === "user-only" ? "My Decks Only" : statisticsTracking === "group-only" ? "Group Decks Only" : "Don't Track"}</span>}
                                     {editField === "stats-track" && 
                                         <select name="stats-track-select" id="stats-track-select" value={statisticsTrackingSelectedValue} onChange={handleStatisticsTrackingSelectedValueChange} >
                                             <option value="all">My Decks and Group Decks</option>
                                             <option value="user-only">My Decks Only</option>
+                                            <option value="group-only">Group Decks Only</option>
                                             <option value="none">Don't Track</option>
                                         </select>
                                     }

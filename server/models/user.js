@@ -27,7 +27,7 @@ const User = new Schema({
         codeExpDate: Date,
         verified: Boolean
     },
-    statisticsTracking: String, //all, user-only, none
+    statisticsTracking: String, //all, user-only, group-only, none
     accountSetupStage: String //email, verified, complete
 }, {timestamps: true});
 

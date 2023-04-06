@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { MdModeEditOutline } from "react-icons/md";
 import { RiImageEditFill } from "react-icons/ri";
-import { deleteProfile, resetAllStatistics, updateProfilePic, updateUser } from "../reducers/loginSlice";
+import { deleteProfile, resetAllStatistics, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
 import RegisterProfilePicCropForm from "./RegisterProfilePicCropForm"; //probably rename all of these to exclude the word "Register"
@@ -25,6 +25,7 @@ const SettingsForm = styled.form`
     max-width: 850px;
     min-width: 350px;
     background-color: #FFD549;
+    padding: 3rem 0;
 `;
 
 const SettingsSection = styled.section`
@@ -116,6 +117,13 @@ function UserSettings() {
     const username = useSelector((state) => state.login.login.username);
     const email = useSelector((state) => state.login.login.email);
     const profilePic = useSelector((state) => state.login.photo);
+    const emailPrivacy = useSelector((state) => state.login.privacy.email);
+    const namePrivacy = useSelector((state) => state.login.privacy.name);
+    const groupsPrivacy = useSelector((state) => state.login.privacy.groups);
+    const profilePhotoPrivacy = useSelector((state) => state.login.privacy.profilePhoto);
+    const newDecksPrivacy = useSelector((state) => state.login.privacy.newDecks);
+    const currentDecksPrivacy = useSelector((state) => state.login.privacy.currentDecks);
+
     const [errorField, setErrorField] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     
@@ -126,7 +134,13 @@ function UserSettings() {
     const [photoInputValue, setPhotoInputValue] = useState();
     
     const statisticsTracking = useSelector((state) => state.login.statisticsTracking);
-    const [statisticsTrackingSelectedValue, setStatisticsTrackingSelectedValue] = useState("");
+    const [statisticsTrackingSelectedValue, clearStatisticsTrackingSelectedValue, handleStatisticsTrackingSelectedValueChange, setStatisticsTrackingSelectedValue] = useFormInput(statisticsTracking);
+    const [emailPrivacySelectedValue, clearEmailPrivacySelectedValue, handleEmailPrivacySelectedValueChange, setEmailPrivacySelectedValue] = useFormInput(emailPrivacy);
+    const [namePrivacySelectedValue, clearNamePrivacySelectedValue, handleNamePrivacySelectedValueChange, setNamePrivacySelectedValue] = useFormInput(namePrivacy);
+    const [groupsPrivacySelectedValue, clearGroupsPrivacySelectedValue, handleGroupsPrivacySelectedValueChange, setGroupsPrivacySelectedValue] = useFormInput(groupsPrivacy);
+    const [profilePhotoPrivacySelectedValue, clearProfilePhotoPrivacySelectedValue, handleProfilePhotoPrivacySelectedValueChange, setProfilePhotoPrivacySelectedValue] = useFormInput(profilePhotoPrivacy);
+    const [newDecksPrivacySelectedValue, clearNewDecksPrivacySelectedValue, handleNewDecksPrivacySelectedValueChange, setNewDecksPrivacySelectedValue] = useFormInput(newDecksPrivacy);
+    const [currentDecksPrivacySelectedValue, clearCurrentDecksPrivacySelectedValue, handleCurrentDecksPrivacySelectedValueChange, setCurrentDecksPrivacySelectedValue] = useFormInput(currentDecksPrivacy);
 
     const dispatch = useDispatch();
 
@@ -159,14 +173,40 @@ function UserSettings() {
                     setStatisticsTrackingSelectedValue(statisticsTracking);
                 }
                 break;
+            case "email-privacy":
+                if(emailPrivacy !== emailPrivacySelectedValue) {
+                    setEmailPrivacySelectedValue(emailPrivacy);
+                }
+                break;
+            case "name-privacy":
+                if(namePrivacy !== namePrivacySelectedValue) {
+                    setNamePrivacySelectedValue(namePrivacy);
+                }
+                break;
+            case "profile-photo-privacy":
+                if(profilePhotoPrivacy !== profilePhotoPrivacySelectedValue) {
+                    setProfilePhotoPrivacySelectedValue(profilePhotoPrivacy);
+                }
+                break;
+            case "groups-privacy":
+                if(groupsPrivacy !== groupsPrivacySelectedValue) {
+                    setGroupsPrivacySelectedValue(groupsPrivacy);
+                }
+                break;
+            case "new-decks-privacy":
+                if(newDecksPrivacy !== newDecksPrivacySelectedValue) {
+                    setNewDecksPrivacySelectedValue(newDecksPrivacy);
+                }
+                break;
+            case "current-decks-privacy":
+                if(currentDecksPrivacy !== currentDecksPrivacySelectedValue) {
+                    setCurrentDecksPrivacySelectedValue(currentDecksPrivacy);
+                }
+                break;
             default: 
                 break;
         }
         setEditField(evt.currentTarget.dataset.editfield);
-    }
-
-    const handleStatisticsTrackingSelectedValueChange = (evt) => {
-        setStatisticsTrackingSelectedValue(evt.target.value);
     }
 
     const showDeleteConfirmation = (evt) => {
@@ -284,6 +324,43 @@ function UserSettings() {
                 .then(() => {
                     setEditField("");
                 });
+                break;
+            case "email-privacy":
+                dispatch(updatePrivacySettings({userId, patchObj: {email: emailPrivacySelectedValue}}))
+                    .then(() => {
+                        console.log("testing");
+                        setEditField("");
+                    });
+                break;
+            case "name-privacy":
+                dispatch(updatePrivacySettings({userId, patchObj: {name: emailPrivacySelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "profile-photo-privacy":
+                dispatch(updatePrivacySettings({userId, patchObj: {profilePhoto: profilePhotoPrivacySelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "groups-privacy":
+                dispatch(updatePrivacySettings({userId, patchObj: {groups: groupsPrivacySelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "new-decks-privacy":
+                dispatch(updatePrivacySettings({userId, patchObj: {newDecks: newDecksPrivacySelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "current-decks-privacy":
+                dispatch(updatePrivacySettings({userId, patchObj: {currentDecks: currentDecksPrivacySelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
                 break;
             default:       
                 break;
@@ -407,6 +484,131 @@ function UserSettings() {
                                     <span>Reset all stats:</span>
                                 </div>
                                 <button  onClick={showResetAllStatsConfirmation}>Reset</button>
+                        </SettingCategoryOption>
+                    </SettingsCategoryOptions>
+                </SettingsSection>
+                <SettingsSection>
+                    <SettingsCategoryLabel>Privacy</SettingsCategoryLabel>
+                    <SettingsCategoryOptions>
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Email: </span>
+                                    {editField !== "email-privacy" && <span>{emailPrivacy === "public" ? "Public" : "Private"}</span>}
+                                    {editField === "email-privacy" && 
+                                        <select name="email-privacy-select" id="email-privacy-select" value={emailPrivacySelectedValue} onChange={handleEmailPrivacySelectedValueChange} >
+                                            <option value="public">Public</option>
+                                            <option value="private">Private</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "email-privacy" && <StyledEditIcon role="button" data-editfield="email-privacy" onClick={handleEditSelection}/>}
+                                {editField === "email-privacy" && 
+                                    <div>
+                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="email-privacy" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Name: </span>
+                                    {editField !== "name-privacy" && <span>{namePrivacy === "public" ? "Public" : "Private"}</span>}
+                                    {editField === "name-privacy" && 
+                                        <select name="name-privacy-select" id="name-privacy-select" value={namePrivacySelectedValue} onChange={handleNamePrivacySelectedValueChange} >
+                                            <option value="public">Public</option>
+                                            <option value="private">Private</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "name-privacy" && <StyledEditIcon role="button" data-editfield="name-privacy" onClick={handleEditSelection}/>}
+                                {editField === "name-privacy" && 
+                                    <div>
+                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="name-privacy" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Profile Photo: </span>
+                                    {editField !== "profile-photo-privacy" && <span>{profilePhotoPrivacy === "public" ? "Public" : "Private"}</span>}
+                                    {editField === "profile-photo-privacy" && 
+                                        <select name="profile-photo-privacy-select" id="profile-photo-privacy-select" value={profilePhotoPrivacySelectedValue} onChange={handleProfilePhotoPrivacySelectedValueChange} >
+                                            <option value="public">Public</option>
+                                            <option value="private">Private</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "profile-photo-privacy" && <StyledEditIcon role="button" data-editfield="profile-photo-privacy" onClick={handleEditSelection}/>}
+                                {editField === "profile-photo-privacy" && 
+                                    <div>
+                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="profile-photo-privacy" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Groups: </span>
+                                    {editField !== "groups-privacy" && <span>{groupsPrivacy === "public" ? "Public" : "Private"}</span>}
+                                    {editField === "groups-privacy" && 
+                                        <select name="groups-privacy-select" id="groups-privacy-select" value={groupsPrivacySelectedValue} onChange={handleGroupsPrivacySelectedValueChange} >
+                                            <option value="public">Public</option>
+                                            <option value="private">Private</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "groups-privacy" && <StyledEditIcon role="button" data-editfield="groups-privacy" onClick={handleEditSelection}/>}
+                                {editField === "groups-privacy" && 
+                                    <div>
+                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="groups-privacy" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>New Decks: </span>
+                                    {editField !== "new-decks-privacy" && <span>{newDecksPrivacy === "public" ? "Default to Public" : "Default to Private"}</span>}
+                                    {editField === "new-decks-privacy" && 
+                                        <select name="new-decks-privacy-select" id="new-decks-privacy-select" value={newDecksPrivacySelectedValue} onChange={handleNewDecksPrivacySelectedValueChange} >
+                                            <option value="public">Default to Public</option>
+                                            <option value="private">Default to Private</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "new-decks-privacy" && <StyledEditIcon role="button" data-editfield="new-decks-privacy" onClick={handleEditSelection}/>}
+                                {editField === "new-decks-privacy" && 
+                                    <div>
+                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="new-decks-privacy" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Current Decks: </span>
+                                    {editField !== "current-decks-privacy" && <span>{currentDecksPrivacy === "public" ? "All Public" : currentDecksPrivacy === "private" ? "All Private" : "Select Individually"}</span>}
+                                    {editField === "current-decks-privacy" && 
+                                        <select name="current-decks-privacy-select" id="current-decks-privacy-select" value={currentDecksPrivacySelectedValue} onChange={handleCurrentDecksPrivacySelectedValueChange} >
+                                            <option value="set-individually">Set Individually</option>
+                                            <option value="public">All Public</option>
+                                            <option value="private">All Private</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "current-decks-privacy" && <StyledEditIcon role="button" data-editfield="current-decks-privacy" onClick={handleEditSelection}/>}
+                                {editField === "current-decks-privacy" && 
+                                    <div>
+                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="current-decks-privacy" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>

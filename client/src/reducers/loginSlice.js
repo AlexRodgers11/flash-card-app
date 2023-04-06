@@ -22,6 +22,14 @@ const initialState = {
     attempts: "",
     accountSetupStage: "",
     statisticsTracking: "",
+    privacy: {
+        email: "",
+        name: "",
+        profilePhoto: "",
+        groups: "",
+        newDecks: "",
+        currentDecks: ""
+    }
 }
 
 export const login = createAsyncThunk("login/login", async({usernameOrEmail, password}) => {
@@ -149,6 +157,11 @@ export const resetAllStatistics = createAsyncThunk("practiceSession/resetAllStat
     return response.data;
 });
 
+export const updatePrivacySettings = createAsyncThunk("login/updatePrivacySettings", async({userId, patchObj}) => {
+    const response = await client.patch(`${baseURL}/users/${userId}/privacy-settings`, patchObj);
+    return response.data;
+});
+
 export const deleteProfile = createAsyncThunk("login/deleteProfile", async({userId}) => {
     const response = await client.delete(`${baseURL}/users/${userId}`);
     console.log({data: response.data});
@@ -191,6 +204,7 @@ export const loginSlice = createSlice({
             state.attempts = action.payload.attempts;
             state.accountSetupStage = action.payload.accountSetupStage;
             state.statisticsTracking = action.payload.statisticsTracking;
+            state.privacy = action.payload.privacy;
         });
         builder.addCase(copyDeck.fulfilled, (state, action) => {
             state.decks = [...state.decks, action.payload];
@@ -214,6 +228,7 @@ export const loginSlice = createSlice({
         builder.addCase(submitVerificationCode.fulfilled, (state, action) => {
             state.accountSetupStage = action.payload.accountSetupStage;
             state.statisticsTracking = action.payload.statisticsTracking;
+            state.privacy = action.payload.privacy;
         });
         builder.addCase(submitJoinCode.fulfilled, (state, action) => {
             state.groups = action.payload ? [...state.groups, action.payload] : [...state.groups];
@@ -230,6 +245,9 @@ export const loginSlice = createSlice({
         });
         builder.addCase(resetAllStatistics.fulfilled, (state, action) => {
             state.attempts = action.payload; 
+        });
+        builder.addCase(updatePrivacySettings.fulfilled, (state, action) => {
+            state.privacy[Object.keys(action.payload)[0]] = Object.values(action.payload)[0];
         });
         builder.addCase(deleteProfile.fulfilled, (state, action) => {
             return initialState;

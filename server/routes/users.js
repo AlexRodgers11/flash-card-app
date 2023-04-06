@@ -90,8 +90,23 @@ userRouter.patch("/:protectedUserId/verification", async (req, res, next) => {
         if(Date.now() < req.user.verification.codeExpDate) {
             if(req.user.verification.code === req.body.code) {
                 await User.findByIdAndUpdate(req.user._id, {"verification.verified": true});
-                const updatedUser = await User.findByIdAndUpdate(req.user._id, { accountSetupStage: "verified", statisticsTracking: "all"}, {new: true});
-                res.status(200).send({accountSetupStage: updatedUser.accountSetupStage, statisticsTracking: updatedUser.statisticsTracking});
+                const updatedUser = await User.findByIdAndUpdate(
+                    req.user._id, 
+                    {
+                        accountSetupStage: "verified", 
+                        statisticsTracking: "all",
+                        privacy: {
+                            email: "public",
+                            name: "public",
+                            profilePhoto: "public",
+                            groups: "public",
+                            newDecks: "public",
+                            currentDecks: "set-individually"
+                        }
+                    },
+                     {new: true}
+                );
+                res.status(200).send({accountSetupStage: updatedUser.accountSetupStage, statisticsTracking: updatedUser.statisticsTracking, privacy: updatedUser.privacy});
             } else {
                 res.status(401).send({verificationResponse: "invalid"})
             }
@@ -407,6 +422,21 @@ userRouter.delete("/:protectedUserId/attempts", async (req, res, next) => {
     await DeckAttempt.deleteMany({_id: {$in: deckAttemptsToRemoveFromUser}});
     const updatedUser = await User.findByIdAndUpdate(req.user._id, {$pull: {deckAttempts: {$in: deckAttemptsToRemoveFromUser}}}, {new: true});
     res.status(200).send(updatedUser.deckAttempts);
+});
+
+userRouter.patch("/:protectedUserId/privacy-settings", async (req, res, next) => {
+    try {
+        const privacySetting = Object.keys(req.body)[0];
+        const updateObj = {[`privacy.${privacySetting}`]: req.body[privacySetting]};
+        const updatedUser = await User.findByIdAndUpdate(req.userId, updateObj, {new: true});
+        if(privacySetting === "currentDecks" && req.body[privacySetting] !== "set-individually") {
+            await Deck.updateMany({_id: {$in: req.user.decks}}, {publiclyAvailable: req.body[privacySetting] === "private" ? false : true});
+        }
+        res.status(200).send({[privacySetting]: updatedUser.privacy[privacySetting]});
+    } catch (err) {
+        res.status(500).send(err.message);
+        console.error(err);
+    }
 });
 
 export default userRouter;

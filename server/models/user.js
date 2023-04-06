@@ -28,7 +28,15 @@ const User = new Schema({
         verified: Boolean
     },
     statisticsTracking: String, //all, user-only, group-only, none
-    accountSetupStage: String //email, verified, complete
+    accountSetupStage: String, //email, verified, complete
+    privacy: {
+        email: String,
+        name: String,
+        profilePhoto: String,
+        groups: String,
+        newDecks: String,
+        currentDecks: String,
+    },
 }, {timestamps: true});
 
 export default mongoose.model("User", User);

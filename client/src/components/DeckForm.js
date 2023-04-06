@@ -41,8 +41,9 @@ const ButtonWrapper = styled.div`
 `;
 
 function DeckForm() {
+	const privacyDefault = useSelector((state) => state.login.privacy.newDecks);
 	const [nameInput, clearNameInput, handleNameInputChange] = useFormInput('');
-  	const [publiclyAvailable, clearPubliclyAvailable, handlePubliclyAvailableChange] = useFormInput("false");
+  	const [publiclyAvailable, clearPubliclyAvailable, handlePubliclyAvailableChange] = useFormInput(privacyDefault === "public" ? "true" : "false");
 	const [allowCopies, clearAllowCopies, handleAllowCopiesChange] = useFormInput("false");
 	const listType = useSelector((state) => state.decks.listType);
 	const userId = useSelector((state) => state.login.userId);

@@ -333,7 +333,7 @@ function UserSettings() {
                     });
                 break;
             case "name-privacy":
-                dispatch(updatePrivacySettings({userId, patchObj: {name: emailPrivacySelectedValue}}))
+                dispatch(updatePrivacySettings({userId, patchObj: {name: namePrivacySelectedValue}}))
                     .then(() => {
                         setEditField("");
                     });

@@ -105,6 +105,7 @@ function Deck() {
     const administrators = useSelector((state) => state.group.administrators)
     const [editedName, clearEditedName, handleChangeEditedName, setEditedName] = useFormInput('');
     const publiclyAvailable = useSelector((state) => state.deck.publiclyAvailable);
+    const allowCopies = useSelector((state) => state.deck.allowCopies);
     const cards = useSelector((state) => state.deck.cards);
     const groupDeckBelongsTo = useSelector((state) => state.deck.groupDeckBelongsTo);
     const [modalContent, setModalContent] = useState("");
@@ -169,6 +170,10 @@ function Deck() {
     const handleChangePubliclyAvailable = evt => {
         dispatch(updateDeck({deckId, deckUpdates: {publiclyAvailable: !publiclyAvailable}}));
     }
+
+    const handleChangeAllowCopies = evt => {
+        dispatch(updateDeck({deckId, deckUpdates: {allowCopies: !allowCopies}}));
+    }
     
     const openNameEditMode = () => {
         setEditedName(name);
@@ -227,6 +232,28 @@ function Deck() {
                         onChange={handleChangePubliclyAvailable}
                     />
                 </PublicControls>
+                {publiclyAvailable &&
+                    <PublicControls>
+                        <label htmlFor="allow-copies">Allow Copies</label>
+                        <input 
+                            type="radio"
+                            id="allow-copies"
+                            name="copies-allowed"
+                            value="true"
+                            checked={allowCopies}
+                            onChange={handleChangeAllowCopies}
+                        />
+                        <label htmlFor="prohibit-copies">Prohibit Copies</label>
+                        <input 
+                            type="radio"
+                            id="prohibit-copies"
+                            name="copies-allowed"
+                            value="false"
+                            checked={!allowCopies}
+                            onChange={handleChangeAllowCopies}
+                        />
+                    </PublicControls>
+                }
                 <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
                 <CardContainer className="CardContainer">
                     {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}

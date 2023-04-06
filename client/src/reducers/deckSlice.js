@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import { client } from "../utils";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
@@ -8,6 +7,7 @@ const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 const initialState = {
     deckId: "",
     name: "",
+    allowCopies: false,
     publiclyAvailable: false,
     creator: "",
     cards: [],
@@ -73,6 +73,7 @@ export const deckSlice = createSlice({
             state.deckId = action.payload._id;
             state.name = action.payload.name;
             state.publiclyAvailable = action.payload.publiclyAvailable;
+            state.allowCopies = action.payload.allowCopies;
             state.creator = action.payload.creator;
             state.cards = [...action.payload.cards];
             state.groupDeckBelongsTo = action.payload.groupDeckBelongsTo;

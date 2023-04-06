@@ -75,7 +75,7 @@ userRouter.get("/:userId", getUserIdFromJWTToken, async (req, res, next) => {
                     ...(user.privacy.email === "public" && {email: user.login.email}),
                 },
                 ...(user.privacy.name === "public" && {name: user.name}),
-                ...((user.privacy.profilePic === "public" && user.photo) && {photo: !user.photo.includes(".") ? await getObjectSignedUrl(user.photo) : user.photo})
+                ...((user.privacy.profilePhoto === "public" && user.photo) && {photo: !user.photo.includes(".") ? await getObjectSignedUrl(user.photo) : user.photo})
             };
             res.status(200).send(responseObj);
         } else {

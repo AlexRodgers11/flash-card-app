@@ -67,9 +67,17 @@ userRouter.get("/:userId/identification", async (req, res, next) => {
 userRouter.get("/:userId", getUserIdFromJWTToken, async (req, res, next) => {
     try {
         if(req.query.public_info === "true") {
-            const user = await User.findById(req.user._id, "login.username login.email name.first name.last photo")
-            user.photo = user.photo ? !user.photo.includes(".") ? await getObjectSignedUrl(user.photo) : user.photo : "",
-            res.status(200).send(user);
+            const user = await User.findById(req.user._id, "login.username login.email name.first name.last photo privacy");
+            const responseObj = {
+                _id: user._id,
+                login: {
+                    username: user.login.username,
+                    ...(user.privacy.email === "public" && {email: user.login.email}),
+                },
+                ...(user.privacy.name === "public" && {name: user.name}),
+                ...((user.privacy.profilePic === "public" && user.photo) && {photo: !user.photo.includes(".") ? await getObjectSignedUrl(user.photo) : user.photo})
+            };
+            res.status(200).send(responseObj);
         } else {
             if(req.userId !== req.user._id.toString()) {
                 return res.status(401).send("Unauthorized");

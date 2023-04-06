@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import DeckList from './DeckList';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
+import { HiOutlineUserCircle } from "react-icons/hi";
 
 const UserWrapper = styled.div`
     background-color: #FFD549;
@@ -15,6 +17,26 @@ const UserWrapper = styled.div`
 const ProfilePic = styled.img`
     border: 2px solid black; 
     border-radius: 50%;
+    height: 20rem;
+    width: 20rem;
+    margin-right: 2rem;
+    @media (max-width: 915px) {
+        height: 15rem;
+        width: 15rem;
+        margin-right: 1rem;
+    }
+    @media (max-width: 795px) {
+        height: 10rem;
+        width: 10rem;
+    }
+    @media (max-width: 680px) {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }    
+`;
+
+const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
+    color: black;
     height: 20rem;
     width: 20rem;
     margin-right: 2rem;
@@ -94,11 +116,11 @@ const InfoBlock = styled.div`
     }
 `;
 
+const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+
 function User() {
     const { userId } = useParams(); 
     const [userData, setUserData] = useState({});
-    
-    const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
     useEffect(() => {
         if(userData._id !== userId) {
@@ -119,15 +141,26 @@ function User() {
     return (
         <UserWrapper>
             <InfoContainer>
-                <ProfilePic alt="Profile" src={userData.photo} />
+                {userData.photo && <ProfilePic alt="Profile" src={userData.photo} />}
+                {!userData.photo && <StyledHiOutlineUserCircle />}
                 <InfoBlock>
                     <p><span className="label">Username:</span> {userData.login.username}</p>
                     <hr />
-                    <p><span className="label">Name:</span> {userData.name.first} {userData.name.last}</p>
+                    <p><span className="label">Name:</span> {userData.name ? `${userData.name.first} ${userData.name.last}` : <em>Private</em>}</p>
                     <hr />
-                    <p><span className="label">Email:</span> {userData.login.email}</p>
+                    <p><span className="label">Email:</span> {userData.login?.email || <em>Private</em>}</p>
                 </InfoBlock>
             </InfoContainer>
+            {/* <InfoContainer>
+                {userData.photo && <ProfilePic alt="Profile" src={userData.photo} />}
+                {!userData.photo && <StyledHiOutlineUserCircle />}
+                <InfoBlock>
+                    <p><span className="label">Username:</span> {userData.login.username}</p>
+                    
+                    {userData.name && <><hr /> <p><span className="label">Name:</span> {userData.name.first} {userData.name.last}</p></>}
+                    {userData.login?.email && <><hr /><p><span className="label">Email:</span> {userData.login.email}</p></>}
+                </InfoBlock>
+            </InfoContainer> */}
             <DeckList listType="user" listId={userId} />
         </UserWrapper>
     );

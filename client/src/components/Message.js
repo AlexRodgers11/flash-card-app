@@ -47,7 +47,7 @@ function Message(props) {
 	
 	const expandMessage = () => {
 		console.log("expanding message");
-		props.expandMessage(props.messageId, props.messageType, props.messageDirection);
+		props.expandMessage(props.messageId, props.messageType, props.direction);
 		if(!props.read) {
 			dispatch(markMessageAsRead({messageId: props.messageId, direction: props.direction, readerId: userId}));
 		}

@@ -28,7 +28,7 @@ groupRouter.get("/search", getUserIdFromJWTToken, async (req, res, next) => {
         const user = await User.findById(req.userId, "groups messages.sent");
         const populatedUser = await user.populate("messages.sent");
         const groups = await Group.find({name: {$regex: regex}});
-        const filteredGroups = groups.filter(group => !populatedUser.groups.includes(group._id) && !populatedUser.messages.sent.map(message => message.targetGroup.toString()).includes(group._id.toString()));
+        const filteredGroups = groups.filter(group => !populatedUser.groups.includes(group._id) && !populatedUser.messages.sent.map(message => message.targetGroup?.toString()).includes(group._id.toString()));
         res.status(200).send(filteredGroups);
     } catch (err) {
         console.error(err);

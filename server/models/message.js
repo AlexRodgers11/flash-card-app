@@ -60,8 +60,7 @@ const CardDecision = Message.discriminator("CardDecision", new Schema({
 }));
 
 const DirectMessage = Message.discriminator("DirectMessage", new Schema({
-    text: String,  
-    targetUser: {type: Schema.Types.ObjectId, ref: "User"}   
+    text: String,
 }));
 
 

@@ -1,6 +1,6 @@
 import express from "express";
 const messageRouter = express.Router();
-import { DeckDecision, DeckSubmission, JoinDecision, JoinRequest, Message } from "../models/message.js";
+import { DeckDecision, DeckSubmission, DirectMessage, JoinDecision, JoinRequest, Message } from "../models/message.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import User from "../models/user.js";
@@ -105,13 +105,29 @@ messageRouter.get("/:messageId", getUserIdFromJWTToken, checkMessageOwnership, a
                 );
                 res.status(200).send(populatedMessage);
                 break;
+            case "DirectMessage":
+                const message = await DirectMessage.findById(req.message._id, "-sendingUserDeleted");
+                populatedMessage = await DirectMessage.findById(req.message._id, "-sendingUserDeleted").populate(
+                    [
+                        {
+                            path: "sendingUser",
+                            select: "login.username name.first name.last"
+                        },
+                        {
+                            path: "receivingUsers",
+                            select: "login.username name.first name.last"
+                        }
+                    ]
+                );
+                res.status(200).send(populatedMessage);
+                break;
             default:
-                console.error(error);
-                res.status(500).send("There was an error with your request");
+                res.status(500).send("Invalid message type requested");
                 break;
         }
     } catch (err) {
-
+        res.status(500).send(err.message);
+        console.error(err);
     }
 });
 

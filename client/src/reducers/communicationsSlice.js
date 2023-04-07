@@ -61,6 +61,19 @@ export const deleteMessage = createAsyncThunk("communications/deleteMessage", as
     }
 });
 
+export const sendDirectMessage = createAsyncThunk("communications/sendDirectMessage", async({senderId, recipientId, message}) => {
+    try {
+        let messageData = {
+            message: message,
+            senderId: senderId
+        }
+        const response = await client.post(`${baseURL}/users/${recipientId}/messages/direct-message`, messageData);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+    }
+});
+
 export const submitDeck = createAsyncThunk("communications/submitDeck", async ({groupId, deckId}) => {
     try {
         let messageData = {
@@ -141,10 +154,12 @@ export const communicationsSlice = createSlice({
             state.messages.sent = [...state.messages.sent, action.payload]
         });
         builder.addCase(makeDeckSubmissionDecision.fulfilled, (state, action) => {
-            console.log({payload: action.payload});
             if(action.payload.sentMessage) {
                 state.messages.sent = [...state.messages.sent, action.payload.sentMessage];
             }
+        });
+        builder.addCase(sendDirectMessage.fulfilled, (state, action) => {
+            state.messages.sent = [...state.messages.sent, action.payload];
         });
         builder.addCase(sendJoinRequest.fulfilled, (state, action) => {
             state.messages.sent = [...state.messages.sent, action.payload];

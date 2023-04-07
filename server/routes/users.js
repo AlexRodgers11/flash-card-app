@@ -10,6 +10,7 @@ import { copyDeck, generateRandomFileName, getUserIdFromJWTToken, storage, uploa
 import jwt from "jwt-simple";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
 import { Card } from "../models/card.js";
+import { DirectMessage } from "../models/message.js";
 
 
 userRouter.param("userId", (req, res, next, userId) => {
@@ -441,6 +442,28 @@ userRouter.patch("/:protectedUserId/privacy-settings", async (req, res, next) =>
             await Deck.updateMany({_id: {$in: req.user.decks}}, {publiclyAvailable: req.body[privacySetting] === "private" ? false : true});
         }
         res.status(200).send({[privacySetting]: updatedUser.privacy[privacySetting]});
+    } catch (err) {
+        res.status(500).send(err.message);
+        console.error(err);
+    }
+});
+
+userRouter.post("/:userId/messages/direct-message", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        //come back and add logic to prevent messages depending on user's preferences
+        if(req.body.senderId.toString() === req.userId.toString()) {
+            const newMessage = new DirectMessage({
+                text: req.body.message,
+                sendingUser: req.userId,
+                receivingUsers: [req.user._id],
+            });
+            const savedMessage = await newMessage.save();
+            await User.findByIdAndUpdate(req.user._id, {$push: {"messages.received": savedMessage}});
+            await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedMessage}});
+            res.status(200).send({_id: savedMessage._id, messageType: "DirectMessage", read: []})
+        } else {
+            res.status(401).send("Messages cannot be sent on behalf of another user");
+        }
     } catch (err) {
         res.status(500).send(err.message);
         console.error(err);

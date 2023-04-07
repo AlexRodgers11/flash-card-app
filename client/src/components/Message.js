@@ -8,6 +8,8 @@ import JoinRequestMessage from './JoinRequestMessage';
 import JoinDecisionMessage from './JoinDecisionMessage';
 import { FaTrashAlt } from 'react-icons/fa';
 import styled from 'styled-components';
+import DirectMessage from './DirectMessage';
+import useToggle from '../hooks/useToggle';
 
 const MessageWrapper = styled.div`
 	display: flex;
@@ -40,6 +42,7 @@ function Message(props) {
 	const dispatch = useDispatch();
 	const userId = useSelector((state) => state.login.userId);
 	const [messageRendered, setMessageRendered] = useState(false);
+	const [showTrashIcon, toggleShowTrashIcon] = useToggle(true);
 
 	const handleDeleteMessage = () => {
 		dispatch(deleteMessage({messageId: props.messageId, direction: props.direction}));
@@ -73,6 +76,10 @@ function Message(props) {
 				return (
 					<JoinDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 				);
+			case "DirectMessage":
+				return (
+					<DirectMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} toggleShowTrashIcon={toggleShowTrashIcon} />
+				);
 			default:
 				return null;
 		}
@@ -83,7 +90,7 @@ function Message(props) {
 			<div role={props.fullView ? "" : "button"} onClick={!props.fullView ? expandMessage : null}>
 				{renderMessage()}
 			</div>
-			{messageRendered && <StyledTrashAlt onClick={handleDeleteMessage} />}
+			{(messageRendered && showTrashIcon) && <StyledTrashAlt onClick={handleDeleteMessage} />}
 		</MessageWrapper>
 	)
 }

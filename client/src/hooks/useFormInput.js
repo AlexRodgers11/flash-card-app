@@ -1,14 +1,14 @@
 import { useState } from 'react';
 
-const useFormInput = (initialValue) => {
+const useFormInput = (initialValue, inputType="text") => {
     const [input, setInput] = useState(initialValue);
 
     const clearInput = () => {
-        setInput('');
+        setInput(inputType === "checkbox" ? false : "");
     }
 
     const handleChangeInput = evt => {
-        setInput(evt.target.value);
+        setInput(inputType === "checkbox" ? evt.currentTarget.checked : evt.target.value);
     }
 
     return [input, clearInput, handleChangeInput, setInput];

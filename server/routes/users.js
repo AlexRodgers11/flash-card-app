@@ -111,11 +111,21 @@ userRouter.patch("/:protectedUserId/verification", async (req, res, next) => {
                             groups: "public",
                             newDecks: "public",
                             currentDecks: "set-individually"
+                        },
+                        communicationSettings: {
+                            notificationPreferences: {
+                                adminChange: true,
+                                deckAdded: true,
+                                groupDeleted: true,
+                                headAdminChange: true,
+                                newMemberJoined: true,
+                                removedFromGroup: true
+                            }
                         }
                     },
                      {new: true}
                 );
-                res.status(200).send({accountSetupStage: updatedUser.accountSetupStage, statisticsTracking: updatedUser.statisticsTracking, privacy: updatedUser.privacy});
+                res.status(200).send({accountSetupStage: updatedUser.accountSetupStage, statisticsTracking: updatedUser.statisticsTracking, privacy: updatedUser.privacy, communicationSettings: updatedUser.communicationSettings});
             } else {
                 res.status(401).send({verificationResponse: "invalid"})
             }
@@ -464,6 +474,18 @@ userRouter.post("/:userId/messages/direct-message", getUserIdFromJWTToken, async
         } else {
             res.status(401).send("Messages cannot be sent on behalf of another user");
         }
+    } catch (err) {
+        res.status(500).send(err.message);
+        console.error(err);
+    }
+});
+
+userRouter.patch("/:protectedUserId/notification-preferences", async (req, res, next) => {
+    try {
+        const notificationSetting = Object.keys(req.body)[0];
+        const updateObj = {[`communicationSettings.notificationPreferences.${notificationSetting}`]: req.body[notificationSetting]};
+        const updatedUser = await User.findByIdAndUpdate(req.userId, updateObj, {new: true});
+        res.status(200).send({[notificationSetting]: updatedUser.communicationSettings.notificationPreferences[notificationSetting]});
     } catch (err) {
         res.status(500).send(err.message);
         console.error(err);

@@ -29,6 +29,16 @@ const initialState = {
         groups: "",
         newDecks: "",
         currentDecks: ""
+    },
+    communicationSettings: {
+        notificationPreferences: {
+            adminChange: true,
+            deckAdded: true,
+            groupDeleted: true,
+            headAdminChange: true,
+            newMemberJoined: true,
+            removedFromGroup: true
+        }
     }
 }
 
@@ -162,6 +172,11 @@ export const updatePrivacySettings = createAsyncThunk("login/updatePrivacySettin
     return response.data;
 });
 
+export const updateNotificationSettings = createAsyncThunk("login/updateNotificationSettings", async({userId, patchObj}) => {
+    const response = await client.patch(`${baseURL}/users/${userId}/notification-preferences`, patchObj);
+    return response.data;
+});
+
 export const deleteProfile = createAsyncThunk("login/deleteProfile", async({userId}) => {
     const response = await client.delete(`${baseURL}/users/${userId}`);
     console.log({data: response.data});
@@ -205,6 +220,7 @@ export const loginSlice = createSlice({
             state.accountSetupStage = action.payload.accountSetupStage;
             state.statisticsTracking = action.payload.statisticsTracking;
             state.privacy = action.payload.privacy;
+            state.communicationSettings = action.payload.communicationSettings;
         });
         builder.addCase(copyDeck.fulfilled, (state, action) => {
             state.decks = [...state.decks, action.payload];
@@ -229,6 +245,7 @@ export const loginSlice = createSlice({
             state.accountSetupStage = action.payload.accountSetupStage;
             state.statisticsTracking = action.payload.statisticsTracking;
             state.privacy = action.payload.privacy;
+            state.communicationSettings = action.payload.communicationSettings;
         });
         builder.addCase(submitJoinCode.fulfilled, (state, action) => {
             state.groups = action.payload ? [...state.groups, action.payload] : [...state.groups];
@@ -249,6 +266,9 @@ export const loginSlice = createSlice({
         builder.addCase(updatePrivacySettings.fulfilled, (state, action) => {
             state.privacy[Object.keys(action.payload)[0]] = Object.values(action.payload)[0];
         });
+        builder.addCase(updateNotificationSettings.fulfilled, (state, action) => {
+            state.communicationSettings.notificationPreferences[Object.keys(action.payload)[0]] = Object.values(action.payload)[0];
+        })
         builder.addCase(deleteProfile.fulfilled, (state, action) => {
             return initialState;
         });

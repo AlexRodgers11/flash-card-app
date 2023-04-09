@@ -37,6 +37,16 @@ const User = new Schema({
         newDecks: String,
         currentDecks: String,
     },
+    communicationSettings: {
+        notificationPreferences: {//not working b/c nested
+            adminChange: Boolean,
+            deckAdded: Boolean,
+            groupDeleted: Boolean,
+            headAdminChange: Boolean,
+            newMemberJoined: Boolean,
+            removedFromGroup: Boolean
+        }
+    }
 }, {timestamps: true});
 
 export default mongoose.model("User", User);

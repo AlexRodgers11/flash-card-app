@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { MdModeEditOutline } from "react-icons/md";
 import { RiImageEditFill } from "react-icons/ri";
-import { deleteProfile, resetAllStatistics, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
+import { deleteProfile, resetAllStatistics, updateNotificationSettings, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
 import RegisterProfilePicCropForm from "./RegisterProfilePicCropForm"; //probably rename all of these to exclude the word "Register"
@@ -110,6 +110,10 @@ const StyledButton = styled.button`
     padding: .25rem;
 `;
 
+const ToggleSwitch = styled.div`
+    display: inline-block;
+`
+
 function UserSettings() {
     const userId = useSelector((state) => state.login.userId);
     const [modalContent, setModalContent] = useState("");
@@ -123,6 +127,13 @@ function UserSettings() {
     const profilePhotoPrivacy = useSelector((state) => state.login.privacy.profilePhoto);
     const newDecksPrivacy = useSelector((state) => state.login.privacy.newDecks);
     const currentDecksPrivacy = useSelector((state) => state.login.privacy.currentDecks);
+    
+    const adminChangeNotification = useSelector((state) => state.login.communicationSettings.notificationPreferences.adminChange);
+    const deckAddedNotification = useSelector((state) => state.login.communicationSettings.notificationPreferences.deckAdded);
+    const groupDeletedNotification = useSelector((state) => state.login.communicationSettings.notificationPreferences.groupDeleted);
+    const headAdminChangeNotification = useSelector((state) => state.login.communicationSettings.notificationPreferences.headAdminChange);
+    const newMemberJoinedNotification = useSelector((state) => state.login.communicationSettings.notificationPreferences.newMemberJoined);
+    const removedFromGroupNotification = useSelector((state) => state.login.communicationSettings.notificationPreferences.removedFromGroup)
 
     const [errorField, setErrorField] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -141,6 +152,18 @@ function UserSettings() {
     const [profilePhotoPrivacySelectedValue, clearProfilePhotoPrivacySelectedValue, handleProfilePhotoPrivacySelectedValueChange, setProfilePhotoPrivacySelectedValue] = useFormInput(profilePhotoPrivacy);
     const [newDecksPrivacySelectedValue, clearNewDecksPrivacySelectedValue, handleNewDecksPrivacySelectedValueChange, setNewDecksPrivacySelectedValue] = useFormInput(newDecksPrivacy);
     const [currentDecksPrivacySelectedValue, clearCurrentDecksPrivacySelectedValue, handleCurrentDecksPrivacySelectedValueChange, setCurrentDecksPrivacySelectedValue] = useFormInput(currentDecksPrivacy);
+
+    const [adminChangeNotificationSelectedValue, clearAdminChangeNotificationSelectedValue, handleAdminChangeNotificationSelectedValueChange, setAdminChangeNotificationSelectedValue] = useFormInput(adminChangeNotification, "checkbox");
+
+    const [deckAddedNotificationSelectedValue, clearDeckAddedNotificationSelectedValue, handleDeckAddedNotificationSelectedValueChange, setDeckAddedNotificationSelectedValue] = useFormInput(deckAddedNotification, "checkbox");
+
+    const [groupDeletedNotificationSelectedValue, clearGroupDeletedNotificationSelectedValue, handleGroupDeletedNotificationSelectedValueChange, setGroupDeletedNotificationSelectedValue] = useFormInput(groupDeletedNotification, "checkbox");
+
+    const [headAdminChangeNotificationSelectedValue, clearHeadAdminChangeNotificationSelectedValue, handleHeadAdminChangeNotificationSelectedValueChange, setHeadAdminChangeNotificationSelectedValue] = useFormInput(headAdminChangeNotification, "checkbox");
+    
+    const [newMemberJoinedNotificationSelectedValue, clearNewMemberJoinedNotificationSelectedValue, handleNewMemberJoinedNotificationSelectedValueChange, setNewMemberJoinedNotificationSelectedValue] = useFormInput(newMemberJoinedNotification, "checkbox");
+    
+    const [removedFromGroupNotificationSelectedValue, clearRemovedFromGroupNotificationSelectedValue, handleRemovedFromGroupNotificationSelectedValueChange, setRemovedFromGroupNotificationSelectedValue] = useFormInput(removedFromGroupNotification, "checkbox");
 
     const dispatch = useDispatch();
 
@@ -201,6 +224,36 @@ function UserSettings() {
             case "current-decks-privacy":
                 if(currentDecksPrivacy !== currentDecksPrivacySelectedValue) {
                     setCurrentDecksPrivacySelectedValue(currentDecksPrivacy);
+                }
+                break;
+            case "admin-change-notification": 
+                if(adminChangeNotification !== adminChangeNotificationSelectedValue) {
+                    setAdminChangeNotificationSelectedValue(adminChangeNotification);
+                }
+                break;
+            case "deck-added-notification":
+                if(deckAddedNotification !== deckAddedNotificationSelectedValue) {
+                    setDeckAddedNotificationSelectedValue(deckAddedNotification);
+                }
+                break;
+            case "group-deleted-notification":
+                if(groupDeletedNotification !== groupDeletedNotificationSelectedValue) {
+                    setGroupDeletedNotificationSelectedValue(groupDeletedNotification);
+                }
+                break;
+            case "head-admin-change-notification": 
+                if(headAdminChangeNotification !== headAdminChangeNotificationSelectedValue) {
+                    setHeadAdminChangeNotificationSelectedValue(headAdminChangeNotification);
+                }
+                break;
+            case "new-member-joined-notification":
+                if(newMemberJoinedNotification !== newMemberJoinedNotificationSelectedValue) {
+                    setNewMemberJoinedNotificationSelectedValue(newMemberJoinedNotification);
+                }
+                break;
+            case "removed-from-group-notification":
+                if(removedFromGroupNotification !== removedFromGroupNotificationSelectedValue) {
+                    setRemovedFromGroupNotificationSelectedValue(removedFromGroupNotification);
                 }
                 break;
             default: 
@@ -362,6 +415,43 @@ function UserSettings() {
                         setEditField("");
                     });
                 break;
+            case "admin-change-notification":
+                dispatch(updateNotificationSettings({userId, patchObj: {adminChange: adminChangeNotificationSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "deck-added-notification":
+                dispatch(updateNotificationSettings({userId, patchObj: {deckAdded: deckAddedNotificationSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "group-deleted-notification":
+                dispatch(updateNotificationSettings({userId, patchObj: {groupDeleted: groupDeletedNotificationSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "head-admin-change-notification":
+                dispatch(updateNotificationSettings({userId, patchObj: {headAdminChange: headAdminChangeNotificationSelectedValue}}))
+                    .then(() => {
+                        console.log("should be closing edit field")
+                        setEditField("");
+                    });
+                break;
+            case "new-member-joined-notification":
+                dispatch(updateNotificationSettings({userId, patchObj: {newMemberJoined: newMemberJoinedNotificationSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "removed-from-group-notification":
+                dispatch(updateNotificationSettings({userId, patchObj: {removedFromGroup: removedFromGroupNotificationSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
             default:       
                 break;
         }
@@ -387,7 +477,7 @@ function UserSettings() {
                             {editField !== "email" && <StyledEditIcon role="button" data-editfield="email" onClick={handleEditSelection}/>}
                             {editField === "email" && 
                                 <div>
-                                    <button data-editfield="email" onClick={handleCancel}>Cancel</button>
+                                    <button onClick={handleCancel}>Cancel</button>
                                     <button data-editfield="email" onClick={handleSave}>Save</button>
                                 </div>
                             }
@@ -407,7 +497,7 @@ function UserSettings() {
                             {editField !== "username" && <StyledEditIcon role="button" data-editfield="username" onClick={handleEditSelection}/>}
                             {editField === "username" && 
                                 <div>
-                                    <button data-editfield="username" onClick={handleCancel}>Cancel</button>
+                                    <button onClick={handleCancel}>Cancel</button>
                                     <button data-editfield="username" onClick={handleSave}>Save</button>
                                 </div>
                             }
@@ -427,7 +517,7 @@ function UserSettings() {
                             {editField !== "password" && <StyledEditIcon role="button" data-editfield="password" onClick={handleEditSelection}/>}
                             {(editField === "password" && !passwordInputValue) && 
                                 <div>
-                                    <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                    <button onClick={handleCancel}>Cancel</button>
                                     {/* <button data-editfield="username" onClick={handleSave}>Save</button> */}
                                 </div>
                             }
@@ -440,7 +530,7 @@ function UserSettings() {
                                     <input type="password" value={passwordConfirmInputValue} onChange={handlePasswordConfirmInputValueChange} />
                                 </div>
                                 <div>
-                                    <button data-editfield="password" onClick={handleCancel}>Cancel</button>
+                                    <button onClick={handleCancel}>Cancel</button>
                                     <button data-editfield="password" onClick={handleSave}>Save</button>
                                 </div>
                         
@@ -473,7 +563,7 @@ function UserSettings() {
                                 {editField !== "stats-track" && <StyledEditIcon role="button" data-editfield="stats-track" onClick={handleEditSelection}/>}
                                 {editField === "stats-track" && 
                                     <div>
-                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button onClick={handleCancel}>Cancel</button>
                                         <button data-editfield="stats-track" onClick={handleSave}>Save</button>
                                     </div>
                                 }
@@ -504,7 +594,7 @@ function UserSettings() {
                                 {editField !== "email-privacy" && <StyledEditIcon role="button" data-editfield="email-privacy" onClick={handleEditSelection}/>}
                                 {editField === "email-privacy" && 
                                     <div>
-                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button onClick={handleCancel}>Cancel</button>
                                         <button data-editfield="email-privacy" onClick={handleSave}>Save</button>
                                     </div>
                                 }
@@ -524,7 +614,7 @@ function UserSettings() {
                                 {editField !== "name-privacy" && <StyledEditIcon role="button" data-editfield="name-privacy" onClick={handleEditSelection}/>}
                                 {editField === "name-privacy" && 
                                     <div>
-                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button onClick={handleCancel}>Cancel</button>
                                         <button data-editfield="name-privacy" onClick={handleSave}>Save</button>
                                     </div>
                                 }
@@ -544,7 +634,7 @@ function UserSettings() {
                                 {editField !== "profile-photo-privacy" && <StyledEditIcon role="button" data-editfield="profile-photo-privacy" onClick={handleEditSelection}/>}
                                 {editField === "profile-photo-privacy" && 
                                     <div>
-                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button onClick={handleCancel}>Cancel</button>
                                         <button data-editfield="profile-photo-privacy" onClick={handleSave}>Save</button>
                                     </div>
                                 }
@@ -564,7 +654,7 @@ function UserSettings() {
                                 {editField !== "groups-privacy" && <StyledEditIcon role="button" data-editfield="groups-privacy" onClick={handleEditSelection}/>}
                                 {editField === "groups-privacy" && 
                                     <div>
-                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button onClick={handleCancel}>Cancel</button>
                                         <button data-editfield="groups-privacy" onClick={handleSave}>Save</button>
                                     </div>
                                 }
@@ -584,7 +674,7 @@ function UserSettings() {
                                 {editField !== "new-decks-privacy" && <StyledEditIcon role="button" data-editfield="new-decks-privacy" onClick={handleEditSelection}/>}
                                 {editField === "new-decks-privacy" && 
                                     <div>
-                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button onClick={handleCancel}>Cancel</button>
                                         <button data-editfield="new-decks-privacy" onClick={handleSave}>Save</button>
                                     </div>
                                 }
@@ -605,13 +695,161 @@ function UserSettings() {
                                 {editField !== "current-decks-privacy" && <StyledEditIcon role="button" data-editfield="current-decks-privacy" onClick={handleEditSelection}/>}
                                 {editField === "current-decks-privacy" && 
                                     <div>
-                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button onClick={handleCancel}>Cancel</button>
                                         <button data-editfield="current-decks-privacy" onClick={handleSave}>Save</button>
                                     </div>
                                 }
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>
+                <SettingsSection>
+                    <SettingsCategoryLabel>Notifications</SettingsCategoryLabel>
+                    <SettingsCategoryOptions>
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>I Am Added or Removed as a Group Administrator: </span>
+                                    {editField !== "admin-change-notification" && <span>{adminChangeNotification ? "On" : "Off"}</span>}
+                                    {editField === "admin-change-notification" && 
+                                        <div style={{display: "inline-block"}} className="form-check form-switch">
+                                            <input role="button" onChange={handleAdminChangeNotificationSelectedValueChange} checked={adminChangeNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{adminChangeNotificationSelectedValue ? "On" : "Off"}</label>
+                                        </div>
+                                    }
+                                </div>
+                                {editField !== "admin-change-notification" && <StyledEditIcon role="button" data-editfield="admin-change-notification" onClick={handleEditSelection}/>}
+                                {editField === "admin-change-notification" && 
+                                    <div>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="admin-change-notification" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Deck Added to a Group I Am In: </span>
+                                    {editField !== "deck-added-notification" && <span>{deckAddedNotification ? "On" : "Off"}</span>}
+                                    {editField === "deck-added-notification" && 
+                                        <div style={{display: "inline-block"}} className="form-check form-switch">
+                                            <input role="button" onChange={handleDeckAddedNotificationSelectedValueChange} checked={deckAddedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckAddedNotificationSelectedValue ? "On" : "Off"}</label>
+                                        </div>
+                                    }
+                                </div>
+                                {editField !== "deck-added-notification" && <StyledEditIcon role="button" data-editfield="deck-added-notification" onClick={handleEditSelection}/>}
+                                {editField === "deck-added-notification" && 
+                                    <div>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="deck-added-notification" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Group I Am in is Deleted: </span>
+                                    {editField !== "group-deleted-notification" && <span>{groupDeletedNotification ? "On" : "Off"}</span>}
+                                    {editField === "group-deleted-notification" && 
+                                        <div style={{display: "inline-block"}} className="form-check form-switch">
+                                            <input role="button" onChange={handleGroupDeletedNotificationSelectedValueChange} checked={groupDeletedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{groupDeletedNotificationSelectedValue ? "On" : "Off"}</label>
+                                        </div>
+                                    }
+                                </div>
+                                {editField !== "group-deleted-notification" && <StyledEditIcon role="button" data-editfield="group-deleted-notification" onClick={handleEditSelection}/>}
+                                {editField === "group-deleted-notification" && 
+                                    <div>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="group-deleted-notification" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Group Head Administrator Changes: </span>
+                                    {editField !== "head-admin-change-notification" && <span>{headAdminChangeNotification ? "On" : "Off"}</span>}
+                                    {editField === "head-admin-change-notification" && 
+                                        <div style={{display: "inline-block"}} className="form-check form-switch">
+                                            <input role="button" onChange={handleHeadAdminChangeNotificationSelectedValueChange} checked={headAdminChangeNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{headAdminChangeNotificationSelectedValue ? "On" : "Off"}</label>
+                                        </div>
+                                    }
+                                </div>
+                                {editField !== "head-admin-change-notification" && <StyledEditIcon role="button" data-editfield="head-admin-change-notification" onClick={handleEditSelection}/>}
+                                {editField === "head-admin-change-notification" && 
+                                    <div>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="head-admin-change-notification" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>New Member Joins a Group I Am In: </span>
+                                    {editField !== "new-member-joined-notification" && <span>{newMemberJoinedNotification ? "On" : "Off"}</span>}
+                                    {editField === "new-member-joined-notification" && 
+                                        <div style={{display: "inline-block"}} className="form-check form-switch">
+                                            <input role="button" onChange={handleNewMemberJoinedNotificationSelectedValueChange} checked={newMemberJoinedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{newMemberJoinedNotificationSelectedValue ? "On" : "Off"}</label>
+                                        </div>
+                                    }
+                                </div>
+                                {editField !== "new-member-joined-notification" && <StyledEditIcon role="button" data-editfield="new-member-joined-notification" onClick={handleEditSelection}/>}
+                                {editField === "new-member-joined-notification" && 
+                                    <div>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="new-member-joined-notification" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>I Am Removed From a Group I Am In: </span>
+                                    {editField !== "removed-from-group-notification" && <span>{removedFromGroupNotification ? "On" : "Off"}</span>}
+                                    {editField === "removed-from-group-notification" && 
+                                        <div style={{display: "inline-block"}} className="form-check form-switch">
+                                            <input role="button" onChange={handleRemovedFromGroupNotificationSelectedValueChange} checked={removedFromGroupNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{removedFromGroupNotificationSelectedValue ? "On" : "Off"}</label>
+                                        </div>
+                                    }
+                                </div>
+                                {editField !== "removed-from-group-notification" && <StyledEditIcon role="button" data-editfield="removed-from-group-notification" onClick={handleEditSelection}/>}
+                                {editField === "removed-from-group-notification" && 
+                                    <div>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="removed-from-group-notification" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                    </SettingsCategoryOptions>
+                </SettingsSection>
+                {/* <SettingsSection>
+                    <SettingsCategoryLabel>Emails</SettingsCategoryLabel>
+                    <SettingsCategoryOptions>
+                        <SettingCategoryOption>
+                                <div>
+                                    <span>Email: </span>
+                                    {editField !== "email-privacy" && <span>{emailPrivacy === "public" ? "Public" : "Private"}</span>}
+                                    {editField === "email-privacy" && 
+                                        <select name="email-privacy-select" id="email-privacy-select" value={emailPrivacySelectedValue} onChange={handleEmailPrivacySelectedValueChange} >
+                                            <option value="public">Public</option>
+                                            <option value="private">Private</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "email-privacy" && <StyledEditIcon role="button" data-editfield="email-privacy" onClick={handleEditSelection}/>}
+                                {editField === "email-privacy" && 
+                                    <div>
+                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="email-privacy" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                        </SettingCategoryOption>
+                    </SettingsCategoryOptions>
+                </SettingsSection> */}
                 <StyledButton onClick={showDeleteConfirmation}>Delete Account</StyledButton>
             </SettingsForm>
             {modalContent &&

@@ -31,6 +31,15 @@ const initialState = {
         currentDecks: ""
     },
     communicationSettings: {
+        emailPreferences: {
+            cardDecision: true,
+            cardSubmission: true,
+            deckDecision: true,
+            deckSubmission: true,
+            direct: true,
+            joinDecision: true,
+            joinRequest: true
+        },
         notificationPreferences: {
             adminChange: true,
             deckAdded: true,
@@ -177,6 +186,11 @@ export const updateNotificationSettings = createAsyncThunk("login/updateNotifica
     return response.data;
 });
 
+export const updateEmailPreferences = createAsyncThunk("login/updateEmailPreferences", async({userId, patchObj}) => {
+    const response = await client.patch(`${baseURL}/users/${userId}/email-preferences`, patchObj);
+    return response.data;
+});
+
 export const deleteProfile = createAsyncThunk("login/deleteProfile", async({userId}) => {
     const response = await client.delete(`${baseURL}/users/${userId}`);
     console.log({data: response.data});
@@ -268,6 +282,9 @@ export const loginSlice = createSlice({
         });
         builder.addCase(updateNotificationSettings.fulfilled, (state, action) => {
             state.communicationSettings.notificationPreferences[Object.keys(action.payload)[0]] = Object.values(action.payload)[0];
+        })
+        builder.addCase(updateEmailPreferences.fulfilled, (state, action) => {
+            state.communicationSettings.emailPreferences[Object.keys(action.payload)[0]] = Object.values(action.payload)[0];
         })
         builder.addCase(deleteProfile.fulfilled, (state, action) => {
             return initialState;

@@ -113,6 +113,15 @@ userRouter.patch("/:protectedUserId/verification", async (req, res, next) => {
                             currentDecks: "set-individually"
                         },
                         communicationSettings: {
+                            emailPreferences: {
+                                cardDecision: true,
+                                cardSubmission: true,
+                                deckDecision: true,
+                                deckSubmission: true,
+                                direct: true,
+                                joinDecision: true,
+                                joinRequest: true
+                            },
                             notificationPreferences: {
                                 adminChange: true,
                                 deckAdded: true,
@@ -486,6 +495,18 @@ userRouter.patch("/:protectedUserId/notification-preferences", async (req, res, 
         const updateObj = {[`communicationSettings.notificationPreferences.${notificationSetting}`]: req.body[notificationSetting]};
         const updatedUser = await User.findByIdAndUpdate(req.userId, updateObj, {new: true});
         res.status(200).send({[notificationSetting]: updatedUser.communicationSettings.notificationPreferences[notificationSetting]});
+    } catch (err) {
+        res.status(500).send(err.message);
+        console.error(err);
+    }
+});
+
+userRouter.patch("/:protectedUserId/email-preferences", async (req, res, next) => {
+    try {
+        const emailSetting = Object.keys(req.body)[0];
+        const updateObj = {[`communicationSettings.emailPreferences.${emailSetting}`]: req.body[emailSetting]};
+        const updatedUser = await User.findByIdAndUpdate(req.userId, updateObj, {new: true});
+        res.status(200).send({[emailSetting]: updatedUser.communicationSettings.emailPreferences[emailSetting]});
     } catch (err) {
         res.status(500).send(err.message);
         console.error(err);

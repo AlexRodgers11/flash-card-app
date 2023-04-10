@@ -38,6 +38,15 @@ const User = new Schema({
         currentDecks: String,
     },
     communicationSettings: {
+        emailPreferences: {
+            cardDecision: Boolean,
+            cardSubmission: Boolean,
+            deckDecision: Boolean,
+            deckSubmission: Boolean,
+            direct: Boolean,
+            joinDecision: Boolean,
+            joinRequest: Boolean
+        },
         notificationPreferences: {
             adminChange: Boolean,
             deckAdded: Boolean,

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { MdModeEditOutline } from "react-icons/md";
 import { RiImageEditFill } from "react-icons/ri";
-import { deleteProfile, resetAllStatistics, updateNotificationSettings, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
+import { deleteProfile, resetAllStatistics, updateEmailPreferences, updateNotificationSettings, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
 import RegisterProfilePicCropForm from "./RegisterProfilePicCropForm"; //probably rename all of these to exclude the word "Register"
@@ -135,6 +135,14 @@ function UserSettings() {
     const newMemberJoinedNotification = useSelector((state) => state.login.communicationSettings.notificationPreferences.newMemberJoined);
     const removedFromGroupNotification = useSelector((state) => state.login.communicationSettings.notificationPreferences.removedFromGroup)
 
+    const cardDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.cardDecision);
+    const cardSubmissionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.cardSubmission);
+    const deckDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.deckDecision);
+    const deckSubmissionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.deckSubmission);
+    const directMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.direct);
+    const joinDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinDecision);
+    const joinRequestMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinRequest);
+
     const [errorField, setErrorField] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     
@@ -164,6 +172,20 @@ function UserSettings() {
     const [newMemberJoinedNotificationSelectedValue, clearNewMemberJoinedNotificationSelectedValue, handleNewMemberJoinedNotificationSelectedValueChange, setNewMemberJoinedNotificationSelectedValue] = useFormInput(newMemberJoinedNotification, "checkbox");
     
     const [removedFromGroupNotificationSelectedValue, clearRemovedFromGroupNotificationSelectedValue, handleRemovedFromGroupNotificationSelectedValueChange, setRemovedFromGroupNotificationSelectedValue] = useFormInput(removedFromGroupNotification, "checkbox");
+
+    const [cardDecisionMessageSelectedValue, clearCardDecisionMessageSelectedValue, handleCardDecisionMessageSelectedValueChange, setCardDecisionMessageSelectedValue] = useFormInput(cardDecisionMessage, "checkbox");
+
+    const [cardSubmissionMessageSelectedValue, clearCardSubmissionSelectedValue, handleCardSubmissionMessageSelectedValueChange, setCardSubmissionMessageSelectedValue] = useFormInput(cardSubmissionMessage, "checkbox");
+
+    const [deckDecisionMessageSelectedValue, clearDeckDecisionMessageSelectedValue, handleDeckDecisionMessageSelectedValueChange, setDeckDecisionMessageSelectedValue] = useFormInput(deckDecisionMessage, "checkbox");
+
+    const [deckSubmissionMessageSelectedValue, clearDeckSubmissionMessageSelectedValue, handleDeckSubmissionMessageSelectedValueChange, setDeckSubmissionMessageSelectedValue] = useFormInput(deckSubmissionMessage, "checkbox");
+
+    const [directMessageSelectedValue, clearDirectMessageSelectedValue, handleDirectMessageSelectedValueChange, setDirectMessageSelectedValue] = useFormInput(directMessage, "checkbox");
+
+    const [joinDecisionMessageSelectedValue, clearJoinDecisionMessageSelectedValue, handleJoinDecisionMessageSelectedValueChange, setJoinDecisionMessageSelectedValue] = useFormInput(joinDecisionMessage, "checkbox");
+
+    const [joinRequestMessageSelectedValue, clearJoinRequestMessageSelectedValue, handleJoinRequestMessageSelectedValueChange, setJoinRequestMessageSelectedValue] = useFormInput(joinRequestMessage, "checkbox");
 
     const dispatch = useDispatch();
 
@@ -254,6 +276,41 @@ function UserSettings() {
             case "removed-from-group-notification":
                 if(removedFromGroupNotification !== removedFromGroupNotificationSelectedValue) {
                     setRemovedFromGroupNotificationSelectedValue(removedFromGroupNotification);
+                }
+                break;
+            case "card-decision-message":
+                if(cardDecisionMessage !== cardDecisionMessageSelectedValue) {
+                    setCardDecisionMessageSelectedValue(cardDecisionMessage);
+                }
+                break;
+            case "card-submission-message":
+                if(cardSubmissionMessage !== cardSubmissionMessageSelectedValue) {
+                    setCardSubmissionMessageSelectedValue(cardSubmissionMessage);
+                }
+                break;
+            case "deck-decision-message":
+                if(deckDecisionMessage !== deckDecisionMessageSelectedValue) {
+                    setDeckDecisionMessageSelectedValue(deckDecisionMessage);
+                }
+                break;
+            case "deck-submission-message":
+                if(deckSubmissionMessage !== deckSubmissionMessageSelectedValue) {
+                    setDeckSubmissionMessageSelectedValue(deckSubmissionMessage);
+                }
+                break;
+            case "direct-message":
+                if(directMessage !== directMessageSelectedValue) {
+                    setDirectMessageSelectedValue(directMessage);
+                }
+                break;
+            case "join-decision-message":
+                if(joinDecisionMessage !== joinDecisionMessageSelectedValue) {
+                    setJoinDecisionMessageSelectedValue(joinDecisionMessage);
+                }
+                break;
+            case "join-request-message":
+                if(joinRequestMessage !== joinRequestMessageSelectedValue) {
+                    setJoinRequestMessageSelectedValue(joinRequestMessage);
                 }
                 break;
             default: 
@@ -448,6 +505,48 @@ function UserSettings() {
                 break;
             case "removed-from-group-notification":
                 dispatch(updateNotificationSettings({userId, patchObj: {removedFromGroup: removedFromGroupNotificationSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "card-decision-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {cardDecision: cardDecisionMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "card-submission-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {cardSubmission: cardSubmissionMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "deck-decision-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {deckDecision: deckDecisionMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "direct-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {direct: directMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "deck-submission-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {deckSubmission: deckSubmissionMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "join-decision-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {joinDecision: joinDecisionMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "join-request-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {joinRequest: joinRequestMessageSelectedValue}}))
                     .then(() => {
                         setEditField("");
                     });
@@ -826,30 +925,150 @@ function UserSettings() {
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>
-                {/* <SettingsSection>
+                <SettingsSection>
                     <SettingsCategoryLabel>Emails</SettingsCategoryLabel>
                     <SettingsCategoryOptions>
                         <SettingCategoryOption>
+                                    <div>
+                                        <span>Card I Submitted to Group Deck Was Approved/Denied: </span>
+                                        {editField !== "card-decision-message" && <span>{cardDecisionMessage ? "On" : "Off"}</span>}
+                                        {editField === "card-decision-message" && 
+                                            <div style={{display: "inline-block"}} className="form-check form-switch">
+                                                <input role="button" onChange={handleCardDecisionMessageSelectedValueChange} checked={cardDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{cardDecisionMessageSelectedValue ? "On" : "Off"}</label>
+                                            </div>
+                                        }
+                                    </div>
+                                    {editField !== "card-decision-message" && <StyledEditIcon role="button" data-editfield="card-decision-message" onClick={handleEditSelection}/>}
+                                    {editField === "card-decision-message" && 
+                                        <div>
+                                            <button onClick={handleCancel}>Cancel</button>
+                                            <button data-editfield="card-decision-message" onClick={handleSave}>Save</button>
+                                        </div>
+                                    }
+                            </SettingCategoryOption>
+                            <hr />
+                        <SettingCategoryOption>
+                                    <div>
+                                        <span>Card Submitted Deck in Group I am Admin Of: </span>
+                                        {editField !== "card-submission-message" && <span>{cardSubmissionMessage ? "On" : "Off"}</span>}
+                                        {editField === "card-submission-message" && 
+                                            <div style={{display: "inline-block"}} className="form-check form-switch">
+                                                <input role="button" onChange={handleCardSubmissionMessageSelectedValueChange} checked={cardSubmissionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{cardSubmissionMessageSelectedValue ? "On" : "Off"}</label>
+                                            </div>
+                                        }
+                                    </div>
+                                    {editField !== "card-submission-message" && <StyledEditIcon role="button" data-editfield="card-submission-message" onClick={handleEditSelection}/>}
+                                    {editField === "card-submission-message" && 
+                                        <div>
+                                            <button onClick={handleCancel}>Cancel</button>
+                                            <button data-editfield="card-submission-message" onClick={handleSave}>Save</button>
+                                        </div>
+                                    }
+                            </SettingCategoryOption>
+                            <hr />
+                        <SettingCategoryOption>
+                                    <div>
+                                        <span>Deck I Submitted to Group Was Approved/Denied: </span>
+                                        {editField !== "deck-decision-message" && <span>{deckDecisionMessage ? "On" : "Off"}</span>}
+                                        {editField === "deck-decision-message" && 
+                                            <div style={{display: "inline-block"}} className="form-check form-switch">
+                                                <input role="button" onChange={handleDeckDecisionMessageSelectedValueChange} checked={deckDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckDecisionMessageSelectedValue ? "On" : "Off"}</label>
+                                            </div>
+                                        }
+                                    </div>
+                                    {editField !== "deck-decision-message" && <StyledEditIcon role="button" data-editfield="deck-decision-message" onClick={handleEditSelection}/>}
+                                    {editField === "deck-decision-message" && 
+                                        <div>
+                                            <button onClick={handleCancel}>Cancel</button>
+                                            <button data-editfield="deck-decision-message" onClick={handleSave}>Save</button>
+                                        </div>
+                                    }
+                            </SettingCategoryOption>
+                            <hr />
+                        <SettingCategoryOption>
+                                    <div>
+                                        <span>Deck Submitted to Group I am Admin Of: </span>
+                                        {editField !== "deck-submission-message" && <span>{deckSubmissionMessage ? "On" : "Off"}</span>}
+                                        {editField === "deck-submission-message" && 
+                                            <div style={{display: "inline-block"}} className="form-check form-switch">
+                                                <input role="button" onChange={handleDeckSubmissionMessageSelectedValueChange} checked={deckSubmissionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckSubmissionMessageSelectedValue ? "On" : "Off"}</label>
+                                            </div>
+                                        }
+                                    </div>
+                                    {editField !== "deck-submission-message" && <StyledEditIcon role="button" data-editfield="deck-submission-message" onClick={handleEditSelection}/>}
+                                    {editField === "deck-submission-message" && 
+                                        <div>
+                                            <button onClick={handleCancel}>Cancel</button>
+                                            <button data-editfield="deck-submission-message" onClick={handleSave}>Save</button>
+                                        </div>
+                                    }
+                            </SettingCategoryOption>
+                            <hr />
+                        <SettingCategoryOption>
+                                    <div>
+                                        <span>Direct Messages from Other Users: </span>
+                                        {editField !== "direct-message" && <span>{directMessage ? "On" : "Off"}</span>}
+                                        {editField === "direct-message" && 
+                                            <div style={{display: "inline-block"}} className="form-check form-switch">
+                                                <input role="button" onChange={handleDirectMessageSelectedValueChange} checked={directMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{directMessageSelectedValue ? "On" : "Off"}</label>
+                                            </div>
+                                        }
+                                    </div>
+                                    {editField !== "direct-message" && <StyledEditIcon role="button" data-editfield="direct-message" onClick={handleEditSelection}/>}
+                                    {editField === "direct-message" && 
+                                        <div>
+                                            <button onClick={handleCancel}>Cancel</button>
+                                            <button data-editfield="direct-message" onClick={handleSave}>Save</button>
+                                        </div>
+                                    }
+                            </SettingCategoryOption>
+                            <hr />
+                        <SettingCategoryOption>
+                                    <div>
+                                        <span>My Request to Join a Group Was Approved/Denied: </span>
+                                        {editField !== "join-decision-message" && <span>{joinDecisionMessage ? "On" : "Off"}</span>}
+                                        {editField === "join-decision-message" && 
+                                            <div style={{display: "inline-block"}} className="form-check form-switch">
+                                                <input role="button" onChange={handleJoinDecisionMessageSelectedValueChange} checked={joinDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{joinDecisionMessageSelectedValue ? "On" : "Off"}</label>
+                                            </div>
+                                        }
+                                    </div>
+                                    {editField !== "join-decision-message" && <StyledEditIcon role="button" data-editfield="join-decision-message" onClick={handleEditSelection}/>}
+                                    {editField === "join-decision-message" && 
+                                        <div>
+                                            <button onClick={handleCancel}>Cancel</button>
+                                            <button data-editfield="join-decision-message" onClick={handleSave}>Save</button>
+                                        </div>
+                                    }
+                            </SettingCategoryOption>
+                            <hr />
+                        <SettingCategoryOption>
                                 <div>
-                                    <span>Email: </span>
-                                    {editField !== "email-privacy" && <span>{emailPrivacy === "public" ? "Public" : "Private"}</span>}
-                                    {editField === "email-privacy" && 
-                                        <select name="email-privacy-select" id="email-privacy-select" value={emailPrivacySelectedValue} onChange={handleEmailPrivacySelectedValueChange} >
-                                            <option value="public">Public</option>
-                                            <option value="private">Private</option>
-                                        </select>
+                                    <span>User Requests to Join Group I am Admin Of: </span>
+                                    {editField !== "join-request-message" && <span>{joinRequestMessage ? "On" : "Off"}</span>}
+                                    {editField === "join-request-message" && 
+                                        <div style={{display: "inline-block"}} className="form-check form-switch">
+                                            <input role="button" onChange={handleJoinRequestMessageSelectedValueChange} checked={joinRequestMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{joinRequestMessageSelectedValue ? "On" : "Off"}</label>
+                                        </div>
                                     }
                                 </div>
-                                {editField !== "email-privacy" && <StyledEditIcon role="button" data-editfield="email-privacy" onClick={handleEditSelection}/>}
-                                {editField === "email-privacy" && 
+                                {editField !== "join-request-message" && <StyledEditIcon role="button" data-editfield="join-request-message" onClick={handleEditSelection}/>}
+                                {editField === "join-request-message" && 
                                     <div>
-                                        <button data-editfield="" onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="email-privacy" onClick={handleSave}>Save</button>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="join-request-message" onClick={handleSave}>Save</button>
                                     </div>
                                 }
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
-                </SettingsSection> */}
+                </SettingsSection>
                 <StyledButton onClick={showDeleteConfirmation}>Delete Account</StyledButton>
             </SettingsForm>
             {modalContent &&

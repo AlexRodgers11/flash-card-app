@@ -180,10 +180,15 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                 //handle add/delete deck based on approval/denial decision
                 if(req.body.decision === "approved") {
                     const updatedDeck = await Deck.findByIdAndUpdate(foundDeckSubmissionMessage.targetDeck, {approvedByGroupAdmins: true}, {new: true});
-                    const updatedGroup = await Group.findByIdAndUpdate(foundDeckSubmissionMessage.targetGroup, {$push: {decks: updatedDeck._id}});
-                    //possibly exclude the approver's id;
+                    const updatedGroup = await Group.findByIdAndUpdate(foundDeckSubmissionMessage.targetGroup, {$push: {decks: updatedDeck._id}})
+                        .populate({
+                            path: "members",
+                            select: "_id communicationSettings.notificationPreferences.deckAdded"
+                        });
         
-                    const otherGroupMembers = updatedGroup.members.filter(memberId => memberId !== foundUser._id && memberId !== req.message.sendingUser);
+                    // const otherGroupMembers = updatedGroup.members.filter(memberId => memberId !== foundUser._id && memberId !== req.message.sendingUser);
+                    
+                    const otherGroupMembers = updatedGroup.members.filter((member) => ((member._id !== foundUser._id && member._id !== req.message.sendingUser) && member.communicationsSettings.notificationPreferences.deckAdded));
                     
                     const deckAddBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
                         const notification = await DeckAddedNotification.create({
@@ -242,11 +247,17 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                 await JoinRequest.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
 
                 if(req.body.decision === "approved") {
-                    const foundGroup = await Group.findById(foundJoinRequestMessage.targetGroup, "members");
+                    const foundGroup = await Group.findById(foundJoinRequestMessage.targetGroup)
+                        .populate({
+                            path: "members",
+                            select: "_id communicationsSettings.notificationPreferences.newMemberJoined"
+                        });
                     await Group.findByIdAndUpdate(foundJoinRequestMessage.targetGroup, {$addToSet: {members: foundJoinRequestMessage.sendingUser}});
                     await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$addToSet: {groups: foundJoinRequestMessage.targetGroup}});
                 
-                    const otherGroupMembers = foundGroup.members.filter(memberId => memberId !== foundUser._id);
+                    // const otherGroupMembers = foundGroup.members.filter(memberId => memberId !== foundUser._id);
+                    // const populatedGroupMembers = await foundGroup.members.populate("communicationsSettings.notificationPreferences.newMemberJoined");
+                    const otherGroupMembers = foundGroup.members.filter(member => member._id !== foundUser._id && member.communicationsSettings.notificationPreferences.newMemberJoined);
 
                     const joinRequestBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
                         const notification = await NewMemberJoinedNotification.create({

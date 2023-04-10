@@ -99,7 +99,7 @@ groupRouter.post("/:groupId/decks", getUserIdFromJWTToken, async (req, res, next
 
         const otherGroupMembers = updatedGroup.members.filter(memberId => memberId.toString() !== req.userId.toString());
 
-        await User.updateMany({_id: {$in: otherGroupMembers}}, {$push: {notifications: await DeckAddedNotification.create({targetDeck: savedDeckCopy._id, targetGroup: updatedGroup._id, read: false})}});
+        await User.updateMany({_id: {$in: otherGroupMembers}, "communicationSettings.notificationPreferences.deckAdded": true}, {$push: {notifications: await DeckAddedNotification.create({targetDeck: savedDeckCopy._id, targetGroup: updatedGroup._id, read: false})}});
         res.status(200).send(savedDeckCopy._id);
     } catch (err) {
         res.status(500).send(err.message);
@@ -142,7 +142,7 @@ groupRouter.patch("/:groupId/head-admin", getUserIdFromJWTToken, async (req, res
         });
         await Group.findByIdAndUpdate(req.group._id, {$set: {members: reorderedGroupMembers}});
 
-        await User.updateMany({_id: {$in: updatedGroup.members}}, {$push: {notifications: await HeadAdminChangeNotification.create({targetGroup: updatedGroup._id, previousHeadAdmin: prevAdminId, newHeadAdmin: req.body.newAdminId, read: false})}});
+        await User.updateMany({_id: {$in: updatedGroup.members, "communicationsSettings.notificationPreferences.headAdminChange": true}}, {$push: {notifications: await HeadAdminChangeNotification.create({targetGroup: updatedGroup._id, previousHeadAdmin: prevAdminId, newHeadAdmin: req.body.newAdminId, read: false})}});
         res.status(200).send({
             administrators: updatedGroup.administrators,
             members: updatedGroup.members
@@ -165,7 +165,7 @@ groupRouter.patch("/:groupId/members", getUserIdFromJWTToken, async (req, res, n
                 
                 //if the user is being removed by an admin (other than an admin removing themselves) send a notification to the removed user
                 if(req.userId.toString() !== req.body.memberToRemoveId) {
-                    await User.findByIdAndUpdate(updatedUser._id, {$push: {notifications: await RemovedFromGroupNotification.create({targetGroup: req.group._id, decidingUser: req.userId, read: false})}});
+                    await User.updateOne({_id: updatedUser._id, "communicationsSettings.notificationPreferences.removedFromGroup": true}, {$push: {notifications: await RemovedFromGroupNotification.create({targetGroup: req.group._id, decidingUser: req.userId, read: false})}});
                 }
                 res.status(200).send(updatedUser._id);
             } else {
@@ -214,7 +214,7 @@ groupRouter.patch("/:groupId/admins", getUserIdFromJWTToken, async (req, res, ne
                 
                 await Group.findByIdAndUpdate(req.group._id, {members: reorderedGroupMembers});
 
-                await User.findByIdAndUpdate(user._id, {$push: {notifications: await AdminChangeNotification.create({targetGroup: req.group._id, decidingUser: req.userId, action: req.body.action, read: false})}});
+                await User.updateOne({_id: user._id, "communicationsSettings.notificationPreferences.adminChange": true}, {$push: {notifications: await AdminChangeNotification.create({targetGroup: req.group._id, decidingUser: req.userId, action: req.body.action, read: false})}});
 
                 res.status(200).send({userId: updatedUser._id, members: reorderedGroupMembers});
             } else {
@@ -307,7 +307,7 @@ groupRouter.delete("/:groupId", getUserIdFromJWTToken, async (req, res, next) =>
 
             const otherGroupMembers = req.group.members.filter(memberId => memberId.toString() !== req.userId.toString());
 
-            await User.updateMany({_id: {$in: otherGroupMembers}}, {$push: {notifications: await GroupDeletedNotification.create({groupName: req.group.name, read: false})}});
+            await User.updateMany({_id: {$in: otherGroupMembers}, "communicationsSettings.notificationPreferences.groupDeleted": true}, {$push: {notifications: await GroupDeletedNotification.create({groupName: req.group.name, read: false})}});
 
             res.status(200).send(group);
         } else {
@@ -326,7 +326,7 @@ groupRouter.post("/:groupId/members/join-code", async(req, res, next) => {
         if((user && foundGroup) && (req.body.joinCode === req.group.joinCode)) {
             const updatedGroup = await Group.findByIdAndUpdate(req.group._id, {$addToSet: {members: user._id}}, {new: true});
             await User.findByIdAndUpdate(req.body.userId, {$addToSet: {groups: updatedGroup._id}});
-            await User.updateMany({_id: {$in: foundGroup.members}}, {$push: {notifications: await NewMemberJoinedNotification.create({member: req.body.userId, targetGroup: updatedGroup._id, read: false})}});
+            await User.updateMany({_id: {$in: foundGroup.members}, "communicationsSettings.notificationPreferences.newMemberJoined": true}, {$push: {notifications: await NewMemberJoinedNotification.create({member: req.body.userId, targetGroup: updatedGroup._id, read: false})}});
             res.status(200).send(updatedGroup._id);
         } else {
             res.status(404).send("Invalid join code");

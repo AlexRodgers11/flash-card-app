@@ -38,7 +38,7 @@ const User = new Schema({
         currentDecks: String,
     },
     communicationSettings: {
-        notificationPreferences: {//not working b/c nested
+        notificationPreferences: {
             adminChange: Boolean,
             deckAdded: Boolean,
             groupDeleted: Boolean,

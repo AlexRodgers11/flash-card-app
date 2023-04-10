@@ -4,7 +4,7 @@ import { DeckDecision, DeckSubmission, DirectMessage, JoinDecision, JoinRequest,
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import User from "../models/user.js";
-import { DeckAddedNotification } from "../models/notification.js";
+import { DeckAddedNotification, NewMemberJoinedNotification } from "../models/notification.js";
 import { getUserIdFromJWTToken } from "../utils.js";
 
 const checkMessageOwnership = (req, res, next) => {
@@ -249,7 +249,7 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                     const otherGroupMembers = foundGroup.members.filter(memberId => memberId !== foundUser._id);
 
                     const joinRequestBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
-                        const notification = await DeckAddedNotification.create({
+                        const notification = await NewMemberJoinedNotification.create({
                             member: foundJoinRequestMessage.sendingUser, 
                             targetGroup: foundJoinRequestMessage.targetGroup, 
                             read: false

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Message from './Message';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
 
 const MessageListWrapper = styled.div`
 	display: flex;
@@ -35,6 +36,12 @@ function MessageList(props) {
 	const selectDirection = evt => {
 		evt.preventDefault();
 		setDirection(evt.target.dataset.direction);
+	}
+
+	if(!messages.length) {
+		return (
+			<EmptyIndicator>No Messages</EmptyIndicator>
+		);
 	}
 
 	return (

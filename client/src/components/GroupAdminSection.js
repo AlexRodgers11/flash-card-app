@@ -83,7 +83,6 @@ export function GroupAdminSection() {
     return (
         <GroupAdminSectionWrapper>
             <GroupEditControlsContainer>
-                {/* {userId === administrators[0] && */}
                     <JoinOptionContainer>
                         <label htmlFor="join-code-options">Select how new members can join:</label>
                         <select id="join-code-options" name="join-code-options" onChange={handleChangeJoinOptions}>
@@ -92,20 +91,21 @@ export function GroupAdminSection() {
                             <option selected={joinOptions === "request"} value="request">Request by User</option>
                             <option selected={joinOptions === "code-and-request"} value="code-and-request">Join Code and Request by User</option>
                         </select>
-                        <JoinCodeContainer>
-                            {!joinCodeVisible ? 
-                                <button onClick={toggleJoinCodeVisible}>Show Group Join Code</button>
-                                :
-                                <div>
-                                    <span>Join Code: {joinCode} </span>
-                                    <CopyButton onClick={copyCode}>Copy Code <BsClipboardPlus /></CopyButton>
-                                    <button onClick={getNewJoinCode}>Get New Code</button>
-                                    <button onClick={toggleJoinCodeVisible}>Hide Join Code</button>
-                                </div>
-                            }
-                        </JoinCodeContainer>
+                        {(joinOptions === "code" || joinOptions === "code-and-request") &&
+                            <JoinCodeContainer>
+                                {!joinCodeVisible ? 
+                                    <button onClick={toggleJoinCodeVisible}>Show Group Join Code</button>
+                                    :
+                                    <div>
+                                        <span>Join Code: {joinCode} </span>
+                                        <CopyButton onClick={copyCode}>Copy Code <BsClipboardPlus /></CopyButton>
+                                        <button onClick={getNewJoinCode}>Get New Code</button>
+                                        <button onClick={toggleJoinCodeVisible}>Hide Join Code</button>
+                                    </div>
+                                }
+                            </JoinCodeContainer>
+                        }
                     </JoinOptionContainer>
-                {/* } */}
             </GroupEditControlsContainer>
             <GroupMemberList editMode={true} listType="members" extraStyling={true}/>
             <GroupDecksSection></GroupDecksSection>

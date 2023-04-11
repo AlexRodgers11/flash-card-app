@@ -21,10 +21,10 @@ const main = async (email, code) => {
     });
 
         await transporter.sendMail({
-        from: '"FlashCardApp" <flashcardapp@example.com>',
+        from: '"FlishFlash" <admin@flishflash.org>',
         to: `${email}`,
         subject: "Verify your email",
-        text: "Test code",
+        replyTo: "no-reply@flishflash.org",
         html: (
             `<html>
                 <body>

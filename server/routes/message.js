@@ -5,7 +5,7 @@ import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import User from "../models/user.js";
 import { DeckAddedNotification, NewMemberJoinedNotification } from "../models/notification.js";
-import { getUserIdFromJWTToken } from "../utils.js";
+import { getUserIdFromJWTToken, sendEmail } from "../utils.js";
 
 const checkMessageOwnership = (req, res, next) => {
     if(req.message.sendingUser.toString() !== req.userId && !req.message.receivingUsers.some(id => id.toString() === req.userId)) {
@@ -186,9 +186,7 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                             select: "_id communicationSettings.notificationPreferences.deckAdded"
                         });
         
-                    // const otherGroupMembers = updatedGroup.members.filter(memberId => memberId !== foundUser._id && memberId !== req.message.sendingUser);
-                    
-                    const otherGroupMembers = updatedGroup.members.filter((member) => ((member._id !== foundUser._id && member._id !== req.message.sendingUser) && member.communicationsSettings.notificationPreferences.deckAdded));
+                    const otherGroupMembers = updatedGroup.members.filter((member) => ((member._id !== foundUser._id && member._id !== req.message.sendingUser) && member.communicationSettings.notificationPreferences.deckAdded));
                     
                     const deckAddBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
                         const notification = await DeckAddedNotification.create({
@@ -226,6 +224,28 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                 await User.findByIdAndUpdate(foundDeckSubmissionMessage.sendingUser, {$push: {"messages.received": savedDeckDecisionMessage}});
                 await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedDeckDecisionMessage}});
 
+                if(foundUser.communicationSettings.emailPreferences.deckDecision) {
+                    const populatedMessage = await savedDeckDecisionMessage.populate([
+                        {
+                            path: "sendingUser",
+                            select: "name.first name.last user.login.username"
+                        },
+                        {
+                            path: "targetDeck",
+                            select: "name"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        },
+                        {
+                            path: "targetUser",
+                            select: "login.email"
+                        }
+                    ]);
+                    await sendEmail(populatedMessage.targetUser.login.email, populatedMessage);
+                }
+
                 res.status(200).send({sentMessage: {_id: savedDeckDecisionMessage._id, read: savedDeckDecisionMessage.read, messageType: savedDeckDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
                 
                 break;
@@ -250,14 +270,12 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                     const foundGroup = await Group.findById(foundJoinRequestMessage.targetGroup)
                         .populate({
                             path: "members",
-                            select: "_id communicationsSettings.notificationPreferences.newMemberJoined"
+                            select: "_id communicationSettings.notificationPreferences.newMemberJoined"
                         });
                     await Group.findByIdAndUpdate(foundJoinRequestMessage.targetGroup, {$addToSet: {members: foundJoinRequestMessage.sendingUser}});
                     await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$addToSet: {groups: foundJoinRequestMessage.targetGroup}});
-                
-                    // const otherGroupMembers = foundGroup.members.filter(memberId => memberId !== foundUser._id);
-                    // const populatedGroupMembers = await foundGroup.members.populate("communicationsSettings.notificationPreferences.newMemberJoined");
-                    const otherGroupMembers = foundGroup.members.filter(member => member._id !== foundUser._id && member.communicationsSettings.notificationPreferences.newMemberJoined);
+    
+                    const otherGroupMembers = foundGroup.members.filter(member => member._id !== foundUser._id && member.communicationSettings.notificationPreferences.newMemberJoined);
 
                     const joinRequestBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
                         const notification = await NewMemberJoinedNotification.create({
@@ -291,6 +309,23 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                 await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$push: {"messages.received": savedJoinDecisionMessage}});
                 await User.findByIdAndUpdate(foundUser._id, {$push: {"messages.sent": savedJoinDecisionMessage}});
 
+                if(foundUser.communicationSettings.emailPreferences.joinDecision) {
+                    const populatedMessage = await savedJoinDecisionMessage.populate([
+                        {
+                            path: "sendingUser",
+                            select: "name.first name.last user.login.username"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        },
+                        {
+                            path: "targetUser",
+                            select: "login.email"
+                        }
+                    ]);
+                    await sendEmail(populatedMessage.targetUser.login.email, populatedMessage);
+                }
 
                 res.status(200).send({sentMessage: {_id: savedJoinDecisionMessage._id, read: savedJoinDecisionMessage.read, messageType: savedJoinDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
                 

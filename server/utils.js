@@ -5,6 +5,8 @@ import jwt from "jwt-simple";
 import crypto from "crypto";
 import { rateLimit } from "express-rate-limit";
 import multer from "multer";
+import {createTransport} from "nodemailer";
+
 
 const characters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','@','#','$','%','&','=','?'];
 
@@ -183,3 +185,89 @@ export const upload = multer({
     },
     fileFilter: fileFilter
 });
+
+export const sendEmail = async (emailAddress, message) => {
+    let transporter = createTransport({
+        host: "smtp-relay.sendinblue.com",
+        port: process.env.SEND_IN_BLUE_PORT,
+        secure: false,
+        auth: {
+            user: process.env.SEND_IN_BLUE_USER,
+            pass: process.env.SEND_IN_BLUE_PASSWORD
+        }
+    });
+    
+    const mailObj = {
+        from: '"FlishFlash" <flashcardapp@example.com>',
+        to: `${emailAddress}`
+    }
+
+    switch(message.messageType) {
+        case "DeckSubmission":
+            mailObj.subject = "New Deck Submitted to One of Your Groups";
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} submitted a deck to be added to group ${message.targetGroup.name}</p>
+
+                        <p>Login to review the request:</p>
+                        <button>Log In</button>
+                    </body>
+                </html>`
+            )
+            break;
+        case "DeckDecision":
+            mailObj.subject = `Your submission of ${message.targetDeck.name} to group ${message.targetGroup.name} has been ${message.acceptanceStatus}`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} ${message.acceptanceStatus} your request to add deck to the group ${message.targetGroup.name}${message.comment ? " and left this comment:" : "."}</p>
+                        ${message.comment ? "<br />" : ""}
+                        ${message.comment ? `<em>${message.comment}</em>` : ""}
+                    </body>
+                </html>`
+            )
+            break;
+        case "JoinRequest":
+            mailObj.subject = `A User Would Like to Join ${message.targetGroup.name}`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} is requesting to join ${message.targetGroup.name}</p>
+
+                        <p>Login to review the request:</p>
+                        <button>Log In</button>
+                    </body>
+                </html>`
+            );
+            break;
+        case "JoinDecision":
+            mailObj.subject = `Your request to join ${message.targetGroup.name} has been ${message.acceptanceStatus}`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} ${message.acceptanceStatus} your request to join ${message.targetGroup.name}${message.comment ? " and left this comment:" : "."}</p>
+                        ${message.comment ? "<br />" : ""}
+                        ${message.comment ? `<em>${message.comment}</em>` : ""}
+                    </body>
+                </html>`
+            )
+            break;
+        case "DirectMessage":
+            mailObj.subject = `${message.sendingUser.name.first} ${message.sendingUser.name.last} Sent You a Message`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} sent you the following message:</p>
+                        <br />
+                        <br />
+                        <em>${message.text}</em>
+                    </body>
+                </html>`
+            )
+            break;
+        default: 
+            throw new Error("An invalid message type was selected to create an email from");
+    }
+    await transporter.sendMail(mailObj);
+}

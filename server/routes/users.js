@@ -6,7 +6,7 @@ import User from "../models/user.js";
 import Group from "../models/group.js";
 import Deck from "../models/deck.js";
 import DeckAttempt from "../models/deckAttempt.js";
-import { copyDeck, generateRandomFileName, getUserIdFromJWTToken, storage, upload, fileFilter } from "../utils.js";
+import { copyDeck, generateRandomFileName, getUserIdFromJWTToken, storage, upload, fileFilter, sendEmail } from "../utils.js";
 import jwt from "jwt-simple";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
 import { Card } from "../models/card.js";
@@ -479,6 +479,15 @@ userRouter.post("/:userId/messages/direct-message", getUserIdFromJWTToken, async
             const savedMessage = await newMessage.save();
             await User.findByIdAndUpdate(req.user._id, {$push: {"messages.received": savedMessage}});
             await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedMessage}});
+
+            if(req.user.communicationSettings.emailPreferences.direct) {
+                const populatedMessage = await savedMessage.populate({
+                    path: "sendingUser",
+                    select: "name.first name.last user.login.username"
+                });
+                await sendEmail(req.user.login.email, populatedMessage);
+            }
+
             res.status(200).send({_id: savedMessage._id, messageType: "DirectMessage", read: []})
         } else {
             res.status(401).send("Messages cannot be sent on behalf of another user");

@@ -142,7 +142,7 @@ groupRouter.patch("/:groupId/head-admin", getUserIdFromJWTToken, async (req, res
         });
         await Group.findByIdAndUpdate(req.group._id, {$set: {members: reorderedGroupMembers}});
 
-        await User.updateMany({_id: {$in: updatedGroup.members, "communicationSettings.notificationPreferences.headAdminChange": true}}, {$push: {notifications: await HeadAdminChangeNotification.create({targetGroup: updatedGroup._id, previousHeadAdmin: prevAdminId, newHeadAdmin: req.body.newAdminId, read: false})}});
+        await User.updateMany({_id: {$in: updatedGroup.members}, "communicationSettings.notificationPreferences.headAdminChange": true}, {$push: {notifications: await HeadAdminChangeNotification.create({targetGroup: updatedGroup._id, previousHeadAdmin: prevAdminId, newHeadAdmin: req.body.newAdminId, read: false})}});
         res.status(200).send({
             administrators: updatedGroup.administrators,
             members: updatedGroup.members

@@ -341,8 +341,6 @@ groupRouter.delete("/:groupId", getUserIdFromJWTToken, async (req, res, next) =>
             }
             await Deck.deleteMany({_id: {$in: req.group.decks}});
 
-            await Activity.deleteMany({_id: {$in: req.group.activities}});
-
             await User.updateMany({_id: {$in: req.group.members}}, {$pull: {groups: req.group._id}});
 
             await User.updateMany({_id: {$in: req.group.administrators}}, {$pull: {adminOf: req.group._id}});

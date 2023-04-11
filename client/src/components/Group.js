@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router';
-import { fetchGroupData } from '../reducers/groupSlice';
+import { deleteGroup, fetchGroupData } from '../reducers/groupSlice';
 import { GroupMemberOptionsContainer, GroupWrapper, GroupNavbar, GroupTitle, OutletContainer, StyledLeaveButton, StyledNavLink } from './StyledComponents/GroupStyles';
 import useToggle from '../hooks/useToggle';
 import GroupMemberOption from './GroupMemberOption';
 import { removeMember, replaceHeadAdmin } from '../reducers/groupSlice';
 import { removeGroup } from '../reducers/loginSlice';
 import Modal from './Modal';
+import useFormInput from '../hooks/useFormInput';
+import { fetchDecksOfUser } from '../reducers/decksSlice';
 
 function Group() {
     const dispatch = useDispatch();
@@ -24,6 +26,7 @@ function Group() {
     const groupMemberIds = useSelector((state) => state.group.memberIds);
     const administrators = useSelector((state) => state.group.administrators);
     const headAdmin = useSelector((state) => state.group.headAdmin);
+    const [deleteConfirmation, clearDeleteConfirmation, handleChangeDeleteConfirmation] = useFormInput("");
 
     const firstRender = useRef(true);
     useEffect(() => {
@@ -100,9 +103,27 @@ function Group() {
                         <button onClick={hideModal}>Cancel</button>
                     </div>
                 );
+            case "delete-group-confirmation":
+                return (
+                    <form onSubmit={handleDeleteGroup}>
+                        <label htmlFor="confirm-delete-group">Type the group's name to delete. This action cannot be undone.</label>
+                        <input id="confirm-delete-group" name="confirm-delete-group" type="text" onChange={handleChangeDeleteConfirmation} value={deleteConfirmation} />
+                        {deleteConfirmation === groupName && <button type="submit">Delete</button>}
+                    </form>
+                );
             default:
                 return;
         }
+    }
+
+    const handleDeleteGroup = (evt) => {
+        evt.preventDefault();
+        toggleGroupDeletionInProgress();
+        batch(() => {
+            dispatch(deleteGroup({groupId, requesterId: userId}));
+            dispatch(removeGroup({groupId}));
+            dispatch(fetchDecksOfUser(userId));
+        })
     }
 
     const handleLeaveGroup = () => {

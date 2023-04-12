@@ -159,7 +159,6 @@ function CardStatsTable() {
                                                 <TableCell className="TableCell"><StyledLinkIcon data-cardid={card._id} onClick={handleSelectCard}/></TableCell>
                                             </TableRow>)
                                         )}
-
                                     </tbody> 
                                 </>
                             );
@@ -167,6 +166,15 @@ function CardStatsTable() {
                             return <></>
                         }
                     })}
+                    {!cardStatsByDeck.map((deck) => deck.cards).flat().length && 
+                        <TableRow className="TableRow">
+                            <TableCell className="RowHeader">--</TableCell>
+                            <TableCell className="TableCell">--%</TableCell>
+                            <TableCell className="TableCell">--</TableCell>
+                            <TableCell className="TableCell">--</TableCell>
+                            <TableCell className="TableCell">N/A</TableCell>
+                        </TableRow>
+                    }
                 </StatsTable>
             </CardStatsTableContainer>
             {!cardStatsByDeck.map(deck => deck.cards).flat().length && (

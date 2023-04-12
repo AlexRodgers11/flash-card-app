@@ -135,6 +135,14 @@ function CardAttemptsTable() {
                             </TableRow>            
                         ))
                     }
+                    {!attempts.length && 
+                        <TableRow>
+                        <TableCell>--</TableCell>
+                        <TableCell>--</TableCell>
+                        <TableCell>--</TableCell>
+                        <TableCell>N/A</TableCell>
+                    </TableRow>                
+                    }
                     </tbody>
                 </AttemptsTable>
             </CardAttemptTableContainer>

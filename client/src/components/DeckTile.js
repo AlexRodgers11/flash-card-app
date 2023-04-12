@@ -391,18 +391,15 @@ function DeckTile(props) {
             return;
         }
         //SEE IF OKAY TO DO THIS WAY- COULD BE UNSAFE AND ALLOW NAVIGATION TO PRIVATE DECKS
-        // if(location.pathname.slice(32, 33) === "p") {
-        //     navigate();
-        // } else if(location.pathname.slice(32, 33) === "d" || location.pathname.slice(1, 2) === "u") {
-        //     navigate(`/decks/${props.deckId}`)
-        // } else if(location.pathname.slice(1,2) === "g") {
-        //     navigate(`/groups/${groupId}/decks/${props.deckId}`);
-        // }
         if(location.pathname.includes("group")) {
             navigate(`/groups/${groupId}/decks/${props.deckId}`);
         } else if(location.pathname.includes("practice")) {
-            navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
-            dispatch(setPracticeDeckType({deckType: listType}))
+            if(deckData.cardCount > 0) {
+                navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
+                dispatch(setPracticeDeckType({deckType: listType}))
+            } else {
+                props.noCardsClick(props.deckId);
+            }
         } else {
             navigate(`/decks/${props.deckId}`);
         }
@@ -431,7 +428,12 @@ function DeckTile(props) {
         evt.stopPropagation();
         switch(evt.target.dataset.option) {
             case "practice":
-                navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
+                if(deckData.cardCount > 0) {
+                    navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
+                    dispatch(setPracticeDeckType({deckType: listType}))
+                } else {
+                    props.noCardsClick(props.deckId);
+                }
                 break;
             case "view":
                 navigate(`/decks/${props.deckId}`);
@@ -590,17 +592,21 @@ function DeckTile(props) {
     return (
         <DeckTileWrapper ref={rootRef} role="button" id="tile" className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
             <TopWrapper>
-                <IndicatorsWrapper ref={indicatorsRef} className="IndictorsWrapper" onClick={stopClickPropagation}>
-                    <StyledOptionsIcon role="button" onClick={handleToggleOptions} />
-                    <RightBlock>
-                        {deckData.publiclyAvailable ? <StyledOpenEye /> : <StyledClosedEye className="StyledClosedEye" />}
-                        <CardCountWrapper>
-                            <span>{deckData.cardCount}</span>
-                            <span />
-                            <span />
-                        </CardCountWrapper>
-                    </RightBlock>
-                </IndicatorsWrapper>
+                    <IndicatorsWrapper ref={indicatorsRef} className="IndictorsWrapper" onClick={stopClickPropagation}>
+                        {!location.pathname.includes("practice") ?
+                            <StyledOptionsIcon role="button" onClick={handleToggleOptions} />
+                            :
+                            <span></span>
+                        }
+                        <RightBlock>
+                            {!location.pathname.includes("practice") ? deckData.publiclyAvailable ? <StyledOpenEye /> : <StyledClosedEye className="StyledClosedEye" /> : <span></span>}
+                            <CardCountWrapper>
+                                <span>{deckData.cardCount}</span>
+                                <span />
+                                <span />
+                            </CardCountWrapper>
+                        </RightBlock>
+                    </IndicatorsWrapper>
                 {showOptions &&
                     <Options>
                         <Option role="button" data-option="practice" onClick={handleOptionSelection}>Practice</Option>

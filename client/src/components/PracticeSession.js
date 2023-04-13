@@ -144,13 +144,21 @@ function PracticeSession() {
     useEffect(() => {
         if(!activeCard?.cardType && firstRender.current) {
             firstRender.current = false;
-            dispatch(fetchDeck(deckId));
-        }
-    }, [activeCard, deckId, dispatch])
+            dispatch(fetchDeck(deckId))
+                .then(response => {
+                    const statusCode = response.payload.response.status
+                    if(statusCode === 400) {
+                        alert("This deck doesn't have any cards. Redirecting to Dashboard");
+                        navigate("/dashboard");
+                    } else if(statusCode === 401) {
+                        navigate("/dashboard");
+                    }
+                })
+        } 
+    }, [activeCard, deckId, dispatch, navigate]);
     
     useEffect(() => {
         return () => {
-            console.log("reset")
             dispatch(resetSession());
         }
     }, [dispatch]);

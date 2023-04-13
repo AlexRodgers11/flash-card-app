@@ -91,6 +91,8 @@ deckRouter.get("/:deckId/practice", getUserIdFromJWTToken, async (req, res, next
             if(!req.deck.groupDeckBelongsTo || !user.groups.some(group => group._id.toString() === req.deck.groupDeckBelongsTo.toString())) {
                 return res.status(401).send("You are not authorized to view this deck");
             }
+        } else if(req.deck.cards.length < 1) {
+            return res.status(400).send("This deck doesn't have any cards to practice");
         }
         const deck = await Deck.findById(req.deck._id, "cards")
             .populate("cards");

@@ -133,10 +133,12 @@ export const practiceSessionSlice = createSlice({
             return {...initialState, practicedSinceAttemptsPulled: true};
         });
         builder.addCase(fetchDeck.fulfilled, (state, action) => {
-            state.cards = action.payload.cards;
-            state.numCards = action.payload.cards.length;
-            state.practiceSet = action.payload.practiceSet;
-            state.activeCard = action.payload.activeCard;
+            if(action.payload.cards) {
+                state.cards = action.payload.cards;
+                state.numCards = action.payload.cards.length;
+                state.practiceSet = action.payload.practiceSet;
+                state.activeCard = action.payload.activeCard;
+            }
         });
         builder.addCase(practiceDeckAgain.fulfilled, (state) => {
             let shuffledCards = shuffleArray(state.cards).map(card => {

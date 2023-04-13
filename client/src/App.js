@@ -31,20 +31,16 @@ const AppWrapper = styled.div`
 	}
 `
 
-const HeaderContainer = styled.div`
+const HeaderContainer = styled.section`
 	height: 5.5rem
 `
 
-const MainContainer = styled.div`
+const MainContainer = styled.section`
 	min-height: calc(100vh - 5.5rem); 
 	// height: calc(100vh - 5.5rem);
 `
 
-const FooterContainer = styled.div`
-	height: 17rem; 
-	@media (max-width: 500px) {
-		height: 35rem;
-	}
+const FooterContainer = styled.section`
 `
 
 function App() {

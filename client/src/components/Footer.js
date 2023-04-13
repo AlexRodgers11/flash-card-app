@@ -9,17 +9,10 @@ import Modal from "./Modal";
 const FooterWrapper = styled.footer`
     display: flex;
     flex-direction: column;
-    // justify-content: center;
     align-items: center;
-    height: 100%;
-    // padding: 1rem;
     background-color: black;
     opacity: 95%;
     color: #a3a3a3;
-    @media (max-width: 500px) {
-        // flex-direction: column;
-        // padding-top: 1.5rem;
-    }
 `;
 
 const LinksSection = styled.div`
@@ -27,24 +20,19 @@ const LinksSection = styled.div`
     flex-direction: row;
     width: 100%;
     justify-content: center;
-    align-items: center;
-    padding: 1rem;
+    align-items: start;
+    padding: 1.5rem;
     @media (max-width: 500px) {
         flex-direction: column;
-        // padding-top: 1.5rem;
     }
 `;
 
 const LinkBlock = styled.div`
     display: inline-block;
     width: 30%;
-    height: 80%;
     @media (max-width: 500px) {
         margin-top: 1rem;
         width: 100%;
-        // &:first-of-type h4 {
-        //     padding-top: 2rem;
-        // }
     }
 `;
 
@@ -67,6 +55,10 @@ const Content = styled.span.attrs({
 })`
 
 `
+
+const Copyright = styled.p`
+    padding-bottom: 2rem;
+`;
 
 const PartialHr = styled.hr`
     width: 85%;
@@ -100,7 +92,7 @@ function Footer() {
         if(bugScreenshot) {
             const formData = new FormData();
             formData.append("bug-screenshot", bugScreenshot);
-            formData.append("subject", subject === "general" ? "General" : subject === "help" ? "Help Requested" : "Bug-Screenshot");
+            formData.append("subject", subject === "general" ? "General" : subject === "help" ? "Help Requested" : "Report Bug");
             formData.append("messageText", message);
             await client.post(`${baseURL}/communications/send-email-to-site-admins`, formData, { headers: {"Content-Type": "multipart/form-data"}});
         } else {
@@ -127,7 +119,10 @@ function Footer() {
         setBugScreenshot(file);
     }    
 
-
+    const handleShowBugForm = () => {
+        setSubject("bug");
+        toggleShowContactForm();
+    }
 
     return (
         <>
@@ -155,32 +150,25 @@ function Footer() {
         <FooterWrapper className="FooterWrapper">
             <LinksSection className="LinksSection">
                 <LinkBlock className="LinkBlock">
-                    <LinkBlockHeading>Heading 1</LinkBlockHeading>
+                    <LinkBlockHeading>Company</LinkBlockHeading>
+                    <ContentWrapper><Content>About</Content></ContentWrapper>
                     {userId && <ContentWrapper><Content onClick={toggleShowContactForm}>Contact</Content></ContentWrapper>}
-                    <ContentWrapper><Content>Link 2</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 3</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 4</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 5</Content></ContentWrapper>
+                    <ContentWrapper><Content>Hire Me</Content></ContentWrapper>
                 </LinkBlock>
                 <LinkBlock className="LinkBlock">
-                    <LinkBlockHeading>Heading 2</LinkBlockHeading>
-                    <ContentWrapper><Content>Link 1</Content></ContentWrapper>
-                    {/* <ContentWrapper><Content>Link 2</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 3</Content></ContentWrapper> */}
-                    <ContentWrapper><Content>Link 4</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 5</Content></ContentWrapper>
+                    <LinkBlockHeading>Resources</LinkBlockHeading>
+                    <ContentWrapper><Content>Docs</Content></ContentWrapper>
+                    <ContentWrapper><Content>Pricing</Content></ContentWrapper>
+                    <ContentWrapper><Content onClick={handleShowBugForm}>Report Bug</Content></ContentWrapper>
                 </LinkBlock>
                 <LinkBlock className="LinkBlock">
-                    <LinkBlockHeading>Heading 3</LinkBlockHeading>
-                    <ContentWrapper><Content>Link 1</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 2</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 3</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 4</Content></ContentWrapper>
-                    <ContentWrapper><Content>Link 5</Content></ContentWrapper>
+                    <LinkBlockHeading>Policies & Preferences</LinkBlockHeading>
+                    <ContentWrapper><Content>Privacy Policy</Content></ContentWrapper>
+                    <ContentWrapper><Content>Cookie Policy</Content></ContentWrapper>
                 </LinkBlock>
             </LinksSection>
             <PartialHr />
-            <p>&copy; 2023 FlishFlash</p>
+            <Copyright>&copy; 2023 FlishFlash</Copyright>
         </FooterWrapper>
         </>
     )

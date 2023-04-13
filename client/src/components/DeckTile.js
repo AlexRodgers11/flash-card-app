@@ -10,7 +10,7 @@ import { removeDeckFromUser } from '../reducers/loginSlice';
 import { deleteDeck } from '../reducers/decksSlice';
 import { copyDeck } from '../reducers/loginSlice';
 import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
-import { setPracticeDeckType } from '../reducers/practiceSessionSlice';
+import { setPracticeDeckGroup } from '../reducers/practiceSessionSlice';
 import useToggle from '../hooks/useToggle';
 import Modal from './Modal';
 
@@ -391,6 +391,9 @@ function DeckTile(props) {
     const [doneResizing, setDoneResizing] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
     const [showNoCardsModal, toggleShowNoCardsModal] = useToggle(false);
+    const [showStatsNotTrackedModal, toggleShowStatsNotTrackedModal] = useToggle(false);
+    const userDeckIds = useSelector((state) => state.login.decks.map((deck) => deck._id));
+    const userGroupIds = useSelector((state) => state.login.groups);
     const administrators = useSelector((state) => state.group.administrators);
     const groupId = useSelector((state) => state.group.groupId);
     const location = useLocation();
@@ -410,7 +413,9 @@ function DeckTile(props) {
         } else if(location.pathname.includes("practice")) {
             if(deckData.cardCount > 0) {
                 navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
-                dispatch(setPracticeDeckType({deckType: listType}))
+                if(deckData.groupDeckBelongsTo) {
+                    dispatch(setPracticeDeckGroup({groupId: deckData.groupDeckBelongsTo}));
+                }
             } else {
                 toggleShowNoCardsModal();
             }
@@ -451,11 +456,13 @@ function DeckTile(props) {
         switch(evt.target.dataset.option) {
             case "practice":
                 if(deckData.cardCount > 0) {
-                    if(location.pathname.includes("public")) {
-                        //show modal that notifies that stats won't be saved, then confirm from modal that it's okay
+                    if(location.pathname.includes("public") && (!userDeckIds.includes(props.deckId) && !userGroupIds.includes(deckData.groupDeckBelongsTo))) {
+                        toggleShowStatsNotTrackedModal();
                     } else {
                         navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
-                        dispatch(setPracticeDeckType({deckType: listType}));
+                        if(deckData.groupDeckBelongsTo) {
+                            dispatch(setPracticeDeckGroup({groupId: deckData.groupDeckBelongsTo}));
+                        }
                     }
                 } else {
                     toggleShowNoCardsModal();
@@ -485,6 +492,13 @@ function DeckTile(props) {
                 break;
         }
         setShowOptions(false);
+    }
+
+    const practicePublicDeck = () => {
+        if(deckData.groupDeckBelongsTo) {
+            dispatch(setPracticeDeckGroup({groupId: deckData.groupDeckBelongsTo}));
+        }
+        navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
     }
     
     const handleResize = useCallback(() => {
@@ -621,6 +635,13 @@ function DeckTile(props) {
             <Modal hideModal={toggleShowNoCardsModal}>
                 <p>This deck doesn't have any cards. Add cards to the deck in order to practice it.</p>
                 <button onClick={goToDeck}>Go to Deck</button>
+            </Modal>
+        }
+        {showStatsNotTrackedModal && 
+            <Modal hideModal={toggleShowStatsNotTrackedModal}>
+                <p>Statistics for practice sessions with other users' decks aren't tracked. If the user allows copies to be made adding a copy to your decks will allow you to practice it there and have your attempts tracked.</p>
+                <button onClick={toggleShowStatsNotTrackedModal}>Cancel</button>
+                <button onClick={practicePublicDeck}>Practice Anyway</button>
             </Modal>
         }
         <DeckTileWrapper ref={rootRef} role="button" id="tile" className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >

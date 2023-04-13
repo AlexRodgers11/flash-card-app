@@ -72,7 +72,8 @@ deckRouter.get("/:deckId/tile", getUserIdFromJWTToken, extendedRateLimiter, asyn
             allowCopies: req.deck.allowCopies || false,
             createdAt: req.deck.createdAt,
             cardCount: req.deck.cards.length,
-            permissions: req.deck.permissions
+            permissions: req.deck.permissions,
+            ...(req.deck.groupDeckBelongsTo && {groupDeckBelongsTo: req.deck.groupDeckBelongsTo})
         };
         res.status(200).send(JSON.stringify(response));
 

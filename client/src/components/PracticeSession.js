@@ -126,27 +126,17 @@ const WrapUpButtonsContainer = styled.div`
     }
 `;
 
-const sessionShouldBeSaved = (deckType, statsPreference) => {
-    console.log({deckType});
-    console.log(({statsPreference}));
-    if(deckType === "user") {
-        return statsPreference === "all" || statsPreference === "user-only";
-    } else if (deckType === "group") {
-        return statsPreference === "all" || statsPreference === "group-only";
-    } else {
-        console.log("incorrect deck type selected");
-        return false;
-    }
-}
-
 function PracticeSession() {
     let { deckId, userId } = useParams();
     const activeCard = useSelector((state) => state.practiceSession.activeCard);
     const stats = useSelector((state) => state.practiceSession.stats);
     const numCards = useSelector((state) => state.practiceSession.numCards);
-    const deckType = useSelector((state) => state.practiceSession.deckType);
+    const groupDeckBelongsTo = useSelector((state) => state.practiceSession.groupDeckBelongsTo);
     const statisticsTracking = useSelector((state) => state.login.statisticsTracking);
-    let retryStatus = useSelector((state) => state.practiceSession.retryStatus);
+    const retryStatus = useSelector((state) => state.practiceSession.retryStatus);
+    const loggedInUserId = useSelector((state) => state.login.userId);
+    const userDeckIds = useSelector((state) => state.login.decks.map((deck) => deck._id));
+    const userGroupIds = useSelector((state) => state.login.groups);
     let dispatch = useDispatch();
     let navigate = useNavigate();
 
@@ -157,7 +147,7 @@ function PracticeSession() {
             dispatch(fetchDeck(deckId));
         }
     }, [activeCard, deckId, dispatch])
-
+    
     useEffect(() => {
         return () => {
             console.log("reset")
@@ -165,19 +155,33 @@ function PracticeSession() {
         }
     }, [dispatch]);
 
-    const handlePracticeDeckAgain = () => {
+    const sessionShouldBeSaved = async (deckType, statsPreference) => {
+        if(!userDeckIds.includes(deckId) && !userGroupIds.includes(groupDeckBelongsTo)) {
+            return false;
+        }
+    
+        if(deckType === "user") {
+            return statsPreference === "all" || statsPreference === "user-only";
+        } else if (deckType === "group") {
+            return statsPreference === "all" || statsPreference === "group-only";
+        } else {
+            console.log("incorrect deck type selected");
+            return false;
+        }
+    }
+    const handlePracticeDeckAgain = async () => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
-        dispatch(practiceDeckAgain({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: sessionShouldBeSaved(deckType, statisticsTracking)}));
+        dispatch(practiceDeckAgain({deckId, userId: loggedInUserId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: await sessionShouldBeSaved(groupDeckBelongsTo ? "group" : "user", statisticsTracking)}));
     }
     
-    const handleRetryMissedCards = () => {
+    const handleRetryMissedCards = async () => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
-        dispatch(retryMissedCards({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: sessionShouldBeSaved(deckType, statisticsTracking)}));
+        dispatch(retryMissedCards({deckId, userId: loggedInUserId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: await sessionShouldBeSaved(groupDeckBelongsTo ? "group" : "user", statisticsTracking)}));
     }
 
-    const navigateAway = (evt) => {
+    const navigateAway = async (evt) => {
         const cardAttempts = store.getState().practiceSession.cardAttempts;
-        dispatch(endPractice({deckId, userId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: sessionShouldBeSaved(deckType, statisticsTracking)}))
+        dispatch(endPractice({deckId, userId: loggedInUserId, retryStatus, cardAttempts, accuracyRate: (stats.numberCorrect / (stats.numberCorrect + stats.numberWrong)) * 100, trackSession: await sessionShouldBeSaved(groupDeckBelongsTo ? "group" : "user", statisticsTracking)}))
             .then(() => {
                 if(evt.target.value === "dashboard") {
                     navigate("/dashboard");

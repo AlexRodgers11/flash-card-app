@@ -1,11 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import { client, shuffleArray } from "../utils";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 const initialState = {
-    deckType: "",
     practicedSinceAttemptsPulled: false,
     cards: [],
     activeCard: {
@@ -22,6 +20,7 @@ const initialState = {
     missedCards: [],
     retryStatus: false,
     cardAttempts: [],
+    groupDeckBelongsTo: "",
     stats: {
         numberCorrect: 0,
         numberWrong: 0
@@ -71,6 +70,7 @@ const saveAttempts = async (deckId, userId, cardAttempts, accuracyRate) => {
 }
 
 export const practiceDeckAgain = createAsyncThunk("practiceSession/practiceDeckAgain", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate, trackSession}) => {
+    console.log({trackSession});
     if(!retryStatus && trackSession) {
         await saveAttempts(deckId, userId, cardAttempts, accuracyRate)
     }
@@ -124,8 +124,8 @@ export const practiceSessionSlice = createSlice({
             state.practicedSinceAttemptsPulled = false;
         },
         resetSession: (state) => initialState,
-        setPracticeDeckType: (state, action) => {
-            state.deckType = action.payload.deckType;
+        setPracticeDeckGroup: (state, action) => {
+            state.groupDeckBelongsTo = action.payload.groupId;
         }
     },
     extraReducers: (builder) => {
@@ -170,5 +170,5 @@ export const practiceSessionSlice = createSlice({
     }
 });
 
-export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession, setPracticeDeckType } = practiceSessionSlice.actions;
+export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession, setPracticeDeckGroup } = practiceSessionSlice.actions;
 export default practiceSessionSlice.reducer;

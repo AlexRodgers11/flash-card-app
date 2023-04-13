@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { fetchCommunications, markNotificationsAsRead } from "../reducers/communicationsSlice";
 import { logout } from "../reducers/loginSlice";
 import Message from "./Message";
@@ -78,9 +78,10 @@ function Header() {
     const profilePic = useSelector((state) => state.login.photo);
     const notifications = useSelector((state) => state.communications.notifications);
     const messages = useSelector((state) => state.communications.messages.received);
+    
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
+    const location = useLocation();
         
     const expandMessage = (id, type, direction) => {
         setModalContent("message");
@@ -165,7 +166,7 @@ function Header() {
                         </div>}
                     <li className="nav-item dropdown">
                         <div tabIndex={0} className="nav-link dropdown-toggle" href="#" style={{paddingRight: "0"}} id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {profilePic ? <ProfilePic alt={username || `${name.first} ${name.last}`} src={profilePic} /> : <StyledHiOutlineUserCircle />}
+                            {profilePic && (!location.pathname.includes("identification") && !location.pathname.includes("profile-pic-crop")) ? <ProfilePic alt={username || `${name.first} ${name.last}`} src={profilePic} /> : <StyledHiOutlineUserCircle />}
                         </div>
                         <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a className="dropdown-item" onClick={name.first ? handleLogout : handleLogin} href="/">{name?.first ? "Log out" : "Login"}</a></li>

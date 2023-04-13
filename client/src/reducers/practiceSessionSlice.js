@@ -123,14 +123,16 @@ export const practiceSessionSlice = createSlice({
         resetPracticedSinceAttemptsPulled: (state) => {
             state.practicedSinceAttemptsPulled = false;
         },
-        resetSession: (state) => initialState,
+        resetSession: (state) => {
+            return {...initialState, practicedSinceAttemptsPulled: true};
+        },
         setPracticeDeckGroup: (state, action) => {
             state.groupDeckBelongsTo = action.payload.groupId;
         }
     },
     extraReducers: (builder) => {
         builder.addCase(endPractice.fulfilled, () => {
-            return {...initialState, practicedSinceAttemptsPulled: true};
+            return {...initialState};
         });
         builder.addCase(fetchDeck.fulfilled, (state, action) => {
             if(action.payload.cards) {
@@ -155,7 +157,6 @@ export const practiceSessionSlice = createSlice({
             state.stats.numberCorrect = 0;
             state.stats.numberWrong = 0;
             state.retryStatus = false;
-            state.practicedSinceAttemptsPulled = true;
         });
         builder.addCase(retryMissedCards.fulfilled, (state) => {
             let shuffledCards = shuffleArray(state.cards.filter(card => state.missedCards.includes(card._id)));
@@ -167,7 +168,6 @@ export const practiceSessionSlice = createSlice({
             state.stats.numberCorrect = 0;
             state.stats.numberWrong = 0;
             state.retryStatus = true;
-            state.practicedSinceAttemptsPulled = true;
         });
     }
 });

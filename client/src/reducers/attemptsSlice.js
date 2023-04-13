@@ -10,14 +10,9 @@ const initialState = {
     selectedDeckId: "",
     deckAttempts: [],
     selectedCard: {},
-    // selectedCardId: "",
-    // selectedCardQuestion: "",
-    // selectedCardAnswer: "",
     cardStatsByDeck: [],
-    // cardAttemptIds: [],
     cardAttempts: [],
     deckIds: [],
-    // deckStats: {}
     decksStats: [],
 }
 
@@ -44,23 +39,9 @@ export const fetchCardAttempts = createAsyncThunk("attempts/fetchCardAttempts", 
     const response = await client.get(`${baseURL}/cards/${cardId}/attempts`);
     return {
         attempts: response.data.attempts,
-        // cardId: cardId,
-        // cardQuestion: response.data.question,
-        // cardAnswer: response.data.answer,
-        // cardType: response.data.cardType
         selectedCard: response.data.selectedCard
     }
 });
-
-// export const fetchCardAttemptIds = createAsyncThunk("attempts/fetchCardAttemptIds", async ({cardId}) => {
-//     const response = await client.get(`${baseURL}/cards/${cardId}/attempts`);
-//     return {
-//         attempts: response.data.attemptIds,
-//         cardId: cardId,
-//         cardQuestion: response.data.question,
-//         cardAnswer: response.data.answer
-//     }
-// });
 
 export const fetchDeckAttemptData = createAsyncThunk("attempts/fetchDeckAttemptData" , async ({attemptId}) => {
     const response = await client.get(`${baseURL}/attempts/${attemptId}`);
@@ -68,17 +49,9 @@ export const fetchDeckAttemptData = createAsyncThunk("attempts/fetchDeckAttemptD
 });
 
 export const fetchAllDecksStats = createAsyncThunk("attempts/fetchAllDecksStats", async ({userId}) => {
-    // const response = await axios.get(`${baseURL}/users/${userId}/decks`);
     const response = await client.get(`${baseURL}/users/${userId}/decks/statistics`);
-    // console.log({data: response.data});
     return response.data;
 });
-
-// export const fetchStatsDeckIds = createAsyncThunk("attempts/fetchStatsDeckIds", async ({userId}) => {
-//     const response = await axios.get(`${baseURL}/users/${userId}/decks`);//this makes no sense route-wise
-//     console.log({data: response.data});
-//     return response.data;
-// });
 
 export const attemptsSlice = createSlice({
     name: "attempts",

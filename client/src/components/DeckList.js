@@ -5,8 +5,6 @@ import { fetchDecksOfCategory, fetchDecksOfGroup, fetchDecksOfUser } from '../re
 import DeckTile from './DeckTile';
 import styled from 'styled-components';
 import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
-import useToggle from '../hooks/useToggle';
-import Modal from './Modal';
 import { useNavigate } from 'react-router';
 
 const DeckListWrapper = styled.div`
@@ -32,13 +30,8 @@ export default function DeckList(props) {
     const listType = useSelector((state) => state.decks.listType);
     const listId = useSelector((state) => state.decks.listId);
     const [clickedDeckId, setClickedDeckId] = useState();
-    const [noCardsModal, toggleNoCardsModal] = useToggle(false);
-    const navigate = useNavigate();
 
-    const handleNoCardsClick = (deckId) => {
-        toggleNoCardsModal();
-        setClickedDeckId(deckId);
-    }
+    const navigate = useNavigate();
 
     const goToDeck = () => {
         if(listType === "user") {
@@ -78,13 +71,7 @@ export default function DeckList(props) {
     }
     return (
         <DeckListWrapper className="DeckListWrapper">
-            {deckIds.map(deckId => <DeckTile noCardsClick={handleNoCardsClick} key={deckId} deckId={deckId} />)}
-            {noCardsModal && 
-                <Modal hideModal={toggleNoCardsModal}>
-                    <p>This deck doesn't have any cards. Add cards to the deck in order to practice it.</p>
-                    <button onClick={goToDeck}>Go to Deck</button>
-                </Modal>
-            }
+            {deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
         </DeckListWrapper>
     )
 }

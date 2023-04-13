@@ -11,6 +11,8 @@ import { deleteDeck } from '../reducers/decksSlice';
 import { copyDeck } from '../reducers/loginSlice';
 import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
 import { setPracticeDeckType } from '../reducers/practiceSessionSlice';
+import useToggle from '../hooks/useToggle';
+import Modal from './Modal';
 
 const DeckTileWrapper = styled.div`
     display: inline-flex; 
@@ -228,6 +230,16 @@ const Option = styled.li`
     padding: .05rem .1rem;
     border-bottom: 1px solid black;
     border-top: 1px;
+
+    &.disabled {
+        background-color: #D4D4D4;
+        cursor: not-allowed;
+        font-style: italic;
+        &:hover {
+            background-color: #D4D4D4;
+            color: black;
+        }
+    }
     
     &:first-of-type {
         border-top: none;
@@ -373,10 +385,12 @@ function DeckTile(props) {
     const userId = useSelector((state) => state.login.userId);
     const params = useParams();
     const listType = useSelector((state) => state.decks.listType);
+    const listId = useSelector((state) => state.decks.listId);
     const [deckData, setDeckData] = useState({});
     const [fontSize, setFontSize] = useState(20);
     const [doneResizing, setDoneResizing] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
+    const [showNoCardsModal, toggleShowNoCardsModal] = useToggle(false);
     const administrators = useSelector((state) => state.group.administrators);
     const groupId = useSelector((state) => state.group.groupId);
     const location = useLocation();
@@ -398,7 +412,7 @@ function DeckTile(props) {
                 navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
                 dispatch(setPracticeDeckType({deckType: listType}))
             } else {
-                props.noCardsClick(props.deckId);
+                toggleShowNoCardsModal();
             }
         } else {
             navigate(`/decks/${props.deckId}`);
@@ -411,6 +425,14 @@ function DeckTile(props) {
 
     const closeOptions = () => {
         setShowOptions(false);
+    }
+
+    const goToDeck = () => {
+        if(listType === "user") {
+            navigate(`/decks/${props.deckId}`);
+        } else {
+            navigate(`/groups/${listId}/decks/${props.deckId}`);   
+        }
     }
     
     const displayOption = () => {
@@ -429,10 +451,14 @@ function DeckTile(props) {
         switch(evt.target.dataset.option) {
             case "practice":
                 if(deckData.cardCount > 0) {
-                    navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
-                    dispatch(setPracticeDeckType({deckType: listType}))
+                    if(location.pathname.includes("public")) {
+                        //show modal that notifies that stats won't be saved, then confirm from modal that it's okay
+                    } else {
+                        navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
+                        dispatch(setPracticeDeckType({deckType: listType}));
+                    }
                 } else {
-                    props.noCardsClick(props.deckId);
+                    toggleShowNoCardsModal();
                 }
                 break;
             case "view":
@@ -590,6 +616,13 @@ function DeckTile(props) {
       }, [deckData.url, handleResize]);
   
     return (
+        <>
+        {showNoCardsModal && 
+            <Modal hideModal={toggleShowNoCardsModal}>
+                <p>This deck doesn't have any cards. Add cards to the deck in order to practice it.</p>
+                <button onClick={goToDeck}>Go to Deck</button>
+            </Modal>
+        }
         <DeckTileWrapper ref={rootRef} role="button" id="tile" className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >
             <TopWrapper>
                     <IndicatorsWrapper ref={indicatorsRef} className="IndictorsWrapper" onClick={stopClickPropagation}>
@@ -612,6 +645,7 @@ function DeckTile(props) {
                         <Option role="button" data-option="practice" onClick={handleOptionSelection}>Practice</Option>
                         <Option role="button" data-option="view" onClick={handleOptionSelection}>View</Option>
                         {deckData.allowCopies && <Option role="button" data-option="copy" onClick={handleOptionSelection}>Copy</Option>}
+                        {/* <Option role="button" data-option="copy" className={deckData.allowCopies ? "" : "disabled"} data-bs-toggle={deckData.allowCopies ? "" : "tooltip"} data-bs-placement={deckData.allowCopies ? "" : "top"} title={deckData.allowCopies ? "" : "This deck is not allowed to be copied"} onClick={deckData.allowCopies ? handleOptionSelection : null}>Copy</Option> */}
                         {(!props.noEdit && displayOption()) && <Option role="button" data-option="edit" onClick={handleOptionSelection}>Edit</Option>}
                         {(!props.noEdit && displayOption()) && <Option role="button" data-option="delete" onClick={handleOptionSelection}>Delete</Option>}
                     </Options>
@@ -623,6 +657,7 @@ function DeckTile(props) {
                 <p className={deckData.url ? "medium-name" : "large-name"} style={{...(fontSize && {fontSize: fontSize}), opacity: doneResizing ? 1 : 0}}>{deckData?.name?.split(" ").map(word => <span className="word">{word} </span>)}</p>
             </ContentWrapper>
         </DeckTileWrapper>
+        </>
     );
 }
 

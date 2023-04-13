@@ -12,7 +12,7 @@ const ModalWrapper = styled.div`
 	top: 0;
 	height: 100vh;
 	width: 100%;
-	z-index: 2;
+	z-index: 3;
 `;
 
 const ModalBackdrop = styled.div`

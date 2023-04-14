@@ -2,13 +2,14 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { MdModeEditOutline } from "react-icons/md";
-import { RiImageEditFill } from "react-icons/ri";
+import { BsFillCameraFill } from "react-icons/bs";
 import { deleteProfile, resetAllStatistics, updateEmailPreferences, updateNotificationSettings, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
 import RegisterProfilePicCropForm from "./RegisterProfilePicCropForm"; //probably rename all of these to exclude the word "Register"
 import axios from "axios";
 import { resetStats } from "../reducers/attemptsSlice";
+import { HiOutlineUserCircle } from "react-icons/hi";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -71,31 +72,43 @@ const ProfilePicContainer = styled.div`
     align-items: flex-end;
     justify-content: center;
     margin-bottom: 2rem;
-    & svg {
-        position: absolute;
-        width: 2rem;
-        height: 2rem;
-        right: 0rem;
-    }
 `;
 
 const ProfilePic = styled.img`
     border: 1px solid transparent; 
     border-radius: 50%;
     height: 20rem;
-    width: 20rem
+    width: 20rem;
+    @media (max-width: 915px) {
+        height: 15rem;
+        width: 15rem;
+        margin-right: 1rem;
+    }
+    @media (max-width: 795px) {
+        height: 10rem;
+        width: 10rem;
+    }
+    @media (max-width: 680px) {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }  
 `;
 
 const StyledEditIcon = styled(MdModeEditOutline)`
     cursor: pointer;
 `;
 
-const StyledPhotoEditIcon = styled(RiImageEditFill)`
+const StyledPhotoEditIcon = styled(BsFillCameraFill)`
     cursor: pointer;
     // background-color: white;
     // background-color: blue;
     border-radius: 10%;
     // padding: .15rem;
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    right: ${props => props.avatar ? "2rem" : 0};
+    bottom: ${props => props.avatar ? "1.25rem" : 0};
 `;
 
 const ErrorAlert = styled.div`
@@ -113,6 +126,42 @@ const StyledButton = styled.button`
 const ToggleSwitch = styled.div`
     display: inline-block;
 `
+
+const ProfilePicEditContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    & button {
+        padding: .5rem;
+        margin: 0 .25rem;
+    }
+`;
+
+const BlockImg = styled.img`
+    display: block;
+    margin-bottom: .75rem;
+    max-width: 75%;
+`;
+
+const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
+    color: black;
+    height: 20rem;
+    width: 20rem;
+    margin-right: 2rem;
+    @media (max-width: 915px) {
+        height: 15rem;
+        width: 15rem;
+        margin-right: 1rem;
+    }
+    @media (max-width: 795px) {
+        height: 10rem;
+        width: 10rem;
+    }
+    @media (max-width: 680px) {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }    
+`;
 
 function UserSettings() {
     const userId = useSelector((state) => state.login.userId);
@@ -329,6 +378,10 @@ function UserSettings() {
         setModalContent("reset-stats-confirmation");
     }
     
+    const handleEditProfilePic = () => {
+        setModalContent("photo-options");
+    }
+    
     const openImageSelector = () => {
         const input = document.createElement("input");
         input.type = "file";
@@ -365,6 +418,17 @@ function UserSettings() {
                         <button onClick={hideModal}>Cancel</button>
                         <button onClick={confirmResetAllStats}>Delete</button>
                     </div>
+                );
+            case "photo-options":
+                return (
+                    <ProfilePicEditContainer>
+                        {profilePic && <BlockImg alt="user-profile" src={profilePic} />}
+                        {!profilePic && <StyledHiOutlineUserCircle />}
+                        <div>
+                            <button className="btn btn-primary btn-md" onClick={openImageSelector}>Choose New Photo</button>
+                            <button className="btn btn-danger btn-md" onClick={deleteProfilePic}>Delete</button>
+                        </div>
+                    </ProfilePicEditContainer>
                 );
             default: 
                 break;
@@ -438,7 +502,6 @@ function UserSettings() {
             case "email-privacy":
                 dispatch(updatePrivacySettings({userId, patchObj: {email: emailPrivacySelectedValue}}))
                     .then(() => {
-                        console.log("testing");
                         setEditField("");
                     });
                 break;
@@ -493,7 +556,6 @@ function UserSettings() {
             case "head-admin-change-notification":
                 dispatch(updateNotificationSettings({userId, patchObj: {headAdminChange: headAdminChangeNotificationSelectedValue}}))
                     .then(() => {
-                        console.log("should be closing edit field")
                         setEditField("");
                     });
                 break;
@@ -556,13 +618,22 @@ function UserSettings() {
         }
     }
 
+    const deleteProfilePic = () => {
+        dispatch(updateProfilePic({userId: userId, photo: undefined}))
+            .then(() => {
+                setModalContent("");
+            });
+    }
+    
     return (
         <UserSettingsWrapper>
             
             <SettingsForm>
                 <ProfilePicContainer>
-                    <ProfilePic alt="Profile" src={profilePic} />
-                    <StyledPhotoEditIcon role="button" data-editfield="profile-pic" onClick={openImageSelector} />
+                    {profilePic && <ProfilePic alt="Profile" src={profilePic} />}
+                    {!profilePic && <StyledHiOutlineUserCircle />}
+
+                    <StyledPhotoEditIcon role="button" data-editfield="profile-pic" avatar={!profilePic} onClick={handleEditProfilePic} />
                 </ProfilePicContainer>
                 <SettingsSection>
                     <SettingsCategoryLabel>Profile</SettingsCategoryLabel>

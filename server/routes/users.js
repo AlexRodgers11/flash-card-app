@@ -290,6 +290,10 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
             await deleteFile(req.user.photo);
         }
     }
+
+    if(req.body.deleteProfilePic) {
+        await deleteFile(req.user.photo);
+    }
     
     if(req.body.name) {
         patchObj.name = req.body.name;
@@ -304,6 +308,10 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
     }
     if(req.body.statisticsTracking) {
         patchObj.statisticsTracking = req.body.statisticsTracking;
+    }
+
+    if(req.body.deleteProfilePic) {
+        patchObj.photo = "";
     }
 
     try {

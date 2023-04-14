@@ -52,8 +52,6 @@ const initialState = {
 }
 
 export const login = createAsyncThunk("login/login", async({usernameOrEmail, password}) => {
-    console.log("in login action");
-    console.log({usernameOrEmail, password});
     try {
         const response = await axios.post(`${baseURL}/login`, {
             usernameOrEmail,
@@ -70,14 +68,12 @@ export const login = createAsyncThunk("login/login", async({usernameOrEmail, pas
 });
 
 export const signUp = createAsyncThunk("login/signUp", async({email, password}) => {
-    console.log("in login action");
-    console.log({email, password});
     try {
         const response = await axios.post(`${baseURL}/login/new`, {
             email,
             password
         });
-        console.log({data: response.data});
+
         document.cookie = `jwt=${response.data.token}; expires=Fri, 31 Dec 9999 23:59:59 GMT; path=/; secure; sameSite=none`;
         return {
             token: response.data.token,
@@ -167,7 +163,11 @@ export const updateUser = createAsyncThunk("login/updateUser", async ({userId, u
 export const updateProfilePic = createAsyncThunk("login/updateProfilePic", async({userId, photo}) => {
     const formData = new FormData();
     formData.append("photo", photo);
+    if(!photo) {
+        formData.append("deleteProfilePic", true);
+    }
     const response = await client.patch(`${baseURL}/users/${userId}`, formData, { headers: {"Content-Type": "multipart/form-data"}});
+
     return response.data.photo;
 });
 
@@ -193,7 +193,7 @@ export const updateEmailPreferences = createAsyncThunk("login/updateEmailPrefere
 
 export const deleteProfile = createAsyncThunk("login/deleteProfile", async({userId}) => {
     const response = await client.delete(`${baseURL}/users/${userId}`);
-    console.log({data: response.data});
+    
     if(response.data === userId) {
         return response.data;
     } else {

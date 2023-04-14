@@ -121,6 +121,14 @@ function DeckStatsTable() {
                                 <DeckStatsCell><StyledLinkIcon data-deckid={deck._id} onClick={handleSelectDeck}/></DeckStatsCell>
                             </DeckStatsRow>
                         ))}
+                        {!decksStats.length && 
+                            <DeckStatsRow>
+                                <DeckStatsCell>--</DeckStatsCell>
+                                <DeckStatsCell>--</DeckStatsCell>
+                                <DeckStatsCell>--%</DeckStatsCell>
+                                <DeckStatsCell>N/A</DeckStatsCell>
+                            </DeckStatsRow>
+                        }
                     </tbody>
                 </StatsTable>
             </DeckStatsTableContainer>

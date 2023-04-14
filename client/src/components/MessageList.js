@@ -26,6 +26,10 @@ const StyledButton = styled.button`
 		margin: 0 .25rem .5rem 0rem;
 		font-size: .75rem;
 	}
+	&.active {
+		background-color: black;
+		color: white;
+	}
 `;
 
 function MessageList(props) {
@@ -38,19 +42,18 @@ function MessageList(props) {
 		setDirection(evt.target.dataset.direction);
 	}
 
-	if(!messages.length) {
-		return (
-			<EmptyIndicator>No Messages</EmptyIndicator>
-		);
-	}
-
 	return (
 		<MessageListWrapper>
 			<ButtonGroup>
-				<StyledButton data-direction="received" onClick={selectDirection}>Received</StyledButton>
-				<StyledButton data-direction="sent" onClick={selectDirection}>Sent</StyledButton>
+				<StyledButton className={direction === "received" ? "active" : ""} data-direction="received" onClick={selectDirection}>Received</StyledButton>
+				<StyledButton className={direction === "sent" ? "active" : ""} data-direction="sent" onClick={selectDirection}>Sent</StyledButton>
 			</ButtonGroup>
-			{messages[direction].map(message => <Message key={message._id} direction={direction} messageId={message._id} messageType={message.messageType} expandMessage={props.expandMessage} read={message.read.includes(userId)}/>)}
+			{!messages[direction].length && 
+				<EmptyIndicator>No Messages</EmptyIndicator>
+			}
+			{messages[direction].length > 0 && 
+				messages[direction].map(message => <Message key={message._id} direction={direction} messageId={message._id} messageType={message.messageType} expandMessage={props.expandMessage} read={message.read.includes(userId)}/>)
+			}
 		</MessageListWrapper>
 	)
 }

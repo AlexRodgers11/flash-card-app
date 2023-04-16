@@ -103,34 +103,6 @@ userRouter.patch("/:protectedUserId/verification", async (req, res, next) => {
                     req.user._id, 
                     {
                         accountSetupStage: "verified", 
-                        statisticsTracking: "all",
-                        privacy: {
-                            email: "public",
-                            name: "public",
-                            profilePhoto: "public",
-                            groups: "public",
-                            newDecks: "public",
-                            currentDecks: "set-individually"
-                        },
-                        communicationSettings: {
-                            emailPreferences: {
-                                cardDecision: true,
-                                cardSubmission: true,
-                                deckDecision: true,
-                                deckSubmission: true,
-                                direct: true,
-                                joinDecision: true,
-                                joinRequest: true
-                            },
-                            notificationPreferences: {
-                                adminChange: true,
-                                deckAdded: true,
-                                groupDeleted: true,
-                                headAdminChange: true,
-                                newMemberJoined: true,
-                                removedFromGroup: true
-                            }
-                        }
                     },
                      {new: true}
                 );

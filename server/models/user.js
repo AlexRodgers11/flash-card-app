@@ -27,35 +27,101 @@ const User = new Schema({
         codeExpDate: Date,
         verified: Boolean
     },
-    statisticsTracking: String, //all, user-only, group-only, none
+    statisticsTracking: {
+        type: String,
+        default: "all" //all, user-only, group-only, none
+    },
     accountSetupStage: String, //email, verified, complete
     privacy: {
-        email: String,
-        name: String,
-        profilePhoto: String,
-        groups: String,
-        newDecks: String,
-        currentDecks: String,
+        email: {
+            type: String,
+            default: "public"
+        },
+        name: {
+            type: String,
+            default: "public"
+        },
+        profilePhoto: {
+            type: String,
+            default: "public"
+        },
+        groups: {
+            type: String,
+            default: "public"
+        },
+        newDecks: {
+            type: String,
+            default: "public"
+        },
+        currentDecks: {
+            type: String,
+            default: "set-individually"
+        },
     },
     communicationSettings: {
         emailPreferences: {
-            cardDecision: Boolean,
-            cardSubmission: Boolean,
-            deckDecision: Boolean,
-            deckSubmission: Boolean,
-            direct: Boolean,
-            groupInvitation: Boolean,
-            invitationDecision: Boolean,
-            joinDecision: Boolean,
-            joinRequest: Boolean
+            cardDecision: {
+                type: Boolean,
+                default: true
+            },
+            cardSubmission: {
+                type: Boolean,
+                default: true
+            },
+            deckDecision: {
+                type: Boolean,
+                default: true
+            },
+            deckSubmission: {
+                type: Boolean,
+                default: true
+            },
+            direct: {
+                type: Boolean,
+                default: true
+            },
+            groupInvitation: {
+                type: Boolean,
+                default: true
+            },
+            invitationDecision: {
+                type: Boolean,
+                default: true
+            },
+            joinDecision: {
+                type: Boolean,
+                default: true
+            },
+            joinRequest: {
+                type: Boolean,
+                default: true
+            }
         },
         notificationPreferences: {
-            adminChange: Boolean,
-            deckAdded: Boolean,
-            groupDeleted: Boolean,
-            headAdminChange: Boolean,
-            newMemberJoined: Boolean,
-            removedFromGroup: Boolean
+            adminChange: {
+                type: Boolean,
+                default: true
+            },
+            deckAdded: {
+                type: Boolean,
+                default: true
+            },
+            groupDeleted: {
+                type: Boolean,
+                default: true
+            },
+            headAdminChange: {
+                type: Boolean,
+                default: true
+            },
+            newMemberJoined: {
+                type: Boolean,
+                default: true
+            },
+            removedFromGroup: {
+                type: Boolean,
+                default: true
+            }
         }
     }
 }, {timestamps: true});

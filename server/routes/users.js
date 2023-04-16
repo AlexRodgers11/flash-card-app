@@ -10,7 +10,7 @@ import { copyDeck, generateRandomFileName, getUserIdFromJWTToken, storage, uploa
 import jwt from "jwt-simple";
 import { deleteFile, getObjectSignedUrl, uploadFile } from "../s3.js";
 import { Card } from "../models/card.js";
-import { DirectMessage } from "../models/message.js";
+import { DirectMessage, GroupInvitation } from "../models/message.js";
 
 
 userRouter.param("userId", (req, res, next, userId) => {
@@ -527,6 +527,45 @@ userRouter.patch("/:protectedUserId/email-preferences", async (req, res, next) =
     } catch (err) {
         res.status(500).send(err.message);
         console.error(err);
+    }
+});
+
+userRouter.post("/:email/messages/group-invitation", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        const foundUser = await User.findOne({"login.email": req.params.email});
+        if(!foundUser) {
+            res.status(404).send("User does not exist");
+        }
+        const foundGroup = await Group.findById(req.body.targetGroup, "administrators");
+        const invitee = await User.findById(foundUser._id, "messages.received")
+            .populate({
+                path: "messages.received",
+                select: "messageType acceptanceStatus targetGroup"
+            });
+
+        if(invitee.messages.received.some(message => ((message.messageType === "GroupInvitation" && req.body.targetGroup === message.targetGroup?.toString()) && message.acceptanceStatus === "pending"))) {
+            return res.status(400).send("This user already has an invitation to this group");
+        }
+
+        if(foundGroup.administrators.map(admin => admin.toString()).includes(req.userId.toString())) {
+            const newMessage = new GroupInvitation({
+                ...req.body,
+                targetUser: foundUser._id,
+                sendingUser: req.userId,
+                receivingUsers: [foundUser._id]
+            });
+
+            const savedMessage = await newMessage.save();
+            await User.findByIdAndUpdate(foundUser._id, {$push: {"messages.received": savedMessage}});
+            
+            await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedMessage}});
+
+            res.status(200).send({_id: savedMessage._id, messageType: "GroupInvitation", read: []});
+        } else {
+            res.status(401).send("You are not authorized to invite members to this group");
+        }
+    } catch (err) {
+        res.status(500).send(err.message);
     }
 });
 

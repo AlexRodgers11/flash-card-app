@@ -45,6 +45,22 @@ const JoinDecision = Message.discriminator("JoinDecision", new Schema({
     targetUser: {type: Schema.Types.ObjectId, ref: "User"}
 }));
 
+const GroupInvitation = Message.discriminator("GroupInvitation", new Schema({
+    comment: String,
+    acceptanceStatus: {//make default for all messages with acceptanceStatus
+        type: String,
+        default: "pending"
+    },
+    targetGroup: {type: Schema.Types.ObjectId, ref: "Group"},
+    targetUser: {type: Schema.Types.ObjectId, ref: "User"}
+}));
+
+const InvitationDecision = Message.discriminator("InvitationDecision", new Schema({
+    acceptanceStatus: String,
+    targetGroup: {type: Schema.Types.ObjectId, ref: "Group"},
+    // targetUser: {type: Schema.Types.ObjectId, ref: "User"}
+}));
+
 const CardSubmission = Message.discriminator("CardSubmission", new Schema({
     acceptanceStatus: String,
     targetDeck: {type: Schema.Types.ObjectId, ref: "Deck"},
@@ -66,4 +82,4 @@ const DirectMessage = Message.discriminator("DirectMessage", new Schema({
 
 
 
-export { CardDecision, CardSubmission, DeckDecision, DeckSubmission, DirectMessage, JoinRequest, JoinDecision, Message };
+export { CardDecision, CardSubmission, DeckDecision, DeckSubmission, DirectMessage, GroupInvitation, InvitationDecision, JoinRequest, JoinDecision, Message };

@@ -10,6 +10,8 @@ import { FaTrashAlt } from 'react-icons/fa';
 import styled from 'styled-components';
 import DirectMessage from './DirectMessage';
 import useToggle from '../hooks/useToggle';
+import GroupInvitationMessage from './GroupInvitationMessage';
+import InvitationDecisionMessage from './InvitationDecisionMessage';
 
 const MessageWrapper = styled.div`
 	display: flex;
@@ -67,6 +69,14 @@ function Message(props) {
 			case 'DeckDecision':
 				return (
 					<DeckDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
+				);
+			case "GroupInvitation":
+				return (
+					<GroupInvitationMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
+				);
+			case "InvitationDecision":
+				return (
+					<InvitationDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
 				);
 			case 'JoinRequest':
 				return (

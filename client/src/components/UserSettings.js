@@ -189,6 +189,8 @@ function UserSettings() {
     const deckDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.deckDecision);
     const deckSubmissionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.deckSubmission);
     const directMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.direct);
+    const groupInvitationMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.groupInvitation);
+    const invitationDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.invitationDecision);
     const joinDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinDecision);
     const joinRequestMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinRequest);
 
@@ -231,6 +233,10 @@ function UserSettings() {
     const [deckSubmissionMessageSelectedValue, clearDeckSubmissionMessageSelectedValue, handleDeckSubmissionMessageSelectedValueChange, setDeckSubmissionMessageSelectedValue] = useFormInput(deckSubmissionMessage, "checkbox");
 
     const [directMessageSelectedValue, clearDirectMessageSelectedValue, handleDirectMessageSelectedValueChange, setDirectMessageSelectedValue] = useFormInput(directMessage, "checkbox");
+    
+    const [groupInvitationMessageSelectedValue, clearGroupInvitationMessageSelectedValue, handleGroupInvitationMessageSelectedValueChange, setGroupInvitationMessageSelectedValue] = useFormInput(groupInvitationMessage, "checkbox");
+    
+    const [invitationDecisionMessageSelectedValue, clearInvitationDecisionMessageSelectedValue, handleInvitationDecisionMessageSelectedValueChange, setInvitationDecisionMessageSelectedValue] = useFormInput(invitationDecisionMessage, "checkbox");
 
     const [joinDecisionMessageSelectedValue, clearJoinDecisionMessageSelectedValue, handleJoinDecisionMessageSelectedValueChange, setJoinDecisionMessageSelectedValue] = useFormInput(joinDecisionMessage, "checkbox");
 
@@ -350,6 +356,16 @@ function UserSettings() {
             case "direct-message":
                 if(directMessage !== directMessageSelectedValue) {
                     setDirectMessageSelectedValue(directMessage);
+                }
+                break;
+            case "group-invitation-message":
+                if(groupInvitationMessage !== groupInvitationMessageSelectedValue) {
+                    setGroupInvitationMessageSelectedValue(groupInvitationMessage);
+                }
+                break;
+            case "invitation-decision-message":
+                if(invitationDecisionMessage !== invitationDecisionMessageSelectedValue) {
+                    setInvitationDecisionMessageSelectedValue(invitationDecisionMessage);
                 }
                 break;
             case "join-decision-message":
@@ -595,6 +611,18 @@ function UserSettings() {
                         setEditField("");
                     });
                 break;
+            case "group-invitation-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {groupInvitation: groupInvitationMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "invitation-decision-message":
+                dispatch(updateEmailPreferences({userId, patchObj: {invitationDecision: invitationDecisionMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
             case "deck-submission-message":
                 dispatch(updateEmailPreferences({userId, patchObj: {deckSubmission: deckSubmissionMessageSelectedValue}}))
                     .then(() => {
@@ -751,124 +779,124 @@ function UserSettings() {
                     <SettingsCategoryLabel>Privacy</SettingsCategoryLabel>
                     <SettingsCategoryOptions>
                         <SettingCategoryOption>
-                                <div>
-                                    <span>Email: </span>
-                                    {editField !== "email-privacy" && <span>{emailPrivacy === "public" ? "Public" : "Private"}</span>}
-                                    {editField === "email-privacy" && 
-                                        <select name="email-privacy-select" id="email-privacy-select" value={emailPrivacySelectedValue} onChange={handleEmailPrivacySelectedValueChange} >
-                                            <option value="public">Public</option>
-                                            <option value="private">Private</option>
-                                        </select>
-                                    }
-                                </div>
-                                {editField !== "email-privacy" && <StyledEditIcon role="button" data-editfield="email-privacy" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>Email: </span>
+                                {editField !== "email-privacy" && <span>{emailPrivacy === "public" ? "Public" : "Private"}</span>}
                                 {editField === "email-privacy" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="email-privacy" onClick={handleSave}>Save</button>
-                                    </div>
+                                    <select name="email-privacy-select" id="email-privacy-select" value={emailPrivacySelectedValue} onChange={handleEmailPrivacySelectedValueChange} >
+                                        <option value="public">Public</option>
+                                        <option value="private">Private</option>
+                                    </select>
                                 }
+                            </div>
+                            {editField !== "email-privacy" && <StyledEditIcon role="button" data-editfield="email-privacy" onClick={handleEditSelection}/>}
+                            {editField === "email-privacy" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="email-privacy" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>Name: </span>
-                                    {editField !== "name-privacy" && <span>{namePrivacy === "public" ? "Public" : "Private"}</span>}
-                                    {editField === "name-privacy" && 
-                                        <select name="name-privacy-select" id="name-privacy-select" value={namePrivacySelectedValue} onChange={handleNamePrivacySelectedValueChange} >
-                                            <option value="public">Public</option>
-                                            <option value="private">Private</option>
-                                        </select>
-                                    }
-                                </div>
-                                {editField !== "name-privacy" && <StyledEditIcon role="button" data-editfield="name-privacy" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>Name: </span>
+                                {editField !== "name-privacy" && <span>{namePrivacy === "public" ? "Public" : "Private"}</span>}
                                 {editField === "name-privacy" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="name-privacy" onClick={handleSave}>Save</button>
-                                    </div>
+                                    <select name="name-privacy-select" id="name-privacy-select" value={namePrivacySelectedValue} onChange={handleNamePrivacySelectedValueChange} >
+                                        <option value="public">Public</option>
+                                        <option value="private">Private</option>
+                                    </select>
                                 }
+                            </div>
+                            {editField !== "name-privacy" && <StyledEditIcon role="button" data-editfield="name-privacy" onClick={handleEditSelection}/>}
+                            {editField === "name-privacy" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="name-privacy" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>Profile Photo: </span>
-                                    {editField !== "profile-photo-privacy" && <span>{profilePhotoPrivacy === "public" ? "Public" : "Private"}</span>}
-                                    {editField === "profile-photo-privacy" && 
-                                        <select name="profile-photo-privacy-select" id="profile-photo-privacy-select" value={profilePhotoPrivacySelectedValue} onChange={handleProfilePhotoPrivacySelectedValueChange} >
-                                            <option value="public">Public</option>
-                                            <option value="private">Private</option>
-                                        </select>
-                                    }
-                                </div>
-                                {editField !== "profile-photo-privacy" && <StyledEditIcon role="button" data-editfield="profile-photo-privacy" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>Profile Photo: </span>
+                                {editField !== "profile-photo-privacy" && <span>{profilePhotoPrivacy === "public" ? "Public" : "Private"}</span>}
                                 {editField === "profile-photo-privacy" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="profile-photo-privacy" onClick={handleSave}>Save</button>
-                                    </div>
+                                    <select name="profile-photo-privacy-select" id="profile-photo-privacy-select" value={profilePhotoPrivacySelectedValue} onChange={handleProfilePhotoPrivacySelectedValueChange} >
+                                        <option value="public">Public</option>
+                                        <option value="private">Private</option>
+                                    </select>
                                 }
+                            </div>
+                            {editField !== "profile-photo-privacy" && <StyledEditIcon role="button" data-editfield="profile-photo-privacy" onClick={handleEditSelection}/>}
+                            {editField === "profile-photo-privacy" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="profile-photo-privacy" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>Groups: </span>
-                                    {editField !== "groups-privacy" && <span>{groupsPrivacy === "public" ? "Public" : "Private"}</span>}
-                                    {editField === "groups-privacy" && 
-                                        <select name="groups-privacy-select" id="groups-privacy-select" value={groupsPrivacySelectedValue} onChange={handleGroupsPrivacySelectedValueChange} >
-                                            <option value="public">Public</option>
-                                            <option value="private">Private</option>
-                                        </select>
-                                    }
-                                </div>
-                                {editField !== "groups-privacy" && <StyledEditIcon role="button" data-editfield="groups-privacy" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>Groups: </span>
+                                {editField !== "groups-privacy" && <span>{groupsPrivacy === "public" ? "Public" : "Private"}</span>}
                                 {editField === "groups-privacy" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="groups-privacy" onClick={handleSave}>Save</button>
-                                    </div>
+                                    <select name="groups-privacy-select" id="groups-privacy-select" value={groupsPrivacySelectedValue} onChange={handleGroupsPrivacySelectedValueChange} >
+                                        <option value="public">Public</option>
+                                        <option value="private">Private</option>
+                                    </select>
                                 }
+                            </div>
+                            {editField !== "groups-privacy" && <StyledEditIcon role="button" data-editfield="groups-privacy" onClick={handleEditSelection}/>}
+                            {editField === "groups-privacy" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="groups-privacy" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>New Decks: </span>
-                                    {editField !== "new-decks-privacy" && <span>{newDecksPrivacy === "public" ? "Default to Public" : "Default to Private"}</span>}
-                                    {editField === "new-decks-privacy" && 
-                                        <select name="new-decks-privacy-select" id="new-decks-privacy-select" value={newDecksPrivacySelectedValue} onChange={handleNewDecksPrivacySelectedValueChange} >
-                                            <option value="public">Default to Public</option>
-                                            <option value="private">Default to Private</option>
-                                        </select>
-                                    }
-                                </div>
-                                {editField !== "new-decks-privacy" && <StyledEditIcon role="button" data-editfield="new-decks-privacy" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>New Decks: </span>
+                                {editField !== "new-decks-privacy" && <span>{newDecksPrivacy === "public" ? "Default to Public" : "Default to Private"}</span>}
                                 {editField === "new-decks-privacy" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="new-decks-privacy" onClick={handleSave}>Save</button>
-                                    </div>
+                                    <select name="new-decks-privacy-select" id="new-decks-privacy-select" value={newDecksPrivacySelectedValue} onChange={handleNewDecksPrivacySelectedValueChange} >
+                                        <option value="public">Default to Public</option>
+                                        <option value="private">Default to Private</option>
+                                    </select>
                                 }
+                            </div>
+                            {editField !== "new-decks-privacy" && <StyledEditIcon role="button" data-editfield="new-decks-privacy" onClick={handleEditSelection}/>}
+                            {editField === "new-decks-privacy" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="new-decks-privacy" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>Current Decks: </span>
-                                    {editField !== "current-decks-privacy" && <span>{currentDecksPrivacy === "public" ? "All Public" : currentDecksPrivacy === "private" ? "All Private" : "Select Individually"}</span>}
-                                    {editField === "current-decks-privacy" && 
-                                        <select name="current-decks-privacy-select" id="current-decks-privacy-select" value={currentDecksPrivacySelectedValue} onChange={handleCurrentDecksPrivacySelectedValueChange} >
-                                            <option value="set-individually">Set Individually</option>
-                                            <option value="public">All Public</option>
-                                            <option value="private">All Private</option>
-                                        </select>
-                                    }
-                                </div>
-                                {editField !== "current-decks-privacy" && <StyledEditIcon role="button" data-editfield="current-decks-privacy" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>Current Decks: </span>
+                                {editField !== "current-decks-privacy" && <span>{currentDecksPrivacy === "public" ? "All Public" : currentDecksPrivacy === "private" ? "All Private" : "Select Individually"}</span>}
                                 {editField === "current-decks-privacy" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="current-decks-privacy" onClick={handleSave}>Save</button>
-                                    </div>
+                                    <select name="current-decks-privacy-select" id="current-decks-privacy-select" value={currentDecksPrivacySelectedValue} onChange={handleCurrentDecksPrivacySelectedValueChange} >
+                                        <option value="set-individually">Set Individually</option>
+                                        <option value="public">All Public</option>
+                                        <option value="private">All Private</option>
+                                    </select>
                                 }
+                            </div>
+                            {editField !== "current-decks-privacy" && <StyledEditIcon role="button" data-editfield="current-decks-privacy" onClick={handleEditSelection}/>}
+                            {editField === "current-decks-privacy" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="current-decks-privacy" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>
@@ -876,123 +904,123 @@ function UserSettings() {
                     <SettingsCategoryLabel>Notifications</SettingsCategoryLabel>
                     <SettingsCategoryOptions>
                         <SettingCategoryOption>
-                                <div>
-                                    <span>I Am Added or Removed as a Group Administrator: </span>
-                                    {editField !== "admin-change-notification" && <span>{adminChangeNotification ? "On" : "Off"}</span>}
-                                    {editField === "admin-change-notification" && 
-                                        <div style={{display: "inline-block"}} className="form-check form-switch">
-                                            <input role="button" onChange={handleAdminChangeNotificationSelectedValueChange} checked={adminChangeNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{adminChangeNotificationSelectedValue ? "On" : "Off"}</label>
-                                        </div>
-                                    }
-                                </div>
-                                {editField !== "admin-change-notification" && <StyledEditIcon role="button" data-editfield="admin-change-notification" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>I Am Added or Removed as a Group Administrator: </span>
+                                {editField !== "admin-change-notification" && <span>{adminChangeNotification ? "On" : "Off"}</span>}
                                 {editField === "admin-change-notification" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="admin-change-notification" onClick={handleSave}>Save</button>
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleAdminChangeNotificationSelectedValueChange} checked={adminChangeNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{adminChangeNotificationSelectedValue ? "On" : "Off"}</label>
                                     </div>
                                 }
+                            </div>
+                            {editField !== "admin-change-notification" && <StyledEditIcon role="button" data-editfield="admin-change-notification" onClick={handleEditSelection}/>}
+                            {editField === "admin-change-notification" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="admin-change-notification" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>Deck Added to a Group I Am In: </span>
-                                    {editField !== "deck-added-notification" && <span>{deckAddedNotification ? "On" : "Off"}</span>}
-                                    {editField === "deck-added-notification" && 
-                                        <div style={{display: "inline-block"}} className="form-check form-switch">
-                                            <input role="button" onChange={handleDeckAddedNotificationSelectedValueChange} checked={deckAddedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckAddedNotificationSelectedValue ? "On" : "Off"}</label>
-                                        </div>
-                                    }
-                                </div>
-                                {editField !== "deck-added-notification" && <StyledEditIcon role="button" data-editfield="deck-added-notification" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>Deck Added to a Group I Am In: </span>
+                                {editField !== "deck-added-notification" && <span>{deckAddedNotification ? "On" : "Off"}</span>}
                                 {editField === "deck-added-notification" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="deck-added-notification" onClick={handleSave}>Save</button>
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleDeckAddedNotificationSelectedValueChange} checked={deckAddedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckAddedNotificationSelectedValue ? "On" : "Off"}</label>
                                     </div>
                                 }
+                            </div>
+                            {editField !== "deck-added-notification" && <StyledEditIcon role="button" data-editfield="deck-added-notification" onClick={handleEditSelection}/>}
+                            {editField === "deck-added-notification" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="deck-added-notification" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>Group I Am in is Deleted: </span>
-                                    {editField !== "group-deleted-notification" && <span>{groupDeletedNotification ? "On" : "Off"}</span>}
-                                    {editField === "group-deleted-notification" && 
-                                        <div style={{display: "inline-block"}} className="form-check form-switch">
-                                            <input role="button" onChange={handleGroupDeletedNotificationSelectedValueChange} checked={groupDeletedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{groupDeletedNotificationSelectedValue ? "On" : "Off"}</label>
-                                        </div>
-                                    }
-                                </div>
-                                {editField !== "group-deleted-notification" && <StyledEditIcon role="button" data-editfield="group-deleted-notification" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>Group I Am in is Deleted: </span>
+                                {editField !== "group-deleted-notification" && <span>{groupDeletedNotification ? "On" : "Off"}</span>}
                                 {editField === "group-deleted-notification" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="group-deleted-notification" onClick={handleSave}>Save</button>
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleGroupDeletedNotificationSelectedValueChange} checked={groupDeletedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{groupDeletedNotificationSelectedValue ? "On" : "Off"}</label>
                                     </div>
                                 }
+                            </div>
+                            {editField !== "group-deleted-notification" && <StyledEditIcon role="button" data-editfield="group-deleted-notification" onClick={handleEditSelection}/>}
+                            {editField === "group-deleted-notification" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="group-deleted-notification" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>Group Head Administrator Changes: </span>
-                                    {editField !== "head-admin-change-notification" && <span>{headAdminChangeNotification ? "On" : "Off"}</span>}
-                                    {editField === "head-admin-change-notification" && 
-                                        <div style={{display: "inline-block"}} className="form-check form-switch">
-                                            <input role="button" onChange={handleHeadAdminChangeNotificationSelectedValueChange} checked={headAdminChangeNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{headAdminChangeNotificationSelectedValue ? "On" : "Off"}</label>
-                                        </div>
-                                    }
-                                </div>
-                                {editField !== "head-admin-change-notification" && <StyledEditIcon role="button" data-editfield="head-admin-change-notification" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>Group Head Administrator Changes: </span>
+                                {editField !== "head-admin-change-notification" && <span>{headAdminChangeNotification ? "On" : "Off"}</span>}
                                 {editField === "head-admin-change-notification" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="head-admin-change-notification" onClick={handleSave}>Save</button>
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleHeadAdminChangeNotificationSelectedValueChange} checked={headAdminChangeNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{headAdminChangeNotificationSelectedValue ? "On" : "Off"}</label>
                                     </div>
                                 }
+                            </div>
+                            {editField !== "head-admin-change-notification" && <StyledEditIcon role="button" data-editfield="head-admin-change-notification" onClick={handleEditSelection}/>}
+                            {editField === "head-admin-change-notification" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="head-admin-change-notification" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>New Member Joins a Group I Am In: </span>
-                                    {editField !== "new-member-joined-notification" && <span>{newMemberJoinedNotification ? "On" : "Off"}</span>}
-                                    {editField === "new-member-joined-notification" && 
-                                        <div style={{display: "inline-block"}} className="form-check form-switch">
-                                            <input role="button" onChange={handleNewMemberJoinedNotificationSelectedValueChange} checked={newMemberJoinedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{newMemberJoinedNotificationSelectedValue ? "On" : "Off"}</label>
-                                        </div>
-                                    }
-                                </div>
-                                {editField !== "new-member-joined-notification" && <StyledEditIcon role="button" data-editfield="new-member-joined-notification" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>New Member Joins a Group I Am In: </span>
+                                {editField !== "new-member-joined-notification" && <span>{newMemberJoinedNotification ? "On" : "Off"}</span>}
                                 {editField === "new-member-joined-notification" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="new-member-joined-notification" onClick={handleSave}>Save</button>
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleNewMemberJoinedNotificationSelectedValueChange} checked={newMemberJoinedNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{newMemberJoinedNotificationSelectedValue ? "On" : "Off"}</label>
                                     </div>
                                 }
+                            </div>
+                            {editField !== "new-member-joined-notification" && <StyledEditIcon role="button" data-editfield="new-member-joined-notification" onClick={handleEditSelection}/>}
+                            {editField === "new-member-joined-notification" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="new-member-joined-notification" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                         <hr />
                         <SettingCategoryOption>
-                                <div>
-                                    <span>I Am Removed From a Group I Am In: </span>
-                                    {editField !== "removed-from-group-notification" && <span>{removedFromGroupNotification ? "On" : "Off"}</span>}
-                                    {editField === "removed-from-group-notification" && 
-                                        <div style={{display: "inline-block"}} className="form-check form-switch">
-                                            <input role="button" onChange={handleRemovedFromGroupNotificationSelectedValueChange} checked={removedFromGroupNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{removedFromGroupNotificationSelectedValue ? "On" : "Off"}</label>
-                                        </div>
-                                    }
-                                </div>
-                                {editField !== "removed-from-group-notification" && <StyledEditIcon role="button" data-editfield="removed-from-group-notification" onClick={handleEditSelection}/>}
+                            <div>
+                                <span>I Am Removed From a Group I Am In: </span>
+                                {editField !== "removed-from-group-notification" && <span>{removedFromGroupNotification ? "On" : "Off"}</span>}
                                 {editField === "removed-from-group-notification" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="removed-from-group-notification" onClick={handleSave}>Save</button>
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleRemovedFromGroupNotificationSelectedValueChange} checked={removedFromGroupNotificationSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{removedFromGroupNotificationSelectedValue ? "On" : "Off"}</label>
                                     </div>
                                 }
+                            </div>
+                            {editField !== "removed-from-group-notification" && <StyledEditIcon role="button" data-editfield="removed-from-group-notification" onClick={handleEditSelection}/>}
+                            {editField === "removed-from-group-notification" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="removed-from-group-notification" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>
@@ -1000,143 +1028,183 @@ function UserSettings() {
                     <SettingsCategoryLabel>Emails</SettingsCategoryLabel>
                     <SettingsCategoryOptions>
                         <SettingCategoryOption>
-                                    <div>
-                                        <span>Card I Submitted to Group Deck Was Approved/Denied: </span>
-                                        {editField !== "card-decision-message" && <span>{cardDecisionMessage ? "On" : "Off"}</span>}
-                                        {editField === "card-decision-message" && 
-                                            <div style={{display: "inline-block"}} className="form-check form-switch">
-                                                <input role="button" onChange={handleCardDecisionMessageSelectedValueChange} checked={cardDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{cardDecisionMessageSelectedValue ? "On" : "Off"}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                    {editField !== "card-decision-message" && <StyledEditIcon role="button" data-editfield="card-decision-message" onClick={handleEditSelection}/>}
-                                    {editField === "card-decision-message" && 
-                                        <div>
-                                            <button onClick={handleCancel}>Cancel</button>
-                                            <button data-editfield="card-decision-message" onClick={handleSave}>Save</button>
-                                        </div>
-                                    }
-                            </SettingCategoryOption>
-                            <hr />
-                        <SettingCategoryOption>
-                                    <div>
-                                        <span>Card Submitted Deck in Group I am Admin Of: </span>
-                                        {editField !== "card-submission-message" && <span>{cardSubmissionMessage ? "On" : "Off"}</span>}
-                                        {editField === "card-submission-message" && 
-                                            <div style={{display: "inline-block"}} className="form-check form-switch">
-                                                <input role="button" onChange={handleCardSubmissionMessageSelectedValueChange} checked={cardSubmissionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{cardSubmissionMessageSelectedValue ? "On" : "Off"}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                    {editField !== "card-submission-message" && <StyledEditIcon role="button" data-editfield="card-submission-message" onClick={handleEditSelection}/>}
-                                    {editField === "card-submission-message" && 
-                                        <div>
-                                            <button onClick={handleCancel}>Cancel</button>
-                                            <button data-editfield="card-submission-message" onClick={handleSave}>Save</button>
-                                        </div>
-                                    }
-                            </SettingCategoryOption>
-                            <hr />
-                        <SettingCategoryOption>
-                                    <div>
-                                        <span>Deck I Submitted to Group Was Approved/Denied: </span>
-                                        {editField !== "deck-decision-message" && <span>{deckDecisionMessage ? "On" : "Off"}</span>}
-                                        {editField === "deck-decision-message" && 
-                                            <div style={{display: "inline-block"}} className="form-check form-switch">
-                                                <input role="button" onChange={handleDeckDecisionMessageSelectedValueChange} checked={deckDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckDecisionMessageSelectedValue ? "On" : "Off"}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                    {editField !== "deck-decision-message" && <StyledEditIcon role="button" data-editfield="deck-decision-message" onClick={handleEditSelection}/>}
-                                    {editField === "deck-decision-message" && 
-                                        <div>
-                                            <button onClick={handleCancel}>Cancel</button>
-                                            <button data-editfield="deck-decision-message" onClick={handleSave}>Save</button>
-                                        </div>
-                                    }
-                            </SettingCategoryOption>
-                            <hr />
-                        <SettingCategoryOption>
-                                    <div>
-                                        <span>Deck Submitted to Group I am Admin Of: </span>
-                                        {editField !== "deck-submission-message" && <span>{deckSubmissionMessage ? "On" : "Off"}</span>}
-                                        {editField === "deck-submission-message" && 
-                                            <div style={{display: "inline-block"}} className="form-check form-switch">
-                                                <input role="button" onChange={handleDeckSubmissionMessageSelectedValueChange} checked={deckSubmissionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckSubmissionMessageSelectedValue ? "On" : "Off"}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                    {editField !== "deck-submission-message" && <StyledEditIcon role="button" data-editfield="deck-submission-message" onClick={handleEditSelection}/>}
-                                    {editField === "deck-submission-message" && 
-                                        <div>
-                                            <button onClick={handleCancel}>Cancel</button>
-                                            <button data-editfield="deck-submission-message" onClick={handleSave}>Save</button>
-                                        </div>
-                                    }
-                            </SettingCategoryOption>
-                            <hr />
-                        <SettingCategoryOption>
-                                    <div>
-                                        <span>Direct Messages from Other Users: </span>
-                                        {editField !== "direct-message" && <span>{directMessage ? "On" : "Off"}</span>}
-                                        {editField === "direct-message" && 
-                                            <div style={{display: "inline-block"}} className="form-check form-switch">
-                                                <input role="button" onChange={handleDirectMessageSelectedValueChange} checked={directMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{directMessageSelectedValue ? "On" : "Off"}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                    {editField !== "direct-message" && <StyledEditIcon role="button" data-editfield="direct-message" onClick={handleEditSelection}/>}
-                                    {editField === "direct-message" && 
-                                        <div>
-                                            <button onClick={handleCancel}>Cancel</button>
-                                            <button data-editfield="direct-message" onClick={handleSave}>Save</button>
-                                        </div>
-                                    }
-                            </SettingCategoryOption>
-                            <hr />
-                        <SettingCategoryOption>
-                                    <div>
-                                        <span>My Request to Join a Group Was Approved/Denied: </span>
-                                        {editField !== "join-decision-message" && <span>{joinDecisionMessage ? "On" : "Off"}</span>}
-                                        {editField === "join-decision-message" && 
-                                            <div style={{display: "inline-block"}} className="form-check form-switch">
-                                                <input role="button" onChange={handleJoinDecisionMessageSelectedValueChange} checked={joinDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                                <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{joinDecisionMessageSelectedValue ? "On" : "Off"}</label>
-                                            </div>
-                                        }
-                                    </div>
-                                    {editField !== "join-decision-message" && <StyledEditIcon role="button" data-editfield="join-decision-message" onClick={handleEditSelection}/>}
-                                    {editField === "join-decision-message" && 
-                                        <div>
-                                            <button onClick={handleCancel}>Cancel</button>
-                                            <button data-editfield="join-decision-message" onClick={handleSave}>Save</button>
-                                        </div>
-                                    }
-                            </SettingCategoryOption>
-                            <hr />
-                        <SettingCategoryOption>
-                                <div>
-                                    <span>User Requests to Join Group I am Admin Of: </span>
-                                    {editField !== "join-request-message" && <span>{joinRequestMessage ? "On" : "Off"}</span>}
-                                    {editField === "join-request-message" && 
-                                        <div style={{display: "inline-block"}} className="form-check form-switch">
-                                            <input role="button" onChange={handleJoinRequestMessageSelectedValueChange} checked={joinRequestMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                                            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{joinRequestMessageSelectedValue ? "On" : "Off"}</label>
-                                        </div>
-                                    }
-                                </div>
-                                {editField !== "join-request-message" && <StyledEditIcon role="button" data-editfield="join-request-message" onClick={handleEditSelection}/>}
-                                {editField === "join-request-message" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="join-request-message" onClick={handleSave}>Save</button>
+                            <div>
+                                <span>Card I Submitted to Group Deck Was Approved/Denied: </span>
+                                {editField !== "card-decision-message" && <span>{cardDecisionMessage ? "On" : "Off"}</span>}
+                                {editField === "card-decision-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleCardDecisionMessageSelectedValueChange} checked={cardDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{cardDecisionMessageSelectedValue ? "On" : "Off"}</label>
                                     </div>
                                 }
+                            </div>
+                            {editField !== "card-decision-message" && <StyledEditIcon role="button" data-editfield="card-decision-message" onClick={handleEditSelection}/>}
+                            {editField === "card-decision-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="card-decision-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>Card Submitted Deck in Group I am Admin Of: </span>
+                                {editField !== "card-submission-message" && <span>{cardSubmissionMessage ? "On" : "Off"}</span>}
+                                {editField === "card-submission-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleCardSubmissionMessageSelectedValueChange} checked={cardSubmissionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{cardSubmissionMessageSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "card-submission-message" && <StyledEditIcon role="button" data-editfield="card-submission-message" onClick={handleEditSelection}/>}
+                            {editField === "card-submission-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="card-submission-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>Deck I Submitted to Group Was Approved/Denied: </span>
+                                {editField !== "deck-decision-message" && <span>{deckDecisionMessage ? "On" : "Off"}</span>}
+                                {editField === "deck-decision-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleDeckDecisionMessageSelectedValueChange} checked={deckDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckDecisionMessageSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "deck-decision-message" && <StyledEditIcon role="button" data-editfield="deck-decision-message" onClick={handleEditSelection}/>}
+                            {editField === "deck-decision-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="deck-decision-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>Deck Submitted to Group I am Admin Of: </span>
+                                {editField !== "deck-submission-message" && <span>{deckSubmissionMessage ? "On" : "Off"}</span>}
+                                {editField === "deck-submission-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleDeckSubmissionMessageSelectedValueChange} checked={deckSubmissionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{deckSubmissionMessageSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "deck-submission-message" && <StyledEditIcon role="button" data-editfield="deck-submission-message" onClick={handleEditSelection}/>}
+                            {editField === "deck-submission-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="deck-submission-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>Direct Messages from Other Users: </span>
+                                {editField !== "direct-message" && <span>{directMessage ? "On" : "Off"}</span>}
+                                {editField === "direct-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleDirectMessageSelectedValueChange} checked={directMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{directMessageSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "direct-message" && <StyledEditIcon role="button" data-editfield="direct-message" onClick={handleEditSelection}/>}
+                            {editField === "direct-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="direct-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>I Am Invited to Join a Group: </span>
+                                {editField !== "group-invitation-message" && <span>{groupInvitationMessage ? "On" : "Off"}</span>}
+                                {editField === "group-invitation-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleGroupInvitationMessageSelectedValueChange} checked={groupInvitationMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{groupInvitationMessageSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "group-invitation-message" && <StyledEditIcon role="button" data-editfield="group-invitation-message" onClick={handleEditSelection}/>}
+                            {editField === "group-invitation-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="group-invitation-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>User Responds to Invitation to Join Group I am Admin Of: </span>
+                                {editField !== "invitation-decision-message" && <span>{invitationDecisionMessage ? "On" : "Off"}</span>}
+                                {editField === "invitation-decision-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleInvitationDecisionMessageSelectedValueChange} checked={invitationDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{invitationDecisionMessageSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "invitation-decision-message" && <StyledEditIcon role="button" data-editfield="invitation-decision-message" onClick={handleEditSelection}/>}
+                            {editField === "invitation-decision-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="invitation-decision-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>My Request to Join a Group Was Approved/Denied: </span>
+                                {editField !== "join-decision-message" && <span>{joinDecisionMessage ? "On" : "Off"}</span>}
+                                {editField === "join-decision-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleJoinDecisionMessageSelectedValueChange} checked={joinDecisionMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{joinDecisionMessageSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "join-decision-message" && <StyledEditIcon role="button" data-editfield="join-decision-message" onClick={handleEditSelection}/>}
+                            {editField === "join-decision-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="join-decision-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>User Requests to Join Group I am Admin Of: </span>
+                                {editField !== "join-request-message" && <span>{joinRequestMessage ? "On" : "Off"}</span>}
+                                {editField === "join-request-message" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleJoinRequestMessageSelectedValueChange} checked={joinRequestMessageSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{joinRequestMessageSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "join-request-message" && <StyledEditIcon role="button" data-editfield="join-request-message" onClick={handleEditSelection}/>}
+                            {editField === "join-request-message" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="join-request-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>

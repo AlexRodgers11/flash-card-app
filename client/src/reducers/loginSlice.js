@@ -37,6 +37,8 @@ const initialState = {
             deckDecision: true,
             deckSubmission: true,
             direct: true,
+            groupInvitation: true,
+            invitationDecision: true,
             joinDecision: true,
             joinRequest: true
         },

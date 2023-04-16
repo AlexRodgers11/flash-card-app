@@ -44,6 +44,8 @@ const User = new Schema({
             deckDecision: Boolean,
             deckSubmission: Boolean,
             direct: Boolean,
+            groupInvitation: Boolean,
+            invitationDecision: Boolean,
             joinDecision: Boolean,
             joinRequest: Boolean
         },

@@ -120,6 +120,29 @@ export const makeJoinRequestDecision = createAsyncThunk("communications/makeJoin
     }
 });
 
+export const inviteUserToGroup = createAsyncThunk("communications/inviteUserToGroup", async ({groupId, email, comment}) => {
+    try {
+        const response = await client.post(`${baseURL}/users/${email}/messages/group-invitation`, {
+            comment: comment,
+            targetGroup: groupId,
+        });
+
+        return response.data;
+    } catch (err) {
+        return err;
+    }
+});
+
+export const makeGroupInvitationDecision = createAsyncThunk("communications/makeGroupInvitationDecision", async ({decision, messageId}) => {
+    try {
+        const response = await client.patch(`${baseURL}/messages/${messageId}`, {decision, messageType: "GroupInvitation"});
+
+        return response.data;
+    } catch (err) {
+        return err;
+    }
+});
+
 export const communicationsSlice = createSlice({
     name: "communications",
     initialState,
@@ -169,7 +192,13 @@ export const communicationsSlice = createSlice({
             if(action.payload.sentMessage) {
                 state.messages.sent = [...state.messages.sent, action.payload.sentMessage];
             }
-        })
+        });
+        builder.addCase(inviteUserToGroup.fulfilled, (state, action) => {
+            state.messages.sent = [...state.messages.sent, action.payload];
+        });
+        builder.addCase(makeGroupInvitationDecision.fulfilled, (state, action) => {
+            state.messages.sent = [...state.messages.sent, action.payload];
+        });
     }
 });
 

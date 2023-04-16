@@ -1,6 +1,6 @@
 import express from "express";
 const messageRouter = express.Router();
-import { DeckDecision, DeckSubmission, DirectMessage, JoinDecision, JoinRequest, Message } from "../models/message.js";
+import { DeckDecision, DeckSubmission, DirectMessage, GroupInvitation, InvitationDecision, JoinDecision, JoinRequest, Message } from "../models/message.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import User from "../models/user.js";
@@ -69,6 +69,36 @@ messageRouter.get("/:messageId", getUserIdFromJWTToken, checkMessageOwnership, a
                         }
                     ]
                 );
+                res.status(200).send(populatedMessage);
+                break;
+            case "GroupInvitation":
+                populatedMessage = await GroupInvitation.findById(req.message._id, "-sendingUserDeleted").populate([
+                    {
+                        path: "sendingUser",
+                        select: "login.username name.first name.last"
+                    },
+                    {
+                        path: "targetGroup",
+                        select: "name"
+                    },
+                    {
+                        path: "targetUser",
+                        select: "login.username name.first name.last"
+                    }
+                ]);
+                res.status(200).send(populatedMessage);
+                break;
+            case "InvitationDecision":
+                populatedMessage = await InvitationDecision.findById(req.message._id, "-sendingUserDeleted").populate([
+                    {
+                        path: "sendingUser",
+                        select: "login.username name.first name.last"
+                    },
+                    {
+                        path: "targetGroup",
+                        select: "name"
+                    }
+                ]);
                 res.status(200).send(populatedMessage);
                 break;
             case "JoinRequest":
@@ -248,6 +278,36 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
 
                 res.status(200).send({sentMessage: {_id: savedDeckDecisionMessage._id, read: savedDeckDecisionMessage.read, messageType: savedDeckDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
                 
+                break;
+            case "GroupInvitation":
+                const foundGroupInvitationMessage = await GroupInvitation.findById(req.message._id);
+
+                if(req.userId.toString() === foundGroupInvitationMessage.targetUser.toString()) {
+                    await GroupInvitation.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
+
+                    const invitationDecisionMessage = new InvitationDecision({
+                        acceptanceStatus: req.body.decision,
+                        targetGroup: foundGroupInvitationMessage.targetGroup,
+                        sendingUser: req.userId
+                    });
+
+                    const savedInvitationDecisionMessage = await invitationDecisionMessage.save();
+
+                    let group;
+                    if(req.body.decision === "approved") {
+                        group = await Group.findByIdAndUpdate(foundGroupInvitationMessage.targetGroup, {$push: {members: req.userId}}, {select: "administrators"});
+                    } else {
+                        group = await Group.findById(foundGroupInvitationMessage.targetGroup, "administrators");
+                    }
+
+                    await User.updateMany({_id: {$in: group.administrators}}, {$push: {"messages.received": savedInvitationDecisionMessage}});
+                    await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedInvitationDecisionMessage}});
+                    
+                
+                    res.status(200).send({sentMessage: {_id: savedInvitationDecisionMessage._id, read: savedInvitationDecisionMessage.read, messageType: savedInvitationDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
+                } else {
+                    res.status(401).send("You do not have the authority to accept or reject this invitation");
+                }
                 break;
             case 'JoinRequest':
                 const foundJoinRequestMessage = await JoinRequest.findById(req.message._id);

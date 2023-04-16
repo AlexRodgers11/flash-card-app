@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import { MdModeEditOutline } from "react-icons/md";
 import { BsFillCameraFill } from "react-icons/bs";
+import { HiOutlineUserCircle } from "react-icons/hi";
+import { MdModeEditOutline } from "react-icons/md";
 import { deleteProfile, resetAllStatistics, updateEmailPreferences, updateNotificationSettings, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
 import RegisterProfilePicCropForm from "./RegisterProfilePicCropForm"; //probably rename all of these to exclude the word "Register"
 import axios from "axios";
 import { resetStats } from "../reducers/attemptsSlice";
-import { HiOutlineUserCircle } from "react-icons/hi";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -19,12 +19,15 @@ const UserSettingsWrapper = styled.div`
     align-items: center;
     justify-content: center;
     background-color: #FFD549;
+    @media (max-width: 400px) {
+        font-size: .75rem
+    }
 `;
 
 const SettingsForm = styled.form`
     width: 70%;
     max-width: 850px;
-    min-width: 350px;
+    min-width: 275px;
     background-color: #FFD549;
     padding: 3rem 0;
 `;
@@ -53,18 +56,30 @@ const SettingsCategoryOptions = styled.div`
     padding: 1rem;
 `;
 
-const SettingCategoryOption = styled.div`
+const SettingCategoryOption = styled.div.attrs({
+    className: "SettingCategoryOption"
+})`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    text-align: left;
     & div span:first-of-type {
         font-weight: 600;
-    } 
-    & button {
-        margin: 0 .15rem; 
     }
-    `;
+    & > div:last-child {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+    & button {
+        margin: 0 .15rem;
+        @media (max-width: 750px) {
+            padding: .25rem;
+            font-size: .85rem;
+        }
+    }
+`;
     
 const ProfilePicContainer = styled.div`
     position: relative;
@@ -672,7 +687,7 @@ function UserSettings() {
                                 {editField !== "email" && <span>{email}</span>}
                                 {editField === "email" && <input type="email" value={emailInputValue} onChange={handleEmailInputValueChange} />}
                             </div>
-                            {editField !== "email" && <StyledEditIcon role="button" data-editfield="email" onClick={handleEditSelection}/>}
+                            {editField !== "email" && <div><StyledEditIcon role="button" data-editfield="email" onClick={handleEditSelection}/></div>}
                             {editField === "email" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -692,7 +707,7 @@ function UserSettings() {
                                 {editField !== "username" && <span>{username}</span>}
                                 {editField === "username" && <input type="text" value={usernameInputValue} onChange={handleUsernameInputValueChange} />}
                             </div>
-                            {editField !== "username" && <StyledEditIcon role="button" data-editfield="username" onClick={handleEditSelection}/>}
+                            {editField !== "username" && <div><StyledEditIcon role="button" data-editfield="username" onClick={handleEditSelection}/></div>}
                             {editField === "username" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -712,7 +727,7 @@ function UserSettings() {
                                 {editField !== "password" && <span>••••••••••</span>}
                                 {editField === "password" && <input type="password" value={passwordInputValue} onChange={handlePasswordInputValueChange} />}
                             </div>
-                            {editField !== "password" && <StyledEditIcon role="button" data-editfield="password" onClick={handleEditSelection}/>}
+                            {editField !== "password" && <div><StyledEditIcon role="button" data-editfield="password" onClick={handleEditSelection}/></div>}
                             {(editField === "password" && !passwordInputValue) && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -758,7 +773,7 @@ function UserSettings() {
                                         </select>
                                     }
                                 </div>
-                                {editField !== "stats-track" && <StyledEditIcon role="button" data-editfield="stats-track" onClick={handleEditSelection}/>}
+                                {editField !== "stats-track" && <div><StyledEditIcon role="button" data-editfield="stats-track" onClick={handleEditSelection}/></div>}
                                 {editField === "stats-track" && 
                                     <div>
                                         <button onClick={handleCancel}>Cancel</button>
@@ -789,7 +804,7 @@ function UserSettings() {
                                     </select>
                                 }
                             </div>
-                            {editField !== "email-privacy" && <StyledEditIcon role="button" data-editfield="email-privacy" onClick={handleEditSelection}/>}
+                            {editField !== "email-privacy" && <div><StyledEditIcon role="button" data-editfield="email-privacy" onClick={handleEditSelection}/></div>}
                             {editField === "email-privacy" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -809,7 +824,7 @@ function UserSettings() {
                                     </select>
                                 }
                             </div>
-                            {editField !== "name-privacy" && <StyledEditIcon role="button" data-editfield="name-privacy" onClick={handleEditSelection}/>}
+                            {editField !== "name-privacy" && <div><StyledEditIcon role="button" data-editfield="name-privacy" onClick={handleEditSelection}/></div>}
                             {editField === "name-privacy" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -829,7 +844,7 @@ function UserSettings() {
                                     </select>
                                 }
                             </div>
-                            {editField !== "profile-photo-privacy" && <StyledEditIcon role="button" data-editfield="profile-photo-privacy" onClick={handleEditSelection}/>}
+                            {editField !== "profile-photo-privacy" && <div><StyledEditIcon role="button" data-editfield="profile-photo-privacy" onClick={handleEditSelection}/></div>}
                             {editField === "profile-photo-privacy" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -890,7 +905,7 @@ function UserSettings() {
                                     </select>
                                 }
                             </div>
-                            {editField !== "current-decks-privacy" && <StyledEditIcon role="button" data-editfield="current-decks-privacy" onClick={handleEditSelection}/>}
+                            {editField !== "current-decks-privacy" && <div><StyledEditIcon role="button" data-editfield="current-decks-privacy" onClick={handleEditSelection}/></div>}
                             {editField === "current-decks-privacy" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -914,7 +929,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "admin-change-notification" && <StyledEditIcon role="button" data-editfield="admin-change-notification" onClick={handleEditSelection}/>}
+                            {editField !== "admin-change-notification" && <div><StyledEditIcon role="button" data-editfield="admin-change-notification" onClick={handleEditSelection}/></div>}
                             {editField === "admin-change-notification" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -934,7 +949,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "deck-added-notification" && <StyledEditIcon role="button" data-editfield="deck-added-notification" onClick={handleEditSelection}/>}
+                            {editField !== "deck-added-notification" && <div><StyledEditIcon role="button" data-editfield="deck-added-notification" onClick={handleEditSelection}/></div>}
                             {editField === "deck-added-notification" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -954,7 +969,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "group-deleted-notification" && <StyledEditIcon role="button" data-editfield="group-deleted-notification" onClick={handleEditSelection}/>}
+                            {editField !== "group-deleted-notification" && <div><StyledEditIcon role="button" data-editfield="group-deleted-notification" onClick={handleEditSelection}/></div>}
                             {editField === "group-deleted-notification" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -974,7 +989,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "head-admin-change-notification" && <StyledEditIcon role="button" data-editfield="head-admin-change-notification" onClick={handleEditSelection}/>}
+                            {editField !== "head-admin-change-notification" && <div><StyledEditIcon role="button" data-editfield="head-admin-change-notification" onClick={handleEditSelection}/></div>}
                             {editField === "head-admin-change-notification" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -994,7 +1009,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "new-member-joined-notification" && <StyledEditIcon role="button" data-editfield="new-member-joined-notification" onClick={handleEditSelection}/>}
+                            {editField !== "new-member-joined-notification" && <div><StyledEditIcon role="button" data-editfield="new-member-joined-notification" onClick={handleEditSelection}/></div>}
                             {editField === "new-member-joined-notification" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1014,7 +1029,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "removed-from-group-notification" && <StyledEditIcon role="button" data-editfield="removed-from-group-notification" onClick={handleEditSelection}/>}
+                            {editField !== "removed-from-group-notification" && <div><StyledEditIcon role="button" data-editfield="removed-from-group-notification" onClick={handleEditSelection}/></div>}
                             {editField === "removed-from-group-notification" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1038,7 +1053,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "card-decision-message" && <StyledEditIcon role="button" data-editfield="card-decision-message" onClick={handleEditSelection}/>}
+                            {editField !== "card-decision-message" && <div><StyledEditIcon role="button" data-editfield="card-decision-message" onClick={handleEditSelection}/></div>}
                             {editField === "card-decision-message" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1078,7 +1093,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "deck-decision-message" && <StyledEditIcon role="button" data-editfield="deck-decision-message" onClick={handleEditSelection}/>}
+                            {editField !== "deck-decision-message" && <div><StyledEditIcon role="button" data-editfield="deck-decision-message" onClick={handleEditSelection}/></div>}
                             {editField === "deck-decision-message" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1098,7 +1113,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "deck-submission-message" && <StyledEditIcon role="button" data-editfield="deck-submission-message" onClick={handleEditSelection}/>}
+                            {editField !== "deck-submission-message" && <div><StyledEditIcon role="button" data-editfield="deck-submission-message" onClick={handleEditSelection}/></div>}
                             {editField === "deck-submission-message" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1118,7 +1133,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "direct-message" && <StyledEditIcon role="button" data-editfield="direct-message" onClick={handleEditSelection}/>}
+                            {editField !== "direct-message" && <div><StyledEditIcon role="button" data-editfield="direct-message" onClick={handleEditSelection}/></div>}
                             {editField === "direct-message" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1138,7 +1153,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "group-invitation-message" && <StyledEditIcon role="button" data-editfield="group-invitation-message" onClick={handleEditSelection}/>}
+                            {editField !== "group-invitation-message" && <div><StyledEditIcon role="button" data-editfield="group-invitation-message" onClick={handleEditSelection}/></div>}
                             {editField === "group-invitation-message" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1158,7 +1173,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "invitation-decision-message" && <StyledEditIcon role="button" data-editfield="invitation-decision-message" onClick={handleEditSelection}/>}
+                            {editField !== "invitation-decision-message" && <div><StyledEditIcon role="button" data-editfield="invitation-decision-message" onClick={handleEditSelection}/></div>}
                             {editField === "invitation-decision-message" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1178,7 +1193,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "join-decision-message" && <StyledEditIcon role="button" data-editfield="join-decision-message" onClick={handleEditSelection}/>}
+                            {editField !== "join-decision-message" && <div><StyledEditIcon role="button" data-editfield="join-decision-message" onClick={handleEditSelection}/></div>}
                             {editField === "join-decision-message" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
@@ -1198,7 +1213,7 @@ function UserSettings() {
                                     </div>
                                 }
                             </div>
-                            {editField !== "join-request-message" && <StyledEditIcon role="button" data-editfield="join-request-message" onClick={handleEditSelection}/>}
+                            {editField !== "join-request-message" && <div><StyledEditIcon role="button" data-editfield="join-request-message" onClick={handleEditSelection}/></div>}
                             {editField === "join-request-message" && 
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>

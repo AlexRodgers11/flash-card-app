@@ -29,6 +29,9 @@ const StyledIoNotificationsSharp = styled(IoNotificationsSharp)`
     width: 2.25rem;
     cursor: pointer;
     color: white;
+    &:hover {
+        color: #03ffff
+    }
 `;
 
 const StyledIoMailSharp = styled(IoMailSharp)`
@@ -36,6 +39,9 @@ const StyledIoMailSharp = styled(IoMailSharp)`
     width: 2.25rem;
     cursor: pointer;
     color: white;
+    &:hover {
+        color: #03ffff
+    }
 `;
 
 const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`

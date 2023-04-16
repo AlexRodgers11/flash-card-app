@@ -8,8 +8,12 @@ const LogoWrapper = styled.div`
     height: 5.5rem;
     // bottom: 2px;
     &:hover div{
-        background-color: #fafafa;
-        color: #363636;
+        background-color: #171717;
+        border-color: #03ffff;
+        color: #03ffff;
+        // background-color: #171717;
+        // border-color: white;
+        // color: white;
     }
     & div {
         position: relative;

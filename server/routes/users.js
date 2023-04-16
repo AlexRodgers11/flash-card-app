@@ -102,7 +102,7 @@ userRouter.patch("/:protectedUserId/verification", async (req, res, next) => {
                 const updatedUser = await User.findByIdAndUpdate(
                     req.user._id, 
                     {
-                        accountSetupStage: "verified", 
+                        accountSetupStage: "verified",
                     },
                      {new: true}
                 );
@@ -527,12 +527,30 @@ userRouter.post("/:email/messages/group-invitation", getUserIdFromJWTToken, asyn
                 receivingUsers: [foundUser._id]
             });
 
-            const savedMessage = await newMessage.save();
-            await User.findByIdAndUpdate(foundUser._id, {$push: {"messages.received": savedMessage}});
+            const savedGroupInvitationMessage = await newMessage.save();
+            await User.findByIdAndUpdate(foundUser._id, {$push: {"messages.received": savedGroupInvitationMessage}});
             
-            await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedMessage}});
+            await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedGroupInvitationMessage}});
 
-            res.status(200).send({_id: savedMessage._id, messageType: "GroupInvitation", read: []});
+            if(foundUser.communicationSettings.emailPreferences.groupInvitation) {
+                const populatedMessage = await savedGroupInvitationMessage.populate([
+                    {
+                        path: "sendingUser",
+                        select: "name.first name.last user.login.username"
+                    },
+                    {
+                        path: "targetGroup",
+                        select: "name"
+                    },
+                    {
+                        path: "targetUser",
+                        select: "login.email"
+                    }
+                ]);
+                await sendEmail(populatedMessage.targetUser.login.email, populatedMessage);
+            }
+
+            res.status(200).send({_id: savedGroupInvitationMessage._id, messageType: "GroupInvitation", read: []});
         } else {
             res.status(401).send("You are not authorized to invite members to this group");
         }

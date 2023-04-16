@@ -228,6 +228,47 @@ export const sendEmail = async (emailAddress, message) => {
                 </html>`
             )
             break;
+        case "DirectMessage":
+            mailObj.subject = `${message.sendingUser.name.first} ${message.sendingUser.name.last} Sent You a Message`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} sent you the following message:</p>
+                        <br />
+                        <br />
+                        <em>${message.text}</em>
+                        <hr />
+                        <hr />
+                        <p>Log in to respond</p>
+                    </body>
+                </html>`
+            )
+            break;
+        case "GroupInvitation":
+            mailObj.subject = `${message.sendingUser.name.first} ${message.sendingUser.name.last} Invited you to Join the Group ${message.targetGroup.name}`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} invited you to join the group ${message.targetGroup.name}${message.comment ? " and included this comment:" : "."}</p>
+                        ${message.comment ? "<br />" : ""}
+                        ${message.comment ? `<em>${message.comment}</em>` : ""}
+                        <hr />
+                        <hr />
+                        <p>Log in to respond</p>
+                    </body>
+                </html>`
+            )
+            break;
+        case "InvitationDecision":
+            mailObj.subject = `${message.sendingUser.name.first} ${message.sendingUser.name.last} Responded to an Invitation to Join Group ${message.targetGroup.name}`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} ${message.acceptanceStatus === "approved" ? "accepted" : "declined"} an invitation to join group ${message.targetGroup.name}</p>
+                    </body>
+                </html>`
+            )
+            break;
         case "JoinRequest":
             mailObj.subject = `A User Would Like to Join ${message.targetGroup.name}`;
             mailObj.html = (
@@ -249,19 +290,6 @@ export const sendEmail = async (emailAddress, message) => {
                         <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} ${message.acceptanceStatus} your request to join ${message.targetGroup.name}${message.comment ? " and left this comment:" : "."}</p>
                         ${message.comment ? "<br />" : ""}
                         ${message.comment ? `<em>${message.comment}</em>` : ""}
-                    </body>
-                </html>`
-            )
-            break;
-        case "DirectMessage":
-            mailObj.subject = `${message.sendingUser.name.first} ${message.sendingUser.name.last} Sent You a Message`;
-            mailObj.html = (
-                `<html>
-                    <body>
-                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} sent you the following message:</p>
-                        <br />
-                        <br />
-                        <em>${message.text}</em>
                     </body>
                 </html>`
             )

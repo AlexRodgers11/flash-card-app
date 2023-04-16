@@ -296,13 +296,32 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                     let group;
                     if(req.body.decision === "approved") {
                         group = await Group.findByIdAndUpdate(foundGroupInvitationMessage.targetGroup, {$push: {members: req.userId}}, {select: "administrators"});
+                        await User.findByIdAndUpdate(req.userId, {$push: {groups: group._id}})
                     } else {
                         group = await Group.findById(foundGroupInvitationMessage.targetGroup, "administrators");
                     }
 
                     await User.updateMany({_id: {$in: group.administrators}}, {$push: {"messages.received": savedInvitationDecisionMessage}});
                     await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedInvitationDecisionMessage}});
+
+                    const populatedMessage = await savedInvitationDecisionMessage.populate([
+                        {
+                            path: "sendingUser",
+                            select: "name.first name.last login.username"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        }
+                    ]);
                     
+                    const admins = await User.find({_id: {$in: group.administrators}, "communicationSettings.emailPreferences.invitationDecision": true}, "login.email");
+
+                    const emailingPromises = admins.map((admin) => {
+                        return sendEmail(admin.login.email, populatedMessage);
+                    });
+
+                    await Promise.all(emailingPromises);
                 
                     res.status(200).send({sentMessage: {_id: savedInvitationDecisionMessage._id, read: savedInvitationDecisionMessage.read, messageType: savedInvitationDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
                 } else {

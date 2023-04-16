@@ -508,6 +508,11 @@ userRouter.post("/:email/messages/group-invitation", getUserIdFromJWTToken, asyn
         if(!foundUser) {
             res.status(404).send("User does not exist");
         }
+
+        if(foundUser.groups.map(groupId => groupId.toString()).includes(req.body.targetGroup)) {
+            res.status(400).send("This user is already a member of this group");
+        }
+        
         const foundGroup = await Group.findById(req.body.targetGroup, "administrators");
         const invitee = await User.findById(foundUser._id, "messages.received")
             .populate({

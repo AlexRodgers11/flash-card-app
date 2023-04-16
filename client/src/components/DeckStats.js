@@ -17,6 +17,7 @@ export default function DeckStats() {
     return (
         <DeckStatsWrapper>
             <DeckStatsTable />
+            {/* Will have other things here like most/least missed card, graphs, etc */}
         </DeckStatsWrapper>
     );
 }

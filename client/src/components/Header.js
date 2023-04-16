@@ -14,7 +14,7 @@ import Logo from "./Logo";
 
 const HeaderWrapper = styled.nav`
     height: 5.5rem;
-    min-width: 300px;
+    min-width: 350px;
     padding: 0;
     // background-color: #152556 !important;
     background-color: #051647 !important;

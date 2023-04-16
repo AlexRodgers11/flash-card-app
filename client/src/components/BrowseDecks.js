@@ -55,6 +55,7 @@ const ControlBarWrapper = styled.form`
     // background-color: #252525;        
     color: white;
     font-size: 1.25rem;
+    min-width: 350px;
     & label {
         margin-right: .35rem;
         @media (max-width: 690px) {

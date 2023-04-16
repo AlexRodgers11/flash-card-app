@@ -27,7 +27,7 @@ const UserSettingsWrapper = styled.div`
 const SettingsForm = styled.form`
     width: 70%;
     max-width: 850px;
-    min-width: 275px;
+    min-width: 350px;
     background-color: #FFD549;
     padding: 3rem 0;
 `;

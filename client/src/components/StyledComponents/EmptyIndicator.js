@@ -7,7 +7,7 @@ export const EmptyIndicator = styled.div`
     justify-content: center;
     height: 50vh;
     width: 80vw;
-    min-width: 325px;
+    min-width: 350px;
     border: 2px solid black;
     font-size: 4rem;
     margin-bottom: 4rem;

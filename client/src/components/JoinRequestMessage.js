@@ -94,9 +94,7 @@ function JoinRequestMessage(props) {
                                     <button className="btn btn-primary btn-md" onClick={submitUserDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button><button className="btn btn-danger btn-md" onClick={clearDecision}>Cancel</button>
                                 </div>
                         }
-                        
-                        {userId !== sender._id}
-                        
+                                                
                     </div>
                     :
                     <MessagePreviewContent>

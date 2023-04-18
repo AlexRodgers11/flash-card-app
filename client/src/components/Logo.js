@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useSelector } from 'react-redux';
 
 const LogoWrapper = styled.div`
     position: relative;
@@ -8,9 +9,10 @@ const LogoWrapper = styled.div`
     height: 5.5rem;
     // bottom: 2px;
     &:hover div{
-        background-color: #171717;
-        border-color: #03ffff;
-        color: #03ffff;
+        background-color: ${props => props.loggedIn ? "#171717" : "white"};
+        border-color: ${props => props.loggedIn ? "#03ffff" : "171717"};
+        border-width: 2px;
+        color: ${props => props.loggedIn ? "#03ffff" : "#171717"};
         // background-color: #171717;
         // border-color: white;
         // color: white;
@@ -29,6 +31,12 @@ const LogoWrapper = styled.div`
         border: 1px solid black;
         background-color: white;
         border-radius: 6px;
+
+        background-color: white; 
+        border-color: #171717;
+        border-width: 2px;
+        color: #171717;
+
         // font-size: 0.6em;
         font-size: 0.7em;
         font-weight: 900;
@@ -49,8 +57,10 @@ const LogoWrapper = styled.div`
 `;
 
 function Logo() {
+    const userId = useSelector((state) => state.login.userId);
+
     return (
-        <LogoWrapper className="LogoWrapper">
+        <LogoWrapper loggedIn={Boolean(userId)} className="LogoWrapper">
             <div>Flish</div>
             <div>Flash</div>
         </LogoWrapper>

@@ -29,6 +29,7 @@ import CardAttemptsTable from './CardAttemptsTable';
 import DeckAttemptsTable from './DeckAttemptsTable';
 import DeckStats from './DeckStats';
 import DeckAttemptCardsTable from './DeckAttemptCardsTable';
+import { CookiePolicy } from './CookiePolicy';
 
 function Router() {
     const { pathname } = useLocation();
@@ -100,6 +101,7 @@ function Router() {
                 <Route exact path="/users/:userId" element={<User />} />
                 <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
                 <Route exact path="/dashboard" element={<Dashboard />} />
+                <Route exact path="/cookie-policy" element={<CookiePolicy />} />
                 <Route path="/" element={<LandingPage />}>
                     <Route path="login" element={<Login />} />
                     <Route path="register/credentials" element={<RegisterCredentialsForm />} />

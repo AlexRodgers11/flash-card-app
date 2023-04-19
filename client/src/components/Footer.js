@@ -53,7 +53,9 @@ const ContentWrapper = styled.p`
 const Content = styled.span.attrs({
     role: "button"
 })`
-
+    &:hover {
+        color: #7d7d7d;
+    }
 `
 
 const Copyright = styled.p`
@@ -164,7 +166,7 @@ function Footer() {
                 <LinkBlock className="LinkBlock">
                     <LinkBlockHeading>Policies & Preferences</LinkBlockHeading>
                     <ContentWrapper><Content>Privacy Policy</Content></ContentWrapper>
-                    <ContentWrapper><Content>Cookie Policy</Content></ContentWrapper>
+                    <ContentWrapper><Content><a href="/cookie-policy" target="_blank">Cookie Policy</a></Content></ContentWrapper>
                 </LinkBlock>
             </LinksSection>
             <PartialHr />

@@ -234,3 +234,13 @@ export const getJwtCookie = () => {
     const parts = value.split(`; jwt=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
+
+export const openLinkInNewTab = (url, func) => {
+    const newTab = window.open(url, "_blank");
+
+    if(newTab) {
+        newTab.focus();
+    } else {
+        func(url);
+    }
+}

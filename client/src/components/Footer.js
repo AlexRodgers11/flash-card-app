@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import useFormInput from "../hooks/useFormInput";
 import useToggle from "../hooks/useToggle";
-import { client } from "../utils";
+import { client, openLinkInNewTab } from "../utils";
 import Modal from "./Modal";
 import { useNavigate } from "react-router";
 
@@ -178,8 +178,8 @@ function Footer() {
                 </LinkBlock>
                 <LinkBlock className="LinkBlock">
                     <LinkBlockHeading>Policies & Preferences</LinkBlockHeading>
-                    <ContentWrapper><Content onClick={() => openLinkInNewTab("/privacy-policy")}>Privacy Policy</Content></ContentWrapper>
-                    <ContentWrapper><Content onClick={() => openLinkInNewTab("/cookie-policy")}>Cookie Policy</Content></ContentWrapper>
+                    <ContentWrapper><Content onClick={() => openLinkInNewTab("/privacy-policy", navigate)}>Privacy Policy</Content></ContentWrapper>
+                    <ContentWrapper><Content onClick={() => openLinkInNewTab("/cookie-policy", navigate)}>Cookie Policy</Content></ContentWrapper>
                 </LinkBlock>
             </LinksSection>
             <PartialHr />

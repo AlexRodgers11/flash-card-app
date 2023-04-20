@@ -120,7 +120,7 @@ export function CookiePolicy() {
                 <Section>
                     <SectionHeader>Changes to our Cookie Policy</SectionHeader>
 
-                    <p>We may update this Cookie Policy from time to time. Any changes will be posted on this page, and we encourage you to review it regularly to stay informed about our use of cookies.</p>
+                    <p>We may update this Cookie Policy from time to time. Any changes will be posted on this page, and the "Last Updated" date will be updated accordingly. We encourage you to review it regularly to stay informed about our use of cookies.</p>
                 </Section>
 
                 <Section>

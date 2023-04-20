@@ -5,6 +5,7 @@ import useFormInput from "../hooks/useFormInput";
 import useToggle from "../hooks/useToggle";
 import { client } from "../utils";
 import Modal from "./Modal";
+import { useNavigate } from "react-router";
 
 const FooterWrapper = styled.footer`
     display: flex;
@@ -87,6 +88,7 @@ function Footer() {
     const [message, clearMessage, handleMessageChange, setMessage] = useFormInput();
     const [bugScreenshot, setBugScreenshot] = useState();
     const userId = useSelector((state) => state.login.userId);
+    const navigate = useNavigate();
     
     const handleSendEmail = async (evt) => {
         evt.preventDefault();
@@ -124,6 +126,17 @@ function Footer() {
     const handleShowBugForm = () => {
         setSubject("bug");
         toggleShowContactForm();
+    }
+
+    const openLinkInNewTab = (url) => {
+        const newTab = window.open(url, "_blank");
+        console.log({newTab});
+
+        if(newTab) {
+            newTab.focus();
+        } else {
+            navigate(url);
+        }
     }
 
     return (
@@ -165,8 +178,8 @@ function Footer() {
                 </LinkBlock>
                 <LinkBlock className="LinkBlock">
                     <LinkBlockHeading>Policies & Preferences</LinkBlockHeading>
-                    <ContentWrapper><Content>Privacy Policy</Content></ContentWrapper>
-                    <ContentWrapper><Content><a href="/cookie-policy" target="_blank">Cookie Policy</a></Content></ContentWrapper>
+                    <ContentWrapper><Content onClick={() => openLinkInNewTab("/privacy-policy")}>Privacy Policy</Content></ContentWrapper>
+                    <ContentWrapper><Content onClick={() => openLinkInNewTab("/cookie-policy")}>Cookie Policy</Content></ContentWrapper>
                 </LinkBlock>
             </LinksSection>
             <PartialHr />

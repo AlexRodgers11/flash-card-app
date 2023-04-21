@@ -6,6 +6,7 @@ import useToggle from "../hooks/useToggle";
 import { client, openLinkInNewTab } from "../utils";
 import Modal from "./Modal";
 import { useNavigate } from "react-router";
+import { HireMe } from "./HireMe";
 
 const FooterWrapper = styled.footer`
     display: flex;
@@ -87,6 +88,7 @@ function Footer() {
     const [subject, clearSubject, handleSubjectChange, setSubject] = useFormInput("general");
     const [message, clearMessage, handleMessageChange, setMessage] = useFormInput();
     const [bugScreenshot, setBugScreenshot] = useState();
+    const [showHireMeModal, toggleShowHireMeModal] = useToggle();
     const userId = useSelector((state) => state.login.userId);
     const navigate = useNavigate();
     
@@ -128,17 +130,7 @@ function Footer() {
         toggleShowContactForm();
     }
 
-    const openLinkInNewTab = (url) => {
-        const newTab = window.open(url, "_blank");
-        console.log({newTab});
-
-        if(newTab) {
-            newTab.focus();
-        } else {
-            navigate(url);
-        }
-    }
-
+    
     return (
         <>
         {showContactForm && 
@@ -162,13 +154,18 @@ function Footer() {
                 </form>
             </Modal>
         }
+        {showHireMeModal &&
+            <Modal hideModal={toggleShowHireMeModal}>
+                <HireMe />
+            </Modal>
+        }
         <FooterWrapper className="FooterWrapper">
             <LinksSection className="LinksSection">
                 <LinkBlock className="LinkBlock">
                     <LinkBlockHeading>Company</LinkBlockHeading>
                     <ContentWrapper><Content>About</Content></ContentWrapper>
                     {userId && <ContentWrapper><Content onClick={toggleShowContactForm}>Contact</Content></ContentWrapper>}
-                    <ContentWrapper><Content>Hire Me</Content></ContentWrapper>
+                    <ContentWrapper><Content onClick={toggleShowHireMeModal}>Hire Me</Content></ContentWrapper>
                 </LinkBlock>
                 <LinkBlock className="LinkBlock">
                     <LinkBlockHeading>Resources</LinkBlockHeading>

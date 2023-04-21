@@ -18,6 +18,12 @@ const HeaderWrapper = styled.nav`
     padding: 0;
     // background-color: #152556 !important;
     background-color: #051647 !important;
+    & #navbarDropdown.nav-link.dropdown-toggle::after {
+        color: white;
+    }
+    & #navbarDropdown.nav-link.dropdown-toggle.show::after {
+        color: #03ffff;
+    }
 `;
 
 const DropDownItem = styled.p`
@@ -48,13 +54,19 @@ const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
     color: white; 
     height: 3.5rem;
     width: 3.5rem;
+    &:hover {
+        border: 2px solid #03ffff;
+    }
 `;
 
 const ProfilePic = styled.img`
     border: 1px solid transparent; 
     border-radius: 50%;
     height: 4rem;
-    width: 4rem
+    width: 4rem;
+    &:hover {
+        border: 2px solid #03ffff;
+    }
 `;
 
 const StyledButton = styled.button`

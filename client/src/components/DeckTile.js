@@ -67,7 +67,7 @@ function DeckTile(props) {
 
     const goToDeck = () => {
         if(listType === "user") {
-            navigate(`/decks/${props.deckId}`);
+            navigate(`/users/${userId}/decks/${props.deckId}`);
         } else {
             navigate(`/groups/${listId}/decks/${props.deckId}`);   
         }

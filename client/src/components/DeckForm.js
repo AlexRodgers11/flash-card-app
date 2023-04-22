@@ -64,15 +64,12 @@ function DeckForm() {
 		clearPubliclyAvailable();
 		clearAllowCopies();
 		dispatch(resetDeck());
-		console.log(`${baseURL}/users/${userId}/decks`);
-		console.log({newDeck});
-
 		dispatch(createDeck({deck: newDeck, userId}))
 			.then((action) => {
 				if(listType === "user") {
 					dispatch(addDeckToCurrentDeckList({deckId: action.payload._id}));
 				}
-				navigate(`/decks/${action.payload._id}`);
+				navigate(`/users/${userId}/decks/${action.payload._id}`);
 			})
 			.catch(err => console.error(err));
 	}

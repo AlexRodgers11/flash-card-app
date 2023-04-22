@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
 import axios from 'axios';
 import { HiOutlineUserCircle } from "react-icons/hi";
 import { useNavigate, useParams } from 'react-router';
@@ -37,7 +36,7 @@ const Button = styled.button`
 const EditOptionsWrapper = styled.div`
 `;
 
-const ImageContainer = styled.div`
+const IconContainer = styled.div`
     position: relative;
     display: inline-block;
     // margin-top: .15rem;
@@ -67,6 +66,24 @@ const InitialsOverlay = styled.div`
     justify-content: center;
     color: white;
     font-size: 2rem;
+    border: 2px solid black;
+`;
+
+const InitialsCircle = styled.div`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    background-color: #008CBA;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    border: 2px solid black;
 `;
 
 const StyledImage = styled.img`
@@ -81,23 +98,6 @@ const StyledImage = styled.img`
     border-radius: 50%;
 `;
 
-const UserSkeleton = styled.div`
-    position: relative;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    padding-bottom: 100%;
-    border-radius: 50%;
-    background-color: white;
-`;
-
-const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
-    position: relative;
-    top: 0;
-    width: 100%;
-    height: 100%;
-
-`
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function UserTile(props) {
@@ -123,16 +123,13 @@ function UserTile(props) {
 
     const handleRemoveMember = () => {
         dispatch(removeMember({groupId, memberToRemoveId: props.memberId}));
-        //be sure to create notification to let member know what happened
     }
     const addMemberToAdmins = () => {
         dispatch(grantAdminAuthority({groupId, memberToAuthorizeId: props.memberId}));
-        //need to make notification
     }
 
     const removeMemberFromAdmins = () => {
         dispatch(revokeAdminAuthority({groupId, memberToDeauthorizeId: props.memberId}));
-        //need to make notification
     }
 
     const handleViewOnEnter = (evt) => {
@@ -142,13 +139,6 @@ function UserTile(props) {
     }
 
     if(!userData.firstName) {
-        // return <StyledHiOutlineUserCircle fill="white" />;
-        // return <UserSkeleton />;
-        // return (
-        //     <ImageContainer className="ImageContainer">
-        //         <UserSkeleton />
-        //     </ImageContainer>
-        // )
         return;
     }
     
@@ -163,14 +153,16 @@ function UserTile(props) {
                 :
                 <TitleWrapper>{props.memberId === headAdmin ? "Head Admin" : props.isAdmin ? "Admin" : ""}</TitleWrapper>
             }
-            {userData.photo ? 
-                <ImageContainer className="ImageContainer">
-                    <StyledImage className="StyledImage" src={userData.photo} alt="profile-icon" /> 
-                    <InitialsOverlay className="initials-overlay">{`${userData.firstName[0]}.${userData.lastName[0]}.`}</InitialsOverlay>
-                </ImageContainer>
-                : 
-                <div style={{display: "inline-block", border: "1.5px solid black", borderRadius: "50%", width: "65%"}}>{`${userData.firstName && userData.firstName[0]}.${userData.lastName && userData.lastName[0]}.`}</div> 
-            }
+            <IconContainer>
+                {userData.photo ?
+                    <>
+                        <StyledImage className="StyledImage" src={userData.photo} alt="profile-icon" /> 
+                        <InitialsOverlay className="initials-overlay">{`${userData.firstName[0]}.${userData.lastName[0]}.`}</InitialsOverlay>
+                    </>
+                    :
+                    <InitialsCircle>{`${userData.firstName[0]}.${userData.lastName[0]}.`}</InitialsCircle>
+                }
+            </IconContainer>
         </UserTileWrapper>
     )
 }

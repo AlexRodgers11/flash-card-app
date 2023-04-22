@@ -127,7 +127,7 @@ const WrapUpButtonsContainer = styled.div`
 `;
 
 function PracticeSession() {
-    let { deckId, userId } = useParams();
+    let { deckId } = useParams();
     const activeCard = useSelector((state) => state.practiceSession.activeCard);
     const stats = useSelector((state) => state.practiceSession.stats);
     const numCards = useSelector((state) => state.practiceSession.numCards);
@@ -194,7 +194,7 @@ function PracticeSession() {
                 if(evt.target.value === "dashboard") {
                     navigate("/dashboard");
                 } else {
-                    navigate(`/users/${userId}/practice`);
+                    navigate(`/users/${loggedInUserId}/practice`);
                 }
             });
     }

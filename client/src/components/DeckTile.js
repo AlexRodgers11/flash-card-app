@@ -53,7 +53,7 @@ function DeckTile(props) {
                 toggleShowNoCardsModal();
             }
         } else {
-            navigate(`/decks/${props.deckId}`);
+            navigate(`/users/${deckData.creator}/decks/${props.deckId}`);
         }
     }
 

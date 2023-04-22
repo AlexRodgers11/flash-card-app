@@ -24,11 +24,9 @@ import GroupMemberList from './GroupMemberList';
 import GroupDecksSection from './GroupDecksSection';
 import { GroupAdminSection } from './GroupAdminSection';
 import CardStatsTable from './CardStatsTable';
-import CardSessionsTable from './CardAttemptsTable';
 import CardAttemptsTable from './CardAttemptsTable';
 import DeckAttemptsTable from './DeckAttemptsTable';
 import DeckStats from './DeckStats';
-import DeckAttemptCardsTable from './DeckAttemptCardsTable';
 import { CookiePolicy } from './CookiePolicy';
 import { PrivacyPolicy } from './PrivacyPolicy';
 
@@ -44,37 +42,29 @@ function Router() {
     }, [pathname]);
     
     if(userId) {
-        // console.log("userId found");
         if(accountSetupStage !== "complete") {
-            // console.log("registration incomplete");
-            // console.log(`still on stage ${accountSetupStage}`);
             switch(accountSetupStage) {
                 case "email":
-                    // console.log("in email case");
                     if(pathname !== "/register/email-verification") {
                         return <Navigate to="/register/email-verification" replace />;
                     }
                     break;
                 case "verified":
-                    // console.log("in verified case");
                     if(pathname !== "/register/email-verification" && pathname !== "/register/identification") {
                         return <Navigate to="/register/identification" replace />;
                     }
                     break;
                 default: 
-                    // console.log("in default case");
                     break;
             }
         }
     } else {
-        // console.log("no userId found")
         if(!pathnamesThatDoNotNeedUserId.includes(pathname)) {
             console.log("user unauthorized to view requested page");
             return <Navigate to="/" replace />
         }
     }
 
-    // console.log("made it past conditional tree");
     return (
         <div className="Router" style={{minHeight: "calc(100vh - 5.5rem)"}}>
             <Routes>
@@ -85,7 +75,8 @@ function Router() {
                 </Route>
                 <Route exact path="/groups/:groupId/decks/:deckId" element={<Deck />} />
                 <Route exact path="/decks/public" element={<BrowseDecks />}/>
-                <Route exact path="/decks/:deckId" element={<Deck />} />
+                {/* <Route exact path="/decks/:deckId" element={<Deck />} /> */}
+                <Route exact path="/users/:userId/decks/:deckId" element={<Deck />} />
                 <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
                 <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
                 <Route exact path="/users/:userId/practice" element={<PracticeLaunchPage />} />

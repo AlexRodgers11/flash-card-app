@@ -12,6 +12,7 @@ import { removeDeckFromUser } from '../reducers/loginSlice';
 import { MdModeEditOutline } from "react-icons/md";
 import styled from 'styled-components';
 import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
+import BackButton from './BackButton';
 
 const DeckWrapper = styled.div`
     display: flex;
@@ -118,8 +119,6 @@ function Deck() {
         if(location.pathname.includes("group")) {
             return administrators.includes(userId);
         } else {
-            console.log(userDecks.map(deck => deck._id));
-            console.log({deckId});
             return userDecks.map(deck => deck._id).includes(deckId);
         }
     }
@@ -200,6 +199,7 @@ function Deck() {
     } else if(unlockControl()) {
         return (
             <DeckWrapper>
+                <BackButton route={location.pathname.slice(0, location.pathname.lastIndexOf("/"))}>All Decks</BackButton>
                 <DeleteButton data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>
                 {!nameEditMode ? 
                     <NameBlock>
@@ -271,6 +271,7 @@ function Deck() {
     } else {
         return (
             <DeckWrapper>
+                <BackButton route={location.pathname.slice(0, location.pathname.lastIndexOf("/"))}>All Decks</BackButton>
                 <NameBlock className="name-only">
                     <h1>{name}</h1>
                 </NameBlock>

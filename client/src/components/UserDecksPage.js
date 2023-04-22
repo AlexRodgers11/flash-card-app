@@ -4,13 +4,13 @@ import useToggle from "../hooks/useToggle";
 import DeckForm from "./DeckForm";
 import DeckList from "./DeckList";
 import Modal from "./Modal";
+import BackButton from "./BackButton";
 
 const UserDecksPageWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
     background-color: #52B2FF; 
-    // background-color: #4C4C9D;
     min-height: calc(100vh - 5.5rem);
 `;
 
@@ -29,8 +29,10 @@ const AddButton = styled.button`
 function UserDecksPage() {
     const userId = useSelector((state) => state.login.userId);
     const [showDeckForm, toggleShowDeckForm] = useToggle(false);
+
     return (
         <UserDecksPageWrapper className="UserDecksPageWrapper">
+            <BackButton route="/dashboard">Dashboard</BackButton>
             <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={toggleShowDeckForm}>Create New Deck</AddButton>
             <DeckList listType="user" listId={userId} />
             {showDeckForm && 

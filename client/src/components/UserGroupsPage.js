@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import { createGroup, fetchLoggedInUserData } from '../reducers/loginSlice';
+import BackButton from "./BackButton";
 import RegisterJoinGroupsForm from "./RegisterJoinGroupsForm";
 import GroupTile from "./GroupTile";
 import useFormInput from "../hooks/useFormInput";
@@ -89,6 +90,7 @@ function UserGroupsPage() {
     
     return (
         <UserGroupsWrapper>
+            <BackButton className="btn btn-md" route="/dashboard" >Dashboard</BackButton>
             <div>
                 <StyledButton data-form="create" onClick={selectForm} >Create New Group</StyledButton>
                 <StyledButton data-form="search" onClick={selectForm} >Search for Groups to Join</StyledButton>

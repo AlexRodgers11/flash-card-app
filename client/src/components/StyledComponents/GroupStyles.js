@@ -52,7 +52,19 @@ export const OutletContainer = styled.div`
 `;
 
 export const StyledNavLink = styled(NavLink)`
-    color: white !important;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 1rem;
+    color: white;
+    height: 100%;
+    &:hover {
+        color: #d1d1d1 !important;
+        background-color: #1a1a1a;
+    }
+    &.active {
+        color: white !important;
+        background-color: black;
+    }
 `;
 
 export const GroupTitle = styled.h1`

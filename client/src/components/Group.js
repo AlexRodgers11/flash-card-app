@@ -151,9 +151,9 @@ function Group() {
     return (
         <GroupWrapper className="GroupWrapper">
             <GroupNavbar>
-                {administrators.includes(userId) && <StyledNavLink to={`/groups/${groupId}/admin-controls`}>Admin Controls</StyledNavLink>}
-                <StyledNavLink to={`/groups/${groupId}/decks`}>Decks</StyledNavLink> 
-                <StyledNavLink to={`/groups/${groupId}/members`}>Members</StyledNavLink> 
+                {administrators.includes(userId) && <StyledNavLink className={({isActive}) => isActive ? "active" : ""} to={`/groups/${groupId}/admin-controls`}>Admin Controls</StyledNavLink>}
+                <StyledNavLink className={({isActive}) => isActive ? "active" : ""} to={`/groups/${groupId}/decks`}>Decks</StyledNavLink> 
+                <StyledNavLink className={({isActive}) => isActive ? "active" : ""} to={`/groups/${groupId}/members`}>Members</StyledNavLink> 
             </GroupNavbar>
             <StyledLeaveButton data-modalcontent={userId === headAdmin ? "head-admin-leave-group-confirmation" : "leave-group-confirmation"} onClick={handleSelectModalContent}>Leave Group</StyledLeaveButton>
             {modalContent &&

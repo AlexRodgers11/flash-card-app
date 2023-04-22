@@ -41,7 +41,19 @@ const StatsNavbar = styled.div`
 `;
 
 const StyledNavLink = styled(NavLink)`
-    color: white !important;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 1rem;
+    color: white;
+    height: 100%;
+    &:hover {
+        color: #d1d1d1 !important;
+        background-color: #1a1a1a;
+    }
+    &.active {
+        color: white !important;
+        background-color: black;
+    }
 `;
 
 function StatisticsPage() {
@@ -59,9 +71,9 @@ function StatisticsPage() {
     return (
         <StatisticsWrapper>
             <StatsNavbar>
-                <StyledNavLink to={`/users/${userId}/statistics/sessions`}>Sessions</StyledNavLink>
-                <StyledNavLink to={`/users/${userId}/statistics/decks`}>Deck Statistics</StyledNavLink> 
-                <StyledNavLink to={`/users/${userId}/statistics/cards`}>Card Statistics</StyledNavLink> 
+                <StyledNavLink className={({isActive}) => isActive ? "active" : ""} to={`/users/${userId}/statistics/sessions`}>Sessions</StyledNavLink>
+                <StyledNavLink className={({isActive}) => isActive ? "active" : ""} to={`/users/${userId}/statistics/decks`}>Deck Statistics</StyledNavLink> 
+                <StyledNavLink className={({isActive}) => isActive ? "active" : ""} to={`/users/${userId}/statistics/cards`}>Card Statistics</StyledNavLink> 
             </StatsNavbar>
             <Outlet />
         </StatisticsWrapper>

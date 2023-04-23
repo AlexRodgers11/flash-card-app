@@ -139,11 +139,9 @@ function PracticeSession() {
     const userGroupIds = useSelector((state) => state.login.groups);
     let dispatch = useDispatch();
     let navigate = useNavigate();
-
-    let firstRender = useRef(true);
+    
     useEffect(() => {
-        if(!activeCard?.cardType && firstRender.current) {
-            firstRender.current = false;
+        if((!activeCard?.cardType) && ((stats.numberCorrect + stats.numberWrong) !== numCards || numCards === 0)) {
             dispatch(fetchDeck(deckId))
                 .then(response => {
                     const statusCode = response.payload.response.status
@@ -155,7 +153,7 @@ function PracticeSession() {
                     }
                 })
         } 
-    }, [activeCard, deckId, dispatch, navigate]);
+    }, [activeCard, deckId, dispatch, navigate, numCards, stats]);
     
     useEffect(() => {
         return () => {

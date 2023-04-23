@@ -12,20 +12,34 @@ import storage from "redux-persist/lib/storage";
 const loginPersistConfig = {
     key: "login",
     storage: storage,
-    whitelist: ["accountSetupStage", "login.username", "photo", "name", "userId", "privacy", "communicationSettings"]
+    whitelist: ["accountSetupStage", "login.username", "decks", "photo", "name", "userId", "privacy", "communicationSettings"]
 }
 
 const persistedLoginReducer = persistReducer(loginPersistConfig, loginReducer);
 
+const communicationsPersistConfig = {
+    key: "communications",
+    storage: storage
+}
+
+const persistedCommunicationsReducer = persistReducer(communicationsPersistConfig, communicationsReducer);
+
+const practiceSessionPersistConfig = {
+    key: "practiceSession",
+    storage: storage
+}
+
+const persistedPracticeSessionReducer = persistReducer(practiceSessionPersistConfig, practiceSessionReducer);
+
 const combinedReducer = combineReducers(
     {
         attempts: attemptReducer,
-        communications: communicationsReducer,
+        communications: persistedCommunicationsReducer,
         deck: deckReducer,
         decks: decksReducer,
         group: groupReducer,
         login: persistedLoginReducer,
-        practiceSession: practiceSessionReducer
+        practiceSession: persistedPracticeSessionReducer
     }
 );
 

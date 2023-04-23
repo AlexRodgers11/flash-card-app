@@ -142,6 +142,8 @@ function Header() {
         document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
         localStorage.removeItem("token");
         localStorage.removeItem("persist:login");
+        localStorage.removeItem("persist:communications");
+        localStorage.removeItem("persist:practiceSession");
         window.location.reload();
         handleHideModal();
     }

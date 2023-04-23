@@ -81,10 +81,9 @@ function UserGroupsPage() {
 
     const firstRender = useRef(true);
     useEffect(() => {
-        if(!firstRender.current) {
-            dispatch(fetchLoggedInUserData(userId));
-        } else {
+        if(firstRender.current) {
             firstRender.current = false;
+            dispatch(fetchLoggedInUserData(userId));
         }
     }, [dispatch, userId, messageCount, notificationCount]);
     

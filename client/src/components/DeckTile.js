@@ -102,10 +102,18 @@ function DeckTile(props) {
                 }
                 break;
             case "view":
-                navigate(`/decks/${props.deckId}`);
+                if(deckData.groupDeckBelongsTo) {
+                    navigate(`/groups/${deckData.groupDeckBelongsTo}/decks/${props.deckId}`);
+                } else {
+                    navigate(`/users/${deckData.creator}/decks/${props.deckId}`);
+                }
                 break;
             case "edit":
-                navigate(`/decks/${props.deckId}`);
+                if(deckData.groupDeckBelongsTo) {
+                    navigate(`/groups/${deckData.groupDeckBelongsTo}/decks/${props.deckId}`);
+                } else {
+                    navigate(`/users/${userId}/decks/${props.deckId}`);
+                }
                 break;
             case "delete":
                 batch(() => {

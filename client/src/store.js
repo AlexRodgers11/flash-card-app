@@ -12,7 +12,7 @@ import storage from "redux-persist/lib/storage";
 const loginPersistConfig = {
     key: "login",
     storage: storage,
-    whitelist: ["accountSetupStage", "login.username", "photo", "name", "userId"]
+    whitelist: ["accountSetupStage", "login.username", "photo", "name", "userId", "privacy", "communicationSettings"]
 }
 
 const persistedLoginReducer = persistReducer(loginPersistConfig, loginReducer);

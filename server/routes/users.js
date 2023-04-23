@@ -68,13 +68,14 @@ userRouter.get("/:userId/identification", async (req, res, next) => {
 userRouter.get("/:userId", getUserIdFromJWTToken, async (req, res, next) => {
     try {
         if(req.query.public_info === "true") {
-            const user = await User.findById(req.user._id, "login.username login.email name.first name.last photo privacy");
+            const user = await User.findById(req.user._id, "login.username login.email name.first name.last communicationSettings.allowDirectMessages photo privacy");
             const responseObj = {
                 _id: user._id,
                 login: {
                     username: user.login.username,
                     ...(user.privacy.email === "public" && {email: user.login.email}),
                 },
+                allowDirectMessages: user.communicationSettings.allowDirectMessages,
                 ...(user.privacy.name === "public" && {name: user.name}),
                 ...((user.privacy.profilePhoto === "public" && user.photo) && {photo: !user.photo.includes(".") ? await getObjectSignedUrl(user.photo) : user.photo})
             };
@@ -449,7 +450,9 @@ userRouter.patch("/:protectedUserId/privacy-settings", async (req, res, next) =>
 
 userRouter.post("/:userId/messages/direct-message", getUserIdFromJWTToken, async (req, res, next) => {
     try {
-        //come back and add logic to prevent messages depending on user's preferences
+        if(!req.user.communicationSettings.allowDirectMessages) {
+            return res.status(500).send("This user doesn't allow direct messages to be sent to them");
+        }
         if(req.body.senderId.toString() === req.userId.toString()) {
             const newMessage = new DirectMessage({
                 text: req.body.message,
@@ -457,6 +460,7 @@ userRouter.post("/:userId/messages/direct-message", getUserIdFromJWTToken, async
                 receivingUsers: [req.user._id],
             });
             const savedMessage = await newMessage.save();
+            
             await User.findByIdAndUpdate(req.user._id, {$push: {"messages.received": savedMessage}});
             await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedMessage}});
 
@@ -559,6 +563,16 @@ userRouter.post("/:email/messages/group-invitation", getUserIdFromJWTToken, asyn
         } else {
             res.status(401).send("You are not authorized to invite members to this group");
         }
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+userRouter.patch("/:protectedUserId/direct-message-preference", async (req, res, next) => {
+    console.log({body: req.body});
+    try {
+        const updatedUser = await User.findByIdAndUpdate(req.userId, req.body, {new: true});
+        res.status(200).send(updatedUser.communicationSettings.allowDirectMessages);
     } catch (err) {
         res.status(500).send(err.message);
     }

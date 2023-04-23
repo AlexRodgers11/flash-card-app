@@ -49,7 +49,9 @@ const initialState = {
             headAdminChange: true,
             newMemberJoined: true,
             removedFromGroup: true
-        }
+        },
+        allowDirectMessages: true,
+        blockedUsers: [],
     }
 }
 
@@ -161,6 +163,10 @@ export const updateUser = createAsyncThunk("login/updateUser", async ({userId, u
     }
 });
 
+export const updateDirectMessagePreference = createAsyncThunk("login/updateDirectMessagePreference", async ({userId, allowDirectMessages}) => {
+    const response = await client.patch(`${baseURL}/users/${userId}/direct-message-preference`, {"communicationSettings.allowDirectMessages": allowDirectMessages});
+    return response.data;
+});
 
 export const updateProfilePic = createAsyncThunk("login/updateProfilePic", async({userId, photo}) => {
     const formData = new FormData();
@@ -290,6 +296,9 @@ export const loginSlice = createSlice({
         })
         builder.addCase(deleteProfile.fulfilled, (state, action) => {
             return initialState;
+        });
+        builder.addCase(updateDirectMessagePreference.fulfilled, (state, action) => {
+            state.communicationSettings.allowDirectMessages = action.payload;
         });
     }
 });

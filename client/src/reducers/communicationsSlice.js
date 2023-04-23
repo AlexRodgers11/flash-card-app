@@ -182,13 +182,14 @@ export const communicationsSlice = createSlice({
             }
         });
         builder.addCase(sendDirectMessage.fulfilled, (state, action) => {
-            state.messages.sent = [...state.messages.sent, action.payload];
+            if(action.payload.messageType) {
+                state.messages.sent = [...state.messages.sent, action.payload];
+            }
         });
         builder.addCase(sendJoinRequest.fulfilled, (state, action) => {
             state.messages.sent = [...state.messages.sent, action.payload];
         });
         builder.addCase(makeJoinRequestDecision.fulfilled, (state, action) => {
-            console.log({payload: action.payload});
             if(action.payload.sentMessage) {
                 state.messages.sent = [...state.messages.sent, action.payload.sentMessage];
             }

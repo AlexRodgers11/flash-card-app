@@ -122,6 +122,11 @@ const User = new Schema({
                 type: Boolean,
                 default: true
             }
+        },
+        allowDirectMessages: {
+            type: Boolean,
+            default: true
+        },
         }
     }
 }, {timestamps: true});

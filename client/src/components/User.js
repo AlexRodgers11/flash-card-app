@@ -180,7 +180,7 @@ function User() {
     }
     return (
         <UserWrapper>
-            <StyledRiMailSendFill onClick={toggleShowModal}/>
+            {userData.allowDirectMessages && <StyledRiMailSendFill onClick={toggleShowModal}/>}
             <InfoContainer>
                 {userData.photo && <ProfilePic alt="Profile" src={userData.photo} />}
                 {!userData.photo && <StyledHiOutlineUserCircle />}

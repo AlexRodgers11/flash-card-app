@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { BsFillCameraFill } from "react-icons/bs";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import { MdModeEditOutline } from "react-icons/md";
-import { deleteProfile, resetAllStatistics, updateEmailPreferences, updateNotificationSettings, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
+import { deleteProfile, resetAllStatistics, updateDirectMessagePreference, updateEmailPreferences, updateNotificationSettings, updatePrivacySettings, updateProfilePic, updateUser } from "../reducers/loginSlice";
 import useFormInput from "../hooks/useFormInput";
 import Modal from "./Modal";
 import RegisterProfilePicCropForm from "./RegisterProfilePicCropForm"; //probably rename all of these to exclude the word "Register"
@@ -209,6 +209,8 @@ function UserSettings() {
     const joinDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinDecision);
     const joinRequestMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinRequest);
 
+    const allowDirectMessages = useSelector((state) => state.login.communicationSettings.allowDirectMessages);
+
     const [errorField, setErrorField] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
     
@@ -256,6 +258,8 @@ function UserSettings() {
     const [joinDecisionMessageSelectedValue, clearJoinDecisionMessageSelectedValue, handleJoinDecisionMessageSelectedValueChange, setJoinDecisionMessageSelectedValue] = useFormInput(joinDecisionMessage, "checkbox");
 
     const [joinRequestMessageSelectedValue, clearJoinRequestMessageSelectedValue, handleJoinRequestMessageSelectedValueChange, setJoinRequestMessageSelectedValue] = useFormInput(joinRequestMessage, "checkbox");
+
+    const [allowDirectMessagesSelectedValue, clearAllowDirectMessagesSelectedValue, handleAllowDirectMessagesSelectedValueChange, setAllowDirectMessagesSelectedValue] = useFormInput(allowDirectMessages, "checkbox");
 
     const dispatch = useDispatch();
 
@@ -391,6 +395,11 @@ function UserSettings() {
             case "join-request-message":
                 if(joinRequestMessage !== joinRequestMessageSelectedValue) {
                     setJoinRequestMessageSelectedValue(joinRequestMessage);
+                }
+                break;
+            case "allow-direct-messages":
+                if(allowDirectMessages !== allowDirectMessagesSelectedValue) {
+                    setAllowDirectMessagesSelectedValue(allowDirectMessages);
                 }
                 break;
             default: 
@@ -652,6 +661,12 @@ function UserSettings() {
                 break;
             case "join-request-message":
                 dispatch(updateEmailPreferences({userId, patchObj: {joinRequest: joinRequestMessageSelectedValue}}))
+                    .then(() => {
+                        setEditField("");
+                    });
+                break;
+            case "allow-direct-messages":
+                dispatch(updateDirectMessagePreference({userId, allowDirectMessages: allowDirectMessagesSelectedValue}))
                     .then(() => {
                         setEditField("");
                     });
@@ -1218,6 +1233,30 @@ function UserSettings() {
                                 <div>
                                     <button onClick={handleCancel}>Cancel</button>
                                     <button data-editfield="join-request-message" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                    </SettingsCategoryOptions>
+                </SettingsSection>
+                <SettingsSection>
+                    <SettingsCategoryLabel>Social</SettingsCategoryLabel>
+                    <SettingsCategoryOptions>
+                        <SettingCategoryOption>
+                            <div>
+                                <span>Allow Other Users to Message Me Directly: </span>
+                                {editField !== "allow-direct-messages" && <span>{allowDirectMessages ? "On" : "Off"}</span>}
+                                {editField === "allow-direct-messages" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleAllowDirectMessagesSelectedValueChange} checked={allowDirectMessagesSelectedValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{allowDirectMessagesSelectedValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "allow-direct-messages" && <div><StyledEditIcon role="button" data-editfield="allow-direct-messages" onClick={handleEditSelection}/></div>}
+                            {editField === "allow-direct-messages" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="allow-direct-messages" onClick={handleSave}>Save</button>
                                 </div>
                             }
                         </SettingCategoryOption>

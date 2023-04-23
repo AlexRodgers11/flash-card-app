@@ -22,6 +22,7 @@ import userRouter from "./routes/users.js"
 import passport from "passport";
 
 import dotenv from "dotenv";
+import { getObjectSignedUrl } from "./s3.js";
 
 dotenv.config();
 console.log("CLIENT_ORIGIN:", process.env.CLIENT_ORIGIN);
@@ -87,6 +88,15 @@ app.use("/notifications", notificationRouter);
 app.use("/users", userRouter);
 
 app.use(router);
+
+app.get("/resume", async (req, res, next) => {
+    try {
+        let resume = await getObjectSignedUrl("9f46d215ab9115d5cb5e5c5dc5a684b7a15c1d3d7d9a2a61d7e28e844f64b19f");
+        res.status(200) .send(resume);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
 
 
 app.listen(port, () => {

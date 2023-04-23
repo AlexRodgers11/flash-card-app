@@ -20,6 +20,7 @@ const DeckWrapper = styled.div`
     align-items: center;
     min-height: calc(100vh - 5.5rem);
     background-color: #52B2FF; 
+    padding-bottom: 3rem;
 `;
     
 const NameBlock = styled.div`

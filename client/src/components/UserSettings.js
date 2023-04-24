@@ -208,7 +208,7 @@ function UserSettings() {
     const invitationDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.invitationDecision);
     const joinDecisionMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinDecision);
     const joinRequestMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinRequest);
-
+    
     const allowDirectMessages = useSelector((state) => state.login.communicationSettings.allowDirectMessages);
 
     const [errorField, setErrorField] = useState("");
@@ -221,7 +221,9 @@ function UserSettings() {
     const [photoInputValue, setPhotoInputValue] = useState();
     
     const statisticsTracking = useSelector((state) => state.login.statisticsTracking);
-    const [statisticsTrackingSelectedValue, clearStatisticsTrackingSelectedValue, handleStatisticsTrackingSelectedValueChange, setStatisticsTrackingSelectedValue] = useFormInput(statisticsTracking);
+    
+    const [statisticsTrackingSelectedValue, clearStatisticsTrackingSelectedValue, handleStatisticsTrackingSelectedValueChange, 
+    setStatisticsTrackingSelectedValue] = useFormInput(statisticsTracking);
     const [emailPrivacySelectedValue, clearEmailPrivacySelectedValue, handleEmailPrivacySelectedValueChange, setEmailPrivacySelectedValue] = useFormInput(emailPrivacy);
     const [namePrivacySelectedValue, clearNamePrivacySelectedValue, handleNamePrivacySelectedValueChange, setNamePrivacySelectedValue] = useFormInput(namePrivacy);
     const [groupsPrivacySelectedValue, clearGroupsPrivacySelectedValue, handleGroupsPrivacySelectedValueChange, setGroupsPrivacySelectedValue] = useFormInput(groupsPrivacy);
@@ -263,8 +265,21 @@ function UserSettings() {
 
     const dispatch = useDispatch();
 
+    const dispatchActionThenClearEditField = (action)  => {
+        dispatch(action)
+            .then(() => {
+                setEditField("");
+            });
+    }
+
     const hideModal = () => {
         setModalContent("");
+    }
+
+    const resetSettingSelectedValueToCurrentStateValue = (currentValue, settingSelectedValue, func) => {
+        if(currentValue !== settingSelectedValue) {
+            func(currentValue);
+        }
     }
 
     const handleEditSelection = evt => {
@@ -274,133 +289,83 @@ function UserSettings() {
         }
         switch(evt.currentTarget.dataset.editfield) {
             case "email":
-                if(email !== emailInputValue) {
-                    setEmailInputValue(email);
-                }
+                resetSettingSelectedValueToCurrentStateValue(email, emailInputValue, setEmailInputValue);
                 break;
             case "username":
-                if(username !== usernameInputValue) {
-                    setUsernameInputValue(username);
-                }
+                resetSettingSelectedValueToCurrentStateValue(username, usernameInputValue, setUsernameInputValue);
                 break;
             case "password":
                 setPasswordInputValue("");
                 setPasswordConfirmInputValue("");
                 break;
             case "stats-track":
-                if(statisticsTracking !== statisticsTrackingSelectedValue) {
-                    setStatisticsTrackingSelectedValue(statisticsTracking);
-                }
+                resetSettingSelectedValueToCurrentStateValue(statisticsTracking, statisticsTrackingSelectedValue, setStatisticsTrackingSelectedValue);
                 break;
             case "email-privacy":
-                if(emailPrivacy !== emailPrivacySelectedValue) {
-                    setEmailPrivacySelectedValue(emailPrivacy);
-                }
+                resetSettingSelectedValueToCurrentStateValue(emailPrivacy, emailPrivacySelectedValue, setEmailPrivacySelectedValue);
                 break;
             case "name-privacy":
-                if(namePrivacy !== namePrivacySelectedValue) {
-                    setNamePrivacySelectedValue(namePrivacy);
-                }
+                resetSettingSelectedValueToCurrentStateValue(namePrivacy, namePrivacySelectedValue, setNamePrivacySelectedValue);
                 break;
             case "profile-photo-privacy":
-                if(profilePhotoPrivacy !== profilePhotoPrivacySelectedValue) {
-                    setProfilePhotoPrivacySelectedValue(profilePhotoPrivacy);
-                }
+                resetSettingSelectedValueToCurrentStateValue(profilePhotoPrivacy, profilePhotoPrivacySelectedValue, setProfilePhotoPrivacySelectedValue);
                 break;
             case "groups-privacy":
-                if(groupsPrivacy !== groupsPrivacySelectedValue) {
-                    setGroupsPrivacySelectedValue(groupsPrivacy);
-                }
+                resetSettingSelectedValueToCurrentStateValue(groupsPrivacy, groupsPrivacySelectedValue, setGroupsPrivacySelectedValue);
                 break;
             case "new-decks-privacy":
-                if(newDecksPrivacy !== newDecksPrivacySelectedValue) {
-                    setNewDecksPrivacySelectedValue(newDecksPrivacy);
-                }
+                resetSettingSelectedValueToCurrentStateValue(newDecksPrivacy, newDecksPrivacySelectedValue, setNewDecksPrivacySelectedValue);
                 break;
             case "current-decks-privacy":
-                if(currentDecksPrivacy !== currentDecksPrivacySelectedValue) {
-                    setCurrentDecksPrivacySelectedValue(currentDecksPrivacy);
-                }
+                resetSettingSelectedValueToCurrentStateValue(currentDecksPrivacy, currentDecksPrivacySelectedValue, setCurrentDecksPrivacySelectedValue);
                 break;
             case "admin-change-notification": 
-                if(adminChangeNotification !== adminChangeNotificationSelectedValue) {
-                    setAdminChangeNotificationSelectedValue(adminChangeNotification);
-                }
+                resetSettingSelectedValueToCurrentStateValue(adminChangeNotification, adminChangeNotificationSelectedValue, setAdminChangeNotificationSelectedValue);
                 break;
             case "deck-added-notification":
-                if(deckAddedNotification !== deckAddedNotificationSelectedValue) {
-                    setDeckAddedNotificationSelectedValue(deckAddedNotification);
-                }
+                resetSettingSelectedValueToCurrentStateValue(deckAddedNotification, deckAddedNotificationSelectedValue, setDeckAddedNotificationSelectedValue);
                 break;
             case "group-deleted-notification":
-                if(groupDeletedNotification !== groupDeletedNotificationSelectedValue) {
-                    setGroupDeletedNotificationSelectedValue(groupDeletedNotification);
-                }
+                resetSettingSelectedValueToCurrentStateValue(groupDeletedNotification, groupDeletedNotificationSelectedValue, setGroupDeletedNotificationSelectedValue);
                 break;
             case "head-admin-change-notification": 
-                if(headAdminChangeNotification !== headAdminChangeNotificationSelectedValue) {
-                    setHeadAdminChangeNotificationSelectedValue(headAdminChangeNotification);
-                }
+                resetSettingSelectedValueToCurrentStateValue(headAdminChangeNotification, headAdminChangeNotificationSelectedValue, setHeadAdminChangeNotificationSelectedValue);
                 break;
             case "new-member-joined-notification":
-                if(newMemberJoinedNotification !== newMemberJoinedNotificationSelectedValue) {
-                    setNewMemberJoinedNotificationSelectedValue(newMemberJoinedNotification);
-                }
+                resetSettingSelectedValueToCurrentStateValue(newMemberJoinedNotification, newMemberJoinedNotificationSelectedValue, setNewMemberJoinedNotificationSelectedValue);
                 break;
             case "removed-from-group-notification":
-                if(removedFromGroupNotification !== removedFromGroupNotificationSelectedValue) {
-                    setRemovedFromGroupNotificationSelectedValue(removedFromGroupNotification);
-                }
+                resetSettingSelectedValueToCurrentStateValue(removedFromGroupNotification, removedFromGroupNotificationSelectedValue, setRemovedFromGroupNotificationSelectedValue);
                 break;
             case "card-decision-message":
-                if(cardDecisionMessage !== cardDecisionMessageSelectedValue) {
-                    setCardDecisionMessageSelectedValue(cardDecisionMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(cardDecisionMessage, cardDecisionMessageSelectedValue, setCardDecisionMessageSelectedValue);
                 break;
             case "card-submission-message":
-                if(cardSubmissionMessage !== cardSubmissionMessageSelectedValue) {
-                    setCardSubmissionMessageSelectedValue(cardSubmissionMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(cardSubmissionMessage, cardSubmissionMessageSelectedValue, setCardSubmissionMessageSelectedValue);
                 break;
             case "deck-decision-message":
-                if(deckDecisionMessage !== deckDecisionMessageSelectedValue) {
-                    setDeckDecisionMessageSelectedValue(deckDecisionMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(deckDecisionMessage, deckDecisionMessageSelectedValue, setDeckDecisionMessageSelectedValue);
                 break;
             case "deck-submission-message":
-                if(deckSubmissionMessage !== deckSubmissionMessageSelectedValue) {
-                    setDeckSubmissionMessageSelectedValue(deckSubmissionMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(deckSubmissionMessage, deckSubmissionMessageSelectedValue, setDeckSubmissionMessageSelectedValue);
                 break;
             case "direct-message":
-                if(directMessage !== directMessageSelectedValue) {
-                    setDirectMessageSelectedValue(directMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(directMessage, directMessageSelectedValue, setDirectMessageSelectedValue);
                 break;
             case "group-invitation-message":
-                if(groupInvitationMessage !== groupInvitationMessageSelectedValue) {
-                    setGroupInvitationMessageSelectedValue(groupInvitationMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(groupInvitationMessage, groupInvitationMessageSelectedValue, setGroupInvitationMessageSelectedValue);
                 break;
             case "invitation-decision-message":
-                if(invitationDecisionMessage !== invitationDecisionMessageSelectedValue) {
-                    setInvitationDecisionMessageSelectedValue(invitationDecisionMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(invitationDecisionMessage, invitationDecisionMessageSelectedValue, setInvitationDecisionMessageSelectedValue);
                 break;
             case "join-decision-message":
-                if(joinDecisionMessage !== joinDecisionMessageSelectedValue) {
-                    setJoinDecisionMessageSelectedValue(joinDecisionMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(joinDecisionMessage, joinDecisionMessageSelectedValue, setJoinDecisionMessageSelectedValue);
                 break;
             case "join-request-message":
-                if(joinRequestMessage !== joinRequestMessageSelectedValue) {
-                    setJoinRequestMessageSelectedValue(joinRequestMessage);
-                }
+                resetSettingSelectedValueToCurrentStateValue(joinRequestMessage, joinRequestMessageSelectedValue, setJoinRequestMessageSelectedValue);
                 break;
             case "allow-direct-messages":
-                if(allowDirectMessages !== allowDirectMessagesSelectedValue) {
-                    setAllowDirectMessagesSelectedValue(allowDirectMessages);
-                }
+                resetSettingSelectedValueToCurrentStateValue(allowDirectMessages, allowDirectMessagesSelectedValue, setAllowDirectMessagesSelectedValue);
                 break;
             default: 
                 break;
@@ -507,8 +472,7 @@ function UserSettings() {
             case "email":
                 let emailResponse = await axios.get(`${baseURL}/login/emails?email=${emailInputValue}`);
                 if(emailResponse.data.emailAvailable) {
-                    dispatch(updateUser({userId, userUpdates: {login: {email: emailInputValue}}}));
-                    setEditField("");
+                    dispatchActionThenClearEditField(updateUser({userId, userUpdates: {login: {email: emailInputValue}}}));
                 } else {
                     setErrorField("email");
                     setErrorMessage("An account with this email already exists");
@@ -517,8 +481,7 @@ function UserSettings() {
             case "username":
                 let usernameResponse = await axios.get(`${baseURL}/login/usernames?username=${usernameInputValue}`);
                 if(usernameResponse.data.usernameAvailable) {
-                    dispatch(updateUser({userId, userUpdates: {login: {username: usernameInputValue}}}));
-                    setEditField("");
+                    dispatchActionThenClearEditField(updateUser({userId, userUpdates: {login: {username: usernameInputValue}}}));
                 } else {
                     setErrorField("username");
                     setErrorMessage("This username is taken");
@@ -526,150 +489,80 @@ function UserSettings() {
                 break;
             case "password":
                 if(passwordInputValue === passwordConfirmInputValue) {
-                    dispatch(updateUser({userId, userUpdates: {login: {password: passwordInputValue}}}));
-                    setEditField("");
+                    dispatchActionThenClearEditField(updateUser({userId, userUpdates: {login: {password: passwordInputValue}}}));
                 } else {
                     setErrorField("password");
                     setErrorMessage("The passwords don't match");
                 }
                 break;
             case "stats-track":
-                dispatch(updateUser({userId, userUpdates: {statisticsTracking: statisticsTrackingSelectedValue}}))
-                .then(() => {
-                    setEditField("");
-                });
+                dispatchActionThenClearEditField(updateUser({userId, userUpdates: {statisticsTracking: statisticsTrackingSelectedValue}}));
                 break;
             case "email-privacy":
-                dispatch(updatePrivacySettings({userId, patchObj: {email: emailPrivacySelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updatePrivacySettings({userId, patchObj: {email: emailPrivacySelectedValue}}));
                 break;
             case "name-privacy":
-                dispatch(updatePrivacySettings({userId, patchObj: {name: namePrivacySelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updatePrivacySettings({userId, patchObj: {name: namePrivacySelectedValue}}));
                 break;
             case "profile-photo-privacy":
-                dispatch(updatePrivacySettings({userId, patchObj: {profilePhoto: profilePhotoPrivacySelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updatePrivacySettings({userId, patchObj: {profilePhoto: profilePhotoPrivacySelectedValue}}));
                 break;
             case "groups-privacy":
-                dispatch(updatePrivacySettings({userId, patchObj: {groups: groupsPrivacySelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updatePrivacySettings({userId, patchObj: {groups: groupsPrivacySelectedValue}}));
                 break;
             case "new-decks-privacy":
-                dispatch(updatePrivacySettings({userId, patchObj: {newDecks: newDecksPrivacySelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updatePrivacySettings({userId, patchObj: {newDecks: newDecksPrivacySelectedValue}}));
                 break;
             case "current-decks-privacy":
-                dispatch(updatePrivacySettings({userId, patchObj: {currentDecks: currentDecksPrivacySelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updatePrivacySettings({userId, patchObj: {currentDecks: currentDecksPrivacySelectedValue}}));
                 break;
             case "admin-change-notification":
-                dispatch(updateNotificationSettings({userId, patchObj: {adminChange: adminChangeNotificationSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateNotificationSettings({userId, patchObj: {adminChange: adminChangeNotificationSelectedValue}}));
                 break;
             case "deck-added-notification":
-                dispatch(updateNotificationSettings({userId, patchObj: {deckAdded: deckAddedNotificationSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateNotificationSettings({userId, patchObj: {deckAdded: deckAddedNotificationSelectedValue}}));
                 break;
             case "group-deleted-notification":
-                dispatch(updateNotificationSettings({userId, patchObj: {groupDeleted: groupDeletedNotificationSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateNotificationSettings({userId, patchObj: {groupDeleted: groupDeletedNotificationSelectedValue}}));
                 break;
             case "head-admin-change-notification":
-                dispatch(updateNotificationSettings({userId, patchObj: {headAdminChange: headAdminChangeNotificationSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateNotificationSettings({userId, patchObj: {headAdminChange: headAdminChangeNotificationSelectedValue}}));
                 break;
             case "new-member-joined-notification":
-                dispatch(updateNotificationSettings({userId, patchObj: {newMemberJoined: newMemberJoinedNotificationSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateNotificationSettings({userId, patchObj: {newMemberJoined: newMemberJoinedNotificationSelectedValue}}));
                 break;
             case "removed-from-group-notification":
-                dispatch(updateNotificationSettings({userId, patchObj: {removedFromGroup: removedFromGroupNotificationSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateNotificationSettings({userId, patchObj: {removedFromGroup: removedFromGroupNotificationSelectedValue}}));
                 break;
             case "card-decision-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {cardDecision: cardDecisionMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {cardDecision: cardDecisionMessageSelectedValue}}));
                 break;
             case "card-submission-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {cardSubmission: cardSubmissionMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {cardSubmission: cardSubmissionMessageSelectedValue}}));
                 break;
             case "deck-decision-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {deckDecision: deckDecisionMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {deckDecision: deckDecisionMessageSelectedValue}}));
                 break;
             case "direct-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {direct: directMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {direct: directMessageSelectedValue}}));
                 break;
             case "group-invitation-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {groupInvitation: groupInvitationMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {groupInvitation: groupInvitationMessageSelectedValue}}));
                 break;
             case "invitation-decision-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {invitationDecision: invitationDecisionMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {invitationDecision: invitationDecisionMessageSelectedValue}}));
                 break;
             case "deck-submission-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {deckSubmission: deckSubmissionMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {deckSubmission: deckSubmissionMessageSelectedValue}}));
                 break;
             case "join-decision-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {joinDecision: joinDecisionMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {joinDecision: joinDecisionMessageSelectedValue}}));
                 break;
             case "join-request-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {joinRequest: joinRequestMessageSelectedValue}}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatch(updateEmailPreferences({userId, patchObj: {joinRequest: joinRequestMessageSelectedValue}}));
                 break;
             case "allow-direct-messages":
-                dispatch(updateDirectMessagePreference({userId, allowDirectMessages: allowDirectMessagesSelectedValue}))
-                    .then(() => {
-                        setEditField("");
-                    });
+                dispatch(updateDirectMessagePreference({userId, allowDirectMessages: allowDirectMessagesSelectedValue}));
                 break;
             default:       
                 break;

@@ -244,3 +244,15 @@ export const openLinkInNewTab = (url, func) => {
         func(url);
     }
 }
+
+export const addMultipleEventListeners = (target, events, callback) => {
+    for(let event of events) {
+        target.addEventListener(event, callback)
+    }
+}
+
+export const removeMultipleEventListeners = (target, events, callback) => {
+    for(let event of events) {
+        target.removeEventListener(event, callback);
+    }
+}

@@ -3,6 +3,10 @@ import Router from './components/Router';
 import styled from 'styled-components';
 import Footer from './components/Footer';
 import { disableReactDevTools } from "@fvilers/disable-react-devtools";
+import { logout } from './reducers/loginSlice';
+import { addMultipleEventListeners, removeMultipleEventListeners } from './utils';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 if(process.env.NODE_ENV === "production") {
 	disableReactDevTools();
@@ -43,7 +47,65 @@ const MainContainer = styled.section`
 const FooterContainer = styled.section`
 `
 
+
 function App() {
+	const userId = useSelector((state) => state.login.userId);
+	const dispatch = useDispatch();
+	
+	useEffect(() => {
+		const executeSessionTimeout = () => {
+			if(userId) {
+				dispatch(logout());
+				document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+				localStorage.removeItem("token");
+				localStorage.removeItem("persist:login");
+				localStorage.removeItem("persist:communications");
+				localStorage.removeItem("persist:practiceSession");
+				window.location.reload();
+				alert("You have been logged out due to inactivity");
+			}
+		}
+	
+		let logoutTimer = setTimeout(executeSessionTimeout, 3600000);
+		// let logoutTimer = setTimeout(executeSessionTimeout, 5000);
+		
+		let debounceTimer;
+	
+		let isHandlingEvent = false;
+		
+		const resetLogoutTimer = () => {
+			clearTimeout(debounceTimer);
+			clearTimeout(logoutTimer);
+			removeMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+			debounceTimer = setTimeout(() => {
+				console.log("debounce timer reset");
+				addMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+				logoutTimer = setTimeout(executeSessionTimeout, 3600000);
+				// logoutTimer = setTimeout(executeSessionTimeout, 5000);
+			}, 30000);
+			// }, 2000);
+	
+		}
+	
+		const handleEventFiring = () => {
+			if(userId) {
+				if(!isHandlingEvent) {
+					isHandlingEvent = true;
+					console.log("activity occurred");
+					resetLogoutTimer();
+					isHandlingEvent = false;
+				}
+			}
+		}
+	
+		addMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+
+		return () => {
+			removeMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+		}
+	}, [dispatch, userId]);
+	
+
 	return (
 		<AppWrapper className="App">
 			<HeaderContainer className="HeaderContainer">

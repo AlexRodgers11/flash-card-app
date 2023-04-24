@@ -8,7 +8,6 @@ deckAttemptRouter.param("attemptId", (req, res, next, attemptId) => {
     DeckAttempt.findById(attemptId, (err, deckAttempt) => {
         if(err) {
             res.status(500).send(err.message);
-            throw err;
         } else if(!deckAttempt) {
             res.status(404).send("DeckAttempt not found");
         } else {

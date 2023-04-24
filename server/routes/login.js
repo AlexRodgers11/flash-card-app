@@ -63,7 +63,7 @@ passport.use(
         }, (err, user) => {
             if(err) {
                 console.error(err);
-                throw err;
+                return done(null, false);
             }
             if(user) {
                 return done(null, user);

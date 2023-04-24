@@ -295,7 +295,7 @@ export const sendEmail = async (emailAddress, message) => {
             )
             break;
         default: 
-            throw new Error("An invalid message type was selected to create an email from");
+            res.status(400).send("An invalid message type was selected to create an email from");
     }
     await transporter.sendMail(mailObj);
 }

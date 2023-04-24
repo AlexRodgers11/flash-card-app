@@ -15,10 +15,8 @@ deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
         if(err) {
             res.status(500).send("There was an error with your request");
-            throw err;
         } else if(!deck) {
             res.status(404).send("Deck not found");
-            throw err;
         } else {
             req.deck = deck;
             next();
@@ -176,7 +174,6 @@ deckRouter.patch("/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
     Deck.findByIdAndUpdate(req.deck._id, req.body, {new: true}, (err, deck) => {
         if(err) {
             res.status(500).send("There was an error with your request");
-            throw err;
         } else {
             res.status(200).send(deck);
         }
@@ -218,7 +215,6 @@ deckRouter.post("/:deckId/cards", getUserIdFromJWTToken, async (req, res, next) 
         res.status(200).send(card._id);
     } catch (err) {
         res.status(500).send("There was an error with your request");
-        throw err;
     }
 });
 

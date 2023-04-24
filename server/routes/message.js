@@ -434,7 +434,7 @@ messageRouter.delete("/:messageId", getUserIdFromJWTToken, checkMessageOwnership
         } else if(req.query.direction === "sent") {
             updatedUser = await User.findByIdAndUpdate(deletingUser._id, {$pull: {"messages.sent": req.message._id}}, {new: true});
         } else {
-            throw new Error("invalid direction submitted");
+            res.status(400).send("invalid direction submitted");
         }
     
 

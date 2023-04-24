@@ -17,7 +17,6 @@ userRouter.param("userId", (req, res, next, userId) => {
     User.findById(userId, (err, user) => {
         if(err) {
             res.status(500).send("There was an error with your request");
-            throw err;
         } else if(!user) {
             res.status(404).send("User not found");
         } else {
@@ -50,7 +49,6 @@ userRouter.param("protectedUserId", async (req, res, next, protectedUserId) => {
         }
     } catch (err) {
         res.status(500).send("There was an error with your request");
-        throw err;
     }
 });
 
@@ -91,7 +89,6 @@ userRouter.get("/:userId", getUserIdFromJWTToken, async (req, res, next) => {
         }
     } catch (err) {
         res.status(500).send("There was an error with your request");
-        throw err;
     }
 });
 
@@ -163,7 +160,6 @@ userRouter.delete("/:protectedUserId", async (req, res, next) => {
         res.status(200).send(userId);
     } catch (err) {
         res.status(500).send("There was an error with your request");
-        throw err;
     }
 });
 
@@ -221,7 +217,6 @@ userRouter.post("/:protectedUserId/decks", async (req, res, next) => {
         res.status(200).send({_id: deck._id, name: deck.name});
     } catch (err) {
         res.status(500).send(err.message);
-        throw err;
     }
 });
 
@@ -318,7 +313,6 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
         res.status(200).send(responseData);
     } catch (err) {
         res.status(500).send("There was an error with your request");
-        throw(err);
     }
 });
 
@@ -359,7 +353,6 @@ userRouter.post("/:protectedUserId/attempts", async (req, res, next) => {
         res.status(200).send(savedDeckAttempt);
     } catch (err) {
         res.status(500).send(err.message);
-        throw err;
     }
 });
 

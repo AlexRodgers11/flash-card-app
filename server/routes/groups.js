@@ -149,7 +149,6 @@ groupRouter.patch("/:groupId/head-admin", getUserIdFromJWTToken, async (req, res
         });
     } catch (err) {
         res.status(500).send(err.message);
-        throw err;
     }
 });
 
@@ -222,7 +221,6 @@ groupRouter.patch("/:groupId/admins", getUserIdFromJWTToken, async (req, res, ne
             }
         } catch (err) {
             res.status(500).send(err.message);
-            throw err;
         }
     } else {
         res.status(401).send("Only authorized users can designate adminstrator authority");
@@ -326,7 +324,6 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", getUserIdFromJWTTok
         }
     } catch (err) {
         res.status(500).send("There was an error updating receiving admins received messages");
-        throw err;
     }
 });
 
@@ -384,7 +381,6 @@ groupRouter.patch("/:groupId", getUserIdFromJWTToken, (req, res, next) => {
     Group.findByIdAndUpdate(req.group._id, req.body, {new:true}, (err, group) => {
         if(err) {
             res.status(500).send("There was an error with your request");
-            throw err;
         } else {
             res.status(200).send(group);
         }

@@ -22,7 +22,6 @@ categoryRouter.get("/", (req, res, next) => {
     Category.find({}, (err, categories) => {
         if(err) {
             res.status(500).send("There was an error with your request");
-            throw err;
         } else {
             res.status(200).send(categories);
         }

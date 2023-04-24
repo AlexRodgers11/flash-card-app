@@ -258,7 +258,7 @@ function Deck() {
                 <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
                 <CardContainer className="CardContainer">
                     {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}
-                    {cards.map(card => <Card cardId={card} />
+                    {cards.map(card => <Card cardId={card} allowedToEdit={true} />
                     )}
     
                     {modalContent && 
@@ -278,7 +278,7 @@ function Deck() {
                 </NameBlock>
                 <CardContainer className="CardContainer">
                     {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}
-                    {cards.map(card => <Card cardId={card} />
+                    {cards.map(card => <Card cardId={card} allowedToEdit={false}/>
                     )}
     
                     {modalContent && 

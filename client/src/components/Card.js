@@ -161,10 +161,12 @@ function Card(props) {
                     </CardControls>
                     <p>{cardData.question}</p>
                 </LeftContainer>
-                <CardControls>
-                    <FaTrashAlt role="button" data-action="delete-card" onClick={handleSelectModalContent}/>
-                    <MdModeEditOutline role="button" data-action="edit-card" onClick={handleSelectModalContent}/>
-                </CardControls>
+                {props.allowedToEdit &&
+                    <CardControls>
+                        <FaTrashAlt role="button" data-action="delete-card" onClick={handleSelectModalContent}/>
+                        <MdModeEditOutline role="button" data-action="edit-card" onClick={handleSelectModalContent}/>
+                    </CardControls>
+                }
             </QuestionBlock>
             {showAnswers &&
                 <AnswerBlock>

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import Modal from './Modal';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 
 const LandingPageWrapper = styled.div`
 	display: grid;
@@ -108,6 +109,7 @@ const StyledImage = styled.img`
 
 
 function LandingPage() {
+	const userId = useSelector((state) => state.login.userId);
 	const location = useLocation();
 	const navigate = useNavigate();
 	
@@ -123,6 +125,12 @@ function LandingPage() {
 	const goBackToHome = () => {
 		navigate("/");
 	};
+
+	useEffect(() => {
+		if(userId) {
+			navigate("/dashboard");
+		}
+	});
 
 	return (
 		<LandingPageWrapper className="LandingPageWrapper">

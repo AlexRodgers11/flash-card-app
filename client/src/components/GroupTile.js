@@ -59,6 +59,8 @@ const BottomBlock = styled.div`
 `;
 
 const UserIconsWrapper = styled.div`
+    display: flex;
+    align-items: center;
     white-space: nowrap;
 `;
 
@@ -124,7 +126,7 @@ function GroupTile(props) {
             clearTimeout(timeoutId);
             window.removeEventListener("resize", handleWindowResize);
         };
-    }, [width]); //need to figure out how to make sure width is set when page loads
+    }, [width]);
 
 
     if(!groupData) {

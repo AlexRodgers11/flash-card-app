@@ -503,11 +503,11 @@ userRouter.post("/:email/messages/group-invitation", getUserIdFromJWTToken, asyn
     try {
         const foundUser = await User.findOne({"login.email": req.params.email});
         if(!foundUser) {
-            res.status(404).send("User does not exist");
+            return res.status(404).send("User does not exist");
         }
 
         if(foundUser.groups.map(groupId => groupId.toString()).includes(req.body.targetGroup)) {
-            res.status(400).send("This user is already a member of this group");
+            return res.status(400).send("This user is already a member of this group");
         }
         
         const foundGroup = await Group.findById(req.body.targetGroup, "administrators");

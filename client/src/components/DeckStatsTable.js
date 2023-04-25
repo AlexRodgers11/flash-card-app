@@ -11,9 +11,13 @@ const DeckStatsTableWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     padding-bottom: 9.5rem;
+    min-width: 350px;
     // pointer-events: auto;
-    @media (max-width: 515px) {
-        padding-top: 6.5rem;
+    @media (max-width: 650px) {
+        font-size: .8rem;
+    }
+    @media (max-width: 550px) {
+        font-size: .7rem;
     }
 `;
 
@@ -29,10 +33,15 @@ const DeckStatsTableContainer = styled.div`
     &:-webkit-scrollbar {
         display: auto;
     }
+    @media (max-width: 650px) {
+        width: 85%;
+    }
+    @media (max-width: 550px) {
+        width: 95%;
+    }
 `;
 
 const StatsTable = styled.table`
-    width: 80%;
     width: 100%;
     border: 2px solid black;
     border-top: none;
@@ -58,6 +67,13 @@ const StyledLinkIcon = styled(HiOutlineExternalLink).attrs({
 })`
     height: 1.5rem;
     width: 1.5rem;
+    @media (max-width: 650px) {
+        height: 1.25rem;
+        width: 1.25rem;
+    }
+    &:hover {
+        color: #5e5e5e;
+    }
 `;
 
 const DeckStatsRow = styled.tr`
@@ -65,9 +81,15 @@ const DeckStatsRow = styled.tr`
 `;
 
 const DeckStatsCell = styled.td`
-    word-wrap: break-word;
     border: 1px solid black;
     padding: .5rem;
+    @media (max-width: 650px) {
+        padding: .25rem;
+    }
+    @media (max-width: 550px) {
+        padding: .1rem;
+    }
+    word-wrap: anywhere;
 `;
 
 const HeaderBlock = styled.thead`
@@ -78,6 +100,12 @@ const HeaderBlock = styled.thead`
     top: 0;
     overflow: auto;
     height: 5rem;
+    @media (max-width: 650px) {
+        height: 4rem;
+    }
+    @media (max-width: 550px) {
+        height: 3rem;
+    }
 `;
 
 function DeckStatsTable() {

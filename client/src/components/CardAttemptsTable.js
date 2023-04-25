@@ -17,6 +17,12 @@ const CardAttemptsTableWrapper = styled.div`
     @media (max-width: 515px) {
         padding-top: 6.5rem;
     }
+    @media (max-width: 650px) {
+        font-size: .8rem;
+    }
+    @media (max-width: 550px) {
+        font-size: .7rem;
+    }
 `;
 
 const CardAttemptTableContainer = styled.div`
@@ -24,17 +30,23 @@ const CardAttemptTableContainer = styled.div`
     overflow: scroll;
     display: flex;
     display: inline-flex;
-    width: 80%;
     flex-direction: column;
     align-items: center;
     // background-color: red;
+    width: 80%;
+    @media (max-width: 650px) {
+        width: 85%;
+    }
+    @media (max-width: 550px) {
+        width: 95%;
+    }
     &:-webkit-scrollbar {
         display: auto;
     }
+    
 `;
 
 const AttemptsTable = styled.table`
-    width: 80%;
     width: 100%;
     border: 2px solid black;
     border-top: none;
@@ -54,6 +66,12 @@ const HeaderBlock = styled.thead`
     top: 0;
     overflow: auto;
     height: 5rem;
+    @media (max-width: 650px) {
+        height: 4rem;
+    }
+    @media (max-width: 550px) {
+        height: 3rem;
+    }
 `;
 
 const Header = styled.th.attrs({
@@ -72,9 +90,15 @@ const TableRow = styled.tr.attrs({
 `;
 
 const TableCell = styled.td`
-    word-wrap: break-word;
     border: 1px solid black;
     padding: .5rem;
+    @media (max-width: 650px) {
+        padding: .25rem;
+    }
+    @media (max-width: 550px) {
+        padding: .1rem;
+    }
+    word-wrap: anywhere;
 `;
 
 const StyledLinkIcon = styled(HiOutlineExternalLink).attrs({
@@ -82,6 +106,10 @@ const StyledLinkIcon = styled(HiOutlineExternalLink).attrs({
 })`
     height: 1.5rem;
     width: 1.5rem;
+    @media (max-width: 650px) {
+        height: 1.25rem;
+        width: 1.25rem;
+    }
 `;
 
 function CardAttemptsTable() {

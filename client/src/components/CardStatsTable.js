@@ -16,6 +16,12 @@ const CardStatsTableWrapper = styled.div`
     @media (max-width: 515px) {
         padding-top: 6.5rem;
     }
+    @media (max-width: 650px) {
+        font-size: .8rem;
+    }
+    @media (max-width: 550px) {
+        font-size: .7rem;
+    }
 `;
 
 const CardStatsTableContainer = styled.div`
@@ -23,16 +29,21 @@ const CardStatsTableContainer = styled.div`
     overflow: scroll;
     display: flex;
     display: inline-flex;
-    width: 80%;
     flex-direction: column;
     align-items: center;
     &:-webkit-scrollbar {
         display: auto;
     }
+    width: 80%;
+    @media (max-width: 650px) {
+        width: 85%;
+    }
+    @media (max-width: 550px) {
+        width: 95%;
+    }
 `;
 
 const StatsTable = styled.table`
-    width: 80%;
     width: 100%;
     border: 2px solid black;
     border-top: none;
@@ -52,15 +63,25 @@ const ColumnHeaderBlock = styled.thead`
     top: 0;
     overflow: auto;
     height: 5rem;
+    @media (max-width: 650px) {
+        height: 4rem;
+    }
+    @media (max-width: 550px) {
+        height: 3rem;
+    }
 `;
 
 const ColumnHeader = styled.th.attrs({
-    scope: "col"
+    scope: "col",
+    className: "ColumnHeader"
 })`
     border: 1px solid black;
     background-color: #bfbfbf;
     background-color: blue;
     padding: 0 1rem;
+    @media (max-width: 550px) {
+        padding: 0 .25rem;
+    }
 `;
     
 const DeckHeaderBlock = styled.thead`
@@ -68,7 +89,14 @@ const DeckHeaderBlock = styled.thead`
     color: white;
     position: sticky;
     top: calc(5rem - 2px);
-    overflow: auto;
+    @media (max-width: 650px) {
+        top: calc(4rem - 2px);
+    }
+    @media (max-width: 550px) {
+        top: calc(3rem - 2px);
+    }
+    // overflow: auto;
+    word-wrap: anywhere;
 `;
 
 const DeckHeader = styled.th.attrs({
@@ -77,6 +105,7 @@ const DeckHeader = styled.th.attrs({
     padding: 0rem;
     width: 100%;
     height: 2rem;
+    word-wrap: anywhere;
 `
 
 const TableRow = styled.tr.attrs({
@@ -90,6 +119,13 @@ const TableCell = styled.td`
     word-wrap: break-word;
     border: 1px solid black;
     padding: .5rem;
+    @media (max-width: 650px) {
+        padding: .25rem;
+    }
+    @media (max-width: 550px) {
+        padding: .1rem;
+    }
+    word-wrap: anywhere;
 `;
 
 const RowHeader = styled.th`
@@ -104,6 +140,13 @@ const StyledLinkIcon = styled(HiOutlineExternalLink).attrs({
 })`
     height: 1.5rem;
     width: 1.5rem;
+    @media (max-width: 650px) {
+        height: 1.25rem;
+        width: 1.25rem;
+    }
+    &:hover {
+        color: #5e5e5e;
+    }
 `;
 
 

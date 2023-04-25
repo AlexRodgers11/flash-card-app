@@ -8,7 +8,6 @@ import DeckAttemptCardsTable from "./DeckAttemptCardsTable";
 const DeckAttemptWrapper = styled.div`
     position: relative;
     top: 4rem;
-
     @media (max-width: 515px) {
         top: 6rem;
     }
@@ -28,7 +27,7 @@ function DeckAttempt() {
 
     if(deckAttempt._id === sessionId) {
         return (
-            <DeckAttemptWrapper>
+            <DeckAttemptWrapper className="DeckAttemptWrapper">
                 <h1>Deck: {deckAttempt.deck?.name}</h1>
                 <DeckAttemptCardsTable />
             </DeckAttemptWrapper>

@@ -210,6 +210,8 @@ function UserSettings() {
     const joinRequestMessage = useSelector((state) => state.login.communicationSettings.emailPreferences.joinRequest);
     
     const allowDirectMessages = useSelector((state) => state.login.communicationSettings.allowDirectMessages);
+    
+    const inactivityLengthBeforeLogout = useSelector((state) => state.login.inactivityLengthBeforeLogout);
 
     const [errorField, setErrorField] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
@@ -262,6 +264,8 @@ function UserSettings() {
     const [joinRequestMessageSelectedValue, clearJoinRequestMessageSelectedValue, handleJoinRequestMessageSelectedValueChange, setJoinRequestMessageSelectedValue] = useFormInput(joinRequestMessage, "checkbox");
 
     const [allowDirectMessagesSelectedValue, clearAllowDirectMessagesSelectedValue, handleAllowDirectMessagesSelectedValueChange, setAllowDirectMessagesSelectedValue] = useFormInput(allowDirectMessages, "checkbox");
+
+    const [inactivityLengthBeforeLogoutSelectedValue, clearInactivityLengthBeforeLogoutSelectedValue, handleInactivityLengthBeforeLogoutSelectedValueChange, setInactivityLengthBeforeLogoutSelectedValue] = useFormInput(inactivityLengthBeforeLogout);
 
     const dispatch = useDispatch();
 
@@ -366,6 +370,9 @@ function UserSettings() {
                 break;
             case "allow-direct-messages":
                 resetSettingSelectedValueToCurrentStateValue(allowDirectMessages, allowDirectMessagesSelectedValue, setAllowDirectMessagesSelectedValue);
+                break;
+            case "inactivity-length-before-logout":
+                resetSettingSelectedValueToCurrentStateValue(inactivityLengthBeforeLogout, inactivityLengthBeforeLogoutSelectedValue, setAllowDirectMessagesSelectedValue);
                 break;
             default: 
                 break;
@@ -559,10 +566,13 @@ function UserSettings() {
                 dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {joinDecision: joinDecisionMessageSelectedValue}}));
                 break;
             case "join-request-message":
-                dispatch(updateEmailPreferences({userId, patchObj: {joinRequest: joinRequestMessageSelectedValue}}));
+                dispatchActionThenClearEditField(updateEmailPreferences({userId, patchObj: {joinRequest: joinRequestMessageSelectedValue}}));
                 break;
             case "allow-direct-messages":
-                dispatch(updateDirectMessagePreference({userId, allowDirectMessages: allowDirectMessagesSelectedValue}));
+                dispatchActionThenClearEditField(updateDirectMessagePreference({userId, allowDirectMessages: allowDirectMessagesSelectedValue}));
+                break;
+            case "inactivity-length-before-logout":
+                dispatchActionThenClearEditField(updateUser({userId, userUpdates: {inactivityLengthBeforeLogout: inactivityLengthBeforeLogoutSelectedValue}}));
                 break;
             default:       
                 break;
@@ -1153,6 +1163,38 @@ function UserSettings() {
                                 </div>
                             }
                         </SettingCategoryOption>
+                    </SettingsCategoryOptions>
+                </SettingsSection>
+                <SettingsSection>
+                    <SettingsCategoryLabel>Security</SettingsCategoryLabel>
+                    <SettingsCategoryOptions>
+                        <SettingCategoryOption>
+                                <div>
+                                    {/* <span>{inactivityLengthBeforeLogout < 86400001 ? "" : ""}</span> */}
+                                    <span>Length of Inactivity Before Being Automatically Logged Out: </span>
+                                    {editField !== "inactivity-length-before-logout" && <span>{inactivityLengthBeforeLogout !== "never" ? Number(inactivityLengthBeforeLogout) < 1800001 ? "30 Minutes" : `${Number(inactivityLengthBeforeLogout)/1000/60/60} hour${inactivityLengthBeforeLogout !== "3600000" ? "s" : ""}` : "Don't Log Me Out Due to Inactivity"}</span>}
+                                    {editField === "inactivity-length-before-logout" && 
+                                        <select name="inactivity-length-before-logout-select" id="inactivity-length-before-logout-select" value={inactivityLengthBeforeLogoutSelectedValue} onChange={handleInactivityLengthBeforeLogoutSelectedValueChange} >
+                                            <option value="never">Never Log Me Out Due to Inactivity</option>
+                                            <option value="1800000">30 Minutes</option>
+                                            <option value="3600000">1 hour</option>
+                                            <option value="7200000">2 hours</option>
+                                            <option value="10800000">3 hours</option>
+                                            <option value="14400000">4 hours</option>
+                                            <option value="28800000">8 hours</option>
+                                            <option value="43200000">12 hours</option>
+                                            <option value="86400000">24 hours</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "inactivity-length-before-logout" && <div><StyledEditIcon role="button" data-editfield="inactivity-length-before-logout" onClick={handleEditSelection}/></div>}
+                                {editField === "inactivity-length-before-logout" && 
+                                    <div>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="inactivity-length-before-logout" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                            </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>
                 <StyledButton onClick={showDeleteConfirmation}>Delete Account</StyledButton>

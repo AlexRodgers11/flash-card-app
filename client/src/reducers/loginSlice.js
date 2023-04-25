@@ -22,6 +22,7 @@ const initialState = {
     attempts: "",
     accountSetupStage: "",
     statisticsTracking: "",
+    inactivityLengthBeforeLogout: "",
     privacy: {
         email: "",
         name: "",
@@ -243,6 +244,7 @@ export const loginSlice = createSlice({
             state.statisticsTracking = action.payload.statisticsTracking;
             state.privacy = action.payload.privacy;
             state.communicationSettings = action.payload.communicationSettings;
+            state.inactivityLengthBeforeLogout = action.payload.inactivityLengthBeforeLogout;
         });
         builder.addCase(copyDeck.fulfilled, (state, action) => {
             state.decks = [...state.decks, action.payload];

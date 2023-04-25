@@ -50,60 +50,64 @@ const FooterContainer = styled.section`
 
 function App() {
 	const userId = useSelector((state) => state.login.userId);
+	const inactivityLengthBeforeLogout = useSelector((state) => state.login.inactivityLengthBeforeLogout);
 	const dispatch = useDispatch();
 	
 	useEffect(() => {
-		const executeSessionTimeout = () => {
-			if(userId) {
-				dispatch(logout());
-				document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
-				localStorage.removeItem("token");
-				localStorage.removeItem("persist:login");
-				localStorage.removeItem("persist:communications");
-				localStorage.removeItem("persist:practiceSession");
-				window.location.reload();
-				alert("You have been logged out due to inactivity");
-			}
-		}
-	
-		let logoutTimer = setTimeout(executeSessionTimeout, 3600000);
-		// let logoutTimer = setTimeout(executeSessionTimeout, 5000);
-		
-		let debounceTimer;
-	
-		let isHandlingEvent = false;
-		
-		const resetLogoutTimer = () => {
-			clearTimeout(debounceTimer);
-			clearTimeout(logoutTimer);
-			removeMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
-			debounceTimer = setTimeout(() => {
-				console.log("debounce timer reset");
-				addMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
-				logoutTimer = setTimeout(executeSessionTimeout, 3600000);
-				// logoutTimer = setTimeout(executeSessionTimeout, 5000);
-			}, 30000);
-			// }, 2000);
-	
-		}
-	
-		const handleEventFiring = () => {
-			if(userId) {
-				if(!isHandlingEvent) {
-					isHandlingEvent = true;
-					console.log("activity occurred");
-					resetLogoutTimer();
-					isHandlingEvent = false;
+		if(inactivityLengthBeforeLogout && inactivityLengthBeforeLogout !== "never") {
+			console.log({inactivityLengthBeforeLogout});
+			
+			const executeSessionTimeout = () => {
+				if(userId) {
+					dispatch(logout());
+					document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+					localStorage.removeItem("token");
+					localStorage.removeItem("persist:login");
+					localStorage.removeItem("persist:communications");
+					localStorage.removeItem("persist:practiceSession");
+					window.location.reload();
+					alert("You have been logged out due to inactivity");
 				}
 			}
-		}
-	
-		addMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
 
-		return () => {
-			removeMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+			const handleEventFiring = () => {
+				if(userId) {
+					if(!isHandlingEvent) {
+						isHandlingEvent = true;
+						console.log("activity occurred");
+						resetLogoutTimer();
+						isHandlingEvent = false;
+					}
+				}
+			}
+			
+			let logoutTimer = setTimeout(executeSessionTimeout, inactivityLengthBeforeLogout || 3600000);
+			
+			let debounceTimer;
+		
+			let isHandlingEvent = false;
+			
+			const resetLogoutTimer = () => {
+				clearTimeout(debounceTimer);
+				clearTimeout(logoutTimer);
+				removeMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+				debounceTimer = setTimeout(() => {
+					console.log("debounce timer reset");
+					addMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+					logoutTimer = setTimeout(executeSessionTimeout, inactivityLengthBeforeLogout || 3600000);
+					// logoutTimer = setTimeout(executeSessionTimeout, 5000);
+				}, 90000);
+				// }, 2000);
+			}
+		
+			
+		
+			addMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+			return () => {
+				removeMultipleEventListeners(window, ["mouseup", "scroll", "keyup", "touchstart"], handleEventFiring);
+			}
 		}
-	}, [dispatch, userId]);
+	}, [inactivityLengthBeforeLogout, dispatch, userId]);
 	
 
 	return (

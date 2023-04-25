@@ -32,6 +32,10 @@ const User = new Schema({
         default: "all" //all, user-only, group-only, none
     },
     accountSetupStage: String, //email, verified, complete
+    inactivityLengthBeforeLogout: {
+        type: String, //in milliseconds or "never"
+        default: "3600000"
+    },
     privacy: {
         email: {
             type: String,

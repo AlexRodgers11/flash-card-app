@@ -282,6 +282,10 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
         patchObj.photo = "";
     }
 
+    if(req.body.inactivityLengthBeforeLogout) {
+        patchObj.inactivityLengthBeforeLogout = req.body.inactivityLengthBeforeLogout;
+    }
+
     try {
         let user;
         user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});

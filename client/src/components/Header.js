@@ -148,18 +148,14 @@ function Header() {
         handleHideModal();
     }
 
-    const firstRender = useRef(true);
+    const communicationsFetchInterval = useRef();
 
     useEffect(() => {
-        if(!firstRender.current) {
-            if(accountSetupStage === "complete" && token) {
-                const communicationsFetchInterval = setInterval(() => dispatch(fetchCommunications()), 10000);
-                return () => clearInterval(communicationsFetchInterval);
+            if(!communicationsFetchInterval.current && (accountSetupStage === "complete" && token)) {
+                communicationsFetchInterval.current = setInterval(() => dispatch(fetchCommunications()), 10000);
+                console.log({newlySetInterval: communicationsFetchInterval.current})
+                return () => clearInterval(communicationsFetchInterval.current);
             }
-        } else {
-            firstRender.current = false;
-        }
-
     }, [dispatch, accountSetupStage, userId, token]);
     
     return (

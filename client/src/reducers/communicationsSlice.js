@@ -12,15 +12,19 @@ const initialState = {
     notifications: [],
 }
 
-export const fetchCommunications = createAsyncThunk("communications/fetchCommunications", async () => {
+export const fetchCommunications = createAsyncThunk("communications/fetchCommunications", async (_, { rejectWithValue }) => {
     try {
         const response = await client.get(`${baseURL}/communications`);
+
         return {
             messages: response.data.messages, 
             notifications: response.data.notifications
         }
     } catch (err) {
-        console.error(err)
+        if(err.response?.data?.message) {
+            return rejectWithValue(err.response?.data);
+        }            
+        throw err;
     }    
 });
 

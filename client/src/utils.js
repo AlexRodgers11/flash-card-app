@@ -227,6 +227,28 @@ client.interceptors.request.use(config => {
     return config;
 });
 
+
+export const dispatchWithExpiredTokenCatch = async (dispatch, logout, action, args) => {
+    dispatch(action(args))
+        .then((response) => {
+            if(response.payload?.message === "Unauthorized: Invalid token") {
+                dispatch(logout());
+                document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+                localStorage.removeItem("token");
+                localStorage.removeItem("persist:login");
+                localStorage.removeItem("persist:communications");
+                localStorage.removeItem("persist:practiceSession");
+                alert("Your credentials have expired. Log back in to continue");
+                window.location.reload();
+            } else {
+                return response;
+            }
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+}
+
 export { client };
 
 export const getJwtCookie = () => {

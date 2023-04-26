@@ -11,6 +11,7 @@ import { HiOutlineUserCircle } from "react-icons/hi";
 import { IoMailSharp, IoNotificationsSharp } from "react-icons/io5";
 import styled from "styled-components";
 import Logo from "./Logo";
+import { dispatchWithExpiredTokenCatch } from "../utils";
 
 const HeaderWrapper = styled.nav`
     height: 5.5rem;
@@ -152,8 +153,8 @@ function Header() {
 
     useEffect(() => {
             if(!communicationsFetchInterval.current && (accountSetupStage === "complete" && token)) {
-                communicationsFetchInterval.current = setInterval(() => dispatch(fetchCommunications()), 10000);
-                console.log({newlySetInterval: communicationsFetchInterval.current})
+                communicationsFetchInterval.current = setInterval(() => dispatchWithExpiredTokenCatch(dispatch, logout, fetchCommunications), 10000);
+
                 return () => clearInterval(communicationsFetchInterval.current);
             }
     }, [dispatch, accountSetupStage, userId, token]);

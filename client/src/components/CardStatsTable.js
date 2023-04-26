@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { fetchCardStatsByDeck } from "../reducers/attemptsSlice";
 import styled from "styled-components";
 import { HiOutlineExternalLink } from "react-icons/hi";
@@ -153,7 +153,7 @@ const StyledLinkIcon = styled(HiOutlineExternalLink).attrs({
 
 function CardStatsTable() {
     const cardStatsByDeck = useSelector((state) => state.attempts.cardStatsByDeck);
-    const { userId } = useParams();
+    const userId = useSelector((state) => state.login.userId);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

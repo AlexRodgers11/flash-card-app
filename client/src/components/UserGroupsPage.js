@@ -36,7 +36,7 @@ const StyledButton = styled.button`
 `;
 
 function UserGroupsPage() {
-    const { userId } = useParams(); 
+    const userId = useSelector((state) => state.login.userId);
     const [groupName, clearGroupNameChange, handleGroupNameChange] = useFormInput("");
     const [modalContent, setModalContent] = useState("");
     const groups = useSelector((state) => state.login.groups);

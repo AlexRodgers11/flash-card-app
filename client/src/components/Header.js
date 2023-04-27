@@ -176,7 +176,7 @@ function Header() {
                             <StyledIoMailSharp role="button"/>
                             <div style={{visibility: messages.filter(message => message.read.includes(userId) === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".5rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{messages.filter(message => message.read.includes(userId) === false).length >= 10 ? "9+": messages.filter(message => message.read.includes(userId) === false).length}</div>
                         </div>}
-                    {name.first && 
+                    {accountSetupStage === "verified" && 
                         <div data-source="notifications" onClick={handleButtonClick} className="d-none d-sm-block" style={{position: "relative", left: "1rem"}}>
                             <StyledIoNotificationsSharp role="button" />
                             <div style={{visibility: notifications.filter(notification => notification.read === false).length > 0 ? "visible" : "hidden", display:"inline-flex", position: "relative", right: ".85rem", bottom: ".65rem", alignItems: "center", justifyContent: "center", backgroundColor:"red", color: "white", border: "1px solid black", borderRadius: "50%", width: "1.25rem", height: "1.25rem", fontSize:".75em", fontWeight: "700"}}>{notifications.filter(notification => notification.read === false).length >= 10 ? "9+": notifications.filter(notification => notification.read === false).length}</div>
@@ -186,11 +186,11 @@ function Header() {
                             {profilePic && (!location.pathname.includes("identification") && !location.pathname.includes("profile-pic-crop")) ? <ProfilePic alt={username || `${name.first} ${name.last}`} src={profilePic} /> : <StyledHiOutlineUserCircle />}
                         </div>
                         <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a className="dropdown-item" onClick={name.first ? handleLogout : handleLogin} href="/">{name?.first ? "Log out" : "Login"}</a></li>
-                            {!name.first && <li><a className="dropdown-item" href="register/credentials">Sign Up</a></li>}
-                            {name.first && <li><hr className="dropdown-divider d-block d-sm-none " /></li>}
-                            {name.first && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Inbox</DropDownItem></li>}
-                            {name.first && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Notifications</DropDownItem></li>}
+                            <li><a className="dropdown-item" onClick={userId ? handleLogout : handleLogin} href="/">{name?.first ? "Log out" : "Login"}</a></li>
+                            {!userId && <li><a className="dropdown-item" href="register/credentials">Sign Up</a></li>}
+                            {userId && <li><hr className="dropdown-divider d-block d-sm-none " /></li>}
+                            {userId && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Inbox</DropDownItem></li>}
+                            {userId && <li><DropDownItem data-source="inbox" onClick={handleButtonClick} className="d-block d-sm-none dropdown-item">Notifications</DropDownItem></li>}
                         </ul>
                     </li>
                 </div>

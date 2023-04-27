@@ -110,6 +110,7 @@ const StyledImage = styled.img`
 
 function LandingPage() {
 	const userId = useSelector((state) => state.login.userId);
+	const accountSetupStage = ((state) => state.login.accountSetupStage);
 	const location = useLocation();
 	const navigate = useNavigate();
 	
@@ -127,7 +128,7 @@ function LandingPage() {
 	};
 
 	useEffect(() => {
-		if(userId) {
+		if(userId && accountSetupStage === "verified") {
 			navigate("/dashboard");
 		}
 	});

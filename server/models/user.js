@@ -130,7 +130,6 @@ const User = new Schema({
         allowDirectMessages: {
             type: Boolean,
             default: true
-        },
         }
     }
 }, {timestamps: true});

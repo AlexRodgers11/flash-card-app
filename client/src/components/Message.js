@@ -29,6 +29,12 @@ const MessageWrapper = styled.div`
 		background-color: ${(props) => props.fullView ? "inherit" : "black"};
 		color: ${(props) => props.fullView ? "inherit" : "white"};
 	}
+	&:hover .MessagePreviewContent {
+		background-color: black;
+        color: white;
+        color: inherit;
+        padding: 0;
+	}
 `;
 
 const StyledTrashAlt = styled(FaTrashAlt)`

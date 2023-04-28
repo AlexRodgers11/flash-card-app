@@ -60,10 +60,9 @@ function DeckDecisionMessage(props) {
                         {comment && <p>Comment: "{comment}"</p>}
                     </div>
                     :
-                    <MessagePreviewContent>
+                    <MessagePreviewContent read={read} >
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetUser?.login?.username || targetUser ? `${targetUser.name.first} ${targetUser.name.last}` : "deleted user"}</p>}
-                        <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> {acceptanceStatus} your request to add deck: {deckName || "deleted deck"} to <span>{targetGroup?.name || "deleted group"}</span></p>
-                        {/* <hr /> */}
+                        <p><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> {acceptanceStatus} your request to add deck: {deckName || "deleted deck"} to <span>{targetGroup?.name || "deleted group"}</span></p>
                     </MessagePreviewContent>
                 }
             </MessageContentContainer>

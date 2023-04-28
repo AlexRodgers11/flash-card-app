@@ -57,7 +57,7 @@ function InvitationDecisionMessage(props) {
                         <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender.login.username}</span> {acceptanceStatus === "approved" ? "accepted" : "rejected"} your invitation to join group <span>{targetGroup?.name || "deleted group"}</span></p>
                     </div>
                     :
-                    <MessagePreviewContent>
+                    <MessagePreviewContent read={read} >
                         {props.direction === "received" ? 
                             <p>From: {sender?.login?.username || sender ? 
                                 `${sender.name.first} ${sender.name.last}` 
@@ -67,7 +67,7 @@ function InvitationDecisionMessage(props) {
                             : 
                             <p>To: {targetGroup?.name || "deleted group"} Admins</p>
                         }
-                        <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender.login.username}</span> {acceptanceStatus === "approved" ? "accepted" : "rejected"} your invitation to join group <span>{targetGroup?.name || "deleted group"}</span></p>
+                        <p><span>{sender.login.username}</span> {acceptanceStatus === "approved" ? "accepted" : "rejected"} your invitation to join group <span>{targetGroup?.name || "deleted group"}</span></p>
                     </MessagePreviewContent>
                 }
             </MessageContentContainer>

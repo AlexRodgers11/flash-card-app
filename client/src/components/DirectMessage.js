@@ -92,9 +92,9 @@ function DirectMessage(props) {
                             </form>
                         </div>
                     :
-                    <MessagePreviewContent>
+                    <MessagePreviewContent read={read} >
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {receivingUser?.login.username || receivingUser ? `${receivingUser.name.first} ${receivingUser.name.last}` : "deleted user"}</p>}
-                        <p><span>{read ? 'Read': 'Unread'}:</span>{text.slice(0, 100)}</p>
+                        <p>{text.slice(0, 100)}</p>
                     </MessagePreviewContent>
                 }
             </MessageContentContainer>

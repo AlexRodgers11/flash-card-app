@@ -73,9 +73,9 @@ function GroupInvitationMessage(props) {
                         }
                     </div>
                     :
-                    <MessagePreviewContent>
+                    <MessagePreviewContent read={read} >
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetUser?.login?.username || targetUser ? `${targetUser.name.first} ${targetUser.name.last}` : "deleted user"}</p>}
-                        <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender.login.username}</span>Invited you to join group <span>{targetGroup?.name || "deleted group"}</span></p>
+                        <p><span>{sender.login.username}</span>Invited you to join group <span>{targetGroup?.name || "deleted group"}</span></p>
                         {comment && <p>Comment: "{comment}"</p>}
                     </MessagePreviewContent>
                 }

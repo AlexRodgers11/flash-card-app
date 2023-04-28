@@ -1,10 +1,8 @@
 import styled from "styled-components";
 
-export const MessagePreviewContent = styled.div`
-    &:hover {
-        background-color: black;
-        color: white;
-    }
+export const MessagePreviewContent = styled.div.attrs({
+    className: "MessagePreviewContent"
+})`
     & p {
         white-space: nowrap;
         overflow: hidden;
@@ -14,4 +12,7 @@ export const MessagePreviewContent = styled.div`
         }
         padding-right: .5rem;
     }
+    background-color: ${props => props.read ? "#f2f2f2" : "white"};
+    padding: ${props => props.read ? "0 1rem" : "0"};
+    font-style: ${props => props.read ? "italic" : "normal"};
 `;

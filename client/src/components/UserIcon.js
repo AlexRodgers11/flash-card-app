@@ -5,7 +5,7 @@ import { client } from '../utils';
 const UserIconWrapper = styled.div`
     position: relative;
     display: inline-block;
-    margin: 0 .1rem;
+    margin: 0 2px;
     &:hover .initials-overlay {
         opacity: 1;
     }

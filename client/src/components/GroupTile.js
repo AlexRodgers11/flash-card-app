@@ -5,6 +5,7 @@ import { client } from '../utils';
 import styled from 'styled-components';
 import UserIcon from './UserIcon';
 import { AiOutlinePlus } from "react-icons/ai";
+import { HiUser, HiUsers } from "react-icons/hi2";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -50,24 +51,38 @@ const TopBlock = styled.div`
     height: 50%;
     display: flex;
     align-items: center;
+    padding-left: .5rem;
 `;
 
 const BottomBlock = styled.div`
     height: 50%;
     display: flex;
     align-items: center;
+    padding-left: calc(.5rem + 1px);
 `;
 
 const UserIconsWrapper = styled.div`
     display: flex;
     align-items: center;
     white-space: nowrap;
+    overflow: hidden;
+`;
+
+const StyledHiUser = styled(HiUser)`
+    height: 2rem;
+    width: 2rem;
+`;
+
+const StyledHiUsers = styled(HiUsers)`
+    height: 2rem;
+    width: 2rem;
 `;
 
 function GroupTile(props) {
     const [groupData, setGroupData] = useState();
     const [overflowSliceIndex, setOverFlowSliceIndex] = useState();
     const [width, setWidth] = useState();
+    const [resizing, setResizing] = useState(false);
     const topBlockRef = useRef();
     const userIconsRef = useRef();
     const navigate = useNavigate();
@@ -92,44 +107,44 @@ function GroupTile(props) {
         setWidth(window.innerWidth);
     }, [groupData]);
 
-    useEffect(() => {        
-        console.log("In resizing useEffect");
+    useEffect(() => {  
         let timeoutId;
-        
+
         const handleWindowResize = () => {
+            setResizing(true);
             clearTimeout(timeoutId);
             timeoutId = setTimeout(() => {
                 setOverFlowSliceIndex(undefined);
                 setWidth(window.innerWidth);
-                const topBlockWidth = topBlockRef.current.offsetWidth;
-                const userIconsWidth = userIconsRef.current.offsetWidth;
+                const topBlockWidth = Math.floor(topBlockRef?.current?.getBoundingClientRect().width) - 8;
+                const userIconWidth = Math.ceil(userIconsRef?.current?.children[1].getBoundingClientRect().width);
+                const userIconsWidth = (userIconWidth + 4) * groupData.memberIds.length;
 
                 if(userIconsWidth > topBlockWidth) {
-                    //get the width of the first userIcon
-                    const userIconWidth = userIconsRef.current.children[1].offsetWidth;
-                    console.log({userIconWidth});
-                    console.log({topBlockWidth});
-                    console.log({userIconsWidth});
-                    const overFlowWidth = userIconsWidth - topBlockWidth;
-                    const numIconsOverflowing = Math.ceil(overFlowWidth / (userIconWidth + 1.6));
-                    const lastNonOverFlowingIconIndex = userIconsRef.current.children.length - numIconsOverflowing - 1;
+                    const numIconsThatFit = Math.floor((topBlockWidth - 16) / (userIconWidth + 4));
+                    const lastNonOverFlowingIconIndex = numIconsThatFit;
                     setOverFlowSliceIndex(lastNonOverFlowingIconIndex);
                 } else {
                     setOverFlowSliceIndex(undefined);
                 }
             }, 300);
+            setResizing(false);
+        }
+
+        if(!overflowSliceIndex) {
+            handleWindowResize();
         }
 
         window.addEventListener("resize", handleWindowResize);
-        
+
         return () => {
             clearTimeout(timeoutId);
             window.removeEventListener("resize", handleWindowResize);
         };
-    }, [width]);
+    }, [groupData, overflowSliceIndex, width]);
 
 
-    if(!groupData) {
+    if(!groupData || resizing) {
         return;
     }
   
@@ -138,19 +153,22 @@ function GroupTile(props) {
             <NameSection style={{fontSize: "200%"}}>{groupData.name}</NameSection>
             <InfoSection>
                 <TopBlock ref={topBlockRef} className="TopBlock"> 
-                    <UserIconsWrapper ref={userIconsRef}>
-                        <span>Members:</span>
-                        {overflowSliceIndex ? 
-                            <>
-                            {groupData.memberIds.map(id => <UserIcon key={id} memberId={id} width={3} height={3} />
-                            )}
-                            <AiOutlinePlus></AiOutlinePlus>
-                            </>
-                            :
-                            groupData.memberIds.map(id => <UserIcon key={id} memberId={id} width={3} height={3} />)
-                        }
-                        
-                    </UserIconsWrapper>
+                    {(width > 750) && 
+                        <UserIconsWrapper className="UserIconsWrapper" ref={userIconsRef}>
+                            {overflowSliceIndex ? 
+                                <>
+                                {groupData.memberIds.slice(0, overflowSliceIndex).map(id => <UserIcon key={id} memberId={id} width={3} height={3} />
+                                )}
+                                <div><AiOutlinePlus /></div>
+                                </>
+                                :
+                                groupData.memberIds.map(id => <UserIcon key={id} memberId={id} width={3} height={3} />)
+                            }
+                        </UserIconsWrapper>
+                    }
+                    {width <= 750 && 
+                        <span>{groupData.memberIds.length > 1 ? <StyledHiUsers /> : <StyledHiUser />}{groupData.memberIds.length}</span>
+                    }
                 </TopBlock>
                 <BottomBlock>
                     <span>{groupData.deckCount} decks</span>

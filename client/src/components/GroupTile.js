@@ -5,24 +5,34 @@ import { client } from '../utils';
 import styled from 'styled-components';
 import UserIcon from './UserIcon';
 import { AiOutlinePlus } from "react-icons/ai";
-import { HiUser, HiUsers } from "react-icons/hi2";
+import { HiRectangleStack, HiUser, HiUsers } from "react-icons/hi2";
+import { TbRectangleVertical } from "react-icons/tb";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
+const StyledHiRectangleStack = styled(HiRectangleStack)`
+    transform: rotate(90deg);
+    height: 2rem;
+    width: 2rem;
+`;
+
+const StyledTbRectangleVertical = styled(TbRectangleVertical).attrs({
+    fill: "black"
+})`
+    height: 2rem;
+    width: 2rem;
+`;
+
 const GroupTileWrapper = styled.div`
     display: flex;
-    // border: 1px solid black;
-    // border-radius: .8rem;
     width: 100%;
     height: 10rem;
     margin-bottom: 1rem;
-    // padding: 1rem;
-    // background-color: white;
     cursor: pointer;
-    // @media(min-width: )
 `;
 
-const NameSection = styled.section`
+const LabelSection = styled.section`
+    position: relative;
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -33,7 +43,9 @@ const NameSection = styled.section`
     height: 100%;
     width: 30%;
     color: white;
-    font-size: 2rem;
+    @media (max-width: 750px) {
+        width: 70%;
+    }
 `;
 
 const InfoSection = styled.section`
@@ -45,6 +57,9 @@ const InfoSection = styled.section`
     width: 70%;
     height: 100%;
     background-color: white;
+    @media (max-width: 750px) {
+        width: 30%;
+    }
 `;
 
 const TopBlock = styled.div`
@@ -52,13 +67,22 @@ const TopBlock = styled.div`
     display: flex;
     align-items: center;
     padding-left: .5rem;
+    @media (max-width: 750px) {
+        padding-left: 0;    
+        justify-content: center;
+    }
 `;
 
 const BottomBlock = styled.div`
     height: 50%;
     display: flex;
     align-items: center;
-    padding-left: calc(.5rem + 1px);
+    justify-content: space-between;
+    padding: 0 calc(.5rem + 1px);
+    @media (max-width: 750px) {
+        padding-left: 0;    
+        justify-content: center;
+    }
 `;
 
 const UserIconsWrapper = styled.div`
@@ -76,6 +100,26 @@ const StyledHiUser = styled(HiUser)`
 const StyledHiUsers = styled(HiUsers)`
     height: 2rem;
     width: 2rem;
+`;
+
+const Name = styled.h1`
+    // height: 100%;
+    width: 100%;
+    word-wrap: break-word;
+    font-size: 2rem;
+    position: absolute;
+`;
+
+const DateJoined = styled.p`
+    @media (max-width: 750px) {
+        color: white;
+        align-self: flex-end;
+        font-size: .75rem;
+    }
+`;
+
+const Count = styled.span`
+    font-weight: 500;
 `;
 
 function GroupTile(props) {
@@ -150,7 +194,10 @@ function GroupTile(props) {
   
     return (
         <GroupTileWrapper role="button" className="GroupTileWrapper" tabIndex={0} onKeyDown={handleViewOnEnter} onClick={handleViewGroup} >
-            <NameSection style={{fontSize: "200%"}}>{groupData.name}</NameSection>
+            <LabelSection>
+                <Name>{groupData.name}</Name>
+                {width <= 750 && <DateJoined>Joined: 7/15/22</DateJoined>}
+            </LabelSection>
             <InfoSection>
                 <TopBlock ref={topBlockRef} className="TopBlock"> 
                     {(width > 750) && 
@@ -167,12 +214,18 @@ function GroupTile(props) {
                         </UserIconsWrapper>
                     }
                     {width <= 750 && 
-                        <span>{groupData.memberIds.length > 1 ? <StyledHiUsers /> : <StyledHiUser />}{groupData.memberIds.length}</span>
+                        <>
+                            <span>{groupData.memberIds.length > 1 ? <StyledHiUsers /> : <StyledHiUser />}</span>
+                            <Count>{groupData.memberIds.length}</Count>
+                        </>
                     }
                 </TopBlock>
                 <BottomBlock>
-                    <span>{groupData.deckCount} decks</span>
-                    <span>Joined: 7/15/22</span>
+                    <div>
+                        <span>{groupData.deckCount > 1 ? <StyledHiRectangleStack /> : <StyledTbRectangleVertical />}</span>
+                        <Count>{groupData.deckCount}</Count>
+                    </div>
+                    {width > 750 && <DateJoined>Joined: 7/15/22</DateJoined>}
                 </BottomBlock>
             </InfoSection>
         </GroupTileWrapper>

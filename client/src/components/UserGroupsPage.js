@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { createGroup, fetchLoggedInUserData } from '../reducers/loginSlice';
 import BackButton from "./BackButton";
 import RegisterJoinGroupsForm from "./RegisterJoinGroupsForm";
@@ -23,15 +23,30 @@ const UserGroupsWrapper = styled.div`
 
 const GroupTilesContainer = styled.div`
     width: 80%;
+    @media (max-width: 500px) {
+        width: 95%;
+    }
     max-width: 1250px;
     align-items: center;
+`;
+
+const ButtonRow = styled.div`
+    width: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 const StyledButton = styled.button`
     display: inline-block;
     margin: 4rem 1rem 3rem 1rem;
-    width: 14rem;
+    width: 45%;
+    max-width: 14rem;
     height: 5rem;
+    @media (max-width: 500px) {
+        margin: 2rem .5rem 1.5rem .5rem; 
+        height: 4rem;
+    }
     border-radius: 1rem;
 `;
 
@@ -90,10 +105,10 @@ function UserGroupsPage() {
     return (
         <UserGroupsWrapper>
             <BackButton className="btn btn-md" route="/dashboard" >Dashboard</BackButton>
-            <div>
+            <ButtonRow>
                 <StyledButton data-form="create" onClick={selectForm} >Create New Group</StyledButton>
                 <StyledButton data-form="search" onClick={selectForm} >Search for Groups to Join</StyledButton>
-            </div>
+            </ButtonRow>
             <GroupTilesContainer className="GroupTilesContainer">
                 {groups.map(groupId => <GroupTile key={groupId} groupId={groupId}/>)}
             </GroupTilesContainer>

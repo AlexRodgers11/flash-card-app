@@ -21,7 +21,7 @@ const DashboardWrapper = styled.div`
 
 const StyledLink = styled(Link)`
     display: flex; 
-    margin: 5vw;
+    margin: 4vw;
     padding: .25rem;
     height: 24vw;
     width: 24vw;
@@ -92,7 +92,7 @@ function Dashboard() {
 
     return (
         <DashboardWrapper className="Dashboard">
-            <Grid>
+            <Grid className="Grid">
                 <StyledLink to="/decks/public" ><ImSearch className="icon" size="7rem" /><p className="hover-text">Search Public Decks</p></StyledLink>
                 <StyledLink to={`/users/${user.userId}/decks`} ><HiRectangleStack className="icon" size="7rem" /><p className="hover-text">Your Decks</p></StyledLink>
                 <StyledLink to={`/users/${user.userId}/settings`} ><RiUserSettingsFill className="icon" size = "7rem" /><p className="hover-text">Profile Settings</p></StyledLink>

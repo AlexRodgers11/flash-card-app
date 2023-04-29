@@ -56,7 +56,7 @@ const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
     height: 3.5rem;
     width: 3.5rem;
     &:hover {
-        border: 2px solid #03ffff;
+        color: #03ffff;
     }
 `;
 

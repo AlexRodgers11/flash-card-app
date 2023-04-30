@@ -130,7 +130,8 @@ const User = new Schema({
         allowDirectMessages: {
             type: Boolean,
             default: true
-        }
+        },
+        blockedUsers: [{type: Schema.Types.ObjectId, ref: "User"}]//not currently used but added so that existing users of app won't be missing the property when functionality added for it
     }
 }, {timestamps: true});
 

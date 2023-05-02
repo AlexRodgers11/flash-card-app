@@ -38,7 +38,7 @@ const ModalContent = styled.div`
         padding: 1rem;
     }
 	overflow: scroll;
-	max-height: 70%;
+	max-height: 80%;
 	scrollbar-width: none;
 	&::-web-kit-scrollbar {
 		display: none;

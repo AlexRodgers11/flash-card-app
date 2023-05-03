@@ -344,7 +344,8 @@ userRouter.post("/:protectedUserId/attempts", async (req, res, next) => {
                 answeredCorrectly: attemptData.answeredCorrectly,
                 wrongAnswerSelected: attemptData.wrongAnswerSelected,
                 fullDeckAttempt: savedDeckAttempt._id,
-                groupAttemptBelongsTo: practicedDeck.groupDeckBelongsTo || undefined
+                groupAttemptBelongsTo: practicedDeck.groupDeckBelongsTo || undefined,
+                attempter: req.user._id
             });
             const savedCardAttempt = await newCardAttempt.save();
 

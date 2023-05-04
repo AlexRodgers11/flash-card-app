@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router';
-import { endPractice, fetchDeck, practiceDeckAgain, resetSession, retryMissedCards } from '../reducers/practiceSessionSlice';
+import { endPractice, fetchPracticeDeck, practiceDeckAgain, resetSession, retryMissedCards } from '../reducers/practiceSessionSlice';
 import FlashCard from "./FlashCard";
 import MultipleChoiceCard from "./MultipleChoiceCard";
 import TrueFalseCard from "./TrueFalseCard";
@@ -142,9 +142,9 @@ function PracticeSession() {
     
     useEffect(() => {
         if((!activeCard?.cardType) && ((stats.numberCorrect + stats.numberWrong) !== numCards || numCards === 0)) {
-            dispatch(fetchDeck(deckId))
+            dispatch(fetchPracticeDeck(deckId))
                 .then(response => {
-                    const statusCode = response.payload.response.status
+                    const statusCode = response?.payload?.response?.status
                     if(statusCode === 400) {
                         alert("This deck doesn't have any cards. Redirecting to Dashboard");
                         navigate("/dashboard");
@@ -157,6 +157,7 @@ function PracticeSession() {
     
     useEffect(() => {
         return () => {
+            console.log("resetting session");
             dispatch(resetSession());
         }
     }, [dispatch]);

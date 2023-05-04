@@ -39,7 +39,7 @@ const initialState = {
     numCards: 0
 }
 
-export const fetchDeck = createAsyncThunk("practiceSession/fetchDeck", async(deckId) => {
+export const fetchPracticeDeck = createAsyncThunk("practiceSession/fetchPracticeDeck", async(deckId) => {
     try {
         const response = await client.get(`${baseURL}/decks/${deckId}/practice`);
         const cards = response.data.cards;
@@ -158,7 +158,7 @@ export const practiceSessionSlice = createSlice({
         builder.addCase(endPractice.fulfilled, () => {
             return {...initialState};
         });
-        builder.addCase(fetchDeck.fulfilled, (state, action) => {
+        builder.addCase(fetchPracticeDeck.fulfilled, (state, action) => {
             if(action.payload.cards) {
                 state.cards = action.payload.cards;
                 state.numCards = action.payload.cards.length;

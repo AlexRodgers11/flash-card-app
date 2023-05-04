@@ -7,7 +7,7 @@ import { removeDeckFromUser } from '../reducers/loginSlice';
 import { deleteDeck } from '../reducers/decksSlice';
 import { copyDeck } from '../reducers/loginSlice';
 import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
-import { setPracticeDeckGroup } from '../reducers/practiceSessionSlice';
+import { setDeckIdInSetup, setPracticeDeckGroup } from '../reducers/practiceSessionSlice';
 import useToggle from '../hooks/useToggle';
 import Modal from './Modal';
 import { DeckTileWrapper, TopWrapper, IndicatorsWrapper, StyledOptionsIcon, RightBlock, StyledOpenEye, StyledClosedEye, CardCountWrapper, Options, Option, ContentWrapper } from './StyledComponents/DeckTileStyles';
@@ -45,7 +45,8 @@ function DeckTile(props) {
             navigate(`/groups/${groupId}/decks/${props.deckId}`);
         } else if(location.pathname.includes("practice")) {
             if(deckData.cardCount > 0) {
-                navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
+                // navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
+                dispatch(setDeckIdInSetup({deckId: props.deckId}));
                 if(deckData.groupDeckBelongsTo) {
                     dispatch(setPracticeDeckGroup({groupId: deckData.groupDeckBelongsTo}));
                 }
@@ -92,7 +93,8 @@ function DeckTile(props) {
                     if(location.pathname.includes("public") && (!userDeckIds.includes(props.deckId) && !userGroupIds.includes(deckData.groupDeckBelongsTo))) {
                         toggleShowStatsNotTrackedModal();
                     } else {
-                        navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
+                        dispatch(setDeckIdInSetup({deckId: props.deckId}));
+                        // navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
                         if(deckData.groupDeckBelongsTo) {
                             dispatch(setPracticeDeckGroup({groupId: deckData.groupDeckBelongsTo}));
                         }

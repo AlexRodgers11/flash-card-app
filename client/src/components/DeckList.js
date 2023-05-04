@@ -3,9 +3,12 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDecksOfCategory, fetchDecksOfGroup, fetchDecksOfUser } from '../reducers/decksSlice';
 import DeckTile from './DeckTile';
+import Modal from './Modal';
+import SessionSetupForm from './SessionSetupForm';
 import styled from 'styled-components';
 import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
 import { useNavigate } from 'react-router';
+import { setDeckIdInSetup } from '../reducers/practiceSessionSlice';
 
 const DeckListWrapper = styled.div`
     min-width: 350px;
@@ -29,17 +32,13 @@ export default function DeckList(props) {
     const deckIds = useSelector((state) => state.decks.deckIds);
     const listType = useSelector((state) => state.decks.listType);
     const listId = useSelector((state) => state.decks.listId);
-    const [clickedDeckId, setClickedDeckId] = useState();
+    const deckInSetup = useSelector((state) => state.practiceSession.deckIdInSetup);
 
     const navigate = useNavigate();
 
-    const goToDeck = () => {
-        if(listType === "user") {
-            navigate(`/decks/${clickedDeckId}`);
-        } else {
-            navigate(`/groups/${listId}/decks/${clickedDeckId}`);   
-        }
-        setClickedDeckId("");
+
+    const handleCloseSessionSetupForm = () => {
+        dispatch(setDeckIdInSetup({deckId: ""}));
     }
 
     useEffect(() => {
@@ -72,6 +71,11 @@ export default function DeckList(props) {
     return (
         <DeckListWrapper className="DeckListWrapper">
             {deckIds.map(deckId => <DeckTile key={deckId} deckId={deckId} />)}
+            {deckInSetup && 
+                <Modal hideModal={handleCloseSessionSetupForm}>
+                    <SessionSetupForm />
+                </Modal>
+            }
         </DeckListWrapper>
     )
 }

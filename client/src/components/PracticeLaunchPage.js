@@ -52,7 +52,7 @@ function PracticeLaunchPage() {
     const deckIds = useSelector((state) => state.login.decks);
     const userId = useSelector((state) => state.login.userId);
     const [showDeckForm, toggleShowDeckForm] = useToggle(false);
-    
+
     return (
         <PracticeLaunchPageWrapper>
             {!deckIds.length && 

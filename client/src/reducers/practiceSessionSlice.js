@@ -4,6 +4,17 @@ import { client, shuffleArray } from "../utils";
 const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 const initialState = {
+    deckIdInSetup: "",
+    quickPracticeSelection: "random",
+    quickPracticeNumCards: 1,
+    filters: {
+        accuracyRate: 100,
+        lastPracticed: 0,
+        dateCreated: 0,
+        flashCard: true,
+        trueFalse: true,
+        multipleChoice: true
+    },
     practicedSinceAttemptsPulled: false,
     cards: [],
     activeCard: {
@@ -126,6 +137,19 @@ export const practiceSessionSlice = createSlice({
         resetSession: (state) => {
             return {...initialState, practicedSinceAttemptsPulled: true};
         },
+        setDeckIdInSetup: (state, action) => {
+            state.deckIdInSetup = action.payload.deckId;
+            state.groupDeckBelongsTo = "";
+        },
+        setFilters: (state, action) => {
+            state.filters = action.payload.filters;
+        },
+        setQuickPracticeNumCards: (state, action) => {
+            state.quickPracticeNumCards = action.payload.numCards;
+        },
+        setQuickPracticeSelection: (state, action) => {
+            state.quickPracticeSelection = action.payload.selection;
+        },
         setPracticeDeckGroup: (state, action) => {
             state.groupDeckBelongsTo = action.payload.groupId;
         }
@@ -172,5 +196,5 @@ export const practiceSessionSlice = createSlice({
     }
 });
 
-export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession, setPracticeDeckGroup } = practiceSessionSlice.actions;
+export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession, setDeckIdInSetup, setFilters, setQuickPracticeNumCards, setQuickPracticeSelection, setPracticeDeckGroup } = practiceSessionSlice.actions;
 export default practiceSessionSlice.reducer;

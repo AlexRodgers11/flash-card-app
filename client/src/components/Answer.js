@@ -50,13 +50,16 @@ function Answer(props) {
         setTimeout(() => {
             let answeredCorrectly = props.answer === activeCard.correctAnswer;
             dispatch(addCardAttempt({
-                answeredCorrectly, 
-                cardId: activeCard._id,
-                correctAnswer: activeCard.correctAnswer,
-                wrongAnswerSelected: answeredCorrectly ? "" : props.answer, 
-                question: activeCard.question,
-                cardType: activeCard.cardType,
-                datePracticed: Date.now()}));
+                    answeredCorrectly, 
+                    cardId: activeCard._id,
+                    correctAnswer: activeCard.correctAnswer,
+                    wrongAnswerSelected: answeredCorrectly ? "" : props.answer, 
+                    question: activeCard.question,
+                    cardType: activeCard.cardType,
+                    datePracticed: Date.now()
+                })
+            );
+            setClicked(false);
         }, 2500);
         // }, 10000);
     }

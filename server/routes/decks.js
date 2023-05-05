@@ -9,7 +9,7 @@ import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import Category from "../models/category.js";
 import User from "../models/user.js";
-import { extendedRateLimiter, getUserIdFromJWTToken } from "../utils.js";
+import { extendedRateLimiter, getUserIdFromJWTToken, shuffleArray } from "../utils.js";
 
 deckRouter.param("deckId", (req, res, next, deckId) => {
     Deck.findById(deckId, (err, deck) => {
@@ -106,7 +106,6 @@ deckRouter.get("/:deckId/practice-setup", getUserIdFromJWTToken, async (req, res
             
             if(req.deck.groupDeckBelongsTo) {
                 let attemptsOfUser = card.attempts.filter(attempt => {
-                    console.log({attempt});
                     return attempt.attempter?.toString() === req.userId.toString()
                 });
 
@@ -137,123 +136,6 @@ deckRouter.get("/:deckId/practice-setup", getUserIdFromJWTToken, async (req, res
     }
 });
 
-// deckRouter.get("/:deckId/practice", getUserIdFromJWTToken, async (req, res, next) => {
-//     try {
-//         if(req.deck.creator.toString() !== req.userId.toString() && !req.deck.publiclyAvailable) {
-//             const user = await User.findById(req.userId, "groups");
-//             if(!req.deck.groupDeckBelongsTo || !user.groups.some(group => group._id.toString() === req.deck.groupDeckBelongsTo.toString())) {
-//                 return res.status(401).send("You are not authorized to view this deck");
-//             }
-//         } else if(req.deck.cards.length < 1) {
-//             return res.status(400).send("This deck doesn't have any cards to practice");
-//         }
-//         const deck = await Deck.findById(req.deck._id, "cards")
-//             .populate({
-//                 path: "cards",
-//                 populate: {
-//                     path: "attempts",
-//                     select: "datePracticed answeredCorrectly createdAt"
-//                 }
-//             });
-
-//         if(req.query.sessionType) {
-//             if(req.query.sessionType === "quick") {
-//                 deck = await Deck.findById(req.deck._id, "cards")
-//                     .populate({
-//                         path: "cards",
-//                         populate: {
-//                             path: "attempts",
-//                             select: "datePracticed answeredCorrectly createdAt"
-//                         }
-//                     })
-//                     .sort((a, b) => {
-//                         switch(req.query.criteria) {
-//                             case "random":
-//                                 return 0;
-//                             case "least-practiced":
-//                                 if(a.attempts[0]?.datePracticed > b.attempts[0]?.datePracticed) {
-//                                     return 1
-//                                 } else if (b.attempts[0]?.datePracticed > a.attempts[0]?.datePracticed) {
-//                                     return -1;
-//                                 } else if(a.attempts[0] && !b.attempts[0]) {
-//                                     return 1;
-//                                 } else if(!a.attempts[0] && b.attempts[0]) {
-//                                     return -1
-//                                 } else {
-//                                     return 1;
-//                                 }
-//                             case "lowest-accuracy":
-//                                 let aAccuracy = a.attempts.length > 0 ? Math.round(a.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / a.attempts.length) : 0;
-//                                 let bAccuracy = b.attempts.length > 0 ? Math.round(b.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / b.attempts.length) : 0;
-
-//                                 return aAccuracy - bAccuracy;
-//                             case "newest":
-//                                 return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-//                             case "oldest":
-//                                 return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-//                         }
-//                     })
-//                     .slice(0, req.query.count);
-//             } else if(req.query.sessionType === "filtered") {
-//                 deck = await Deck.findById(req.deck._id, "cards")
-//                     .populate({
-//                         path: "cards",
-//                         populate: {
-//                             path: "attempts",
-//                             select: "datePracticed answeredCorrectly createdAt"
-//                         }
-//                     })
-//                     .filter(card => {
-//                         switch(req.query.filter) {
-//                             case "accuracy":
-//                                 const accuracyRate = card.attempts.length > 0 ? Math.round(card.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / card.attempts.length) : null;
-
-//                                 return accuracyRate <= Number(req.query.value);
-
-//                             case "date-practiced":
-//                                 const unixMillisecondsSincePracticed = card.attempts[card.attempts.length - 1]?.createdAt ? new Date(card.attempts[card.attempts.length - 1].createdAt).getTime() : 0;
-
-//                                 return unixMillisecondsSincePracticed >= Number(req.query.value);
-
-//                             case "date-created":
-//                                 const unixMillisecondsSinceCreated = new Date(card.createdAt).getTime();
-                                
-//                                 return unixMillisecondsSinceCreated >= Number(req.query.value);
-//                             case "card-type":
-//                                 if(card.cardType === "FlashCard") {
-//                                     return req.query.flashCard === "true";
-//                                 } else if(card.cardType === "TrueFalseCard") {
-//                                     return req.query.trueFalse === "true";
-//                                 } else if(card.cardType === "MultipleChoiceCard") {
-//                                     return req.query.multipleChoice === "true";
-//                                 } else {
-//                                     console.log("in bad case");
-//                                     return true;
-//                                 }
-//                             default: 
-//                                 return
-//                         }
-//                     });
-//             }
-//             const cardsWithoutAttempts = deck.cards.map(card => {
-//                 const { attempts, ...cardWithoutAttempts } = card.toObject();
-//                 return cardWithoutAttempts;
-//             })
-//             deck.set("cards", cardsWithoutAttempts);
-//         } else {
-//             deck = await Deck.findById(req.deck._id, "cards")
-//                 .populate("cards");
-//         }
-
-        
-
-//         res.status(200).send(deck);
-//     } catch (err) {
-//         console.error(err.message);
-//         res.status(500).send(err.message);
-//     }
-// });
-
 deckRouter.get("/:deckId/practice", getUserIdFromJWTToken, async (req, res, next) => {
     try {
         if(req.deck.creator.toString() !== req.userId.toString() && !req.deck.publiclyAvailable) {
@@ -264,9 +146,139 @@ deckRouter.get("/:deckId/practice", getUserIdFromJWTToken, async (req, res, next
         } else if(req.deck.cards.length < 1) {
             return res.status(400).send("This deck doesn't have any cards to practice");
         }
-        const deck = await Deck.findById(req.deck._id, "cards")
-            .populate("cards");
-        res.status(200).send(deck);
+
+        let responseObj;
+
+        if(req.query.sessionType === "quick") {
+            const deck = await Deck.findById(req.deck._id, "cards")
+                .populate({
+                    path: "cards",
+                    populate: {
+                        path: "attempts",
+                        select: "datePracticed answeredCorrectly createdAt"
+                    }
+                });
+            console.log({cards: deck.cards});
+            deck.cards
+                .sort((a, b) => {
+                    switch(req.query.criteria) {
+                        case "random":
+                            return 0;
+                        case "least-recently-practiced":
+                            let aDate = a.attempts[0] ? new Date(a.attempts[a.attempts.length - 1].datePracticed).getTime() : 0
+                            let bDate = b.attempts[0] ? new Date(b.attempts[b.attempts.length - 1].datePracticed).getTime() : 0;
+                            return aDate - bDate;
+                        case "least-practiced":
+                            return a.attempts.length - b.attempts.length;
+                        case "lowest-accuracy":
+                            let aAccuracy = a.attempts.length > 0 ? Math.round(a.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / a.attempts.length) : 0;
+                            let bAccuracy = b.attempts.length > 0 ? Math.round(b.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / b.attempts.length) : 0;
+                            return aAccuracy - bAccuracy;
+                        case "newest":
+                            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                        case "oldest":
+                            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+                    }
+                });
+            
+            let slicedCardsWithoutAttempts = deck.cards.slice(0, req.query.count).map(card => {
+                console.log({card});
+                const { attempts, ...cardWithoutAttempts } = card.toObject();
+                console.log({cardWithoutAttempts});
+                return cardWithoutAttempts;
+            });
+            if(req.query.criteria === "random") {
+                console.log({slicedCardsWithoutAttempts});
+                slicedCardsWithoutAttempts = shuffleArray(deck.cards).slice(0, req.query.count);
+                console.log({slicedCardsWithoutAttempts});
+            }
+            responseObj = {
+                _id: deck._id,
+                ...(deck.groupDeckBelongsTo && {groupDeckBelongsTo: deck.groupDeckBelongsTo}),
+                cards: slicedCardsWithoutAttempts
+            }
+        } else if(req.query.sessionType === "filtered") {
+            const deck = await Deck.findById(req.deck._id, "cards")
+                .populate({
+                    path: "cards",
+                    populate: {
+                        path: "attempts",
+                        select: "datePracticed answeredCorrectly createdAt"
+                    }
+                })
+            let filteredCards = deck.cards
+                .filter(card => {
+                    const accuracyRate = card.attempts.length > 0 ? Math.round(card.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / card.attempts.length) : 0;
+
+                    
+                    if(accuracyRate > Number(req.query.accuracyRate)) {
+                        console.log({accuracyRate});
+                        console.log({query: req.query.accuracyRate});
+                        console.log("filtered out for accuracy rate");
+                        return false;
+                    }
+
+                    let now = Date.now();
+
+                    const lastPracticed = card.attempts[card.attempts.length - 1]?.createdAt ? new Date(card.attempts[card.attempts.length - 1].createdAt).getTime() : 0;
+                    
+                    const millisecondsSincePracticed = now - lastPracticed;
+                
+                    const daysSincePracticed = Math.floor(millisecondsSincePracticed / 86400000);
+                    
+                    if(daysSincePracticed < Number(req.query.lastPracticed) / 86400000) {
+                        console.log("this card was filtered out for date practiced");
+                        console.log({daysSincePracticed});
+                        console.log({query: Number(req.query.lastPracticed) / 86400000});
+                        return false;
+                    }
+
+                    const dateCreated = new Date(card.createdAt).getTime();
+                    const millisecondsSinceCreated = now - dateCreated;
+                    const daysSinceCreated = Math.floor(millisecondsSinceCreated / 86400000);
+
+                    if(daysSinceCreated < Number(req.query.dateCreated) / 86400000) {
+                        console.log("filtered out for date created");
+                        return false;
+                    }
+
+                    if(card.cardType === "FlashCard" && req.query.flashCard !== "true") {
+                        console.log("filtered out for cardType (FC)");
+                        return false;
+                    }
+
+                    if(card.cardType === "TrueFalseCard" && req.query.trueFalse !== "true") {
+                        console.log("filtered out for cardType (TF)");
+                        return false;
+                    }
+
+                    if(card.cardType === "MultipleChoiceCard" && req.query.multipleChoice !== "true") {
+                        console.log({query: req.query.multipleChoice});
+                        return false;
+                    }
+
+                    
+                    return true;
+
+                });
+            const cardsWithoutAttempts = filteredCards.map(card => {
+                const { attempts, ...cardWithoutAttempts } = card.toObject();
+                return cardWithoutAttempts;
+            })
+
+            responseObj = {
+                _id: deck._id,
+                ...(deck.groupDeckBelongsTo && {groupDeckBelongsTo: deck.groupDeckBelongsTo}),
+                cards: cardsWithoutAttempts
+            }
+        } else if(req.query.sessionType === "full") {
+            responseObj = await Deck.findById(req.deck._id, "cards")
+                .populate("cards");
+        } else {
+            return res.status(400).send("Bad request, invalid session type selected");
+        }
+
+        res.status(200).send(responseObj);
     } catch (err) {
         console.error(err.message);
         res.status(500).send(err.message);

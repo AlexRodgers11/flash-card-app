@@ -5,6 +5,7 @@ const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 const initialState = {
     deckIdInSetup: "",
+    sessionType: "full",
     quickPracticeSelection: "random",
     quickPracticeNumCards: 1,
     filters: {
@@ -39,9 +40,17 @@ const initialState = {
     numCards: 0
 }
 
-export const fetchPracticeDeck = createAsyncThunk("practiceSession/fetchPracticeDeck", async(deckId) => {
+export const fetchPracticeDeck = createAsyncThunk("practiceSession/fetchPracticeDeck", async({deckId, sessionType, options}) => {
     try {
-        const response = await client.get(`${baseURL}/decks/${deckId}/practice`);
+        let queryString = "";
+        if(sessionType === "quick") {
+            queryString += `?sessionType=quick&criteria=${options.quickPracticeSelection}&count=${options.quickPracticeNumCards}`;
+        } else if(sessionType === "filtered") {
+            queryString += `?sessionType=filtered&accuracyRate=${options.accuracyRate}&lastPracticed=${options.lastPracticed}&dateCreated=${options.dateCreated}&flashCard=${options.flashCard}&trueFalse=${options.trueFalse}&multipleChoice=${options.multipleChoice}`;
+        } else {
+            queryString += "?sessionType=full";
+        }
+        const response = await client.get(`${baseURL}/decks/${deckId}/practice${queryString}`);
         const cards = response.data.cards;
 
         const practiceSet = shuffleArray(response.data.cards).map(card => {
@@ -81,7 +90,6 @@ const saveAttempts = async (deckId, userId, cardAttempts, accuracyRate) => {
 }
 
 export const practiceDeckAgain = createAsyncThunk("practiceSession/practiceDeckAgain", async ({deckId, userId, retryStatus, cardAttempts, accuracyRate, trackSession}) => {
-    console.log({trackSession});
     if(!retryStatus && trackSession) {
         await saveAttempts(deckId, userId, cardAttempts, accuracyRate)
     }
@@ -135,11 +143,12 @@ export const practiceSessionSlice = createSlice({
             state.practicedSinceAttemptsPulled = false;
         },
         resetSession: (state) => {
+            console.log("resetting session");
             return {...initialState, practicedSinceAttemptsPulled: true};
         },
         setDeckIdInSetup: (state, action) => {
             state.deckIdInSetup = action.payload.deckId;
-            state.groupDeckBelongsTo = "";
+            // state.groupDeckBelongsTo = "";//why have this?
         },
         setFilters: (state, action) => {
             state.filters = action.payload.filters;
@@ -152,6 +161,23 @@ export const practiceSessionSlice = createSlice({
         },
         setPracticeDeckGroup: (state, action) => {
             state.groupDeckBelongsTo = action.payload.groupId;
+        },
+        setSessionType: (state, action) => {
+            state.sessionType = action.payload.sessionType;
+        },
+        resetSessionSetupFormData: (state, action) => {
+            state.deckIdInSetup = "";
+            state.sessionType = "full";
+            state.quickPracticeSelection = "random";
+            state.quickPracticeNumCards = 1;
+            state.filters = {
+                accuracyRate: 100,
+                lastPracticed: 0,
+                dateCreated: 0,
+                flashCard: true,
+                trueFalse: true,
+                multipleChoice: true
+            }
         }
     },
     extraReducers: (builder) => {
@@ -196,5 +222,5 @@ export const practiceSessionSlice = createSlice({
     }
 });
 
-export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession, setDeckIdInSetup, setFilters, setQuickPracticeNumCards, setQuickPracticeSelection, setPracticeDeckGroup } = practiceSessionSlice.actions;
+export const { addCardAttempt, answerCard, resetPracticedSinceAttemptsPulled, resetSession, setDeckIdInSetup, setFilters, setQuickPracticeNumCards, setQuickPracticeSelection, setPracticeDeckGroup, setSessionType, resetSessionSetupFormData } = practiceSessionSlice.actions;
 export default practiceSessionSlice.reducer;

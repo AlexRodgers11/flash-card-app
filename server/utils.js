@@ -18,6 +18,16 @@ export const generateCode = (characterCount) => {
     return code;
 }
 
+////Durstenfeld shuffle, copied from https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+export const shuffleArray = (array) => {
+    let arrayCopy = [...array];
+    for (let i = arrayCopy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arrayCopy[i], arrayCopy[j]] = [arrayCopy[j], arrayCopy[i]];
+    }
+    return arrayCopy;
+}
+
 const getRandomCardType = num => {
     if(num < .33) {
         return "multiple-choice"

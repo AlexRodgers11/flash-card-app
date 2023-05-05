@@ -8,7 +8,7 @@ import SessionSetupForm from './SessionSetupForm';
 import styled from 'styled-components';
 import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
 import { useNavigate } from 'react-router';
-import { setDeckIdInSetup } from '../reducers/practiceSessionSlice';
+import { resetSessionSetupFormData, setDeckIdInSetup } from '../reducers/practiceSessionSlice';
 
 const DeckListWrapper = styled.div`
     min-width: 350px;
@@ -34,11 +34,8 @@ export default function DeckList(props) {
     const listId = useSelector((state) => state.decks.listId);
     const deckInSetup = useSelector((state) => state.practiceSession.deckIdInSetup);
 
-    const navigate = useNavigate();
-
-
     const handleCloseSessionSetupForm = () => {
-        dispatch(setDeckIdInSetup({deckId: ""}));
+        dispatch(resetSessionSetupFormData());
     }
 
     useEffect(() => {

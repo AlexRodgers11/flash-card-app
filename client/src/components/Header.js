@@ -12,6 +12,7 @@ import { IoMailSharp, IoNotificationsSharp } from "react-icons/io5";
 import styled from "styled-components";
 import Logo from "./Logo";
 import { dispatchWithExpiredTokenCatch } from "../utils";
+import { resetSessionSetupFormData, setDeckIdInSetup } from "../reducers/practiceSessionSlice";
 
 const HeaderWrapper = styled.nav`
     height: 5.5rem;
@@ -149,6 +150,11 @@ function Header() {
         handleHideModal();
     }
 
+    const handleGoToDashboard = () => {
+        dispatch(setDeckIdInSetup(""));
+        dispatch(resetSessionSetupFormData());
+    }
+
     const communicationsFetchInterval = useRef();
 
     useEffect(() => {
@@ -164,7 +170,7 @@ function Header() {
             <div className="container-fluid" style={{height: "100%"}}>
                 <div style={{display: "flex", alignItems: "center", height: "100%"}}>
                     <div className="navbar-brand">
-                        <Link to={userId ? "/dashboard" : "/"}>
+                        <Link onClick={handleGoToDashboard} to={userId ? "/dashboard" : "/"}>
                             <Logo />
                         </Link>
                     </div>

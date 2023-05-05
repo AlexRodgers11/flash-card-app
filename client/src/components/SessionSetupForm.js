@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import styled from 'styled-components';
 import { client } from '../utils';
-import { setFilters, setQuickPracticeNumCards, setQuickPracticeSelection } from '../reducers/practiceSessionSlice';
+import { setFilters, setQuickPracticeNumCards, setQuickPracticeSelection, setSessionType } from '../reducers/practiceSessionSlice';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -12,7 +12,7 @@ const SessionSetupFormWrapper = styled.div`
     border: 2px solid black;
 `;
 
-const PracticeAll = styled.div`
+const PracticeAll = styled.form`
     padding: 1rem 1rem;
     display: flex;
     justify-content: space-between;
@@ -121,7 +121,6 @@ function SessionSetupForm() {
     }
 
     const handleNumCardsChange = (evt) => {
-        console.log({value: evt.target.value});
         dispatch(setQuickPracticeNumCards({numCards: Number(evt.target.value)}));
     }
 
@@ -133,24 +132,14 @@ function SessionSetupForm() {
         }
     }
 
-    const handlePracticeAllSubmit = (evt) => {
+    const handlePracticeSelectionSubmission = (evt) => {
         evt.preventDefault();
-        navigate(`/users/${userId}/decks/${deckInSetup}/practice-session`);
-    }
-
-    const handleQuickPracticeSubmit = (evt) => {
-        evt.preventDefault();
-        navigate(`/users/${userId}/decks/${deckInSetup}/practice-session`);
-    }
-
-    const handleFilteredPracticeSubmit = (evt) => {
-        evt.preventDefault();
+        dispatch(setSessionType({sessionType: evt.target.dataset.sessiontype}));
         navigate(`/users/${userId}/decks/${deckInSetup}/practice-session`);
     }
 
     useEffect(() => {
         if(!cardsFetched) {
-            console.log("fetching cards");
             const fetchCards = async () => {
                 try {
                     const response = await client.get(`${baseURL}/decks/${deckInSetup}/practice-setup`);
@@ -213,7 +202,7 @@ function SessionSetupForm() {
   	return (
 		<SessionSetupFormWrapper>
 			<div>
-                <PracticeAll onSubmit={handlePracticeAllSubmit} cardsLength={cards.length}>
+                <PracticeAll onSubmit={handlePracticeSelectionSubmission} data-sessiontype="full" cardsLength={cards.length}>
                     <h2>Full Practice</h2>
                     <button className="btn btn-primary btn-lg">Practice all cards</button>
                 </PracticeAll>
@@ -221,7 +210,7 @@ function SessionSetupForm() {
                     <>
                         <QuickPractice className="QuickPractice">
                             <h2>Quick Practice</h2>
-                            <OptionsBlock onSubmit={handleQuickPracticeSubmit} className="OptionsBlock">
+                            <OptionsBlock id="quick-form" onSubmit={handlePracticeSelectionSubmission} data-sessiontype="quick" className="OptionsBlock">
                                 <HalfBlock className="HalfBlock">
                                     <label htmlFor="quick-num-cards">Number of Cards</label>
                                     <select id="quick-num-cards" value={numCards} onChange={handleNumCardsChange}>
@@ -240,6 +229,16 @@ function SessionSetupForm() {
                                                 onChange={handleQuickPracticeSelectionChange} />
                                             <label htmlFor="random">Random</label>
 
+                                        </div>
+                                        <div>
+                                            <input 
+                                                type="radio" 
+                                                name="quick-selection" 
+                                                id="least-recently-practiced" 
+                                                value="least-recently-practiced" 
+                                                checked={quickPracticeSelection === "least-recently-practiced"}  
+                                                onChange={handleQuickPracticeSelectionChange} />
+                                            <label htmlFor="least-recently-practiced">Least Recently Practiced</label>
                                         </div>
                                         <div>
                                             <input 
@@ -285,7 +284,7 @@ function SessionSetupForm() {
                                 </HalfBlock>
                             </OptionsBlock>
                             <ButtonWrapper>
-                                <button className="btn btn-success btn-lg">Practice {numCards} Card{numCards > 1 ? "s" : ""}</button>
+                                <button type="submit" form="quick-form" className="btn btn-success btn-lg">Practice {numCards} Card{numCards > 1 ? "s" : ""}</button>
                             </ButtonWrapper>
                         </QuickPractice>
                         <DividerContainer>
@@ -294,7 +293,7 @@ function SessionSetupForm() {
                         </DividerContainer>
                         <FilteredPractice>
                             <h2>Filtered Practice</h2>
-                            <OptionsBlock onSubmit={handleFilteredPracticeSubmit}>
+                            <OptionsBlock id="filtered-form" onSubmit={handlePracticeSelectionSubmission} data-sessiontype="filtered">
                                 <HalfBlock className="HalfBlock">
                                     <p>Number of Cards</p>
                                     <p>{getFilterPassingCount()}</p>
@@ -369,7 +368,7 @@ function SessionSetupForm() {
                                 </HalfBlock>
                             </OptionsBlock>    
                             <ButtonWrapper>
-                                <button disabled={getFilterPassingCount() === 0} className="btn btn-success btn-lg">{getFilterPassingCount() === 0 ? "No Cards Meet Criteria" : "Practice Selection"}</button>
+                                <button type="submit" form="filtered-form" disabled={getFilterPassingCount() === 0} className="btn btn-success btn-lg">{getFilterPassingCount() === 0 ? "No Cards Meet Criteria" : "Practice Selection"}</button>
                             </ButtonWrapper>
                         </FilteredPractice>
                     </>

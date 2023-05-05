@@ -6,7 +6,6 @@ import FlashCard from "./FlashCard";
 import MultipleChoiceCard from "./MultipleChoiceCard";
 import TrueFalseCard from "./TrueFalseCard";
 import { store } from '../store';
-import { useRef } from 'react';
 import styled from 'styled-components';
 
 const createCard = (type) => {
@@ -137,12 +136,24 @@ function PracticeSession() {
     const loggedInUserId = useSelector((state) => state.login.userId);
     const userDeckIds = useSelector((state) => state.login.decks.map((deck) => deck._id));
     const userGroupIds = useSelector((state) => state.login.groups);
+    const sessionType = useSelector((state) => state.practiceSession.sessionType);
+    const quickPracticeSelection = useSelector((state) => state.practiceSession.quickPracticeSelection);
+    const quickPracticeNumCards = useSelector((state) => state.practiceSession.quickPracticeNumCards);
+    const filters = useSelector((state) => state.practiceSession.filters);
+    const deckIdInSetup = useSelector((state) => state.practiceSession.deckIdInSetup);
     let dispatch = useDispatch();
     let navigate = useNavigate();
     
     useEffect(() => {
-        if((!activeCard?.cardType) && ((stats.numberCorrect + stats.numberWrong) !== numCards || numCards === 0)) {
-            dispatch(fetchPracticeDeck(deckId))
+        if((deckIdInSetup === deckId && (!activeCard?.cardType)) && ((stats.numberCorrect + stats.numberWrong) !== numCards || numCards === 0)) {
+            const options = {
+                ...(sessionType === "quick" && {
+                    quickPracticeSelection,
+                    quickPracticeNumCards
+                }),
+                ...(sessionType === "filtered" && filters)
+            }
+            dispatch(fetchPracticeDeck({deckId: deckId, sessionType: sessionType, options: options}))
                 .then(response => {
                     const statusCode = response?.payload?.response?.status
                     if(statusCode === 400) {
@@ -153,11 +164,12 @@ function PracticeSession() {
                     }
                 })
         } 
-    }, [activeCard, deckId, dispatch, navigate, numCards, stats]);
+    }, [activeCard, deckId, deckIdInSetup, dispatch, filters, quickPracticeNumCards, quickPracticeSelection, sessionType, navigate, numCards, stats]);
     
     useEffect(() => {
         return () => {
             console.log("resetting session");
+            localStorage.removeItem("persist:practiceSession");
             dispatch(resetSession());
         }
     }, [dispatch]);

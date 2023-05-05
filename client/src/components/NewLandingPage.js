@@ -110,11 +110,12 @@
 
 
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import Modal from './Modal';
 import styled, { keyframes } from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
 
 const NewLandingPageWrapper = styled.div`
 	color: white;
@@ -335,9 +336,12 @@ const BackTwoText = styled.div`
     animation-delay: 6s;
 `;
 
+const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+
 function NewLandingPage() {
 	const userId = useSelector((state) => state.login.userId);
 	const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
+    const [publicDeckCount, setPublicDeckCount] = useState();
 	const location = useLocation();
 	const navigate = useNavigate();
 	
@@ -358,7 +362,32 @@ function NewLandingPage() {
 		if(userId && accountSetupStage === "complete") {
 			navigate("/dashboard");
 		}
-	});
+	}, [userId, accountSetupStage, navigate]);
+
+    
+    const getPublicDeckCountInterval = useRef();
+
+    useEffect(() => {
+        if(!getPublicDeckCountInterval.current) {
+            const getPublicDeckCount = async () => {
+                const response = await axios.get(`${baseURL}/decks/public-count`);
+                return response.data.deckCount;
+            }
+
+            getPublicDeckCountInterval.current = setInterval(async () => {
+                const deckCount = await getPublicDeckCount();
+                setPublicDeckCount(deckCount);
+            }, 3000);
+            
+            return () => {
+                clearInterval(getPublicDeckCountInterval.current);
+            }
+        }
+    }, []);
+
+    if(!publicDeckCount) {
+        return <></>;
+    }
 
 	return (
 		<NewLandingPageWrapper className="LandingPageWrapper">
@@ -381,11 +410,12 @@ function NewLandingPage() {
 				<button onClick={openForm} data-location="register/credentials" className="btn btn-lg">SignUp</button>
 			</LoginControls>	
             </MainSection>
-            <Section color="green" height="70vh">
+            <Section color="black" height="70vh">
                 <SectionHeading>Create different types of cards: Flip, True/False, and Multiple Choice</SectionHeading>
             </Section>
             <Section color="orange" height="70vh">
                 <SectionHeading>Browse public decks or create your own</SectionHeading>
+                <p>{publicDeckCount} public decks and counting</p>
             </Section>
             <Section color="blue" height="70vh">
                 <SectionHeading>Form study groups and share resources</SectionHeading>    

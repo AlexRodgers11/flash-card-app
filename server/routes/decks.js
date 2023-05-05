@@ -55,6 +55,15 @@ deckRouter.get("/", async (req, res, next) => {
     }   
 });
 
+deckRouter.get("/public-count", extendedRateLimiter, async (req, res, next) => {
+    try {
+        const decks = await Deck.find({publiclyAvailable: true}, "_id");
+        res.status(200).send({deckCount: decks.length});
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 deckRouter.get("/:deckId/tile", getUserIdFromJWTToken, extendedRateLimiter, async (req, res, next) => {
     try {
         if(req.deck.creator.toString() !== req.userId.toString() && !req.deck.publiclyAvailable) {

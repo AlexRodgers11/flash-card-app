@@ -189,7 +189,7 @@ userRouter.get("/:protectedUserId/card-stats", async (req, res, next) => {
                     return {
                         _id: card._id,
                         cardQuestion: card.question,
-                        dateLastPracticed: card.attempts[0]?.createdAt,
+                        dateLastPracticed: card.attempts[card.attempts.length - 1]?.createdAt,
                         attemptCount: card.attempts.length,
                         accuracyRate: card.attempts.length > 0 ? Math.round(card.attempts.reduce((acc, curr) => acc + (curr.answeredCorrectly ? 1 : 0), 0) * 100 / card.attempts.length) : undefined,
                     }

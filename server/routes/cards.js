@@ -4,6 +4,7 @@ const cardRouter = express.Router();
 import { Card, FlashCard, MultipleChoiceCard, TrueFalseCard } from "../models/card.js";
 import User from "../models/user.js"
 import Deck from "../models/deck.js";
+import Group from "../models/group.js";
 import { getUserIdFromJWTToken } from "../utils.js";
 
 cardRouter.param("cardId", (req, res, next, cardId) => {

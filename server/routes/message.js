@@ -241,7 +241,7 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
 
                 const deckDecisionMessage = new DeckDecision({
                     sendingUser: req.userId,
-                    receivingUsers: [submittedDeck.creator. _id],
+                    receivingUsers: [submittedDeck.creator],
                     acceptanceStatus: req.body.decision,
                     comment: req.body.comment,
                     deckName: submittedDeck.name,

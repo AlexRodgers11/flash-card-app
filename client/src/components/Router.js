@@ -6,7 +6,6 @@ import Dashboard from './Dashboard';
 import Deck from './Deck';
 import Group from './Group';
 import LandingPage from './LandingPage';
-import NewLandingPage from './NewLandingPage';
 import Login from './Login';
 import PracticeSession from './PracticeSession';
 import RegisterCredentialsForm from './RegisterCredentialsForm';
@@ -95,7 +94,7 @@ function Router() {
                 <Route exact path="/users/:userId/decks/:deckId/practice-session" element={<PracticeSession />} />
                 <Route exact path="/dashboard" element={<Dashboard />} />
                 {/* <Route path="/" element={<LandingPage />}> */}
-                <Route path="/" element={<NewLandingPage />}>
+                <Route path="/" element={<LandingPage />}>
                     <Route path="login" element={<Login />} />
                     <Route path="register/credentials" element={<RegisterCredentialsForm />} />
                     <Route path="register/email-verification" element={<RegisterEmailVerificationForm />} />

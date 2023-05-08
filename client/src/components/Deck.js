@@ -204,7 +204,7 @@ function Deck() {
     return (
         <DeckWrapper>
             <BackButton route={location.pathname.slice(0, location.pathname.lastIndexOf("/"))}>All Decks</BackButton>
-            <DeleteButton data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>
+            {unlockControl() && <DeleteButton data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>}
             {!nameEditMode ? 
                 <NameBlock>
                     <h1>{name}</h1> 

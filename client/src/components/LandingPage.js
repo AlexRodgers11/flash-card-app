@@ -374,6 +374,8 @@ function LandingPage() {
                 return response.data.deckCount;
             }
 
+            getPublicDeckCount();
+
             getPublicDeckCountInterval.current = setInterval(async () => {
                 const deckCount = await getPublicDeckCount();
                 setPublicDeckCount(deckCount);
@@ -384,10 +386,6 @@ function LandingPage() {
             }
         }
     }, []);
-
-    if(!publicDeckCount) {
-        return <></>;
-    }
 
 	return (
 		<LandingPageWrapper className="LandingPageWrapper">
@@ -415,7 +413,7 @@ function LandingPage() {
             </Section>
             <Section color="orange" height="70vh">
                 <SectionHeading>Browse public decks or create your own</SectionHeading>
-                <p>{publicDeckCount} public decks and counting</p>
+                {publicDeckCount && <p>{publicDeckCount} public decks and counting</p>}
             </Section>
             <Section color="blue" height="70vh">
                 <SectionHeading>Form study groups and share resources</SectionHeading>    

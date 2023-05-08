@@ -1,120 +1,8 @@
-//flip left horizontally for 1 second, wait 2 seconds- left backwards- 
-    //start at 0seconds ends at 1 second
-//flip right vertically for 1 second, wait 2 seconds- right upside down
-    //start at 3 seconds
-//flip left vertically for 1 second, wait 2 seconds- left backwards and upside down 
-    //start at 6 seconds ends at 7 seconds
-//flip right horizontally for 1 seconds, wait 2 seconds- right backwards and upside down
-    //start at 9 seconds
-//flip left horizontally for 1 second, wait 2 seconds- left upside down
-    //start at 12 seconds ends at 13 seconds
-//flip right vertically for 1 second, wait 2 seconds- right backwards
-    //start at 15 seconds
-//flip left vertically for 1 second, wait 2 seconds- left in original position
-    //start at 18 seconds ends at 19 seconds
-//flip right horizontally for 1 second, wait 2 seconds- right in original position
-    //start at 21 seconds
-//flip left horizontally for 1 second, wait 2 seconds- left backwards
-    //start at 24 seconds
-//flip right vertically for 1 second, wait 2 seconds- left backwards- 
-    //start at 27 seconds
-//flip right vertically for 1 second, wait 2 seconds- right upside down
-    //start at 30 seconds
-//flip left vertically for 1 second, wait 2 seconds- left backwards and upside down 
-    //start at 33 seconds
-//flip right horizontally for 1 seconds, wait 2 seconds- right backwards and upside down
-    //start at 36 seconds
-//flip left horizontally for 1 second, wait 2 seconds- left upside down
-    //start at 39 seconds
-//flip right vertically for 1 second, wait 2 seconds- right backwards
-    //start at 42 seconds
-//flip left vertically for 1 second, wait 2 seconds- left in original position
-    //start at 45 seconds
-//flip right horizontally for 1 second, wait 2 seconds- right in original position
-    //start at 48 seconds
-//flip left horizontally for 1 second, wait seconds- left in original position
-    //start at 51
-
-    
-//0 seconds-flip horizontal show back
-//1 back-showing
-//2 seconds (8.33%)- flip front text
-//6 seconds- flip vertical show front
-//7 front-showing
-//12 seconds- flip horizontal show back
-//13 back-showing
-//14 seconds (58.33%)- flip front text
-//18 seconds- flip vertical show front
-//19 front-showing
-
-//0 seconds-flip horizontal show back
-//1 back-showing (correct)
-//6 seconds- flip vertical show front
-//7 front-showing
-//8 seconds- flip back text
-//12 seconds- flip horizontal show back
-//13 back-showing
-//18 seconds- flip vertical show front
-//19 front-showing
-//20 seconds- flip back text
-
-// const rotateCard1 = keyframes`
-//     0% {
-//         transform: rotateX(0deg) rotateY(0deg); //(front correct) flip l/r blue to red
-//     }
-//     3.7%, 33.3% {
-//         transform: rotateX(0deg) rotateY(180deg); //(back correct)
-//         //need to flip both ways 
-//     }
-//     37%, 55.56% {
-//         transform: rotateX(180deg) rotateY(180deg);//(front backward and upside down)
-//     }
-//     59.26%, 77.78% {
-//         transform: rotateX(180deg) rotateY(0deg);//(back backward and upside down)
-//     }
-//     81.48%, 100% {
-//         transform: rotateX(0deg) rotateY(0deg);//(front correct)
-//     }
-// `;
-
-// const rotateCard2 = keyframes`
-//     0% {
-//         transform: rotateX(0deg) rotateY(0deg);//original
-//     }
-//     3.7%, 33.3% {
-//         transform: rotateX(180deg) rotateY(0deg);//upside down
-//     }
-//     37%, 55.56% {
-//         transform: rotateX(180deg) rotateY(180deg);//backward and upside down
-//     }
-//     59.26%, 77.78% {
-//         transform: rotateX(0deg) rotateY(180deg);//backward
-//     }
-//     81.48%, 100% {
-//         transform: rotateX(0deg) rotateY(0deg);//original
-//     }
-// `;
-
-//step 0 (no flip) (front is correct)
-//step 1 (flip l/r) (back is correct)
-    //starts at 0% ends at 3.7%
-//step 2 (flip u/d) (front is upside down and backward)
-    //starts at 33.3% ends at 37%
-//step 3 (flip l/r) (back is upside down and backward)
-    //starts at 55.56% ends at 59.26%
-//step 4 (flip u/d) (front is correct)
-    //starts at 77.78% ends at 81.48%
-
-//step 5 (flip l/r) (back is correct)
-    //starts at 100% ends at 3.7%
-
-
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import Modal from './Modal';
 import styled, { keyframes } from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
 
 const LandingPageWrapper = styled.div`
@@ -208,36 +96,46 @@ const SectionHeading = styled.h3`
 const rotateCard1 = keyframes`
     0% {
         transform: rotateX(0deg) rotateY(0deg); //(front correct) flip l/r blue to red
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
     4.17%, 25% {
         transform: rotateX(0deg) rotateY(180deg); //(back correct)
+        -webkit-transform: rotateX(0deg) rotateY(180deg);
     }
     29.17%, 50% {
         transform: rotateX(180deg) rotateY(180deg);//(front backward and upside down)
+        -webkit-transform: rotateX(180deg) rotateY(180deg);
     }
     54.17%, 75% {
         transform: rotateX(180deg) rotateY(0deg);//(back backward and upside down)
+        -webkit-transform: rotateX(180deg) rotateY(0deg);
     }
     79.17%, 100% {
         transform: rotateX(0deg) rotateY(0deg);//(front correct)
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
 `;
 
 const rotateCard2 = keyframes`
     0% {
         transform: rotateX(0deg) rotateY(0deg); //(front correct) flip l/r blue to red
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
     4.17%, 25% {
         transform: rotateX(180deg) rotateY(0deg); //(back correct)
+        -webkit-transform: rotateX(180deg) rotateY(0deg);
     }
     29.17%, 50% {
         transform: rotateX(180deg) rotateY(180deg);//(front backward and upside down)
+        -webkit-transform: rotateX(180deg) rotateY(180deg);
     }
     54.17%, 75% {
         transform: rotateX(0deg) rotateY(180deg);//(back backward and upside down)
+        -webkit-transform: rotateX(0deg) rotateY(180deg);
     }
     79.17%, 100% {
         transform: rotateX(0deg) rotateY(0deg);//(front correct)
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
 `;
 
@@ -254,46 +152,58 @@ const TitleCard = styled.div`
     height: 20rem;
     &.first {
         animation: ${rotateCard1} 24s infinite;
+        -webkit-animation: ${rotateCard1} 24s infinite;
     }
     &.second {
         animation: ${rotateCard2} 24s infinite;
+        -webkit-animation: ${rotateCard2} 24s infinite;
         animation-delay: 3s;
+        -webkit-animation-delay: 3s;
     }
 `;
 
 const rotateCardFrontText = keyframes`
     0%, 8.33% {
         transform: rotateX(0deg) rotateY(0deg);
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
     9%, 58.33% {
         transform: rotateX(180deg) rotateY(180deg);
+        -webkit-transform: rotateX(180deg) rotateY(180deg);
     }
     59%, 100% {
         transform: rotateX(0deg) rotateY(0deg);
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
 `;
 
 const rotateCardOneBackText = keyframes`
     0%, 33.33% {
         transform: rotateX(0deg) rotateY(0deg);
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
     34%, 80% {
         transform: rotateX(180deg) rotateY(180deg);
+        -webkit-transform: rotateX(180deg) rotateY(180deg);
     }
     81%, 100% {
         transform: rotateX(0deg) rotateY(0deg);
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
 `;
 
 const rotateCardTwoBackText = keyframes`
     0%, 15% {
         transform: rotateX(180deg) rotateY(180deg);
+        -webkit-transform: rotateX(180deg) rotateY(180deg);
     }
     16%, 80% {
         transform: rotateX(0deg) rotateY(0deg);
+        -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
     81%, 100% {
         transform: rotateX(180deg) rotateY(180deg);
+        -webkit-transform: rotateX(180deg) rotateY(180deg);
     }
 `;
 
@@ -305,35 +215,43 @@ const Side = styled.div`
     width: 100%;
     position: absolute;
     backface-visibility: hidden;
-    
+    -webkit-backface-visibility: hidden;
 `;
 
 const CardOneFront = styled(Side)`
     animation: ${rotateCardFrontText} 24s infinite;
+    -webkit-animation: ${rotateCardFrontText} 24s infinite;
 `;
 const CardTwoFront = styled(Side)`
     animation: ${rotateCardFrontText} 24s infinite;
+    -webkit-animation: ${rotateCardFrontText} 24s infinite;
     animation-delay: 6s;
+    -webkit-animation-delay: 6s;
 `;
     
 const CardOneBack = styled(Side)`
     z-index: -1;
     transform: rotateY(180deg);
-
+    -webkit-transform: rotateY(180deg);
 `;
 
 const CardTwoBack = styled(Side)`
     z-index: -1;
     transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
 `;
 
 const BackOneText = styled.div`
     animation: ${rotateCardOneBackText} 24s infinite;
+    -webkit-animation: ${rotateCardOneBackText} 24s infinite;
 `;
 const BackTwoText = styled.div`
     transform: rotateX(180deg) rotateY(180deg);
+    -webkit-transform: rotateX(180deg) rotateY(180deg);
     animation: ${rotateCardTwoBackText} 24s infinite;
+    -webkit-animation: ${rotateCardTwoBackText} 24s infinite;
     animation-delay: 6s;
+    -webkit-animation-delay: 6s;
 `;
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
@@ -428,3 +346,81 @@ function LandingPage() {
 }
 
 export default LandingPage;
+
+
+
+
+//flip left horizontally for 1 second, wait 2 seconds- left backwards- 
+    //start at 0seconds ends at 1 second
+//flip right vertically for 1 second, wait 2 seconds- right upside down
+    //start at 3 seconds
+//flip left vertically for 1 second, wait 2 seconds- left backwards and upside down 
+    //start at 6 seconds ends at 7 seconds
+//flip right horizontally for 1 seconds, wait 2 seconds- right backwards and upside down
+    //start at 9 seconds
+//flip left horizontally for 1 second, wait 2 seconds- left upside down
+    //start at 12 seconds ends at 13 seconds
+//flip right vertically for 1 second, wait 2 seconds- right backwards
+    //start at 15 seconds
+//flip left vertically for 1 second, wait 2 seconds- left in original position
+    //start at 18 seconds ends at 19 seconds
+//flip right horizontally for 1 second, wait 2 seconds- right in original position
+    //start at 21 seconds
+//flip left horizontally for 1 second, wait 2 seconds- left backwards
+    //start at 24 seconds
+//flip right vertically for 1 second, wait 2 seconds- left backwards- 
+    //start at 27 seconds
+//flip right vertically for 1 second, wait 2 seconds- right upside down
+    //start at 30 seconds
+//flip left vertically for 1 second, wait 2 seconds- left backwards and upside down 
+    //start at 33 seconds
+//flip right horizontally for 1 seconds, wait 2 seconds- right backwards and upside down
+    //start at 36 seconds
+//flip left horizontally for 1 second, wait 2 seconds- left upside down
+    //start at 39 seconds
+//flip right vertically for 1 second, wait 2 seconds- right backwards
+    //start at 42 seconds
+//flip left vertically for 1 second, wait 2 seconds- left in original position
+    //start at 45 seconds
+//flip right horizontally for 1 second, wait 2 seconds- right in original position
+    //start at 48 seconds
+//flip left horizontally for 1 second, wait seconds- left in original position
+    //start at 51
+
+    
+//0 seconds-flip horizontal show back
+//1 back-showing
+//2 seconds (8.33%)- flip front text
+//6 seconds- flip vertical show front
+//7 front-showing
+//12 seconds- flip horizontal show back
+//13 back-showing
+//14 seconds (58.33%)- flip front text
+//18 seconds- flip vertical show front
+//19 front-showing
+
+//0 seconds-flip horizontal show back
+//1 back-showing (correct)
+//6 seconds- flip vertical show front
+//7 front-showing
+//8 seconds- flip back text
+//12 seconds- flip horizontal show back
+//13 back-showing
+//18 seconds- flip vertical show front
+//19 front-showing
+//20 seconds- flip back text
+
+
+//step 0 (no flip) (front is correct)
+//step 1 (flip l/r) (back is correct)
+    //starts at 0% ends at 3.7%
+//step 2 (flip u/d) (front is upside down and backward)
+    //starts at 33.3% ends at 37%
+//step 3 (flip l/r) (back is upside down and backward)
+    //starts at 55.56% ends at 59.26%
+//step 4 (flip u/d) (front is correct)
+    //starts at 77.78% ends at 81.48%
+
+//step 5 (flip l/r) (back is correct)
+    //starts at 100% ends at 3.7%
+

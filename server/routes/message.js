@@ -290,10 +290,10 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                 });
 
                 const savedDeckDecisionMessage = await deckDecisionMessage.save();
-                await User.findByIdAndUpdate(foundDeckSubmissionMessage.sendingUser, {$push: {"messages.received": savedDeckDecisionMessage}});
+                const deckSubmittingUser = await User.findByIdAndUpdate(foundDeckSubmissionMessage.sendingUser, {$push: {"messages.received": savedDeckDecisionMessage}});
                 await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedDeckDecisionMessage}});
 
-                if(foundUser.communicationSettings.emailPreferences.deckDecision) {
+                if(deckSubmittingUser?.communicationSettings.emailPreferences.deckDecision) {
                     const populatedMessage = await savedDeckDecisionMessage.populate([
                         {
                             path: "sendingUser",
@@ -425,15 +425,10 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
 
                 const savedCardDecisionMessage = await cardDecisionMessage.save();
 
-                console.log({recipient: foundCardSubmissionMessage.sendingUser});
-                await User.findByIdAndUpdate(foundCardSubmissionMessage.sendingUser, {$push: {"messages.received": savedCardDecisionMessage}});
-                console.log({sender: req.userId});
-                console.log({savedCardDecisionMessage});
-                
-                await User.findById(req.userId);
+                const cardSubmittingUser = await User.findByIdAndUpdate(foundCardSubmissionMessage.sendingUser, {$push: {"messages.received": savedCardDecisionMessage}});
                 await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedCardDecisionMessage}});
 
-                if(foundUser.communicationSettings.emailPreferences.cardDecision) {
+                if(cardSubmittingUser?.communicationSettings.emailPreferences.cardDecision) {
                     const populatedMessage = await savedCardDecisionMessage.populate([
                         {
                             path: "sendingUser",
@@ -569,9 +564,9 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                 const savedJoinDecisionMessage = await joinDecisionMessage.save();
 
                 await User.findByIdAndUpdate(foundJoinRequestMessage.sendingUser, {$push: {"messages.received": savedJoinDecisionMessage}});
-                await User.findByIdAndUpdate(foundUser._id, {$push: {"messages.sent": savedJoinDecisionMessage}});
+                const joinRequestingUser = await User.findByIdAndUpdate(foundUser._id, {$push: {"messages.sent": savedJoinDecisionMessage}});
 
-                if(foundUser.communicationSettings.emailPreferences.joinDecision) {
+                if(joinRequestingUser.communicationSettings.emailPreferences.joinDecision) {
                     const populatedMessage = await savedJoinDecisionMessage.populate([
                         {
                             path: "sendingUser",

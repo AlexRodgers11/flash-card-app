@@ -1,11 +1,13 @@
 import express from "express";
 const messageRouter = express.Router();
-import { DeckDecision, DeckSubmission, DirectMessage, GroupInvitation, InvitationDecision, JoinDecision, JoinRequest, Message } from "../models/message.js";
+import { CardDecision, CardSubmission, DeckDecision, DeckSubmission, DirectMessage, GroupInvitation, InvitationDecision, JoinDecision, JoinRequest, Message } from "../models/message.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
 import User from "../models/user.js";
 import { DeckAddedNotification, NewMemberJoinedNotification } from "../models/notification.js";
 import { getUserIdFromJWTToken, sendEmail } from "../utils.js";
+import { FlashCard, TrueFalseCard, MultipleChoiceCard } from "../models/card.js";
+import mongoose from "mongoose";
 
 const checkMessageOwnership = (req, res, next) => {
     if(req.message.sendingUser.toString() !== req.userId && !req.message.receivingUsers.some(id => id.toString() === req.userId)) {
@@ -33,6 +35,48 @@ messageRouter.get("/:messageId", getUserIdFromJWTToken, checkMessageOwnership, a
     try {
         let populatedMessage;
         switch(req.query.type) {
+            case 'CardSubmission':
+                populatedMessage = await CardSubmission.findById(req.message._id, "-sendingUserDeleted").populate(
+                    [
+                        {
+                            path: "sendingUser",
+                            select: "login.username name.first name.last"
+                        },
+                        {
+                            path: "targetDeck",
+                            select: "name"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        }
+                    ]
+                );
+                res.status(200).send(populatedMessage);
+                break;
+            case "CardDecision":
+                populatedMessage = await CardDecision.findById(req.message._id, "-sendingUserDeleted").populate(
+                    [
+                        {
+                            path: "sendingUser",
+                            select: "login.username name.first name.last"
+                        },
+                        {
+                            path: "targetDeck",
+                            select: "name"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        },
+                        {
+                            path: "targetUser",
+                            select: "login.username name.first name.last"
+                        }
+                    ]
+                );
+                res.status(200).send(populatedMessage);
+                break;
             case 'DeckSubmission':
                 populatedMessage = await DeckSubmission.findById(req.message._id, "-sendingUserDeleted").populate(
                         [
@@ -185,24 +229,19 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
         }
         switch(req.body.messageType) {
             case "DeckSubmission":
-                //first make sure hasn't already been approved/denied by another admin
                 const foundDeckSubmissionMessage = await DeckSubmission.findById(req.message._id).populate("targetDeck", "name");
                 
-                // then make sure the deciding user is an admin of the group (may have initially been when message sent but then removed)
+                //make sure the deciding user is an admin of the group (may have initially been when message sent but then removed)
                 const foundGroup = await Group.findById(foundDeckSubmissionMessage.targetGroup, "administrators");
                 if(!foundGroup.administrators.includes(foundUser._id)) {
-                    res.status(403).send("Only group administrators may approve or deny submitted decks");
-                    return;
+                    return res.status(403).send("Only group administrators may approve or deny submitted decks");
                 }
                 
 
                 //if it has already been approved/denied, send back the acceptanceStatus and (if approved) the added deck id
                 if(foundDeckSubmissionMessage.acceptanceStatus !== "pending") {
-                    res.status(409).send(`This deck has already been ${foundDeckSubmissionMessage.acceptanceStatus}`);
-                    return;
+                    return res.status(409).send(`This deck has already been ${foundDeckSubmissionMessage.acceptanceStatus}`);
                 } 
-                //otherwise first update the acceptanceStatus of the DeckSubmission message
-                await DeckSubmission.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
 
                 // get the deck name to send back for the message in case deck/id get deleted if submission denied
                 const submittedDeck = await Deck.findById(foundDeckSubmissionMessage.targetDeck, "name creator");
@@ -261,6 +300,146 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                             select: "name.first name.last user.login.username"
                         },
                         {
+                            path: "targetDeck",//wouldn't this not be there if deck deleted?
+                            select: "name"
+                        },
+                        {
+                            path: "targetGroup",
+                            select: "name"
+                        },
+                        {
+                            path: "targetUser",
+                            select: "login.email"
+                        }
+                    ]);
+                    await sendEmail(populatedMessage.targetUser.login.email, populatedMessage);
+                }
+
+                //update the acceptanceStatus of the DeckSubmission message
+                await DeckSubmission.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
+
+                res.status(200).send({sentMessage: {_id: savedDeckDecisionMessage._id, read: savedDeckDecisionMessage.read, messageType: savedDeckDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
+                
+                break;
+            case "CardSubmission":
+                const foundCardSubmissionMessage = await CardSubmission.findById(req.message._id);
+
+                const foundGroupCardWasSubmittedTo = await Group.findById(foundCardSubmissionMessage.targetGroup, "administrators");
+
+                if(!foundGroupCardWasSubmittedTo.administrators.includes(foundUser._id)) {
+                    return res.status(403).send("Only group administrators may approve or deny submitted cards");
+                };
+
+                if(foundCardSubmissionMessage.acceptanceStatus !== "pending") {
+                    return res.status(409).send(`This deck has already been ${foundCardSubmissionMessage.acceptanceStatus}`);
+                }
+
+                // const submittedCard = await Card.findById(foundCardSubmissionMessage.targetCard, "question creator");
+
+                if(req.body.decision === "approved") {
+                    // const updatedCard = await Card.findByIdAndUpdate(foundCardSubmissionMessage.targetCard, {approvedByGroupAdmins: true}, {new: true});
+
+                    let cardData = foundCardSubmissionMessage.cardData;
+                    // delete req.body.cardType;
+                    let newCard;
+                    switch(cardData.cardType) {
+                        case "FlashCard":
+                            newCard = new FlashCard({
+                                question: cardData.question,
+                                correctAnswer: cardData.correctAnswer,
+                                hint: cardData.hint,
+                                creator: req.userId, 
+                                groupCardBelongsTo: foundCardSubmissionMessage.targetGroup, 
+                                _id: new mongoose.Types.ObjectId()
+                            });
+                            break;
+                        case "TrueFalseCard":
+                            newCard = new TrueFalseCard({
+                                question: cardData.question,
+                                correctAnswer: cardData.correctAnswer,
+                                hint: cardData.hint,
+                                wrongAnswerOne: cardData.wrongAnswers[0],
+                                creator: req.userId, 
+                                groupCardBelongsTo: foundCardSubmissionMessage.targetGroup, 
+                                _id: new mongoose.Types.ObjectId()
+                            });
+                            break;
+                        case "MultipleChoiceCard":
+                            newCard = new MultipleChoiceCard({
+                                question: cardData.question,
+                                correctAnswer: cardData.correctAnswer,
+                                hint: cardData.hint,
+                                wrongAnswerOne: cardData.wrongAnswers[0],
+                                wrongAnswerTwo: cardData.wrongAnswers[1],
+                                wrongAnswerThree: cardData.wrongAnswers[2],
+                                creator: req.userId,
+                                groupCardBelongsTo: foundCardSubmissionMessage.targetGroup, 
+                                _id: new mongoose.Types.ObjectId()
+                            });
+                            break;
+                        default:
+                            res.status(500).send("Invalid card type selected");
+                            return;
+                    }
+
+                    const savedCard = await newCard.save();
+
+
+                    // await Deck.findByIdAndUpdate(foundCardSubmissionMessage.targetDeck, {$push: {cards: updatedCard}});
+                    await Deck.findByIdAndUpdate(foundCardSubmissionMessage.targetDeck, {$push: {cards: savedCard}});
+                    // const otherGroupMembers = foundGroupCardWasSubmittedTo.members.filter((member) => ((member._id !== foundUser._id && member._id !== req.message.sendingUser) && member.communicationSettings.notificationPreferences.deckAdded));
+                    // const cardAddBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
+                    //     const notification = await CardAddedNotification.create({
+                    //         targetDeck: updatedDeck, 
+                    //         targetGroup: foundDeckSubmissionMessage.targetGroup, 
+                    //         read: false
+                    //     });
+
+                    //     return {
+                    //         updateOne: {
+                    //             filter: {_id: memberId},
+                    //             update: {$push: {notifications: notification}}
+                    //         }
+                    //     };
+                    // }));
+
+                    // await User.bulkWrite(cardAddBulkOperations);
+                    // //possibly add this later if I want notifications to go out for when a card is added to deck in group I'm in- would be a lot of notifications
+                    
+                } 
+                // else if (req.body.decision === "denied") {
+                //     await Card.findByIdAndDelete(foundCardSubmissionMessage.targetCard);
+                // }
+
+                const cardDecisionMessage = new CardDecision({
+                    sendingUser: req.userId,
+                    receivingUsers: [foundCardSubmissionMessage.sendingUser],
+                    acceptanceStatus: req.body.decision,
+                    comment: req.body.comment,
+                    // cardQuestion: submittedCard.question,
+                    cardData: foundCardSubmissionMessage.cardData,
+                    targetDeck: foundCardSubmissionMessage.targetDeck,
+                    targetGroup: foundCardSubmissionMessage.targetGroup,
+                    targetUser: foundCardSubmissionMessage.sendingUser
+                });
+
+                const savedCardDecisionMessage = await cardDecisionMessage.save();
+
+                console.log({recipient: foundCardSubmissionMessage.sendingUser});
+                await User.findByIdAndUpdate(foundCardSubmissionMessage.sendingUser, {$push: {"messages.received": savedCardDecisionMessage}});
+                console.log({sender: req.userId});
+                console.log({savedCardDecisionMessage});
+                
+                await User.findById(req.userId);
+                await User.findByIdAndUpdate(req.userId, {$push: {"messages.sent": savedCardDecisionMessage}});
+
+                if(foundUser.communicationSettings.emailPreferences.cardDecision) {
+                    const populatedMessage = await savedCardDecisionMessage.populate([
+                        {
+                            path: "sendingUser",
+                            select: "name.first name.last user.login.username",
+                        },
+                        {
                             path: "targetDeck",
                             select: "name"
                         },
@@ -276,8 +455,12 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                     await sendEmail(populatedMessage.targetUser.login.email, populatedMessage);
                 }
 
-                res.status(200).send({sentMessage: {_id: savedDeckDecisionMessage._id, read: savedDeckDecisionMessage.read, messageType: savedDeckDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
-                
+                //update the acceptance status so other admins can't do something with it later
+                await CardSubmission.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
+
+                res.status(200).send({sentMessage: {_id: savedCardDecisionMessage._id, read: savedCardDecisionMessage.read, messageType: savedCardDecisionMessage.messageType}, acceptanceStatus: req.body.decision});
+                //message wasn't sent to card submitter after decision made, but card was added
+
                 break;
             case "GroupInvitation":
                 const foundGroupInvitationMessage = await GroupInvitation.findById(req.message._id);

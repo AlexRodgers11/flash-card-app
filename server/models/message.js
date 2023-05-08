@@ -30,7 +30,7 @@ const DeckDecision = Message.discriminator("DeckDecision", new Schema({
     deckName: String,//need this in addition to the id because the id will be deleted if the deck isn't approved 
     targetDeck: {type: Schema.Types.ObjectId, ref: "Deck"},
     targetGroup: {type: Schema.Types.ObjectId, ref: "Group"},
-    targetUser: {type: Schema.Types.ObjectId, ref: "User"},
+    targetUser: {type: Schema.Types.ObjectId, ref: "User"},//may not need this
 }));
 
 const JoinRequest = Message.discriminator("JoinRequest", new Schema({
@@ -58,21 +58,34 @@ const GroupInvitation = Message.discriminator("GroupInvitation", new Schema({
 const InvitationDecision = Message.discriminator("InvitationDecision", new Schema({
     acceptanceStatus: String,
     targetGroup: {type: Schema.Types.ObjectId, ref: "Group"},
-    // targetUser: {type: Schema.Types.ObjectId, ref: "User"}
 }));
 
 const CardSubmission = Message.discriminator("CardSubmission", new Schema({
     acceptanceStatus: String,
+    cardData: {
+        cardType: String,
+        question: String,
+        correctAnswer: String,
+        hint: String,
+        wrongAnswers: [String]
+    },
     targetDeck: {type: Schema.Types.ObjectId, ref: "Deck"},
     targetGroup: {type: Schema.Types.ObjectId, ref: "Group"}
 }));
 
 const CardDecision = Message.discriminator("CardDecision", new Schema({
-    targetCard: {type: Schema.Types.ObjectId, ref: "Card"},
-    decision: String,
+    acceptanceStatus: String,
     comment: String,
+    cardData: {
+        question: String,
+        correctAnswer: String,
+        hint: String,
+        cardType: String,
+        wrongAnswers: [String]
+    },
     targetDeck: {type: Schema.Types.ObjectId, ref: "Deck"},
-    targetGroup: {type: Schema.Types.ObjectId, ref: "Group"}
+    targetGroup: {type: Schema.Types.ObjectId, ref: "Group"},
+    targetUser: {type: Schema.Types.ObjectId, ref: "User"}//may not need this
 }));
 
 const DirectMessage = Message.discriminator("DirectMessage", new Schema({

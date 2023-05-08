@@ -4,7 +4,7 @@ const groupRouter = express.Router();
 import { Card } from "../models/card.js";
 import Deck from "../models/deck.js";
 import Group from "../models/group.js";
-import { DeckSubmission, JoinRequest } from "../models/message.js";
+import { CardSubmission, DeckSubmission, JoinRequest } from "../models/message.js";
 import { AdminChangeNotification, DeckAddedNotification, GroupDeletedNotification, HeadAdminChangeNotification, NewMemberJoinedNotification, RemovedFromGroupNotification } from "../models/notification.js";
 import User from "../models/user.js";
 import { copyDeck, getUserIdFromJWTToken, sendEmail, swapIndexes } from "../utils.js";
@@ -324,6 +324,84 @@ groupRouter.post("/:groupId/messages/admin/deck-submission", getUserIdFromJWTTok
         }
     } catch (err) {
         res.status(500).send("There was an error updating receiving admins received messages");
+    }
+});
+
+groupRouter.post("/:groupId/messages/admin/card-submission", getUserIdFromJWTToken, async (req, res, next) => {
+    try {
+        if(!req.group.members.map(id => id.toString()).includes(req.userId.toString())) {
+            return res.status(403).send("Only group members may submit cards");
+        }
+        if(!req.group.decks.map(id => id.toString()).includes(req.body.targetDeck)) {
+            return res.status(403).send("The deck you are trying to submit a card to doesn't belong to the submitted group");
+        }
+        
+        // let cardType = req.body.cardType;
+        // delete req.body.cardType;
+        // let newCard;
+        // switch(cardType) {
+        //     case "FlashCard":
+        //         newCard = new FlashCard({...req.body, creator: req.userId, groupCardBelongsTo: req.deck.groupDeckBelongsTo, _id: new mongoose.Types.ObjectId()});
+        //         break;
+        //     case "TrueFalseCard":
+        //         newCard = new TrueFalseCard({...req.body, creator: req.userId, groupCardBelongsTo: req.deck.groupDeckBelongsTo, _id: new mongoose.Types.ObjectId()});
+        //         break;
+        //     case "MultipleChoiceCard":
+        //         newCard = new MultipleChoiceCard({...req.body, creator: req.userId,groupCardBelongsTo: req.deck.groupDeckBelongsTo, _id: new mongoose.Types.ObjectId()});
+        //         break;
+        //     default:
+        //         res.status(500).send("Invalid card type selected");
+        //         return;
+        // }
+
+        // const savedCard = await newCard.save();
+
+        const newMessage = new CardSubmission({
+            sendingUser: req.userId,
+            // receivingUsers: foundGroup.administrators,
+            receivingUsers: req.group.administrators,
+            acceptanceStatus: "pending",
+            cardData: req.body.cardData,
+            // cardQuestion: savedCard.question,
+            targetDeck: req.body.targetDeck,
+            targetGroup: req.group._id,
+        });
+
+        const savedMessage = await newMessage.save();
+
+        await User.updateMany({_id: {$in: req.group.administrators}}, {$push: {'messages.received': savedMessage}});
+        await User.findByIdAndUpdate(req.userId, {$push: {'messages.sent': savedMessage}});
+
+        const populatedMessage = await savedMessage.populate([
+            {
+                path: "sendingUser",
+                select: "name.first name.last login.username"
+            },
+            {
+                path: "targetDeck",
+                select: "name"
+            },
+            {
+                path: "targetGroup",
+                select: "name"
+            },
+            // {
+            //     path: "targetCard",
+            //     select: "question"
+            // }
+        ]);
+
+        const admins = await User.find({_id: {$in: req.group.administrators}, "communicationSettings.emailPreferences.cardSubmission": true}, "login.email");
+
+        const emailingPromises = admins.map((admin) => {
+            return sendEmail(admin.login.email, populatedMessage);
+        });
+
+        await Promise.all(emailingPromises);
+
+        res.status(200).send({_id: savedMessage._id, messageType: "CardSubmission", read: []});
+    } catch (err) {
+        res.status(500).send(err.message);
     }
 });
 

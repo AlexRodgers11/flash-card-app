@@ -13,6 +13,7 @@ import { MdModeEditOutline } from "react-icons/md";
 import styled from 'styled-components';
 import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
 import BackButton from './BackButton';
+import { submitCardForApproval } from '../reducers/communicationsSlice';
 
 const DeckWrapper = styled.div`
     display: flex;
@@ -127,7 +128,7 @@ function Deck() {
     const displayModalContent = () => {
         switch(modalContent) {
             case "add-card":
-                return <CardForm submit={handleAddCard} />
+                return <CardForm buttonText={unlockControl() ? "Add Card" : "Submit Card for Approval"} submit={unlockControl() ? handleAddCard : handleSubmitCardForApproval} />
             case "delete-deck-confirmation":
                 return (
                     <div>
@@ -156,10 +157,12 @@ function Deck() {
     }
 
     const handleAddCard = (newCard) => {
-        if(groupDeckBelongsTo) {
-            newCard.groupCardBelongsTo = groupDeckBelongsTo;
-        }
         dispatch(addCard({newCard, deckId}));
+        hideModal();
+    }
+
+    const handleSubmitCardForApproval = (newCard) => {
+        dispatch(submitCardForApproval({newCard, groupId: groupDeckBelongsTo, deckId}));
         hideModal();
     }
 
@@ -197,22 +200,24 @@ function Deck() {
 
     if(storedDeckId !== deckId) {
         return <></>;
-    } else if(unlockControl()) {
-        return (
-            <DeckWrapper>
-                <BackButton route={location.pathname.slice(0, location.pathname.lastIndexOf("/"))}>All Decks</BackButton>
-                <DeleteButton data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>
-                {!nameEditMode ? 
-                    <NameBlock>
-                        <h1>{name}</h1> 
-                        <StyledEditIcon role="button" onClick={openNameEditMode} />
-                    </NameBlock>
-                    : 
-                    <form onSubmit={saveDeckNameChange}>
-                        <input type="text" name="name" id="name" value={editedName} onChange={handleChangeEditedName} />
-                        <button type="submit">Save</button>
-                    </form>
-                }
+    } 
+    return (
+        <DeckWrapper>
+            <BackButton route={location.pathname.slice(0, location.pathname.lastIndexOf("/"))}>All Decks</BackButton>
+            <DeleteButton data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>
+            {!nameEditMode ? 
+                <NameBlock>
+                    <h1>{name}</h1> 
+                    <StyledEditIcon role="button" onClick={openNameEditMode} />
+                </NameBlock>
+                : 
+                <form onSubmit={saveDeckNameChange}>
+                    <input type="text" name="name" id="name" value={editedName} onChange={handleChangeEditedName} />
+                    <button type="submit">Save</button>
+                </form>
+            }
+            {unlockControl() &&
+                <>
                 <PublicControls>
                     <label htmlFor='public'>Public</label>
                     <input 
@@ -255,41 +260,22 @@ function Deck() {
                         />
                     </PublicControls>
                 }
-                <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
-                <CardContainer className="CardContainer">
-                    {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}
-                    {cards.map(card => <Card cardId={card} allowedToEdit={true} />
-                    )}
-    
-                    {modalContent && 
-                        <Modal hideModal={hideModal}>
-                            {displayModalContent()}
-                        </Modal>
-                    }
-                </CardContainer>
-            </DeckWrapper>
-        )
-    } else {
-        return (
-            <DeckWrapper>
-                <BackButton route={location.pathname.slice(0, location.pathname.lastIndexOf("/"))}>All Decks</BackButton>
-                <NameBlock className="name-only">
-                    <h1>{name}</h1>
-                </NameBlock>
-                <CardContainer className="CardContainer">
-                    {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}
-                    {cards.map(card => <Card cardId={card} allowedToEdit={false}/>
-                    )}
-    
-                    {modalContent && 
-                        <Modal hideModal={hideModal}>
-                            {displayModalContent()}
-                        </Modal>
-                    }
-                </CardContainer>
-            </DeckWrapper>
-        )
-    }
+                </>
+            }
+            <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
+            <CardContainer className="CardContainer">
+                {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}
+                {cards.map(card => <Card cardId={card} allowedToEdit={true} />
+                )}
+
+                {modalContent && 
+                    <Modal hideModal={hideModal}>
+                        {displayModalContent()}
+                    </Modal>
+                }
+            </CardContainer>
+        </DeckWrapper>
+    )
     
 }
 

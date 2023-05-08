@@ -12,6 +12,8 @@ import DirectMessage from './DirectMessage';
 import useToggle from '../hooks/useToggle';
 import GroupInvitationMessage from './GroupInvitationMessage';
 import InvitationDecisionMessage from './InvitationDecisionMessage';
+import CardSubmissionMessage from './CardSubmissionMessage';
+import CardDecisionMessage from './CardDecisionMessage';
 
 const MessageWrapper = styled.div`
 	display: flex;
@@ -68,6 +70,14 @@ function Message(props) {
 		switch(props.messageType) {
 			case '':
 				return null;
+			case "CardSubmission":
+				return (
+					<CardSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
+				);
+			case "CardDecision":
+				return (
+					<CardDecisionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />
+				);
 			case 'DeckSubmission':
 				return (
 					<DeckSubmissionMessage messageId={props.messageId} messageType={props.messageType} fullView={props.fullView} hideModal={props.hideModal} direction={props.direction} setMessageRendered={setMessageRendered} />

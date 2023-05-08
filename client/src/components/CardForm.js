@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import useFormInput from '../hooks/useFormInput';
 import { client } from '../utils';
+import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -13,6 +15,7 @@ function CardForm(props) {
 	const [wrongAnswerOne, clearWrongAnswerOne, handleChangeWrongAnswerOne,setWrongAnswerOne] = useFormInput("");
 	const [wrongAnswerTwo, clearWrongAnswerTwo, handleChangeWrongAnswerTwo, setWrongAnswerTwo] = useFormInput("");
 	const [wrongAnswerThree, clearWrongAnswerThree ,handleChangeWrongAnswerThree, setWrongAnswerThree] = useFormInput("");
+	const groupDeckBelongsTo = useSelector((state) => state.deck.groupDeckBelongsTo);
 
 	const handleSubmit = evt => {
 		evt.preventDefault();
@@ -23,7 +26,8 @@ function CardForm(props) {
 			wrongAnswerOne,
 			wrongAnswerTwo,
 			wrongAnswerThree,
-			hint
+			hint,
+			...(groupDeckBelongsTo && {groupCardBelongsTo: groupDeckBelongsTo})
 		}
 		clearCardType();
 		clearQuestion();
@@ -33,7 +37,6 @@ function CardForm(props) {
 		clearWrongAnswerTwo();
 		clearWrongAnswerThree();
 		props.submit(card);
-		
 	}
 
 	useEffect(() => {
@@ -139,7 +142,7 @@ function CardForm(props) {
 							</div>
 						</div>
 					}
-					<button type="submit">Submit</button>
+					<button type="submit">{props.buttonText || "Add Card"}</button>
 				</form>
 			}
 		</div>

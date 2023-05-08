@@ -80,7 +80,7 @@ export const sendDirectMessage = createAsyncThunk("communications/sendDirectMess
 
 export const submitDeck = createAsyncThunk("communications/submitDeck", async ({groupId, deckId}) => {
     try {
-        let messageData = {
+        const messageData = {
             targetGroup: groupId,
             deckToCopy: deckId
         }
@@ -90,7 +90,45 @@ export const submitDeck = createAsyncThunk("communications/submitDeck", async ({
     } catch (err) {
         console.error(err)
     }
-}); 
+});
+
+export const submitCardForApproval = createAsyncThunk("deck/submitCardForApproval", async ({newCard, deckId, groupId}) => {
+    try {
+        const messageData = {
+            targetGroup: groupId,
+            cardData: {
+                cardType: newCard.cardType,
+                question: newCard.question,
+                correctAnswer: newCard.correctAnswer,
+                hint: newCard.hint,
+                wrongAnswers: [
+                    newCard.wrongAnswerOne,
+                    newCard.wrongAnswerTwo,
+                    newCard.wrongAnswerThree,
+                  ].filter((answer) => answer !== undefined),
+                ...(newCard.groupDeckBelongsTo && {groupCardBelongsTo: newCard.groupDeckBelongsTo}),
+            },
+            targetDeck: deckId
+        }
+        const response = await client.post(`${baseURL}/groups/${groupId}/messages/admin/card-submission`, messageData);
+
+        return response.data;
+    } catch (err) {
+        console.error(err);
+    }
+});
+
+export const makeCardSubmissionDecision = createAsyncThunk("communications/makeCardSubmissionDecision", async ({messageId, decision, comment}) => {
+    try {
+        const response = await client.patch(`${baseURL}/messages/${messageId}`, {decision, comment, messageType: "CardSubmission"});   
+        
+        return response.data;
+
+    } catch (err) {
+        console.log({err});
+        return err.response.data;
+    }
+});
 
 export const makeDeckSubmissionDecision = createAsyncThunk("communications/makeDeckSubmissionDecision", async ({messageId, decision, comment}) => {
     try {
@@ -178,7 +216,17 @@ export const communicationsSlice = createSlice({
             state.messages[action.payload.direction] = state.messages[action.payload.direction].filter(message => message._id !== action.payload.messageId);
         });
         builder.addCase(submitDeck.fulfilled, (state, action) => {
-            state.messages.sent = [...state.messages.sent, action.payload]
+            state.messages.sent = [...state.messages.sent, action.payload];
+        });
+        builder.addCase(submitCardForApproval.fulfilled, (state, action) => {
+            if(action.payload.sentMessage) {
+                state.messages.sent = [...state.messages.sent, action.payload.sentMessage];
+            }
+        });
+        builder.addCase(makeCardSubmissionDecision.fulfilled, (state, action) => {
+            if(action.payload.sentMessage) {
+                state.messages.sent = [...state.messages.sent, action.payload.sentMessage];
+            }
         });
         builder.addCase(makeDeckSubmissionDecision.fulfilled, (state, action) => {
             if(action.payload.sentMessage) {

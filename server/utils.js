@@ -226,12 +226,55 @@ export const sendEmail = async (emailAddress, message) => {
                 </html>`
             )
             break;
+        case "CardSubmission":
+            mailObj.subject = `New Card Submitted to Deck ${message.targetDeck.name} in Group ${message.targetGroup.name}`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} submitted the following card to be added to deck ${message.targetDeck.name} in group ${message.targetGroup.name}</p>
+
+                        <br />
+
+                        <p>Card Type: ${message.cardData.cardType}</p>
+                        <p>Question: ${message.cardData.question}</p>
+                        ${message.cardData.hint ? 
+                            `<p>Hint: ${message.cardData.hint}</p>`
+                            :
+                            ""
+                        }
+                        <p>Correct Answer: ${message.cardData.correctAnswer}</p>
+                        ${message.cardData.cardType === "MultipleChoiceCard" ? 
+                            `<p>Wrong Answer One: ${message.cardData.wrongAnswers[0]}</p>
+                            <p>Wrong Answer Two: ${message.cardData.wrongAnswers[1]}</p>
+                            <p>Wrong Answer Three: ${message.cardData.wrongAnswers[2]}</p>`
+                            :
+                            ""
+                        }
+
+                        <p>Login to review the request:</p>
+                        <button>Log In</button>
+                    </body>
+                </html>`
+            )
+            break;
         case "DeckDecision":
-            mailObj.subject = `Your submission of ${message.targetDeck.name} to group ${message.targetGroup.name} has been ${message.acceptanceStatus}`;
+            mailObj.subject = `Your submission of ${message.deckName} to group ${message.targetGroup.name} has been ${message.acceptanceStatus}`;
             mailObj.html = (
                 `<html>
                     <body>
                         <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} ${message.acceptanceStatus} your request to add deck to the group ${message.targetGroup.name}${message.comment ? " and left this comment:" : "."}</p>
+                        ${message.comment ? "<br />" : ""}
+                        ${message.comment ? `<em>${message.comment}</em>` : ""}
+                    </body>
+                </html>`
+            )
+            break;
+        case "CardDecision":
+            mailObj.subject = `Your card submission to ${message.targetGroup.name} has been ${message.acceptanceStatus}`;
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} ${message.acceptanceStatus} your request to add card "${message.cardData.question}" to deck ${message.targetDeck.name} in the group ${message.targetGroup.name}${message.comment ? " and left this comment:" : "."}</p>
                         ${message.comment ? "<br />" : ""}
                         ${message.comment ? `<em>${message.comment}</em>` : ""}
                     </body>

@@ -11,7 +11,9 @@ const CardSchema = new Schema({
     correctAnswer: String,
     hint: String,
     attempts: [{type: Schema.Types.ObjectId, ref: "CardAttempt"}],
-    groupCardBelongsTo: {type: Schema.Types.ObjectId, ref: "Group"}
+    groupCardBelongsTo: {type: Schema.Types.ObjectId, ref: "Group"},
+    allowCopies: Boolean, //add functionality later that allows user to copy a card into one of their own decks
+    cardCopiedFrom: {type: Schema.Types.ObjectId, ref: "Card"}
 }, {discriminatorKey: "cardType", timestamps: true});
 
 const Card = mongoose.model("Card", CardSchema);

@@ -207,12 +207,12 @@ messageRouter.get("/:messageId", getUserIdFromJWTToken, checkMessageOwnership, a
 
 messageRouter.patch('/:messageId/add-to-read', getUserIdFromJWTToken, checkMessageOwnership, async (req, res, next) => {
     try {
-        const foundMessage = await Message.findById(req.message._id, "receivingUsers");
-        if(foundMessage.receivingUsers.includes(req.userId)) {
+        const foundMessage = await Message.findById(req.message._id, "receivingUsers sendingUser");
+        if(foundMessage.receivingUsers.includes(req.userId) || foundMessage.sendingUser.toString() === req.userId) {
             const updatedMessage = await Message.findByIdAndUpdate(req.message._id, {$addToSet: {read: req.body.readerId}}, {new: true});
             res.status(200).send({messageId: updatedMessage._id, read: updatedMessage.read});
         } else {
-            res.status(403).send("Only recipients of a message may mark it as read");
+            res.status(403).send("Unauthorized");
         }
     } catch (err) {
         res.status(500).send(err.message);

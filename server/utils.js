@@ -221,7 +221,7 @@ export const sendEmail = async (emailAddress, message) => {
                         <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} submitted a deck to be added to group ${message.targetGroup.name}</p>
 
                         <p>Login to review the request:</p>
-                        <button>Log In</button>
+                        <a href="https://www.flishflash.org" style="background-color: #007BFF; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">Log In</a>
                     </body>
                 </html>`
             )
@@ -252,7 +252,7 @@ export const sendEmail = async (emailAddress, message) => {
                         }
 
                         <p>Login to review the request:</p>
-                        <button>Log In</button>
+                        <a href="https://www.flishflash.org" style="background-color: #007BFF; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">Log In</a>
                     </body>
                 </html>`
             )
@@ -330,7 +330,7 @@ export const sendEmail = async (emailAddress, message) => {
                         <p>${message.sendingUser.name.first} ${message.sendingUser.name.last} is requesting to join ${message.targetGroup.name}</p>
 
                         <p>Login to review the request:</p>
-                        <button>Log In</button>
+                        <a href="https://www.flishflash.org" style="background-color: #007BFF; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px;">Log In</a>
                     </body>
                 </html>`
             );

@@ -25,92 +25,111 @@ const PracticeSessionWrapper = styled.div`
     display: flex; 
     flex-direction: column; 
     align-items: center; 
-    // justify-content: center; 
+    justify-content: center; 
     width: 100%; 
-    height: 100%;
+    // height: 100%;
+    height: calc(100vh - 5.5rem);
     background-color: #9DE59D;
-
-
-
-    // background-color: #8EE18E;
-    // background-color: #7EDD7E;
-
-    // background-color: #0E958F;
-    // background-color: #10A8A0;
-    min-height: calc(100vh - 5.5rem);
+    // min-height: calc(100vh - 5.5rem);
+    // @media (min-width: 450px) {
+    //     min-height: 710px;
+    // }
+    // @media (min-width: 600px) {
+    //     min-height: 870px;
+    // }
+    // @media (max-width: 600px) {
+    // }
 `
 
 const CardWrapper = styled.div`
     border: 3px solid black; 
     overflow: hidden;
-    // border-radius: 3rem;
     border-radius: 10%;
-    // background-color: white;
     background-color: #2C262C;
-    width: 28em;
-    height: 32em;
-    min-height: 20em;
-    // margin-bottom: 10rem;
+    width: 28rem;
+    min-height: 32rem;
+    // min-height: 20em;
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-`
-
-
-const StatsColumn = styled.div`
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center;
-    align-items: center; 
-    border: 1px solid black;
-`
-
-const StatsRow = styled.div`
-    height: 5rem;
-    // color: white;
-    color: #FAF9FA;
-    font-size: 1.5rem;
-    font-weight: 600;
-    & h3 {
-        font-size: 1.75rem;
-        font-weight: 700;
+    @media (max-width: 600px) {
+        width: 25rem;
+        min-height: 28.5rem;
     }
-    & .col {
-        // margin: 0 .15rem;
-        margin: 0 .5rem;
-        // background-color: white;
-        // background-color: #F0F600;
-        // background-color: #F6F4F6;
-        // background-color: #FAF9FA;
-        // background-color: #211C21;
-        background-color: #2C262C;
-        border: 3px solid black;
-        &.correct {
-            // background-color: blue;
-            color: #FAF9FA;
-            // color: white;
-            background-color: #333FFF;
-            // background-color: #1F1FFF
-            
-        }
-        &.incorrect {
-            // background-color: red;
-            background-color: #FF3333;
-            // background-color: #FF1F1F;
-        }
-        &.accuracy-rate {
-            // color: black;
-            // background-color: #198754;
-        }
-        &.cards-left {
-            // color: black;
-            // background-color: #212529
-        }
-    }
-`
 
+    @media (max-width: 550px) {
+        width: 21rem;
+        min-height: 24rem;
+    }
+
+`
 const StatsWrapper = styled.div`
-    margin: 5rem; 
-    max-width: 45rem;
-`
+    position: absolute;
+    @media (max-height: 870px) and (min-width: 601px) {
+        position: static;
+    }
+    @media (max-height: 762px) and (min-width: 551px) {
+        position static;
+    }
+    top: 6rem;
+    margin: 1rem 0;
+`;
+
+const StatContainer = styled.div`
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center;
+    padding: 1rem;
+    margin: 0 1rem;
+    background-color: white;
+    border: 2px solid black;
+    @media (max-width: 750px) {
+        margin: 0 .75rem;
+        padding: .75rem;
+    }
+    @media (max-width: 600px) {
+        margin: 0 .5rem;
+        padding: .5rem;
+    }
+    @media (max-width: 550px) {
+        padding: .25rem;
+    }
+    @media (max-width: 460px) {
+        margin: 0 .25rem;
+        padding: .125rem;
+    }
+`;
+
+const StatHeading = styled.p`
+    font-weight: 700;
+    font-size: 1.5rem;
+    padding-bottom: .5rem;
+    @media (max-width: 700px) {
+        font-weight: 600;
+        font-size: 1.25rem;    
+    }
+    @media (max-width: 500px) {
+        padding-bottom: .125rem;
+        font-weight: 500;
+        font-size: 1.125rem;
+    }
+    @media (max-width: 400px) {
+        font-size: 1rem;
+    }
+    @media (max-width: 374px) {
+        font-size: .825rem;
+    }
+`;
+
+const Stat = styled.p`
+    font-weight: 500;
+    @media (max-width: 500px) {
+        font-size: .825rem;
+    }
+    @media (max-width: 374px) {
+        font-size: .75rem;
+    }
+    
+`;
 
 const WrapUpButtonsContainer = styled.div`
     width: 100%;
@@ -212,25 +231,23 @@ function PracticeSession() {
 
     return (
         <PracticeSessionWrapper>
-            <StatsWrapper className="container">
-                <StatsRow className="row">
-                    <StatsColumn className="col correct">
-                        <h3>Correct</h3>
-                        <p>{stats.numberCorrect || 0}</p>
-                    </StatsColumn>
-                    <StatsColumn className="col incorrect">
-                        <h3>Incorrect</h3>
-                        <p>{stats.numberWrong || 0}</p>
-                    </StatsColumn>
-                    <StatsColumn className="col accuracy-rate">
-                        <h3>Accuracy Rate</h3>
-                        <p>{stats.numberCorrect || stats.numberWrong ? (stats.numberCorrect * 100 / (stats.numberCorrect + stats.numberWrong)).toFixed() + "%" : "0%"}</p>
-                    </StatsColumn>
-                    <StatsColumn className="col cards-left">
-                        <h3>Cards Left</h3>
-                        <p>{numCards - (stats.numberCorrect + stats.numberWrong)}</p>
-                    </StatsColumn>
-                </StatsRow>
+            <StatsWrapper>
+                <StatContainer>
+                    <StatHeading>Correct</StatHeading>
+                    <Stat>{stats.numberCorrect || 0}</Stat>
+                </StatContainer>
+                <StatContainer>
+                    <StatHeading>Incorrect</StatHeading>
+                    <Stat>{stats.numberWrong || 0}</Stat>   
+                </StatContainer>
+                <StatContainer>
+                    <StatHeading>Accuracy Rate</StatHeading>
+                    <Stat>{stats.numberCorrect || stats.numberWrong ? (stats.numberCorrect * 100 / (stats.numberCorrect + stats.numberWrong)).toFixed() + "%" : "0%"}</Stat>
+                </StatContainer>
+                <StatContainer>
+                    <StatHeading>Cards Left</StatHeading>
+                    <Stat>{numCards - (stats.numberCorrect + stats.numberWrong)}</Stat>    
+                </StatContainer>
             </StatsWrapper>
             <CardWrapper>
                 {activeCard?.cardType ? 

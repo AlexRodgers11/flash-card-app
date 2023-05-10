@@ -88,7 +88,7 @@ export function HireMe() {
         <HireMeWrapper>
             <Header>Thank you for your consideration! Below are some resources to get to know me and my work.</Header>
             <StyledButton onClick={getResume}>View My Resume</StyledButton>
-            <StyledButton onClick={() => openLinkInNewTab("https://github.com/SkyeWulff", navigate)}><StyledImage src={GitHubWordLogo} /><StyledImage src={GitHubLogo} /></StyledButton>
+            <StyledButton onClick={() => openLinkInNewTab("https://github.com/AlexRodgers11", navigate)}><StyledImage src={GitHubWordLogo} /><StyledImage src={GitHubLogo} /></StyledButton>
             <StyledButton onClick={() => openLinkInNewTab("https://www.linkedin.com/in/alex-rodgers-68b61a154/", navigate)}><StyledImage src={LinkedInLogo} /></StyledButton>
             <ButtonHeader>My Other Project</ButtonHeader>
             <StyledButton onClick={() => openLinkInNewTab("https://chaoszengarden.com", navigate)}><StyledImage src={ChaosZenGardenLogo} /></StyledButton>

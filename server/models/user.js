@@ -131,7 +131,17 @@ const User = new Schema({
             type: Boolean,
             default: true
         },
-        blockedUsers: [{type: Schema.Types.ObjectId, ref: "User"}]//not currently used but added so that existing users of app won't be missing the property when functionality added for it
+        blockedUsers: [{type: Schema.Types.ObjectId, ref: "User"}],//not currently used but added so that existing users of app won't be missing the property when functionality added for it
+        subscription: {
+            status: {
+                type: String,
+                enum: ["active", "inactive", "canceled", "expired", "discount-grandfathered-active", "discount-grandfathered-expired"],
+                default: "inactive"
+            },
+            tier: String,
+            startDate: Date,
+            endDate: Date
+        }
     }
 }, {timestamps: true});
 

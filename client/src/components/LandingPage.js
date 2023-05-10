@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router';
 import Modal from './Modal';
 import styled, { keyframes } from 'styled-components';
 import { useSelector } from 'react-redux';
+import { GoLightBulb } from "react-icons/go";
 import axios from 'axios';
 
 const LandingPageWrapper = styled.div`
@@ -254,6 +255,87 @@ const BackTwoText = styled.div`
     -webkit-animation-delay: 6s;
 `;
 
+
+const CardWrapper = styled.div`
+    display: inline-block;
+    border: 3px solid black; 
+    overflow: hidden;
+    // border-radius: 3rem;
+    border-radius: 10%;
+    // background-color: white;
+    background-color: #2C262C;
+    width: 28em;
+    height: 32em;
+    min-height: 20em;
+    // margin-bottom: 10rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+`
+
+const QuestionBox = styled.div`
+	height: 40%;
+	border-bottom: 1px solid black;
+	// background-color: #FFD549;
+	// background-color: #A3A5B8;
+	// background-color: #757895;
+	// background-color: #58355E;
+	// background-color: #6A6E8A;
+	background-color:  #2C262C;
+
+	// color: black;
+	color: white;
+`
+
+const QuestionWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+`
+
+const HintBox = styled.div`
+	position: absolute;
+	width: 28rem;
+	text-align: left;
+	& button {
+		margin: .5rem;
+	}
+	& p {
+		display: inline-block;
+		margin-left: .5rem;
+		font-style: italic;
+		font-size: .75rem 	;
+		word-wrap: break-word;
+		overflow-wrap: break-word; 
+	}
+`
+
+const Answer = styled.div`
+    display: flex;
+    flex-shrink: 1;
+    overflow: auto;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background-color: white;
+`;
+
+const AnswerBox = styled.div`
+	height: 60%;
+    color: black;
+`
+
+const AnswerWrapper = styled.div`
+	height: 25%;
+	border-bottom: .25px solid black;
+	&:first-child {
+		border-top: none;
+	}
+	&:last-child {
+		border-bottom: none
+	}
+`
+
 const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 
 function LandingPage() {
@@ -328,6 +410,59 @@ function LandingPage() {
             </MainSection>
             <Section color="black" height="70vh">
                 <SectionHeading>Create different types of cards: Flip, True/False, and Multiple Choice</SectionHeading>
+                <CardWrapper>
+                        <QuestionBox>
+                            <HintBox>
+                                <div>
+                                    <GoLightBulb />
+                                    <p>Hint</p>
+                                </div>
+                            </HintBox>
+                            <QuestionWrapper>Which of the following means "average"</QuestionWrapper>
+                        </QuestionBox>
+                        <AnswerBox>
+                            <AnswerWrapper><Answer>Median</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Mode</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
+                        </AnswerBox>
+                </CardWrapper>
+                <CardWrapper>
+                        <QuestionBox>
+                            <HintBox>
+                                
+                                <div>
+                                    <button>Hint</button>
+                                    <p>Hint</p>
+                                </div>
+                            </HintBox>
+                            <QuestionWrapper>Which of the following means "average"</QuestionWrapper>
+                        </QuestionBox>
+                        <AnswerBox>
+                            <AnswerWrapper><Answer>Median</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Mode</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
+                        </AnswerBox>
+                </CardWrapper>
+                <CardWrapper>
+                        <QuestionBox>
+                            <HintBox>
+                                
+                                <div>
+                                    <button>Hint</button>
+                                    <p>Hint</p>
+                                </div>
+                            </HintBox>
+                            <QuestionWrapper>Which of the following means "average"</QuestionWrapper>
+                        </QuestionBox>
+                        <AnswerBox>
+                            <AnswerWrapper><Answer>Median</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Mode</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
+                        </AnswerBox>
+                </CardWrapper>
             </Section>
             <Section color="orange" height="70vh">
                 <SectionHeading>Browse public decks or create your own</SectionHeading>

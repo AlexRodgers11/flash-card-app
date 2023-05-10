@@ -7,6 +7,7 @@ import { client, openLinkInNewTab } from "../utils";
 import Modal from "./Modal";
 import { useNavigate } from "react-router";
 import { HireMe } from "./HireMe";
+import { Pricing } from "./Pricing";
 
 const FooterWrapper = styled.footer`
     display: flex;
@@ -85,6 +86,7 @@ const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function Footer() {
     const [showContactForm, toggleShowContactForm] = useToggle(false);
+    const [showPricing, toggleShowPricing] = useToggle(false);
     const [subject, clearSubject, handleSubjectChange, setSubject] = useFormInput("general");
     const [message, clearMessage, handleMessageChange, setMessage] = useFormInput();
     const [bugScreenshot, setBugScreenshot] = useState();
@@ -159,6 +161,11 @@ function Footer() {
                 <HireMe />
             </Modal>
         }
+        {showPricing &&
+            <Modal hideModal={toggleShowPricing}>
+                <Pricing />
+            </Modal>
+        }
         <FooterWrapper className="FooterWrapper">
             <LinksSection className="LinksSection">
                 <LinkBlock className="LinkBlock">
@@ -170,7 +177,7 @@ function Footer() {
                 <LinkBlock className="LinkBlock">
                     <LinkBlockHeading>Resources</LinkBlockHeading>
                     <ContentWrapper><Content>Docs</Content></ContentWrapper>
-                    <ContentWrapper><Content>Pricing</Content></ContentWrapper>
+                    <ContentWrapper><Content onClick={toggleShowPricing}>Pricing</Content></ContentWrapper>
                     <ContentWrapper><Content onClick={handleShowBugForm}>Report Bug</Content></ContentWrapper>
                 </LinkBlock>
                 <LinkBlock className="LinkBlock">

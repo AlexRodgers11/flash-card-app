@@ -233,7 +233,7 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
                 
                 //make sure the deciding user is an admin of the group (may have initially been when message sent but then removed)
                 const foundGroup = await Group.findById(foundDeckSubmissionMessage.targetGroup, "administrators");
-                if(!foundGroup.administrators.includes(foundUser._id)) {
+                if(!foundGroup?.administrators.includes(foundUser._id)) {
                     return res.status(403).send("Only group administrators may approve or deny submitted decks");
                 }
                 
@@ -332,15 +332,16 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
 
                 if(foundCardSubmissionMessage.acceptanceStatus !== "pending") {
                     return res.status(409).send(`This deck has already been ${foundCardSubmissionMessage.acceptanceStatus}`);
+                };
+
+                const deckCardSubmittedTo = Deck.findById(foundCardSubmissionMessage.targetDeck);
+
+                if(!deckCardSubmittedTo) {
+                    return res.status(409).send("Cannot approve or deny this card because the deck it was submitted to has been deleted");
                 }
 
-                // const submittedCard = await Card.findById(foundCardSubmissionMessage.targetCard, "question creator");
-
                 if(req.body.decision === "approved") {
-                    // const updatedCard = await Card.findByIdAndUpdate(foundCardSubmissionMessage.targetCard, {approvedByGroupAdmins: true}, {new: true});
-
                     let cardData = foundCardSubmissionMessage.cardData;
-                    // delete req.body.cardType;
                     let newCard;
                     switch(cardData.cardType) {
                         case "FlashCard":
@@ -384,32 +385,8 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
 
                     const savedCard = await newCard.save();
 
-
-                    // await Deck.findByIdAndUpdate(foundCardSubmissionMessage.targetDeck, {$push: {cards: updatedCard}});
                     await Deck.findByIdAndUpdate(foundCardSubmissionMessage.targetDeck, {$push: {cards: savedCard}});
-                    // const otherGroupMembers = foundGroupCardWasSubmittedTo.members.filter((member) => ((member._id !== foundUser._id && member._id !== req.message.sendingUser) && member.communicationSettings.notificationPreferences.deckAdded));
-                    // const cardAddBulkOperations = await Promise.all(otherGroupMembers.map(async (memberId) => {
-                    //     const notification = await CardAddedNotification.create({
-                    //         targetDeck: updatedDeck, 
-                    //         targetGroup: foundDeckSubmissionMessage.targetGroup, 
-                    //         read: false
-                    //     });
-
-                    //     return {
-                    //         updateOne: {
-                    //             filter: {_id: memberId},
-                    //             update: {$push: {notifications: notification}}
-                    //         }
-                    //     };
-                    // }));
-
-                    // await User.bulkWrite(cardAddBulkOperations);
-                    // //possibly add this later if I want notifications to go out for when a card is added to deck in group I'm in- would be a lot of notifications
-                    
                 } 
-                // else if (req.body.decision === "denied") {
-                //     await Card.findByIdAndDelete(foundCardSubmissionMessage.targetCard);
-                // }
 
                 const cardDecisionMessage = new CardDecision({
                     sendingUser: req.userId,
@@ -460,7 +437,13 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
             case "GroupInvitation":
                 const foundGroupInvitationMessage = await GroupInvitation.findById(req.message._id);
 
+                
                 if(req.userId.toString() === foundGroupInvitationMessage.targetUser.toString()) {
+                    const groupInvitedTo = await Group.findById(GroupInvitation.targetGroup);
+                    if(!groupInvitedTo) {
+                        return res.status(409).send("The group you have been invited to has been deleted");
+                    }
+
                     await GroupInvitation.findByIdAndUpdate(req.message._id, {acceptanceStatus: req.body.decision});
 
                     const invitationDecisionMessage = new InvitationDecision({
@@ -511,11 +494,10 @@ messageRouter.patch('/:messageId',  getUserIdFromJWTToken, async (req, res, next
 
                 // then make sure the deciding user is an admin of the group (may have initially been when message sent but then removed)
                 const foundGroupToJoin = await Group.findById(foundJoinRequestMessage.targetGroup, "administrators");
-                if(!foundGroupToJoin.administrators.includes(foundUser._id)) {
+                if(!foundGroupToJoin?.administrators.includes(foundUser._id)) {
                     res.status(403).send("Only group administrators may approve or deny join requests");
                     return;
                 }
-                
                 
                 if(foundJoinRequestMessage.acceptanceStatus !== "pending") {
                     res.status(409).send(`This user's request has already been ${foundJoinRequestMessage.acceptanceStatus}`);

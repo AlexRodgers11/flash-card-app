@@ -86,12 +86,12 @@ function JoinRequestMessage(props) {
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup?.name || "deleted group"} admins</p>}
                         <p><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to join: {targetGroup?.name || "deleted group"}</p>
                         {!decision ? 
-                            userId !== sender._id && <><button onClick={acceptUser}>Accept</button><button onClick={denyUser}>Decline</button><button onClick={reviewUser}>View User</button></>
+                            userId !== sender._id && <><button disabled={!targetGroup?.name} onClick={acceptUser}>Accept</button><button disabled={!targetGroup?.name} onClick={denyUser}>Decline</button><button disabled={!targetGroup?.name} onClick={reviewUser}>View User</button></>
                             :
                             userId !== sender._id && 
                                 <div>
                                     <textarea name="comments" id="comments" onChange={handleCommentChange} value={comment} placeholder="Add a comment (optional)"></textarea>
-                                    <button className="btn btn-primary btn-md" onClick={submitUserDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button><button className="btn btn-danger btn-md" onClick={clearDecision}>Cancel</button>
+                                    <button disabled={!targetGroup?.name} className="btn btn-primary btn-md" onClick={submitUserDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button><button className="btn btn-danger btn-md" onClick={clearDecision}>Cancel</button>
                                 </div>
                         }
                                                 

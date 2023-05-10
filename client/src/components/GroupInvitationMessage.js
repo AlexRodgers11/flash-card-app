@@ -69,7 +69,7 @@ function GroupInvitationMessage(props) {
                         <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender.login.username}</span>Invited you to join group <span>{targetGroup?.name || "deleted group"}</span></p>
                         {comment && <p>Comment: "{comment}"</p>}
                         {acceptanceStatus === "pending" && 
-                            userId !== sender._id && <><button data-decision="approved" onClick={submitUserDecision}>Accept</button><button data-decision="denied" onClick={submitUserDecision}>Decline</button></>
+                            userId !== sender._id && <><button disabled={!targetGroup?.name} style={{backgroundColor: !targetGroup?.name ? "blue" : "red"}} data-decision="approved" onClick={submitUserDecision}>Accept</button><button disabled={!targetGroup?.name} data-decision="denied" onClick={submitUserDecision}>Decline</button></>
                         }
                     </div>
                     :

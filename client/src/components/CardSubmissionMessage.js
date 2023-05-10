@@ -107,12 +107,12 @@ function CardSubmissionMessage(props) {
                         }
 
                         {!decision ? 
-                            userId !== sender._id && <><button onClick={acceptCard}>Accept</button><button onClick={denyCard}>Decline</button></>
+                            userId !== sender._id && <><button disabled={!targetGroup?.name} onClick={acceptCard}>Accept</button><button disabled={!targetGroup?.name} onClick={denyCard}>Decline</button></>
                             :
                             userId !== sender._id && 
                                 <div>
                                     <textarea name="comments" id="comments" onChange={handleCommentChange} value={comment} placeholder="Add a comment (optional)"></textarea>
-                                    <button className="btn btn-primary btn-md" onClick={submitCardDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button><button className="btn btn-danger btn-md" onClick={clearDecision}>Cancel</button>
+                                    <button disabled={!targetDeck?.name || !targetGroup?.name} className="btn btn-primary btn-md" onClick={submitCardDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button><button className="btn btn-danger btn-md" onClick={clearDecision}>Cancel</button>
                                 </div>
                         }
                         

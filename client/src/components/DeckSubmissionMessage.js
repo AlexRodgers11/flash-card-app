@@ -87,12 +87,12 @@ function DeckSubmissionMessage(props) {
                         {props.direction === "received" ? <p>From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p>To: {targetGroup.name} admins</p>}
                         <p><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to add deck: {deckName} to <span>{targetGroup?.name || "deleted group"}</span></p>
                         {!decision ? 
-                            userId !== sender._id && <><button onClick={acceptDeck}>Accept</button><button onClick={denyDeck}>Decline</button><button onClick={reviewDeck}>View Deck</button></>
+                            userId !== sender._id && <><button disabled={!targetGroup?.name} onClick={acceptDeck}>Accept</button><button disabled={!targetGroup?.name} onClick={denyDeck}>Decline</button><button disabled={!targetGroup?.name} onClick={reviewDeck}>View Deck</button></>
                             :
                             userId !== sender._id && 
                                 <div>
                                     <textarea name="comments" id="comments" onChange={handleCommentChange} value={comment} placeholder="Add a comment (optional)"></textarea>
-                                    <button className="btn btn-primary btn-md" onClick={submitDeckDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button><button className="btn btn-danger btn-md" onClick={clearDecision}>Cancel</button>
+                                    <button disabled={!targetGroup?.name} className="btn btn-primary btn-md" onClick={submitDeckDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button><button className="btn btn-danger btn-md" onClick={clearDecision}>Cancel</button>
                                 </div>
                         }
                         

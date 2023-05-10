@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import useFormInput from '../hooks/useFormInput';
+import { ErrorMessage } from './StyledComponents/ErrorMessage';
 import { client } from '../utils';
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 function CardForm(props) {
 	const [isLoaded, setIsLoaded] = useState(false);
+	const [errorMessage, setErrorMessage] = useState();
 	const [cardType, clearCardType, handleChangeCardType, setCardType] = useFormInput("")
 	const [question, clearQuestion, handleChangeQuestion, setQuestion] = useFormInput("");
 	const [hint, clearHint, handleChangeHint, setHint] = useFormInput("");
@@ -16,6 +17,19 @@ function CardForm(props) {
 	const [wrongAnswerTwo, clearWrongAnswerTwo, handleChangeWrongAnswerTwo, setWrongAnswerTwo] = useFormInput("");
 	const [wrongAnswerThree, clearWrongAnswerThree ,handleChangeWrongAnswerThree, setWrongAnswerThree] = useFormInput("");
 	const groupDeckBelongsTo = useSelector((state) => state.deck.groupDeckBelongsTo);
+
+	const allAnswersAreUnique = (ans1, ans2, ans3, ans4) => {
+		if(ans1 === ans2 || ans1 === ans3) {
+			return false;
+		}
+		if(ans1 === ans4 || ans2 === ans3) {
+			return false;
+		}
+		if(ans2 === ans4 || ans3 === ans4) {
+			return false;
+		}
+		return true;
+	}
 
 	const handleSubmit = evt => {
 		evt.preventDefault();
@@ -29,14 +43,19 @@ function CardForm(props) {
 			hint,
 			...(groupDeckBelongsTo && {groupCardBelongsTo: groupDeckBelongsTo})
 		}
-		clearCardType();
-		clearQuestion();
-		clearHint();
-		clearCorrectAnswer();
-		clearWrongAnswerOne();
-		clearWrongAnswerTwo();
-		clearWrongAnswerThree();
-		props.submit(card);
+		if(cardType !== "MultipleChoiceCard" || allAnswersAreUnique(correctAnswer, wrongAnswerOne, wrongAnswerTwo, wrongAnswerThree)) {
+			clearCardType();
+			clearQuestion();
+			clearHint();
+			clearCorrectAnswer();
+			clearWrongAnswerOne();
+			clearWrongAnswerTwo();
+			clearWrongAnswerThree();
+			setErrorMessage("");
+			props.submit(card);
+		} else {
+			setErrorMessage("No two answers can be the same");
+		} 
 	}
 
 	useEffect(() => {
@@ -77,8 +96,7 @@ function CardForm(props) {
 
 						<label htmlFor="type">Card Type: </label>
                         <select id="type" name="type" value={cardType} onChange={handleChangeCardType}>
-                            <option selected value={null}></option>
-                            <option value="FlashCard">Flash Card</option>
+                            <option selected value="FlashCard">Flash Card</option>
                             <option value="MultipleChoiceCard">Multiple Choice</option>
                             <option value="TrueFalseCard">True/False</option>
                         </select>
@@ -143,6 +161,7 @@ function CardForm(props) {
 						</div>
 					}
 					<button type="submit">{props.buttonText || "Add Card"}</button>
+					{errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
 				</form>
 			}
 		</div>

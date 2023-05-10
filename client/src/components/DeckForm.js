@@ -7,8 +7,6 @@ import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
 import { createDeck } from '../reducers/loginSlice';
 import styled from 'styled-components';
 
-const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
-
 const RadioWrapper = styled.div`
 	display: flex;
 	justify-content: center;
@@ -82,7 +80,7 @@ function DeckForm() {
 		<form onSubmit={handleSubmit}>
 			<div>
 				<label className="form-label" htmlFor="name">Deck Name:</label>
-				<input  type="text" id="name" name="name" value={nameInput} onChange={handleNameInputChange} />
+				<input required type="text" id="name" name="name" value={nameInput} onChange={handleNameInputChange} />
 			</div>
 			<RadioWrapper>
 				<label className="form-label" htmlFor="public">Public</label>

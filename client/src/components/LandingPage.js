@@ -365,11 +365,10 @@ function LandingPage() {
     }
 
 	useEffect(() => {
-		if(userId && accountSetupStage === "complete") {
-            console.log("navigating to dashboard");
+		if((userId && accountSetupStage === "complete") && location.pathname !== "/register/profile-pic-crop") {
 			navigate("/dashboard");
 		}
-	}, [userId, accountSetupStage, navigate]);
+	}, [userId, accountSetupStage, location, navigate]);
 
     
     const getPublicDeckCountInterval = useRef();

@@ -32,13 +32,16 @@ const ModalContent = styled.div`
 	border-radius: 1rem;
 	padding: 4rem 4rem 4rem 4rem;
 	@media (max-width: 450px) {
-        padding: 2rem;
+		padding: 2rem;
     }
 	@media (max-width: 375px) {
-        padding: 1rem;
+		padding: 1rem;
     }
 	overflow: scroll;
 	max-height: 80%;
+	@media (max-width: 550px) {
+		max-height: 70%;
+	}
 	scrollbar-width: none;
 	&::-web-kit-scrollbar {
 		display: none;

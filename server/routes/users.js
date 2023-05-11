@@ -147,10 +147,10 @@ userRouter.delete("/:protectedUserId", async (req, res, next) => {
         
         //delete the user's card attempts
         for(let i = 0; i < req.user.deckAttempts.length; i++) {
-            await CardAttempt.deleteMany({fullDeckAttempt: {$in: req.user.deckAttempts}, groupAttemptBelongsTo: ""});
+            await CardAttempt.deleteMany({fullDeckAttempt: {$in: req.user.deckAttempts[0]}, groupAttemptBelongsTo: {$exists: false}});
         }
         //delete the user's deck attempts
-        await DeckAttempt.deleteMany({_id: {$in: req.user.deckAttempts}, groupAttemptBelongsTo: ""});
+        await DeckAttempt.deleteMany({_id: {$in: req.user.deckAttempts}, groupAttemptBelongsTo: {$exists: false}});
         
         //delete the user
         const deletedUser = await User.findByIdAndDelete(userId);
@@ -159,7 +159,7 @@ userRouter.delete("/:protectedUserId", async (req, res, next) => {
 
         res.status(200).send(userId);
     } catch (err) {
-        res.status(500).send("There was an error with your request");
+        res.status(500).send(err.message);
     }
 });
 

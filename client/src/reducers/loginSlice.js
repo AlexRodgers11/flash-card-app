@@ -23,6 +23,7 @@ const initialState = {
     accountSetupStage: "",
     statisticsTracking: "",
     inactivityLengthBeforeLogout: "",
+    subscription: {},
     privacy: {
         email: "",
         name: "",
@@ -243,6 +244,7 @@ export const loginSlice = createSlice({
             state.accountSetupStage = action.payload.accountSetupStage;
             state.statisticsTracking = action.payload.statisticsTracking;
             state.privacy = action.payload.privacy;
+            state.subscription = action.payload.subscription;
             state.communicationSettings = action.payload.communicationSettings;
             state.inactivityLengthBeforeLogout = action.payload.inactivityLengthBeforeLogout;
         });

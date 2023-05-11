@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import Modal from './Modal';
 import styled, { keyframes } from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { GoLightBulb } from "react-icons/go";
 import axios from 'axios';
+import { logout } from '../reducers/loginSlice';
 
 const LandingPageWrapper = styled.div`
 	color: white;
@@ -342,9 +343,10 @@ function LandingPage() {
 	const userId = useSelector((state) => state.login.userId);
 	const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
     const [publicDeckCount, setPublicDeckCount] = useState();
+    const dispatch = useDispatch();
 	const location = useLocation();
 	const navigate = useNavigate();
-	
+
 	const openForm = evt => {
 		evt.preventDefault();
 		if(evt.target.dataset.location === "login") {
@@ -354,12 +356,17 @@ function LandingPage() {
 		}
 	}
 
-	const goBackToHome = () => {
-		navigate("/");
-	};
+    const handleHideModal = () => {
+        navigate("/");
+        dispatch(logout());
+        document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+        localStorage.removeItem("token");
+        localStorage.removeItem("persist:login");
+    }
 
 	useEffect(() => {
 		if(userId && accountSetupStage === "complete") {
+            console.log("navigating to dashboard");
 			navigate("/dashboard");
 		}
 	}, [userId, accountSetupStage, navigate]);
@@ -474,8 +481,7 @@ function LandingPage() {
             <Section color="pink" height="70vh">
                 <SectionHeading>Track statistics and customize study sessions for more efficient learning</SectionHeading>    
             </Section>
-
-			{location.pathname !== "/" && <Modal hideModal={location.pathname === "/register/credentials" || location.pathname === "/login" ? goBackToHome : null}><Outlet /></Modal>}
+			{location.pathname !== "/" && <Modal hideModal={handleHideModal}><Outlet /></Modal>}
 		</LandingPageWrapper>
 	)
 }

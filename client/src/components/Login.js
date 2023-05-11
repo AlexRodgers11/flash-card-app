@@ -23,6 +23,7 @@ function Login() {
     const [passwordVisible, togglePasswordVisible] = useToggle(false);
     const [errorMessage, setErrorMessage] = useState();
     const userId = useSelector((state) => state.login.userId);
+    const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
 
     const handleUserNameOrEmailChange = (evt) => {
         setUsernameOrEmail(evt.target.value);
@@ -62,9 +63,11 @@ function Login() {
         if(userId) {
             dispatch(fetchLoggedInUserData(userId));
             dispatch(fetchCommunications());
-            navigate("/dashboard");
+            if(accountSetupStage === "complete") {
+                navigate("/dashboard");
+            }
         }
-    }, [userId, dispatch, navigate]);
+    }, [accountSetupStage, userId, dispatch, navigate]);
 
     return (
         <div>

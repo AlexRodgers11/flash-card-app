@@ -291,7 +291,7 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
         user = await User.findByIdAndUpdate(req.user._id, patchObj, {new: true});
 
         if(user.accountSetupStage !== "complete" && ((user._id && user.name.first) && (user.name.last && user.login.email))) {
-            user = await User.findByIdAndUpdate(req.user._id, {accountSetupStage: "complete"}, {new: true});
+            user = await User.findByIdAndUpdate(req.user._id, {accountSetupStage: "complete", "subscription.status": "active"}, {new: true});
         }
 
         let responseData = {};

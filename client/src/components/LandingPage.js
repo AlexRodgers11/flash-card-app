@@ -9,17 +9,20 @@ import { logout } from '../reducers/loginSlice';
 
 const LandingPageWrapper = styled.div`
 	color: white;
+    width: 100vw;
+    background-color: yellow;
 `;
 
 const MainSection = styled.div`
-    height: ${props => props.height};
-    min-height: 500px;
+    // height: ${props => props.height};
+    // min-height: 500px;
     background-color: ${props => props.color};
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
-    height: calc(100vh - 5.5rem);
-    @media (max-width: 950px) {
+    min-height: calc(100vh - 5.5rem);
+    // @media (max-width: 950px) {
+    @media (max-width: 1024px) {
         grid-template-columns: 1fr;
         // grid-template-rows: 1fr 1fr;
         grid-template-rows: 5fr 2fr;
@@ -54,7 +57,8 @@ const LoginControls = styled.div`
 		// background-color: #223843;
 		background-color: black;
 		color: white;
-		@media (max-width: 950px) {
+		// @media (max-width: 950px) {
+		@media (max-width: 1024px) {
 			width: 25%;
 			max-height: 25%;
 			font-size: 1.25rem;
@@ -64,8 +68,10 @@ const LoginControls = styled.div`
 			padding: .25rem .5rem;
 		}
 	}
-	@media (max-width: 950px) {
+	// @media (max-width: 950px) {
+	@media (max-width: 1024px) {
 		flex-direction: row;
+        border: none;
 	}
 `;
 
@@ -79,20 +85,25 @@ const TitleBlock = styled.div`
 	background-color: #333333;
 `;
 
-const SiteTitle = styled.h1`
-    color: white;
-    font-size: 6rem;
+const SiteTitle = styled.div`
+    min-width: 375px;
 `;
 
 const Section = styled.section`
-    height: ${props => props.height};
-    min-height: 500px;
-    background-color: ${props => props.color}
+    min-width: 100vw;
+    min-height: ${props => props.height};
+    // min-height: 500px;
+    background-color: ${props => props.color};
+    padding: .75rem 0;
 `;
 
 const SectionHeading = styled.h3`
     color: white;
     font-size: 4rem;
+`;
+
+const SectionSubHeading = styled.h6`
+    
 `;
 
 const rotateCard1 = keyframes`
@@ -149,9 +160,31 @@ const TitleCard = styled.div`
     border: 2px solid black;
     border-radius: 1.25rem;
     background-color: white;
+    font-size: 6rem;
+    font-weight: 500;
     color: black;
     width: 15rem;
     height: 20rem;
+    @media (max-width: 550px) {
+        width: 13.5rem;
+        height: 18rem;
+        font-size: 5.25rem;
+    }
+    @media (max-width: 470px) {
+        width: 12rem;
+        height: 16rem;
+        font-size: 5rem;
+    }
+    @media (max-width: 420px) {
+        width: 10.5rem;
+        height: 14rem;
+        font-size: 4.25rem;
+    }
+    @media (max-width: 370px) {
+        width: 9rem;
+        height: 12rem;
+        font-size: 3.75rem;
+    }
     &.first {
         animation: ${rotateCard1} 24s infinite;
         -webkit-animation: ${rotateCard1} 24s infinite;
@@ -256,23 +289,46 @@ const BackTwoText = styled.div`
     -webkit-animation-delay: 6s;
 `;
 
+const CardsContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    @media (max-width: 515px) {
+        flex-direction: column;
+    }
+`;
 
 const CardWrapper = styled.div`
     display: inline-block;
     border: 3px solid black; 
     overflow: hidden;
-    // border-radius: 3rem;
     border-radius: 10%;
-    // background-color: white;
     background-color: #2C262C;
-    width: 28em;
-    height: 32em;
-    min-height: 20em;
-    // margin-bottom: 10rem;
+    width: 21rem;
+    height: 24rem;
+    @media (max-width: 1015px) {
+        width: 17.5rem;
+        height: 20rem;
+    }
+    @media (max-width: 850px) {
+        width: 14rem;
+        height: 16rem;
+    }
+    @media (max-width: 690px) {
+        width: 10.5rem;
+        height: 12rem;
+    }
+    @media (max-width: 515px) {
+        display: block;
+        width: 14rem;
+        height: 16rem;
+        margin-bottom: .5rem;
+        align-self: center;
+    }
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 `
 
 const QuestionBox = styled.div`
+    position: relative;
 	height: 40%;
 	border-bottom: 1px solid black;
 	// background-color: #FFD549;
@@ -295,7 +351,7 @@ const QuestionWrapper = styled.div`
 
 const HintBox = styled.div`
 	position: absolute;
-	width: 28rem;
+    width: 100%;
 	text-align: left;
 	& button {
 		margin: .5rem;
@@ -409,14 +465,45 @@ function LandingPage() {
                     </SiteTitle>
                     <h4>A customizable flash card experience that lets you study smarter, shorter, and more efficiently</h4>
                 </TitleBlock>
-            <LoginControls className="LoginControls">
-				<button onClick={openForm} data-location="login" className="btn btn-lg">Login</button>
-				<button onClick={openForm} data-location="register/credentials" className="btn btn-lg">SignUp</button>
-			</LoginControls>	
+                <LoginControls className="LoginControls">
+                    <button onClick={openForm} data-location="login" className="btn btn-lg">Login</button>
+                    <button onClick={openForm} data-location="register/credentials" className="btn btn-lg">SignUp</button>
+                </LoginControls>	
             </MainSection>
+            <Section color="blue" height="70vh" >
+                <SectionHeading>Collaborate and Share Resources in Study Groups</SectionHeading>
+                    <p>Empower your learning experience by forming study groups, where members can share and contribute to each other's resources.</p>
+
+                    <p>Members can:</p>
+                    <ul>
+                        <li>Submit personal decks to the group.</li>
+                        <li>Create and contribute to existing group decks.</li>
+                    </ul>
+
+                    <SectionSubHeading>Group Admin Privileges</SectionSubHeading>
+                    <p>Group admins have enhanced control, allowing them to:</p>
+                    <ul>
+                        <li>Approve or deny other users' deck and card submissions.</li>
+                        <li>Directly submit their own decks and cards, bypassing the need for approval.</li>
+                        <li>Invite new members or approve incoming join requests.</li>
+                    </ul>
+
+                    <SectionSubHeading>Flexible Join Options</SectionSubHeading>
+                    <p>Customize how new members join your group:</p>
+                    <ul>
+                        <li>Use a Group Join Code for effortless access.</li>
+                        <li>Send invites from admin accounts to potential members.</li>
+                        <li>Approve requests initiated by potential members themselves.</li>
+                    </ul>
+            </Section>
+            <Section color="orange" height="70vh">
+                <SectionHeading>Browse public decks or create your own</SectionHeading>
+                {publicDeckCount && <p>{publicDeckCount} public decks and counting</p>}
+            </Section>
             <Section color="black" height="70vh">
                 <SectionHeading>Create different types of cards: Flip, True/False, and Multiple Choice</SectionHeading>
-                <CardWrapper>
+                <CardsContainer>
+                    <CardWrapper>
                         <QuestionBox>
                             <HintBox>
                                 <div>
@@ -432,8 +519,8 @@ function LandingPage() {
                             <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
                             <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
                         </AnswerBox>
-                </CardWrapper>
-                <CardWrapper>
+                    </CardWrapper>
+                    <CardWrapper>
                         <QuestionBox>
                             <HintBox>
                                 
@@ -450,8 +537,8 @@ function LandingPage() {
                             <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
                             <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
                         </AnswerBox>
-                </CardWrapper>
-                <CardWrapper>
+                    </CardWrapper>
+                    <CardWrapper>
                         <QuestionBox>
                             <HintBox>
                                 
@@ -468,17 +555,49 @@ function LandingPage() {
                             <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
                             <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
                         </AnswerBox>
-                </CardWrapper>
+                    </CardWrapper>
+                </CardsContainer>
             </Section>
-            <Section color="orange" height="70vh">
-                <SectionHeading>Browse public decks or create your own</SectionHeading>
-                {publicDeckCount && <p>{publicDeckCount} public decks and counting</p>}
-            </Section>
-            <Section color="blue" height="70vh">
-                <SectionHeading>Form study groups and share resources</SectionHeading>    
+            <Section color="black" height="70vh">
+                {/* <SectionHeading>Customizble Practice Sessions for Personalized Learning</SectionHeading> */}
+                <SectionHeading>Customize Practice Sessions for Personalized Learning</SectionHeading>
+
+                <p>Transform your study routine with our customizable practice sessions, designed to cater to your unique learning needs and preferences. Choose from:</p>
+
+                <ul>
+                    <li><strong>Full Deck Study:</strong> Review all the cards in a deck for a comprehensive study session.</li>
+                    <li>
+                        <strong>Quick Practice:</strong> Short on time? Select a specific number of cards for a quick review. You can choose from:
+                        <ul>
+                            <li>Random cards for diverse learning.</li>
+                            <li>Least recently practiced cards to refresh your memory.</li>
+                            <li>Least practiced cards to ensure balanced learning.</li>
+                            <li>Cards with the lowest accuracy to focus on challenging areas.</li>
+                            <li>Newest created cards to keep up with fresh content.</li>
+                            <li>Oldest created cards to revisit foundational knowledge.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Filtered Practice:</strong> Want more control? Conduct a filtered session based on specific criteria:
+                        <ul>
+                            <li>Type of card (Flip/Flash, Multiple Choice, True/False).</li>
+                            <li>Accuracy rate to focus on cards that need more practice.</li>
+                            <li>Date last practiced to revisit cards at the right time.</li>
+                            <li>Date created to organize your learning chronologically.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <p>With these flexible options, you can create a study session that perfectly aligns with your learning goals and time availability.</p>
             </Section>
             <Section color="pink" height="70vh">
-                <SectionHeading>Track statistics and customize study sessions for more efficient learning</SectionHeading>    
+                <SectionHeading>Track Your Practice Session Stats to Keep Track of Your Progress</SectionHeading>
+                <p>Boost your learning efficiency by leveraging our statistics tracking feature and customizable study sessions. This allows you to:</p>
+                <ul>
+                    <li>Review past practice sessions, helping you to identify and focus on areas of improvement.</li>
+                    <li>Analyze detailed statistics for individual decks, cards, and practice sessions to understand your learning progress and patterns.</li>
+                    <li>Enjoy the flexibility to turn off statistics tracking at any point if you prefer a simpler learning approach.</li>
+                </ul>
             </Section>
 			{location.pathname !== "/" && <Modal hideModal={handleHideModal}><Outlet /></Modal>}
 		</LandingPageWrapper>

@@ -8,7 +8,6 @@ import { setFilters, setQuickPracticeNumCards, setQuickPracticeSelection, setSes
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 const SessionSetupFormWrapper = styled.div`
-    min-width: 30rem;
     border: 2px solid black;
 `;
 
@@ -20,6 +19,16 @@ const PracticeAll = styled.form`
     border-bottom: ${props => props.cardsLength > 1 ? "2px solid black" : "none"};
     & h2 {
         display: inline-block;
+    }
+    @media (max-width: 575px) {
+        padding: .5rem;
+        & button {
+            padding: .25rem .5rem;
+            font-size: 1rem;
+        }
+        & h2 {
+            font-size: 1.5rem;
+        }
     }
 `;
 
@@ -61,31 +70,55 @@ const Section = styled.div`
             width: 12rem;
         }
     }
+    @media (max-width: 575px) {
+        padding: .5rem;
+        & button {
+            padding: .25rem .5rem;
+            font-size: 1rem;
+        }
+        & h2 {
+            font-size: 1.5rem;
+        }
+    }
 `;
 
 const QuickPractice = styled(Section)`
+
 `;
 
 const FilteredPractice = styled(Section)`
+
 `;
 
 
 const HalfBlock = styled.div`
-    // width: calc((100% - 2rem) / 2);
     display: inline-flex;
     height: 100%;
     flex-direction: column;
+    &.first {
+        margin-right: 5rem;
+        @media (max-width: 575px) {
+            margin-right: 3rem;    
+        }
+        @media (max-width: 545px) {
+            margin-right: 1rem;    
+        }
+    }
+    @media (max-width: 545px) {
+        margin-right: 1rem;    
+        font-size: .875rem;
+    }
 `;
 
 const ControlsContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    white-space: nowrap;
 `;
 
 const OptionsBlock = styled.form`
     display: flex;
-    // flex-direction: column;
     padding: 0 5%;
     justify-content: space-between;
 `;
@@ -211,14 +244,14 @@ function SessionSetupForm() {
                         <QuickPractice className="QuickPractice">
                             <h2>Quick Practice</h2>
                             <OptionsBlock id="quick-form" onSubmit={handlePracticeSelectionSubmission} data-sessiontype="quick" className="OptionsBlock">
-                                <HalfBlock className="HalfBlock">
+                                <HalfBlock className="HalfBlock first">
                                     <label htmlFor="quick-num-cards">Number of Cards</label>
                                     <select id="quick-num-cards" value={numCards} onChange={handleNumCardsChange}>
                                         {cards.slice(0, cards.length - 1).map((card, idx) => <option key={card.createdAt}>{idx + 1}</option>)}
                                     </select>
                                 </HalfBlock>
-                                <HalfBlock className="HalfBlock">
-                                    <ControlsContainer>
+                                <HalfBlock className="HalfBlock second">
+                                    <ControlsContainer className="ControlsContainer">
                                         <div>
                                             <input 
                                                 type="radio" 
@@ -294,11 +327,11 @@ function SessionSetupForm() {
                         <FilteredPractice>
                             <h2>Filtered Practice</h2>
                             <OptionsBlock id="filtered-form" onSubmit={handlePracticeSelectionSubmission} data-sessiontype="filtered">
-                                <HalfBlock className="HalfBlock">
+                                <HalfBlock className="HalfBlock first">
                                     <p>Number of Cards</p>
                                     <p>{getFilterPassingCount()}</p>
                                 </HalfBlock>
-                                <HalfBlock className="HalfBlock sliders">
+                                <HalfBlock className="HalfBlock sliders second">
                                     <ControlsContainer>
                                         <label htmlFor="accuracyRate">Accuracy Rate</label>
                                         <input 

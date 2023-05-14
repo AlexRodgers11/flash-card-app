@@ -9,7 +9,7 @@ const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 function CardForm(props) {
 	const [isLoaded, setIsLoaded] = useState(false);
 	const [errorMessage, setErrorMessage] = useState();
-	const [cardType, clearCardType, handleChangeCardType, setCardType] = useFormInput("")
+	const [cardType, clearCardType, handleChangeCardType, setCardType] = useFormInput("FlashCard")
 	const [question, clearQuestion, handleChangeQuestion, setQuestion] = useFormInput("");
 	const [hint, clearHint, handleChangeHint, setHint] = useFormInput("");
 	const [correctAnswer, clearCorrectAnswer, handleChangeCorrectAnswer, setCorrectAnswer] = useFormInput("");
@@ -52,6 +52,7 @@ function CardForm(props) {
 			clearWrongAnswerTwo();
 			clearWrongAnswerThree();
 			setErrorMessage("");
+			console.log({card});
 			props.submit(card);
 		} else {
 			setErrorMessage("No two answers can be the same");

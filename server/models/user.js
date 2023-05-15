@@ -29,9 +29,13 @@ const User = new Schema({
     },
     statisticsTracking: {
         type: String,
-        default: "all" //all, user-only, group-only, none
+        enum: ["all", "user-only", "group-only", "none"],
+        default: "all"
     },
-    accountSetupStage: String, //email, verified, complete
+    accountSetupStage: {
+        type: String,
+        enum: ["email", "verified", "complete"]
+    }, //email, verified, complete
     inactivityLengthBeforeLogout: {
         type: String, //in milliseconds or "never"
         default: "3600000"
@@ -133,12 +137,12 @@ const User = new Schema({
         },
         blockedUsers: [{type: Schema.Types.ObjectId, ref: "User"}],//not currently used but added so that existing users of app won't be missing the property when functionality added for it
     },
-        subscription: {
-            status: {
-                type: String,
-                enum: ["active", "inactive", "canceled", "expired", "discount-grandfathered-active", "discount-grandfathered-expired"],
-                default: "inactive"
-            },
+    subscription: {
+        status: {
+            type: String,
+            enum: ["active", "inactive", "canceled", "expired", "discount-grandfathered-active", "discount-grandfathered-expired"],
+            default: "inactive"
+        },
         tier: {
             type: String,
             enum: ["basic", "pro"],
@@ -148,7 +152,7 @@ const User = new Schema({
             type: Date,
             default: Date.now()
         },
-            endDate: Date
+        endDate: Date
     }
 }, {timestamps: true});
 

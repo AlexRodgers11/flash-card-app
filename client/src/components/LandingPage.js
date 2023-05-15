@@ -4,6 +4,7 @@ import Modal from './Modal';
 import styled, { keyframes } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { GoLightBulb } from "react-icons/go";
+import { GiRapidshareArrow } from "react-icons/gi";
 import axios from 'axios';
 import { logout } from '../reducers/loginSlice';
 
@@ -16,15 +17,12 @@ const LandingPageWrapper = styled.div`
 const MainSection = styled.div`
     // height: ${props => props.height};
     // min-height: 500px;
-    background-color: ${props => props.color};
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
     min-height: calc(100vh - 5.5rem);
-    // @media (max-width: 950px) {
     @media (max-width: 1024px) {
         grid-template-columns: 1fr;
-        // grid-template-rows: 1fr 1fr;
         grid-template-rows: 5fr 2fr;
     }
 `;
@@ -36,14 +34,8 @@ const LoginControls = styled.div`
 	justify-content: center;
 	height: 100%;
 	width: 100%;
-	// background-color: cornflowerblue;
-	// background-color: #0AFFED;
-	
-
-	// background-color: #FF6565;
-    // background-color: #9DE59D;
     background-color: #52B2FF;
-    // background-color: #CC52CC;
+    // background-color: #FFD549;
 	border-left: 1px solid black;
 	& button {
 		font-size: 2.5rem;
@@ -83,6 +75,14 @@ const TitleBlock = styled.div`
 	width: 100%;
 	height: 100%;
 	background-color: #333333;
+	// background-color: #303030;
+    & h4 {
+        margin-top: 2rem;
+        padding: 0 1rem;
+        @media (max-width: 450px), (max-height: 450px) {
+			font-size: 1rem;
+		}
+    }
 `;
 
 const SiteTitle = styled.div`
@@ -90,20 +90,95 @@ const SiteTitle = styled.div`
 `;
 
 const Section = styled.section`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Georgia;
+    font-family: 'Bookman Old Style', serif;
+    // font-family: Garamond, serif;
+
+    /* Sans-Serif Fonts */
+    // font-family: Arial, Helvetica, sans-serif;
+    // font-family: 'Arial Black', Gadget, sans-serif;
+    // font-family: 'Comic Sans MS', cursive, sans-serif;
+    // font-family: Impact, Charcoal, sans-serif;
     min-width: 100vw;
-    min-height: ${props => props.height};
-    // min-height: 500px;
-    background-color: ${props => props.color};
-    padding: .75rem 0;
+    // min-height: ${props => props.height};
+    background-color: ${props => props.backgroundColor};
+    color: ${props => props.color};
+    padding: .75rem;
+    @media (max-width: 450px) {
+        font-size: .75rem;
+    }
 `;
 
 const SectionHeading = styled.h3`
-    color: white;
     font-size: 4rem;
+    @media(max-width: 1350px) {
+        font-size: 3.25rem;
+    }
+    @media (max-width: 1075px) {
+        font-size: 2.75rem;
+    }
+    @media (max-width: 750px) {
+        font-size: 2.25rem;
+    }
+    @media (max-width: 450px) {
+        font-size: 2rem;
+    }
 `;
 
-const SectionSubHeading = styled.h6`
-    
+const SectionSubHeading = styled.p`
+    text-align: left;
+    align-self: center;
+    font-size: 1.125em;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.25;
+    padding: 1.25rem;
+    width: 60%;
+    @media (max-width: 1075px) {
+        padding: 1rem;
+        width: 65%;
+    }
+    @media (max-width: 750px) {
+        padding: .75rem;
+        width: 70%;
+    }
+    @media (max-width: 450px) {
+        width: 90%;
+    }
+`;
+const MiniSectionsContainer = styled.div`
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+`;
+
+const MiniSection = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+`;
+
+const MiniSectionHeading = styled.p`
+    text-align: left;
+    // display: inline-block;
+    padding-top: .5rem;
+`;
+
+const List = styled.ul`
+
+    text-align: left;
+`;
+
+const ListItem = styled.li`
+    display: block;
+    list-style-type: decimal;
+    &:before {
+        // content: "• ";
+        content: "- ";
+    }
 `;
 
 const rotateCard1 = keyframes`
@@ -292,12 +367,13 @@ const BackTwoText = styled.div`
 const CardsContainer = styled.div`
     display: flex;
     justify-content: center;
-    @media (max-width: 515px) {
+    @media (max-width: 530px) {
         flex-direction: column;
     }
 `;
 
 const CardWrapper = styled.div`
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
     display: inline-block;
     border: 3px solid black; 
     overflow: hidden;
@@ -305,19 +381,29 @@ const CardWrapper = styled.div`
     background-color: #2C262C;
     width: 21rem;
     height: 24rem;
-    @media (max-width: 1015px) {
+    margin: 0 2rem;
+    @media (max-width: 1250px) {
+        margin: 0 1.25rem;
+    }
+    @media (max-width: 1150px) {
+        margin: 0 .75rem;
+    }
+    @media (max-width: 1075px) {
         width: 17.5rem;
         height: 20rem;
+        margin: 0 .5rem;
     }
-    @media (max-width: 850px) {
+    @media (max-width: 900px) {
         width: 14rem;
         height: 16rem;
+        margin: 0 .25rem;
     }
     @media (max-width: 690px) {
+        font-size: .875rem;
         width: 10.5rem;
         height: 12rem;
     }
-    @media (max-width: 515px) {
+    @media (max-width: 530px) {
         display: block;
         width: 14rem;
         height: 16rem;
@@ -327,26 +413,82 @@ const CardWrapper = styled.div`
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 `
 
+const FlashCard = styled.div`
+    position: relative;
+    // diplay: flex;
+    // flex-direction: column;
+    height: 100%;
+    width: 100%;
+    & button {
+        padding: .5rem;
+        font-size: 1rem;
+        @media (max-width: 1015px) {
+            padding: .375rem;
+            font-size: .875rem;
+        }
+        @media (max-width: 690px) {
+            font-size: .75rem
+        }
+	}
+    @media (max-width: 1015px) {
+        // width: 17.5rem;
+        // height: 20rem;
+    }
+    @media (max-width: 850px) {
+        // width: 14rem;
+        // height: 16rem;
+    }
+    @media (max-width: 690px) {
+        // width: 10.5rem;
+        // height: 12rem;
+    }
+    @media (max-width: 515px) {
+        // display: block;
+        // width: 14rem;
+        // height: 16rem;
+        // margin-bottom: .5rem;
+        // align-self: center;
+    }
+`;
+
+const StyledFlipArrow = styled(GiRapidshareArrow)`
+	height: 1.25rem;
+	width: 1.25rem;
+    margin-left: 5px;
+    @media (max-width: 1015px) {
+        font-size: 1rem;
+    }
+    @media (max-width: 690px) {
+        font-size: .875rem
+    }
+    font-size: inherit
+	transform: rotate(180deg);
+	-webkit-transform: rotate(180deg);
+`;
+
 const QuestionBox = styled.div`
     position: relative;
 	height: 40%;
 	border-bottom: 1px solid black;
-	// background-color: #FFD549;
-	// background-color: #A3A5B8;
-	// background-color: #757895;
-	// background-color: #58355E;
-	// background-color: #6A6E8A;
 	background-color:  #2C262C;
-
-	// color: black;
-	color: white;
+    &.True-False {
+        height: 46%;
+    }
 `
 
 const QuestionWrapper = styled.div`
 	display: flex;
+    flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	height: 100%;
+    color: white;
+    &.FlashCard {
+        padding: 30% 5%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
 `
 
 const HintBox = styled.div`
@@ -380,6 +522,9 @@ const Answer = styled.div`
 const AnswerBox = styled.div`
 	height: 60%;
     color: black;
+    &.True-False {
+        height: calc(54% - 1px);
+    }
 `
 
 const AnswerWrapper = styled.div`
@@ -391,6 +536,12 @@ const AnswerWrapper = styled.div`
 	&:last-child {
 		border-bottom: none
 	}
+    &.True-False {
+        height: 50%;
+        // &:nth-of-type(2) {
+        //     height: calc(50% + 1px);
+        // }
+    }
 `
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
@@ -451,7 +602,7 @@ function LandingPage() {
 
 	return (
 		<LandingPageWrapper className="LandingPageWrapper">
-            <MainSection color="red" height="100vh">
+            <MainSection>
                 <TitleBlock>
                     <SiteTitle>
                         <TitleCard className="first">
@@ -470,135 +621,150 @@ function LandingPage() {
                     <button onClick={openForm} data-location="register/credentials" className="btn btn-lg">SignUp</button>
                 </LoginControls>	
             </MainSection>
-            <Section color="blue" height="70vh" >
-                <SectionHeading>Collaborate and Share Resources in Study Groups</SectionHeading>
-                    <p>Empower your learning experience by forming study groups, where members can share and contribute to each other's resources.</p>
-
-                    <p>Members can:</p>
-                    <ul>
-                        <li>Submit personal decks to the group.</li>
-                        <li>Create and contribute to existing group decks.</li>
-                    </ul>
-
-                    <SectionSubHeading>Group Admin Privileges</SectionSubHeading>
-                    <p>Group admins have enhanced control, allowing them to:</p>
-                    <ul>
-                        <li>Approve or deny other users' deck and card submissions.</li>
-                        <li>Directly submit their own decks and cards, bypassing the need for approval.</li>
-                        <li>Invite new members or approve incoming join requests.</li>
-                    </ul>
-
-                    <SectionSubHeading>Flexible Join Options</SectionSubHeading>
-                    <p>Customize how new members join your group:</p>
-                    <ul>
-                        <li>Use a Group Join Code for effortless access.</li>
-                        <li>Send invites from admin accounts to potential members.</li>
-                        <li>Approve requests initiated by potential members themselves.</li>
-                    </ul>
-            </Section>
-            <Section color="orange" height="70vh">
+            <Section backgroundColor="black" color="white">
                 <SectionHeading>Browse public decks or create your own</SectionHeading>
                 {publicDeckCount && <p>{publicDeckCount} public decks and counting</p>}
             </Section>
-            <Section color="black" height="70vh">
+            
+            
+            <Section  backgroundColor="#9DE59D" color="black">
                 <SectionHeading>Create different types of cards: Flip, True/False, and Multiple Choice</SectionHeading>
                 <CardsContainer>
                     <CardWrapper>
-                        <QuestionBox>
-                            <HintBox>
+                        <FlashCard className="FlashCard">
+                            {/* <HintBox>
+                                
+                                <div>
+                                    <button>Hint</button>
+                                    <p>Hint</p>
+                                </div>
+                            </HintBox> */}
+                            <QuestionWrapper className="QuestionWrapper FlashCard">
+                                How many bones are there in the human body?
+                                <button className="btn btn-primary">View Answer<StyledFlipArrow /></button>
+                            </QuestionWrapper>
+                        </FlashCard>
+                    </CardWrapper>
+                    <CardWrapper>
+                        <QuestionBox className="True-False">
+                            {/* <HintBox>
                                 <div>
                                     <GoLightBulb />
                                     <p>Hint</p>
                                 </div>
-                            </HintBox>
-                            <QuestionWrapper>Which of the following means "average"</QuestionWrapper>
+                            </HintBox> */}
+                            <QuestionWrapper>Mount Everest is located in the Andes</QuestionWrapper>
                         </QuestionBox>
-                        <AnswerBox>
-                            <AnswerWrapper><Answer>Median</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Mode</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
+                        <AnswerBox className="True-False">
+                            <AnswerWrapper  className="True-False"><Answer>True</Answer></AnswerWrapper>
+                            <AnswerWrapper  className="True-False"><Answer>False</Answer></AnswerWrapper>
                         </AnswerBox>
                     </CardWrapper>
                     <CardWrapper>
                         <QuestionBox>
-                            <HintBox>
+                            {/* <HintBox>
                                 
                                 <div>
                                     <button>Hint</button>
                                     <p>Hint</p>
                                 </div>
-                            </HintBox>
-                            <QuestionWrapper>Which of the following means "average"</QuestionWrapper>
+                            </HintBox> */}
+                            <QuestionWrapper>What is the hotest planet in the Milky Way?</QuestionWrapper>
                         </QuestionBox>
                         <AnswerBox>
-                            <AnswerWrapper><Answer>Median</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Mode</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
-                        </AnswerBox>
-                    </CardWrapper>
-                    <CardWrapper>
-                        <QuestionBox>
-                            <HintBox>
-                                
-                                <div>
-                                    <button>Hint</button>
-                                    <p>Hint</p>
-                                </div>
-                            </HintBox>
-                            <QuestionWrapper>Which of the following means "average"</QuestionWrapper>
-                        </QuestionBox>
-                        <AnswerBox>
-                            <AnswerWrapper><Answer>Median</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Mode</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Mean</Answer></AnswerWrapper>
-                            <AnswerWrapper><Answer>Range</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Mercury</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Venus</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Mars</Answer></AnswerWrapper>
+                            <AnswerWrapper><Answer>Jupiter</Answer></AnswerWrapper>
                         </AnswerBox>
                     </CardWrapper>
                 </CardsContainer>
             </Section>
-            <Section color="black" height="70vh">
-                {/* <SectionHeading>Customizble Practice Sessions for Personalized Learning</SectionHeading> */}
+
+            
+            
+            <Section backgroundColor="#52B2FF" color="black" >
                 <SectionHeading>Customize Practice Sessions for Personalized Learning</SectionHeading>
 
-                <p>Transform your study routine with our customizable practice sessions, designed to cater to your unique learning needs and preferences. Choose from:</p>
+                <SectionSubHeading>Transform your study routine with our customizable practice sessions, designed to cater to your unique learning needs and preferences. With our flexible session options you can create a study session that perfectly aligns with your learning goals and time availability. Choose from:</SectionSubHeading>
+                <MiniSectionsContainer>
+                <MiniSection>
+                    <MiniSectionHeading><strong>Full Deck Study</strong> Review all the cards in a deck for a comprehensive study session.</MiniSectionHeading>
+                </MiniSection>
+                <MiniSection>
+                    <MiniSectionHeading><strong>Quick Practice</strong> Short on time? Select a specific number of cards for a quick review. You can choose from:</MiniSectionHeading>
 
-                <ul>
-                    <li><strong>Full Deck Study:</strong> Review all the cards in a deck for a comprehensive study session.</li>
-                    <li>
-                        <strong>Quick Practice:</strong> Short on time? Select a specific number of cards for a quick review. You can choose from:
-                        <ul>
-                            <li>Random cards for diverse learning.</li>
-                            <li>Least recently practiced cards to refresh your memory.</li>
-                            <li>Least practiced cards to ensure balanced learning.</li>
-                            <li>Cards with the lowest accuracy to focus on challenging areas.</li>
-                            <li>Newest created cards to keep up with fresh content.</li>
-                            <li>Oldest created cards to revisit foundational knowledge.</li>
-                        </ul>
-                    </li>
-                    <li>
-                        <strong>Filtered Practice:</strong> Want more control? Conduct a filtered session based on specific criteria:
-                        <ul>
-                            <li>Type of card (Flip/Flash, Multiple Choice, True/False).</li>
-                            <li>Accuracy rate to focus on cards that need more practice.</li>
-                            <li>Date last practiced to revisit cards at the right time.</li>
-                            <li>Date created to organize your learning chronologically.</li>
-                        </ul>
-                    </li>
-                </ul>
+                    <List>
+                        <ListItem>Random cards for diverse learning.</ListItem>
+                        <ListItem>Least recently practiced cards to refresh your memory.</ListItem>
+                        <ListItem>Least practiced cards to ensure balanced learning.</ListItem>
+                        <ListItem>Cards with the lowest accuracy to focus on challenging areas.</ListItem>
+                        <ListItem>Newest created cards to keep up with fresh content.</ListItem>
+                        <ListItem>Oldest created cards to revisit foundational knowledge.</ListItem>
+                    </List>
+                </MiniSection>
+                <MiniSection>
+                    <MiniSectionHeading><strong>Filtered Practice</strong> Want more control? Conduct a filtered session based on specific criteria:</MiniSectionHeading>
+                    <List>
+                        <ListItem>Type of card (Flip/Flash, Multiple Choice, True/False).</ListItem>
+                        <ListItem>Accuracy rate to focus on cards that need more practice.</ListItem>
+                        <ListItem>Date last practiced to revisit cards at the right time.</ListItem>
+                        <ListItem>Date created to organize your learning chronologically.</ListItem>
+                    </List>
+                </MiniSection>
+                </MiniSectionsContainer>
 
-                <p>With these flexible options, you can create a study session that perfectly aligns with your learning goals and time availability.</p>
             </Section>
-            <Section color="pink" height="70vh">
+
+            <Section backgroundColor="black" color="white">
                 <SectionHeading>Track Your Practice Session Stats to Keep Track of Your Progress</SectionHeading>
-                <p>Boost your learning efficiency by leveraging our statistics tracking feature and customizable study sessions. This allows you to:</p>
-                <ul>
-                    <li>Review past practice sessions, helping you to identify and focus on areas of improvement.</li>
-                    <li>Analyze detailed statistics for individual decks, cards, and practice sessions to understand your learning progress and patterns.</li>
-                    <li>Enjoy the flexibility to turn off statistics tracking at any point if you prefer a simpler learning approach.</li>
-                </ul>
+                <SectionSubHeading>Boost your learning efficiency by leveraging our statistics tracking feature and customizable study sessions. This allows you to:</SectionSubHeading>
+                <MiniSectionsContainer>
+                    <MiniSection>
+                        <List>
+                            <ListItem>Review past practice sessions, helping you to identify and focus on areas of improvement.</ListItem>
+                            <ListItem>Analyze detailed statistics for individual decks, cards, and practice sessions to understand your learning progress and patterns.</ListItem>
+                            <ListItem>Enjoy the flexibility to turn off statistics tracking at any point if you prefer a simpler learning approach.</ListItem>
+                        </List>
+                    </MiniSection>
+                </MiniSectionsContainer>
             </Section>
+
+            <Section backgroundColor="#FFD549" color="black">
+                <SectionHeading>Collaborate and Share Resources in Study Groups</SectionHeading>
+                <SectionSubHeading>Empower your learning experience by forming study groups, where members can share and contribute to each other's resources.</SectionSubHeading>
+                <MiniSectionsContainer>
+                    <MiniSection>
+                        <MiniSectionHeading><strong>Members can</strong></MiniSectionHeading>
+                        <List>
+                            <ListItem>Submit personal decks to the group.</ListItem>
+                            <ListItem>Create and contribute to existing group decks.</ListItem>
+                        </List>
+                    </MiniSection>
+                    
+                    <MiniSection>
+                        <MiniSectionHeading><strong>Group Admin Privileges</strong></MiniSectionHeading>
+                        {/* <p>Group admins have enhanced control, allowing them to:</p> */}
+                        <List>
+                            <ListItem>Approve or deny other users' deck and card submissions.</ListItem>
+                            <ListItem>Directly submit their own decks and cards, bypassing the need for approval.</ListItem>
+                            <ListItem>Invite new members or approve incoming join requests.</ListItem>
+                        </List>
+                    </MiniSection>
+
+                    <MiniSection>
+                        <MiniSectionHeading><strong>Flexible Join Options</strong></MiniSectionHeading>
+                        {/* <p>Customize how new members join your group:</p> */}
+                        <List>
+                            <ListItem>Use a Group Join Code for effortless access.</ListItem>
+                            <ListItem>Send invites from admin accounts to potential members.</ListItem>
+                            <ListItem>Approve requests initiated by potential members themselves.</ListItem>
+                        </List>
+                    </MiniSection>
+                </MiniSectionsContainer>
+            </Section>
+
+
 			{location.pathname !== "/" && <Modal hideModal={handleHideModal}><Outlet /></Modal>}
 		</LandingPageWrapper>
 	)

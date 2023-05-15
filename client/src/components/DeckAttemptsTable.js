@@ -167,7 +167,7 @@ export default function DeckAttemptsTable(props) {
                                     <DeckAttemptRow key={attempt._id}>
                                         <DeckAttemptCell>{attempt.datePracticed}</DeckAttemptCell>
                                         <DeckAttemptCell>{attempt.deck.name}</DeckAttemptCell>
-                                        <DeckAttemptCell>{attempt.accuracyRate.toFixed()}%</DeckAttemptCell>
+                                        <DeckAttemptCell>{attempt.accuracyRate?.toFixed()}%</DeckAttemptCell>
                                         <DeckAttemptCell><StyledLinkIcon data-sessionid={attempt._id} onClick={handleSelectSession}/></DeckAttemptCell>
                                     </DeckAttemptRow>
                                 ))
@@ -186,7 +186,7 @@ export default function DeckAttemptsTable(props) {
                                     <DeckAttemptRow>
                                         <DeckAttemptCell>{attempt.datePracticed}</DeckAttemptCell>
                                         <DeckAttemptCell>{attempt.deck.name}</DeckAttemptCell>
-                                        <DeckAttemptCell>{attempt.accuracyRate.toFixed()}%</DeckAttemptCell>
+                                        <DeckAttemptCell>{attempt.accuracyRate?.toFixed()}%</DeckAttemptCell>
                                         <DeckAttemptCell><StyledLinkIcon data-sessionid={attempt._id} onClick={handleSelectSession}/></DeckAttemptCell>
                                     </DeckAttemptRow>
                                 ))

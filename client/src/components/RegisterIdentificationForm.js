@@ -15,12 +15,32 @@ const ErrorAlert = styled.div`
     color: white;
 `;
 
+const RegisterIdentificationFormWrapper = styled.form`
+    text-align: left;
+    & div {
+        margin-top: .5rem;
+    }
+    & .form-label {
+        margin-bottom: 1px;
+    }
+    & button {
+        
+    }
+`;
+
+const ButtonWrapper = styled.div`
+    text-align: center;
+    margin-top: 1rem;
+`;
+
 function RegisterIdentificationForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [username, clearUsername, setUsername] = useFormInput('');
-    const [firstName, clearFirstName, setFirstName] = useFormInput('');
-    const [lastName, clearLastName, setLastName] = useFormInput('');
+    const [username, clearUsername, handleUsernameChange, setUsername] = useFormInput('');
+    const [firstName, clearFirstName, handleFirstNameChange, setFirstName] = useFormInput('');
+    const [lastName, clearLastName, handleLastNameChange, setLastName] = useFormInput('');
+    const [showPronouns, clearShowPronouns, handleShowPronounsChange, setShowPronouns] = useFormInput(false, "checkbox");
+    const [pronouns, clearPronouns, handlePronounsChange, setPronouns] = useFormInput("");
     const [photo, setPhoto] = useState();
     const [errorMessage, setErrorMessage] = useState("");
     const userId = useSelector((state) => state.login.userId);
@@ -50,6 +70,8 @@ function RegisterIdentificationForm() {
                 clearUsername();
                 clearFirstName();
                 clearLastName();
+                clearPronouns();
+                setShowPronouns(false);
                 setPhoto("");
                 // setEditField("");
             } else {
@@ -85,11 +107,11 @@ function RegisterIdentificationForm() {
 
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
+        // <div>
+            <RegisterIdentificationFormWrapper onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="username">Username (optional)</label>
-                    <input type="text" id="username" name="username" value={username} onChange={setUsername} />
+                    <label className="form-label" htmlFor="username">Username (optional)</label>
+                    <input className="form-control" type="text" id="username" name="username" value={username} onChange={handleUsernameChange} />
                 </div>
                 {(errorMessage) && 
                     <ErrorAlert role="alert">
@@ -97,20 +119,37 @@ function RegisterIdentificationForm() {
                     </ErrorAlert>
                 }
                 <div>
-                    <label htmlFor="firstName">First Name</label>
-                    <input type="text" id="firstName" name="firstName" value={firstName} onChange={setFirstName} />
+                    <label className="form-label" htmlFor="firstName">First Name</label>
+                    <input className="form-control" type="text" id="firstName" name="firstName" value={firstName} onChange={handleFirstNameChange} />
                 </div> 
                 <div>
-                    <label htmlFor="lastName">Last Name</label>
-                    <input type="text" id="lastName" name="lastName" value={lastName} onChange={setLastName} />
+                    <label className="form-label" htmlFor="lastName">Last Name</label>
+                    <input className="form-control" type="text" id="lastName" name="lastName" value={lastName} onChange={handleLastNameChange} />
                 </div>
+                <div className="form-check form-switch">
+                    <input style={{display: "inline-block"}} role="button" onChange={handleShowPronounsChange} checked={showPronouns} className="form-control form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                    <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{showPronouns ? "Display My Pronouns" : "Don't Display My Pronouns"}</label>
+                </div>
+                {showPronouns &&
+                    <>
+                    <label className="form-check-label" htmlFor="pronouns">Pronouns</label>
+                    <select required={showPronouns} className="form-select" name="pronouns" id="pronouns" value={pronouns} onChange={handlePronounsChange}  >
+                        <option value="" default></option>
+                        <option value="he">He/Him/His</option>
+                        <option value="her">She/Her/Hers</option>
+                        <option value="they">They/Them/Theirs</option>
+                    </select>
+                    </>
+                }
                 <div>
-                    <label htmlFor="photo">Photo (optional)</label>
-                    <input type="file" accept="image/*" id="photo" name="photo" onChange={handlePhotoChange} />
+                    <label className="form-label" htmlFor="photo">Photo (optional)</label>
+                    <input className="form-control" type="file" accept="image/*" id="photo" name="photo" onChange={handlePhotoChange} />
                 </div>
-                <button type="submit">Submit</button>
-            </form>
-        </div>
+                <ButtonWrapper>
+                    <button className="btn btn-primary" type="submit">Submit</button>
+                </ButtonWrapper>
+            </RegisterIdentificationFormWrapper>
+        // </div>
     )
 }
 

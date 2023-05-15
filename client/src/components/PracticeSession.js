@@ -82,6 +82,7 @@ const StatContainer = styled.div`
     margin: 0 1rem;
     background-color: white;
     border: 2px solid black;
+    border-radius: .5rem;
     @media (max-width: 750px) {
         margin: 0 .75rem;
         padding: .75rem;
@@ -139,8 +140,21 @@ const WrapUpButtonsContainer = styled.div`
     align-items: center;
     justify-content: space-evenly;
     padding: 6rem 0;
-    & button {
-        width: 50%;
+`;
+
+const WrapUpButton = styled.button`
+    border: 2px solid black;
+    border-radius: .5rem;
+    padding: 1rem;
+    background-color: white;
+    color: black;
+    width: 50%;
+    font-weight: 600;
+    outline: none;
+    &:hover {
+        background-color: black;
+        color: white;
+        border-color: white;
     }
 `;
 
@@ -254,14 +268,14 @@ function PracticeSession() {
                     createCard(activeCard.cardType) 
                     : 
                     <WrapUpButtonsContainer>
-                        <button className="btn btn-lg btn-dark" onClick={handlePracticeDeckAgain}>Practice Deck Again</button>
+                        <WrapUpButton onClick={handlePracticeDeckAgain}>Practice Deck Again</WrapUpButton>
                         {stats.numberWrong ? 
-                            <button className="btn btn-lg btn-dark" onClick={handleRetryMissedCards}>Retry Missed Cards</button>
+                            <WrapUpButton onClick={handleRetryMissedCards}>Retry Missed Cards</WrapUpButton>
                             :
                             null
                         }
-                        <button className="btn btn-lg btn-dark" value="practice" onClick={navigateAway}>Select Another Deck</button>
-                        <button className="btn btn-lg btn-dark" value="dashboard" onClick={navigateAway}>Home</button>
+                        <WrapUpButton value="practice" onClick={navigateAway}>Select Another Deck</WrapUpButton>
+                        <WrapUpButton value="dashboard" onClick={navigateAway}>Home</WrapUpButton>
                     </WrapUpButtonsContainer>
                 }
             </CardWrapper>

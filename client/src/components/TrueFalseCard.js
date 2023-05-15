@@ -12,11 +12,7 @@ const QuestionBox = styled.div`
 	height: 45%;
 	width: 100%;
 	border-bottom: 1px solid black;
-	// background-color: white;
-	// background-color: #4C4C52;
-	// background-color: black;
-	// background-color: #242424;
-	background-color: #58355E;
+	background-color: #2C262C;
 	color: white;
 `
 

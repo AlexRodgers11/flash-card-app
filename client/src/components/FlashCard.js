@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useToggle from '../hooks/useToggle';
 import { addCardAttempt } from '../reducers/practiceSessionSlice';
+import { GiRapidshareArrow } from "react-icons/gi";
 import styled from 'styled-components';
 
 // const FlashCardWrapper = styled.div`
@@ -40,31 +41,54 @@ const CardWrapper = styled.div`
 	background-color:  #2C262C;
 	color: white;
 	& button {
-		margin: .25rem;
-		padding: .5rem 1.25rem;
+		// margin: .25rem;
+		// padding: .5rem 1.25rem;
 	}
-	 & .view-answer {
-		background-color: #E3DEE3;
-		&:hover {
-			background-color: black;
-			color: white;
-		}
-	 }
-	 & .answered-correctly {
+	& .answered-correctly {
 		color: white;
 		background-color: #333FFF;
 		&:hover {
 			background-color: black;
 		}
-	 }
-	 & .answered-incorrectly {
+	}
+	& .answered-incorrectly {
 		color: white;
 		background-color: #FF3333;
 		&:hover {
 			background-color: black;
 		}
-	 }
+	}
 `
+
+const ViewAnswerButton = styled.button`
+	padding: .5rem;
+	&:hover {
+		background-color: black;
+	}
+	@media (max-width: 600px) {
+		font-size: .9375rem;
+		padding: 0.375rem
+	}
+	@media (max-width: 550px) {
+		font-size: .8125rem;
+		padding: 0.25rem;
+	}
+`;
+
+const StyledFlipArrow = styled(GiRapidshareArrow)`
+	height: 1.5rem;
+	width: 1.5rem;
+	@media (max-width: 600px) {
+		width: 1.25rem;
+		height: 1.25rem;
+	}
+	@media (max-width: 550px) {
+		width: 1rem;
+		height: 1rem;
+	}
+	transform: rotate(180deg);
+	-webkit-transform: rotate(180deg);
+`;
 
 function FlashCard() {
 	const [answered, setAnswered] = useState(false);
@@ -107,8 +131,7 @@ function FlashCard() {
 					<CardWrapper>
 						<div>{activeCard.question}</div>
 						<div>
-							{/* <button className="view-answer" onClick={toggleShowAnswer}>View Answer</button> */}
-							<button className="view-answer" onClick={() => setShowAnswer(true)}>View Answer</button>
+							<ViewAnswerButton className="view-answer btn btn-primary" onClick={() => setShowAnswer(true)}>View Answer <StyledFlipArrow /></ViewAnswerButton>
 						</div>
 					</CardWrapper>
 				</>

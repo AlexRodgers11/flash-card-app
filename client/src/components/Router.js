@@ -29,13 +29,14 @@ import DeckAttemptsTable from './DeckAttemptsTable';
 import DeckStats from './DeckStats';
 import { CookiePolicy } from './CookiePolicy';
 import { PrivacyPolicy } from './PrivacyPolicy';
+import PasswordReset from './PasswordReset';
 
 function Router() {
     const { pathname } = useLocation();
     const userId = useSelector((state) => state.login.userId);
     const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
 
-    const pathnamesThatDoNotNeedUserId = ["/", "/login", "/register/credentials", "/decks/public", "/cookie-policy", "/privacy-policy"];
+    const pathnamesThatDoNotNeedUserId = ["/", "/login", "/register/credentials", "/decks/public", "/cookie-policy", "/privacy-policy", "/reset-password"];
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -101,6 +102,7 @@ function Router() {
                     <Route path="register/identification" element={<RegisterIdentificationForm />} />
                     <Route path="register/profile-pic-crop" element={<RegisterProfilePicCropForm />} />
                     <Route path="register/join-groups" element={<RegisterJoinGroupsForm />} />
+                    <Route path="reset-password" element={<PasswordReset />} />
                 </Route>
                 <Route exact path="/cookie-policy" element={<CookiePolicy />} />
                 <Route exact path="/privacy-policy" element={<PrivacyPolicy />} />

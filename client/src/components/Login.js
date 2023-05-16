@@ -56,7 +56,11 @@ function Login() {
     }
 
     const goToSignUpPage = () => {
-        navigate("/register/credentials")
+        navigate("/register/credentials");
+    }
+
+    const goToPasswordReset = () => {
+        navigate("/reset-password");
     }
 
     useEffect(() => {
@@ -81,7 +85,7 @@ function Login() {
                     {passwordVisible && <StyledClosedEye onClick={togglePasswordVisible} />}
                 </PasswordWrapper> 
                 {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-                <button type="submit">Submit</button>
+                <p>Forgot your password? <NavigationSpan onClick={goToPasswordReset}>Reset Password</NavigationSpan></p>
                 <p>Don't have an account? <NavigationSpan onClick={goToSignUpPage}>Sign up now!</NavigationSpan></p>
             </FormWrapper>
         </div>

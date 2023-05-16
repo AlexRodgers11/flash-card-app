@@ -6,7 +6,10 @@ const User = new Schema({
     login: {
         username: String,
         password: String,
-        email: String
+        email: String,
+        passwordResetCode: String,
+        passwordResetCodeExp: Date,
+        passwordResetCodeVerificationAttemptCount: Number
     },
     name: {
         first: String,

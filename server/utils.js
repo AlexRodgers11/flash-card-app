@@ -11,7 +11,7 @@ import {createTransport} from "nodemailer";
 const characters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','0','1','2','3','4','5','6','7','8','9','!','@','#','$','%','&','=','?'];
 
 export const generateCode = (characterCount) => {
-    let code = [];
+    let code = "";
     while (code.length < characterCount) {
         code += characters[Math.floor(Math.random() * characters.length)];
     }
@@ -213,6 +213,20 @@ export const sendEmail = async (emailAddress, message) => {
     }
 
     switch(message.messageType) {
+        case "PasswordReset":
+            mailObj.subject = "A Password Reset Was Requested for Your Account";
+            mailObj.html = (
+                `<html>
+                    <body>
+                        <p>A password reset was requested for your account. If this wasn't you please log in and change your password as soon as possible.</p>
+
+                        <br />
+
+                        <p>The code you will need to reset your password is "${message.resetCode}". This code will expire in 15 minutes.</p>
+                    </body>
+                </html>`
+            )
+            break;
         case "DeckSubmission":
             mailObj.subject = "New Deck Submitted to One of Your Groups";
             mailObj.html = (

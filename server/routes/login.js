@@ -8,6 +8,7 @@ import { generateCode } from "../utils.js";
 
 
 import {createTransport} from "nodemailer";
+import { sendEmail } from "../utils.js";
 
 const main = async (email, code) => {
     let transporter = createTransport({
@@ -164,6 +165,68 @@ loginRouter.get("/usernames", async (req, res, next) => {
         res.status(200).send({usernameAvailable: !user});
     } else {
         res.status(400).send("No email submitted");
+    }
+});
+
+loginRouter.patch("/reset-password", async (req, res, next) => {
+    console.log("made it into patch route");
+    console.log({email: req.body.email});
+    try {
+        const foundUser = await User.findOne({"login.email": req.body.email});
+        console.log({login: foundUser.login});
+        if(!foundUser) {
+            return res.status(404).send("A user with that email address wasn't found");
+        }
+
+        if(req.body.resetCode && !req.body.password) {
+            console.log("in check reset code case");
+            if(req.body.resetCode === foundUser.login.passwordResetCode && Date.now() < new Date(foundUser.login.passwordResetCodeExp).getTime()) {
+                console.log("in reset code passed case");
+
+                await User.findByIdAndUpdate(foundUser._id,{"login.passwordResetCodeExp": Date.now() + (1000 * 60 * 5)});
+
+    
+                return res.status(200).send({userId: foundUser._id});
+            } else {
+                if(foundUser.login.passwordResetCodeVerificationAttemptCount < 3) {
+                    await User.findByIdAndUpdate(foundUser._id, {"login.passwordResetCodeVerificationAttemptCount": foundUser.login.passwordResetCodeVerificationAttemptCount + 1});
+
+                    res.status(403).send(req.body.resetCode === foundUser.login.passwordResetCode ? "Code expired. Please request new code." : "Incorrect code");
+                } else {
+                    await User.findByIdAndUpdate(foundUser._id,{$unset: {"login.passwordResetCode": "", "login.passwordResetCodeExp": ""}});
+
+                    res.status(403).send("Maximum number of attempts exceeded. Please request a new reset code");
+                }
+                
+            }
+        } else if (req.body.resetCode && req.body.password) {
+            console.log("should be resetting password");
+            const verifiedUser = await User.findById(req.body.userId);
+            console.log({login: verifiedUser.login})
+            if(req.body.resetCode === verifiedUser.login.passwordResetCode && Date.now() < new Date(verifiedUser.login.passwordResetCodeExp).getTime()) {
+                console.log("in reset code passed case");
+                await User.findByIdAndUpdate(verifiedUser._id, {"login.password": req.body.password, $unset: {"login.passwordResetCode": "", "login.passwordResetCodeExp": "", "passwordResetCodeVerificationAttemptCount": ""}});
+                res.status(200).send({reset: true});
+            } else {
+                console.log({expDate: new Date(verifiedUser.login.passwordResetCodeExp).getTime()});
+                console.log({now: Date.now()});
+                return res.status(403).send("Password reset failed. Please request a new reset code");
+            }
+        } else {
+            console.log("in send reset code case");
+            const updatedUser = await User.findByIdAndUpdate(foundUser._id, {"login.passwordResetCode": generateCode(10), "login.passwordResetCodeExp": Date.now() + (1000 * 60 * 15)}, {new: true});
+
+            console.log({updatedUser});
+
+            const message = {
+                messageType: "PasswordReset",
+                resetCode: updatedUser.login.passwordResetCode
+            }
+            sendEmail(updatedUser.login.email, message);
+            res.status(200).send({codeSent: true});
+        }
+    } catch (err) {
+        res.status(500).send(err.message);
     }
 });
 

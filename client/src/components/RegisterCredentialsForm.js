@@ -8,11 +8,23 @@ import styled from 'styled-components';
 import useToggle from '../hooks/useToggle';
 import { ErrorMessage } from './StyledComponents/ErrorMessage';
 import { PasswordWrapper, StyledClosedEye, StyledOpenEye } from './StyledComponents/Password';
+import { NavigationSpan } from './StyledComponents/NavigationSpan';
 
 const FormWrapper = styled.form`
+    text-align: left;
     & input {
         width: 100%;
+        margin-bottom: .5rem;
     }
+    & .form-label {
+        font-weight: 500;
+        margin-bottom: 1px;
+    }
+`;
+
+const ButtonContainer = styled.div`
+    text-align: center;
+    margin-bottom: 2.5rem;
 `;
 
 
@@ -24,7 +36,7 @@ function RegisterCredentialsForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showVerifyPassword, setShowVerifyPassword] = useState(false);
-    const [verifyPassword, clearVerifyPassword, setVerifyPassword] = useFormInput('');
+    const [verifyPassword, clearVerifyPassword, handleVerifyPasswordChange] = useFormInput("");
     const [passwordVisible, togglePasswordVisible] = useToggle(false);
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -40,6 +52,10 @@ function RegisterCredentialsForm() {
         if(errorMessage) {
             setErrorMessage("");
         }
+    }
+
+    const goToLogin = () => {
+        navigate("/login");
     }
     
     const handleSubmit = async (evt) => {
@@ -82,16 +98,19 @@ function RegisterCredentialsForm() {
         <div>
             <FormWrapper onSubmit={handleSubmit}>
                 <div>
-                    <input placeholder="email" type="email" id="email" name="email" value={email} onChange={handleEmailChange} />
+                    <label className="form-label" htmlFor="email" >Email</label>
+                    <input className="form-control" placeholder="email" type="email" id="email" name="email" value={email} onChange={handleEmailChange} />
                 </div>
                 <PasswordWrapper>
-                    <input placeholder="password" type={passwordVisible ? "text" : "password"} id="password" name="password" value={password} onChange={handlePasswordChange} />
+                    <label className="form-label" htmlFor="password" >Password</label>
+                    <input className="form-control" placeholder="password" type={passwordVisible ? "text" : "password"} id="password" name="password" value={password} onChange={handlePasswordChange} />
                     {!passwordVisible && <StyledOpenEye onClick={togglePasswordVisible} />}
                     {passwordVisible && <StyledClosedEye onClick={togglePasswordVisible} />}
                 </PasswordWrapper> 
                 {showVerifyPassword ? 
                     <PasswordWrapper>
-                        <input placeholder="verify password" type={passwordVisible ? "text" : "password"} id="verifyPassword" name="verifyPassword" value={verifyPassword} onChange={setVerifyPassword} />
+                        <label className="form-label" htmlFor="verifyPassword" >Verify Password</label>
+                        <input className="form-control" placeholder="verify password" type={passwordVisible ? "text" : "password"} id="verifyPassword" name="verifyPassword" value={verifyPassword} onChange={handleVerifyPasswordChange} />
                         {!passwordVisible && <StyledOpenEye onClick={togglePasswordVisible} />}
                         {passwordVisible && <StyledClosedEye onClick={togglePasswordVisible} />}
                     </PasswordWrapper> 
@@ -99,7 +118,10 @@ function RegisterCredentialsForm() {
                     null
                 }
                 {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-                <button type="submit">Submit</button>
+                <ButtonContainer>
+                    <button className="btn btn-primary" type="submit">Submit</button>
+                </ButtonContainer>
+                <p>Already have an account? <NavigationSpan onClick={goToLogin}>Login</NavigationSpan></p>
             </FormWrapper>
         </div>
     )

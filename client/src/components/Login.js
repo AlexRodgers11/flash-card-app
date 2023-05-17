@@ -10,9 +10,20 @@ import { ErrorMessage } from './StyledComponents/ErrorMessage';
 import { PasswordWrapper, StyledClosedEye, StyledOpenEye } from './StyledComponents/Password';
 
 const FormWrapper = styled.form`
+    text-align: left;
     & input {
         width: 100%;
+        margin-bottom: .5rem;
     }
+    & .form-label {
+        font-weight: 500;
+        margin-bottom: 1px;
+    }
+`;
+
+const ButtonContainer = styled.div`
+    text-align: center;
+    margin-bottom: 2.5rem;
 `;
 
 function Login() {
@@ -77,14 +88,19 @@ function Login() {
         <div>
             <FormWrapper onSubmit={handleSubmit}>
                 <div>
-                    <input placeholder="username or email" type="text" id="usernameOrEmail" name="usernameOrEmail" value={usernameOrEmail} onChange={handleUserNameOrEmailChange} />
+                    <label className="form-label" htmlFor="userNameOrEmail" >Username or Email</label>
+                    <input className="form-control" placeholder="username or email" type="text" id="usernameOrEmail" name="usernameOrEmail" value={usernameOrEmail} onChange={handleUserNameOrEmailChange} />
                 </div>
                 <PasswordWrapper>
-                    <input placeholder="password" type={passwordVisible ? "text" : "password"} id="password" name="password" value={password} onChange={handlePasswordChange} />
+                    <label className="form-label" htmlFor="password" >Password</label>
+                    <input className="form-control" placeholder="password" type={passwordVisible ? "text" : "password"} id="password" name="password" value={password} onChange={handlePasswordChange} />
                     {!passwordVisible && <StyledOpenEye onClick={togglePasswordVisible} />}
                     {passwordVisible && <StyledClosedEye onClick={togglePasswordVisible} />}
                 </PasswordWrapper> 
                 {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+                <ButtonContainer>
+                    <button className="btn btn-primary" type="submit">Submit</button>
+                </ButtonContainer>
                 <p>Forgot your password? <NavigationSpan onClick={goToPasswordReset}>Reset Password</NavigationSpan></p>
                 <p>Don't have an account? <NavigationSpan onClick={goToSignUpPage}>Sign up now!</NavigationSpan></p>
             </FormWrapper>

@@ -8,14 +8,14 @@ export const PasswordWrapper = styled.div`
 export const StyledOpenEye = styled(AiOutlineEye)`
     position: absolute;
     right: 4%;
-    top: 28%;
+    top: 60%;
     cursor: pointer;
 `;
 
 export const StyledClosedEye = styled(AiOutlineEyeInvisible)`
     position: absolute;
     right: 4%;
-    top: 28%;
+    top: 60%;
     cursor: pointer;
 `;
 

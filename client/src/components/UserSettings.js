@@ -183,6 +183,10 @@ function UserSettings() {
     const [modalContent, setModalContent] = useState("");
     const [editField, setEditField] = useState("");
     const username = useSelector((state) => state.login.login.username);
+    const firstName = useSelector((state) => state.login.name.first);
+    const lastName = useSelector((state) => state.login.name.last);
+    const displayPronouns = useSelector((state) => state.login.name.displayPronouns);
+    const pronouns = useSelector((state) => state.login.name.pronouns);
     const email = useSelector((state) => state.login.login.email);
     const profilePic = useSelector((state) => state.login.photo);
     const emailPrivacy = useSelector((state) => state.login.privacy.email);
@@ -218,6 +222,10 @@ function UserSettings() {
     
     const [emailInputValue, clearEmailInputValue, handleEmailInputValueChange, setEmailInputValue] = useFormInput(email);
     const [usernameInputValue, clearUsernameInputValue, handleUsernameInputValueChange, setUsernameInputValue] = useFormInput(username);
+    const [firstNameInputValue, clearFirstNameInputValue, handleFirstNameInputValueChange, setFirstNameInputValue] = useFormInput(firstName);
+    const [lastNameInputValue, clearLastNameInputValue, handleLastNameInputValueChange, setLastNameInputValue] = useFormInput(lastName);
+    const [displayPronounsInputValue, clearDisplayPronounsInputValue, handleDisplayPronounsInputValueChange, setDisplayPronounsInputValue] = useFormInput(displayPronouns, "checkbox");
+    const [pronounsInputValue, clearPronounsInputValue, handlePronounsInputValueChange, setPronounsInputValue] = useFormInput(pronouns);
     const [passwordInputValue, clearPasswordInputValue, handlePasswordInputValueChange, setPasswordInputValue] = useFormInput("");
     const [passwordConfirmInputValue, clearPasswordConfirmInputValue, handlePasswordConfirmInputValueChange, setPasswordConfirmInputValue] = useFormInput("");
     const [photoInputValue, setPhotoInputValue] = useState();
@@ -297,6 +305,16 @@ function UserSettings() {
                 break;
             case "username":
                 resetSettingSelectedValueToCurrentStateValue(username, usernameInputValue, setUsernameInputValue);
+                break;
+            case "first-name": 
+                resetSettingSelectedValueToCurrentStateValue(firstName, firstNameInputValue, setFirstNameInputValue);
+                break;
+            case "last-name": 
+                resetSettingSelectedValueToCurrentStateValue(lastName, lastNameInputValue, setLastNameInputValue);
+                break
+            case "display-pronouns":
+                resetSettingSelectedValueToCurrentStateValue(displayPronouns, displayPronounsInputValue, setDisplayPronounsInputValue);
+                resetSettingSelectedValueToCurrentStateValue(pronouns, pronounsInputValue, setPronounsInputValue);
                 break;
             case "password":
                 setPasswordInputValue("");
@@ -494,6 +512,36 @@ function UserSettings() {
                     setErrorMessage("This username is taken");
                 }
                 break;
+            case "first-name":
+                dispatchActionThenClearEditField(updateUser({userId, userUpdates: {name: 
+                    {
+                        first: firstNameInputValue,
+                        last: lastNameInputValue,
+                        displayPronouns: displayPronounsInputValue,
+                        ...(displayPronounsInputValue && {pronouns: pronounsInputValue})
+                    }
+                }}));
+                break;
+            case "last-name":
+                dispatchActionThenClearEditField(updateUser({userId, userUpdates: {name: 
+                    {
+                        first: firstNameInputValue,
+                        last: lastNameInputValue,
+                        displayPronouns: displayPronounsInputValue,
+                        ...(displayPronounsInputValue && {pronouns: pronounsInputValue})
+                    }
+                }}));
+                break;
+            case "display-pronouns":
+                dispatchActionThenClearEditField(updateUser({userId, userUpdates: {name: 
+                    {
+                        first: firstNameInputValue,
+                        last: lastNameInputValue,
+                        displayPronouns: displayPronounsInputValue,
+                        ...(displayPronounsInputValue && {pronouns: pronounsInputValue})
+                    }
+                }}));
+                break;
             case "password":
                 if(passwordInputValue === passwordConfirmInputValue) {
                     dispatchActionThenClearEditField(updateUser({userId, userUpdates: {login: {password: passwordInputValue}}}));
@@ -639,6 +687,75 @@ function UserSettings() {
                             </ErrorAlert>
                         }
                         <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>First Name: </span>
+                                {editField !== "first-name" && <span>{firstName}</span>}
+                                {editField === "first-name" && <input type="text" value={firstNameInputValue} onChange={handleFirstNameInputValueChange} />}
+                            </div>
+                            {editField !== "first-name" && <div><StyledEditIcon role="button" data-editfield="first-name" onClick={handleEditSelection}/></div>}
+                            {editField === "first-name" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="first-name" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>Last Name: </span>
+                                {editField !== "last-name" && <span>{lastName}</span>}
+                                {editField === "last-name" && <input type="text" value={lastNameInputValue} onChange={handleLastNameInputValueChange} />}
+                            </div>
+                            {editField !== "last-name" && <div><StyledEditIcon role="button" data-editfield="last-name" onClick={handleEditSelection}/></div>}
+                            {editField === "last-name" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="last-name" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>Display Pronouns: </span>
+                                {editField !== "display-pronouns" && <span>{displayPronouns ? "On" : "Off"}</span>}
+                                {editField === "display-pronouns" && 
+                                    <div style={{display: "inline-block"}} className="form-check form-switch">
+                                        <input role="button" onChange={handleDisplayPronounsInputValueChange} checked={displayPronounsInputValue} className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                                        <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{displayPronounsInputValue ? "On" : "Off"}</label>
+                                    </div>
+                                }
+                            </div>
+                            {editField !== "display-pronouns" && <div><StyledEditIcon role="button" data-editfield="display-pronouns" onClick={handleEditSelection}/></div>}
+                        </SettingCategoryOption>
+                        {(editField !== "display-pronouns" || !displayPronounsInputValue) && <hr />}
+                        {displayPronounsInputValue &&
+                            <>
+                            <SettingCategoryOption>
+                                <div>
+                                    <span>Pronouns: </span>
+                                    {editField !== "display-pronouns" && <span>{pronouns === "he" ? "He/Him/His" : pronouns === "she" ? "She/Her/Hers" : "They/Them/Theirs"}</span>}
+                                    {editField === "display-pronouns" && 
+                                        <select name="pronouns-select" id="pronouns-select" value={pronounsInputValue} onChange={handlePronounsInputValueChange} >
+                                            <option value="he">He/Him/His</option>
+                                            <option value="she">She/Her/Hers</option>
+                                            <option value="they">They/Them/Theirs</option>
+                                        </select>
+                                    }
+                                </div>
+                                {editField !== "display-pronouns" && <div><StyledEditIcon role="button" data-editfield="display-pronouns" onClick={handleEditSelection}/></div>}
+                                {editField === "display-pronouns" && 
+                                    <div>
+                                        <button onClick={handleCancel}>Cancel</button>
+                                        <button data-editfield="display-pronouns" onClick={handleSave}>Save</button>
+                                    </div>
+                                }
+                            </SettingCategoryOption>
+                            <hr />
+                            </>
+                        }
                         <SettingCategoryOption>
                             <div>
                                 <span>Password: </span>

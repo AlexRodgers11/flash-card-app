@@ -13,7 +13,12 @@ const User = new Schema({
     },
     name: {
         first: String,
-        last: String
+        last: String,
+        displayPronouns: Boolean,
+        pronouns: {
+            type: String,
+            enum: ["he", "she", "they"]
+        }
     },
     photo: String,
     decks: [{type: Schema.Types.ObjectId, ref: "Deck"}],

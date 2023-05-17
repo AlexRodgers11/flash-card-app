@@ -28,7 +28,7 @@ const RegisterIdentificationFormWrapper = styled.form`
     }
 `;
 
-const ButtonWrapper = styled.div`
+const ButtonContainer = styled.div`
     text-align: center;
     margin-top: 1rem;
 `;
@@ -39,7 +39,7 @@ function RegisterIdentificationForm() {
     const [username, clearUsername, handleUsernameChange, setUsername] = useFormInput('');
     const [firstName, clearFirstName, handleFirstNameChange, setFirstName] = useFormInput('');
     const [lastName, clearLastName, handleLastNameChange, setLastName] = useFormInput('');
-    const [showPronouns, clearShowPronouns, handleShowPronounsChange, setShowPronouns] = useFormInput(false, "checkbox");
+    const [displayPronouns, clearDisplayPronouns, handleDisplayPronounsChange, setDisplayPronouns] = useFormInput(false, "checkbox");
     const [pronouns, clearPronouns, handlePronounsChange, setPronouns] = useFormInput("");
     const [photo, setPhoto] = useState();
     const [errorMessage, setErrorMessage] = useState("");
@@ -71,7 +71,7 @@ function RegisterIdentificationForm() {
                 clearFirstName();
                 clearLastName();
                 clearPronouns();
-                setShowPronouns(false);
+                setDisplayPronouns(false);
                 setPhoto("");
                 // setEditField("");
             } else {
@@ -127,13 +127,13 @@ function RegisterIdentificationForm() {
                     <input className="form-control" type="text" id="lastName" name="lastName" value={lastName} onChange={handleLastNameChange} />
                 </div>
                 <div className="form-check form-switch">
-                    <input style={{display: "inline-block"}} role="button" onChange={handleShowPronounsChange} checked={showPronouns} className="form-control form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                    <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{showPronouns ? "Display My Pronouns" : "Don't Display My Pronouns"}</label>
+                    <input style={{display: "inline-block"}} role="button" onChange={handleDisplayPronounsChange} checked={displayPronouns} className="form-control form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
+                    <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{displayPronouns ? "Display My Pronouns" : "Don't Display My Pronouns"}</label>
                 </div>
-                {showPronouns &&
+                {displayPronouns &&
                     <>
                     <label className="form-check-label" htmlFor="pronouns">Pronouns</label>
-                    <select required={showPronouns} className="form-select" name="pronouns" id="pronouns" value={pronouns} onChange={handlePronounsChange}  >
+                    <select required={displayPronouns} className="form-select" name="pronouns" id="pronouns" value={pronouns} onChange={handlePronounsChange}  >
                         <option value="" default></option>
                         <option value="he">He/Him/His</option>
                         <option value="her">She/Her/Hers</option>
@@ -145,9 +145,9 @@ function RegisterIdentificationForm() {
                     <label className="form-label" htmlFor="photo">Photo (optional)</label>
                     <input className="form-control" type="file" accept="image/*" id="photo" name="photo" onChange={handlePhotoChange} />
                 </div>
-                <ButtonWrapper>
+                <ButtonContainer>
                     <button className="btn btn-primary" type="submit">Submit</button>
-                </ButtonWrapper>
+                </ButtonContainer>
             </RegisterIdentificationFormWrapper>
         // </div>
     )

@@ -14,7 +14,9 @@ const initialState = {
     },
     name: {
         first: "",
-        last: ""
+        last: "",
+        showPronouns: false,
+        pronouns: ""
     },
     photo: "",
     decks: [],

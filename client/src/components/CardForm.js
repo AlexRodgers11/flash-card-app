@@ -3,6 +3,68 @@ import useFormInput from '../hooks/useFormInput';
 import { ErrorMessage } from './StyledComponents/ErrorMessage';
 import { client } from '../utils';
 import { useSelector } from 'react-redux';
+import styled from 'styled-components';
+
+const CardFormWrapper = styled.form`
+    text-align: left;
+    & div {
+        margin-top: .5rem;
+		@media (max-width: 500px) {
+			margin-top: .25rem;
+		}
+    }
+    & .form-label {
+        margin-bottom: 1px;
+    }
+	& textarea {
+		width: 500px;
+		@media (max-width: 650px) {
+			width: 400px;
+		}
+		@media (max-width: 550px) {
+			width: 350px;
+		}
+		@media (max-width: 500px) {
+			width: 300px;
+			height: 25px;
+		}
+	}
+	& textarea, label, select, option, button, .ErrorMessage {
+		@media (max-width: 500px) {
+			font-size: .6875rem;
+		}
+	}
+	& button {
+		@media (max-width: 500px) {
+			padding: .25rem .5rem;
+		}
+	}
+	.ErrorMessage {
+		@media (max-width: 500px) {
+			padding-top: 0;
+		}
+	}
+`;
+
+const RadioContainer = styled.div`
+	display: flex;
+	align-items: center;
+	& input {
+		margin-right: 2px;
+	}
+	& label {
+		margin-right: .5rem;
+	}
+`;
+
+const ButtonContainer = styled.div`
+    text-align: center;
+    margin-top: 1rem;
+	@media (max-width: 500px) {
+		margin-top: .5rem;
+	}
+`;
+
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -88,33 +150,45 @@ function CardForm(props) {
 	}, [isLoaded, props.cardId, setCorrectAnswer, setHint, setIsLoaded, setQuestion, setCardType, setWrongAnswerOne, setWrongAnswerThree, setWrongAnswerTwo]);
   
 	return (
-		<div>
+		<>
 			{!isLoaded ? 
 				null
 				:
-				<form onSubmit={handleSubmit}>
+				<CardFormWrapper onSubmit={handleSubmit}>
 					<div>
 
-						<label htmlFor="type">Card Type: </label>
-                        <select id="type" name="type" value={cardType} onChange={handleChangeCardType}>
+						<label className="form-check-label" htmlFor="type">Card Type: </label>
+                        <select className="form-select" id="type" name="type" value={cardType} onChange={handleChangeCardType}>
                             <option selected value="FlashCard">Flash Card</option>
                             <option value="MultipleChoiceCard">Multiple Choice</option>
                             <option value="TrueFalseCard">True/False</option>
                         </select>
 					</div>
 					<div>
-						<label htmlFor='question'>Question</label>
-						<textarea required type='text' name='question' id='question' value={question} onChange={handleChangeQuestion} />
+						<label className="form-label" htmlFor="question">Question</label>
+						<textarea
+							className="form-control" 
+							required type="text"
+							name="question" 
+							id="question"
+							value={question} 
+							onChange={handleChangeQuestion} />
 					</div>
 					<div>
-						<label htmlFor='hint'>Hint (optional)</label>
-						<textarea type='text' name='hint' id='hint' value={hint} onChange={handleChangeHint}/>
+						<label className="form-label" htmlFor="hint">Hint (optional)</label>
+						<textarea 
+							className="form-control"
+							type="text" 
+							name="hint" 
+							id="hint" 
+							value={hint} 
+							onChange={handleChangeHint}/>
 					</div>
 					<div>
 						{cardType === 'TrueFalseCard' ? 
 							<>
-								<label htmlFor="true-false-options">Answer</label>
-								<div id="true-false-options">
+								<label className="form-label" htmlFor="true-false-options">Answer</label>
+								<RadioContainer id="true-false-options">
 									<input 
 										type="radio" 
 										required
@@ -123,7 +197,7 @@ function CardForm(props) {
 										value="True" checked={correctAnswer === "True"} 
 										onChange={handleChangeCorrectAnswer} 
 									/>
-									<label htmlFor="correct-answer-true">True</label>
+									<label className="form-label" htmlFor="correct-answer-true">True</label>
 									<input 
 										type="radio" 
 										required
@@ -133,13 +207,19 @@ function CardForm(props) {
 										checked={correctAnswer === "False"} 
 										onChange={handleChangeCorrectAnswer} 
 									/>
-									<label htmlFor="correct-answer-false">False</label>
-								</div>
+									<label className="form-label" htmlFor="correct-answer-false">False</label>
+								</RadioContainer>
 							</>
 							:
 							<>
-								<label htmlFor="correct-answer">{cardType === 'MultipleChoiceCard' ? 'Correct ' : ''}Answer</label>
-								<textarea required id="correct-answer" name="correct-answer" value={correctAnswer} onChange={handleChangeCorrectAnswer} />
+								<label className="form-label" htmlFor="correct-answer">{cardType === "MultipleChoiceCard" ? "Correct " : ""}Answer</label>
+								<textarea 
+									className="form-control"
+									required 
+									id="correct-answer" 
+									name="correct-answer" 
+									value={correctAnswer} 
+									onChange={handleChangeCorrectAnswer} />
 							</>
 						} 
 					</div>
@@ -148,24 +228,26 @@ function CardForm(props) {
 						:
 						<div>
 							<div>
-								<label htmlFor="wrong-answer-one">Wrong Answer #1</label>
-								<textarea required id="wrong-answer-one" name="wrong-answer-one" value={wrongAnswerOne} onChange={handleChangeWrongAnswerOne} />
+								<label className="form-label" htmlFor="wrong-answer-one">Wrong Answer #1</label>
+								<textarea className="form-control" required id="wrong-answer-one" name="wrong-answer-one" value={wrongAnswerOne} onChange={handleChangeWrongAnswerOne} />
 							</div>
 							<div>
-								<label htmlFor="wrong-answer-two">Wrong Answer #2</label>
-								<textarea required id="wrong-answer-two" name="wrong-answer-two" value={wrongAnswerTwo} onChange={handleChangeWrongAnswerTwo} />
+								<label className="form-label" htmlFor="wrong-answer-two">Wrong Answer #2</label>
+								<textarea className="form-control" required id="wrong-answer-two" name="wrong-answer-two" value={wrongAnswerTwo} onChange={handleChangeWrongAnswerTwo} />
 							</div>
 							<div>
-								<label htmlFor="wrong-answer-three">Wrong Answer #3</label>
-								<textarea required id="wrong-answer-three" name="wrong-answer-three" value={wrongAnswerThree} onChange={handleChangeWrongAnswerThree} />
+								<label className="form-label" htmlFor="wrong-answer-three">Wrong Answer #3</label>
+								<textarea className="form-control" required id="wrong-answer-three" name="wrong-answer-three" value={wrongAnswerThree} onChange={handleChangeWrongAnswerThree} />
 							</div>
 						</div>
 					}
-					<button type="submit">{props.buttonText || "Add Card"}</button>
 					{errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-				</form>
+					<ButtonContainer>
+						<button className="btn btn-success" type="submit">{props.buttonText || "Add Card"}</button>
+					</ButtonContainer>
+				</CardFormWrapper>
 			}
-		</div>
+		</>
 	)
 }
 

@@ -3,6 +3,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import useFormInput from "../hooks/useFormInput";
 import { submitVerificationCode } from "../reducers/loginSlice";
+import styled from "styled-components";
+
+const FormWrapper = styled.form`
+    text-align: left;
+    & input {
+        width: 100%;
+        margin-bottom: .5rem;
+    }
+    & .form-label {
+        font-weight: 500;
+        margin-bottom: 1px;
+    }
+`;
+
+const ButtonContainer = styled.div`
+    text-align: center;
+    margin-bottom: 2.5rem;
+`;
 
 function RegisterEmailVerificationForm() {
     const dispatch = useDispatch();
@@ -54,14 +72,14 @@ function RegisterEmailVerificationForm() {
     }    
 
     return (
-        <form onSubmit={checkValidationCode}>
+        <FormWrapper onSubmit={checkValidationCode}>
             <div>
-                <label htmlFor="verification-code">Enter the verification code sent to the email you provided</label>
-                <input type="text" id="verification-code" name="verification-code" value={verificationCode} onChange={handleVerificationCodeChange} />
+                <label className="form-label" htmlFor="verification-code">Enter the verification code sent to the email you provided</label>
+                <input className="form-control" type="text" placeholder="Enter 6-digit Verification Code" id="verification-code" name="verification-code" value={verificationCode} onChange={handleVerificationCodeChange} />
                 {!verificationResponse || verificationCode.length > 0 ? null : displayVerificationError()}
             </div>
-            <button type="submit">Submit</button>
-        </form>
+            <button className="btn btn-primary" type="submit">Submit</button>
+        </FormWrapper>
     )
 }
 

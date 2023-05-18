@@ -105,7 +105,7 @@ function Card(props) {
     const displayModalContent = () => {
         switch(modalContent) {
             case "edit-card":
-                return <CardForm cardId={props.cardId} submit={handleSaveCardChanges}/>
+                return <CardForm cardId={props.cardId} submit={handleSaveCardChanges} buttonText="Save"/>
             case "delete-card":
                 return (
                     <div>

@@ -134,8 +134,12 @@ const ErrorAlert = styled.div`
 `;
 
 const StyledButton = styled.button`
-    background-color: white;
-    padding: .25rem;
+    // background-color: white;
+    padding: .50rem;
+    border: 2px solid black;
+    &:hover {
+        border: 2px solid white;
+    }
 `;
 
 const ToggleSwitch = styled.div`
@@ -821,7 +825,7 @@ function UserSettings() {
                                 <div>
                                     <span>Reset all stats:</span>
                                 </div>
-                                <button  onClick={showResetAllStatsConfirmation}>Reset</button>
+                                <button className="btn btn-danger" onClick={showResetAllStatsConfirmation}>Reset</button>
                         </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>
@@ -1314,7 +1318,7 @@ function UserSettings() {
                             </SettingCategoryOption>
                     </SettingsCategoryOptions>
                 </SettingsSection>
-                <StyledButton onClick={showDeleteConfirmation}>Delete Account</StyledButton>
+                <StyledButton className="btn btn-danger" onClick={showDeleteConfirmation}>Delete Account</StyledButton>
             </SettingsForm>
             {modalContent &&
                 <Modal hideModal={hideModal}>

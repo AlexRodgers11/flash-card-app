@@ -1,13 +1,19 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
 const StatisticsWrapper = styled.div`
-    // background-color: #503047;
+    background-color: #503047;
     background-color: #CC52CC;
+    background-color: #FFD549;
+    background-color: #52B2FF;
+    background-color: #9DE59D;
     min-height: calc(100vh - 5.5rem);
+    *::-webkit-scrollbar {
+        display: none;
+    }
 `;
 
 const StatsNavbar = styled.div`

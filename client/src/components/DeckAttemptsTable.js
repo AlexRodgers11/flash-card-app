@@ -74,7 +74,7 @@ const DeckAttemptCell = styled.td`
 `;
 
 const HeaderBlock = styled.thead`
-    background-color: black;
+    // background-color: black;
     border-top: 2px solid black;
     color: white;
     position: sticky;
@@ -95,6 +95,7 @@ const Header = styled.th.attrs({
     border: 1px solid black;
     background-color: #bfbfbf;
     background-color: blue;
+    background-color: #393939;
     padding: 0 1rem;
     @media (max-width: 650px) {
         padding: 0 .75rem;

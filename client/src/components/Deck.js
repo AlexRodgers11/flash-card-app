@@ -14,6 +14,7 @@ import styled from 'styled-components';
 import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
 import BackButton from './BackButton';
 import { submitCardForApproval } from '../reducers/communicationsSlice';
+import { WarningButtonsWrapper, WarningMessage } from './StyledComponents/Warning';
 
 const DeckWrapper = styled.div`
     display: flex;
@@ -89,7 +90,7 @@ export const DeleteButton = styled.button`
     position: relative;
     top: 1rem;
     right: 1rem;
-    background-color: black;
+    // background-color: black;
     color: white;
     @media (max-width: 750px) {
         font-size: .8rem;
@@ -132,9 +133,11 @@ function Deck() {
             case "delete-deck-confirmation":
                 return (
                     <div>
-                        <h3>Are you sure you want to delete this deck? This action cannot be undone.</h3>
-                        <button onClick={hideModal}>Cancel</button>
-                        <button onClick={confirmDeleteDeck}>Delete</button>
+                        <WarningMessage>Are you sure you want to delete this deck? This action cannot be undone.</WarningMessage>
+                        <WarningButtonsWrapper>
+                            <button className="btn btn-secondary" onClick={hideModal}>Cancel</button>
+                            <button className="btn btn-danger" onClick={confirmDeleteDeck}>Delete</button>
+                        </WarningButtonsWrapper>
                     </div>
                 );
             default:
@@ -204,7 +207,7 @@ function Deck() {
     return (
         <DeckWrapper>
             <BackButton route={location.pathname.slice(0, location.pathname.lastIndexOf("/"))}>All Decks</BackButton>
-            {unlockControl() && <DeleteButton data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>}
+            {unlockControl() && <DeleteButton className="btn btn-danger" data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>}
             {!nameEditMode ? 
                 <NameBlock>
                     <h1>{name}</h1> 

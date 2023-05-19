@@ -37,6 +37,9 @@ const MessageWrapper = styled.div`
         color: inherit;
         padding: 0;
 	}
+	& button {
+		margin: .125rem;
+	}
 `;
 
 const StyledTrashAlt = styled(FaTrashAlt)`

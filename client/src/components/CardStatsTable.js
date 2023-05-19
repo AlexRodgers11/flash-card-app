@@ -56,7 +56,7 @@ const StatsTable = styled.table`
 `;
     
 const ColumnHeaderBlock = styled.thead`
-    background-color: black;
+    // background-color: black;
     border-top: 2px solid black;
     color: white;
     position: sticky;
@@ -78,6 +78,7 @@ const ColumnHeader = styled.th.attrs({
     border: 1px solid black;
     background-color: #bfbfbf;
     background-color: blue;
+    background-color: #393939;
     padding: 0 1rem;
     @media (max-width: 550px) {
         padding: 0 .25rem;
@@ -149,7 +150,9 @@ const StyledLinkIcon = styled(HiOutlineExternalLink).attrs({
     }
 `;
 
+const TableBody = styled.tbody`
 
+`;
 
 function CardStatsTable() {
     const cardStatsByDeck = useSelector((state) => state.attempts.cardStatsByDeck);
@@ -192,7 +195,7 @@ function CardStatsTable() {
                                         </tr>
                                     </DeckHeaderBlock>  
                                     
-                                    <tbody>
+                                    <TableBody>
                                         {deck.cards.map(card => 
                                             (<TableRow key={card._id} className="TableRow">
                                                 <RowHeader className="RowHeader">{card.cardQuestion}</RowHeader>
@@ -202,7 +205,7 @@ function CardStatsTable() {
                                                 <TableCell className="TableCell"><StyledLinkIcon data-cardid={card._id} onClick={handleSelectCard}/></TableCell>
                                             </TableRow>)
                                         )}
-                                    </tbody> 
+                                    </TableBody> 
                                 </>
                             );
                         } else {

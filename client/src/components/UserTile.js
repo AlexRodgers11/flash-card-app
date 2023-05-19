@@ -30,7 +30,7 @@ const Button = styled.button`
     max-width: 5.5rem;
     display: block;
     margin-bottom: .15rem;
-
+    padding: .125rem .25rem;
 `;
 
 const EditOptionsWrapper = styled.div`
@@ -146,9 +146,9 @@ function UserTile(props) {
         <UserTileWrapper className="UserTileWrapper" editMode={props.editMode} tabIndex={0} role="button" onKeyDown={props.editMode ? null : handleViewOnEnter} onClick={props.editMode ? null : viewUser}>
             {(props.editMode && (loggedInUserId !== props.memberId && headAdmin !== props.memberId)) ?
                 <EditOptionsWrapper className="EditOptionsWrapper">
-                    {(((props.listType==="members") && props.memberId !== headAdmin) && (loggedInUserId === headAdmin || !props.isAdmin)) && <Button onClick={handleRemoveMember}>Remove From Group</Button>}
-                    {(!props.isAdmin && props.listType==="members") && <Button onClick={addMemberToAdmins}>Make Administrator</Button>}
-                    {(loggedInUserId === headAdmin && props.isAdmin) && <Button onClick={removeMemberFromAdmins}>Remove From Administrators</Button>}
+                    {(((props.listType==="members") && props.memberId !== headAdmin) && (loggedInUserId === headAdmin || !props.isAdmin)) && <Button className="btn btn-danger" onClick={handleRemoveMember}>Remove From Group</Button>}
+                    {(!props.isAdmin && props.listType==="members") && <Button className="btn btn-primary" onClick={addMemberToAdmins}>Make Administrator</Button>}
+                    {(loggedInUserId === headAdmin && props.isAdmin) && <Button className="btn btn-danger" onClick={removeMemberFromAdmins}>Remove From Administrators</Button>}
                 </EditOptionsWrapper>
                 :
                 <TitleWrapper>{props.memberId === headAdmin ? "Head Admin" : props.isAdmin ? "Admin" : ""}</TitleWrapper>

@@ -6,7 +6,8 @@ export const GroupWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #FF6565;
+    background-color: #52B2FF;
+    // background-color: #FFD549;
 `;
 
 export const GroupNavbar = styled.div`
@@ -81,9 +82,11 @@ export const StyledLeaveButton = styled.button`
     top: 4rem;
     @media (max-width: 515px) {
         top: 6rem;
+        font-size: .75rem;
+        padding: .25rem .5rem;
     }
     right: 1rem;
-    background-color: black;
+    // background-color: black;
     color: white;
 `;
 
@@ -136,6 +139,8 @@ export const JoinOptionContainer = styled.div`
     margin-bottom: 3.75rem;
     & label {
         margin-right: .5rem;
+        font-size: 1.125rem;
+        justify-self: flex-start;
     }
     & select {
         display: inline-block;

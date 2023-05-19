@@ -127,8 +127,8 @@ function RegisterIdentificationForm() {
                     <input className="form-control" type="text" id="lastName" name="lastName" value={lastName} onChange={handleLastNameChange} />
                 </div>
                 <div className="form-check form-switch">
-                    <input style={{display: "inline-block"}} role="button" onChange={handleDisplayPronounsChange} checked={displayPronouns} className="form-control form-check-input" type="checkbox" id="flexSwitchCheckDefault" />
-                    <label className="form-check-label" htmlFor="flexSwitchCheckDefault">{displayPronouns ? "Display My Pronouns" : "Don't Display My Pronouns"}</label>
+                    <input style={{display: "inline-block"}} role="button" onChange={handleDisplayPronounsChange} checked={displayPronouns} className="form-control form-check-input" type="checkbox" id="pronoun-display-switch" />
+                    <label className="form-check-label" htmlFor="pronoun-display-switch">{displayPronouns ? "Display My Pronouns" : "Don't Display My Pronouns"}</label>
                 </div>
                 {displayPronouns &&
                     <>

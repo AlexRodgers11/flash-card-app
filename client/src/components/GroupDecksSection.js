@@ -66,7 +66,7 @@ export default function GroupDecksSection() {
                                     {deck.name}
                                 </DeckOption>
                             )}
-                            <button onClick={handleCreateNew}>Create new deck</button>
+                            <button className="btn btn-primary" onClick={handleCreateNew}>Create new deck</button>
                         </DeckOptionContainer>
                     </Modal>
                 }

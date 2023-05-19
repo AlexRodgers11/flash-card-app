@@ -10,6 +10,7 @@ import useToggle from '../hooks/useToggle';
 import CardForm from './CardForm';
 import Modal from './Modal';
 import { client } from "../utils";
+import { WarningButtonsWrapper, WarningMessage } from './StyledComponents/Warning';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -109,8 +110,11 @@ function Card(props) {
             case "delete-card":
                 return (
                     <div>
-                        <h3>Are you sure you want to delete this card? This action cannot be undone.</h3>
-                        <button onClick={() => setModalContent("")}>Cancel</button><button onClick={confirmDeleteCard}>Delete</button>
+                        <WarningMessage>Are you sure you want to delete this card? This action cannot be undone.</WarningMessage>
+                        <WarningButtonsWrapper>
+                            <button className="btn btn-secondary" onClick={() => setModalContent("")}>Cancel</button>
+                            <button className="btn btn-danger" onClick={confirmDeleteCard}>Delete</button>
+                        </WarningButtonsWrapper>
                     </div>
                 );
             default:

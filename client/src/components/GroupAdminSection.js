@@ -143,33 +143,33 @@ export function GroupAdminSection() {
                             <EmailInput name="email" id="email" value={emailInput} onChange={handleEmailInputChange}/>
                             <BlockTextArea placeholder="Comments (Optional)" value={comment} onChange={handleCommentChange}/>
                             <CenteredButtonGroup>
-                                <button className="btn btn-danger btn-md" onClick={toggleShowInviteModal}>Cancel</button>
-                                <button type="submit" className="btn btn-primary btn-md">Send</button>
+                                <button className="btn btn-danger" onClick={toggleShowInviteModal}>Cancel</button>
+                                <button className="btn btn-primary" type="submit" >Send</button>
                             </CenteredButtonGroup>
                         </InvitationForm>
                     }
                     {showMessageSent &&
                         <div>
                             <p>Success. If {emailInput} is an existing user they should receive invitation shortly</p>
-                            <button className="btn btn-primary btn-md" onClick={handleCloseModal}>Ok</button>
+                            <button className="btn btn-primary" onClick={handleCloseModal}>Ok</button>
                         </div>
                     }
                 </Modal>
             }
             <GroupEditControlsContainer>
                 <JoinOptionContainer>
-                    <label htmlFor="join-code-options">Select how new members can join:</label>
-                    <select id="join-code-options" name="join-code-options" onChange={handleChangeJoinOptions}>
+                    <label className="form-label" htmlFor="join-code-options">Select how new members can join:</label>
+                    <select className="form-select" id="join-code-options" name="join-code-options" onChange={handleChangeJoinOptions}>
                         <option selected={joinOptions === "invite"} value="invite">Invite Only</option>
                         <option selected={joinOptions === "code"} value="code">Join Code</option>
                         <option selected={joinOptions === "request"} value="request">Request by User</option>
                         <option selected={joinOptions === "code-and-request"} value="code-and-request">Join Code and Request by User</option>
                     </select>
-                    <button onClick={toggleShowInviteModal} className="btn btn-primary btn-sm"><MdGroupAdd /> Invite</button>
+                    <button onClick={toggleShowInviteModal} className="btn btn-success"><MdGroupAdd /> Invite</button>
                     {(joinOptions === "code" || joinOptions === "code-and-request") &&
                         <JoinCodeContainer>
                             {!joinCodeVisible ? 
-                                <button onClick={toggleJoinCodeVisible}>Show Group Join Code</button>
+                                <button className="btn btn-success" onClick={toggleJoinCodeVisible}>Show Group Join Code</button>
                                 :
                                 <div>
                                     <span>Join Code: {joinCode} </span>

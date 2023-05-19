@@ -10,6 +10,7 @@ import { removeGroup } from '../reducers/loginSlice';
 import Modal from './Modal';
 import useFormInput from '../hooks/useFormInput';
 import { fetchDecksOfUser } from '../reducers/decksSlice';
+import { WarningButtonsWrapper, WarningMessage } from './StyledComponents/Warning';
 
 function Group() {
     const dispatch = useDispatch();
@@ -64,7 +65,6 @@ function Group() {
     }
 
     const handleSelectModalContent = (evt) => {
-        console.log("should be selecting modal content");
         setModalContent(evt.target.dataset.modalcontent);
     }
 
@@ -73,9 +73,11 @@ function Group() {
             case "leave-group-confirmation":
                 return (
                     <div>
-                        <p>Are you sure you want to leave {groupName}?</p>
-                        <button onClick={handleLeaveGroup}>Yes, leave</button>
-                        <button onClick={hideModal}>Cancel</button>
+                        <WarningMessage>Are you sure you want to leave {groupName}?</WarningMessage>
+                        <WarningButtonsWrapper>
+                            <button className="btn btn-secondary" onClick={hideModal}>Cancel</button>
+                            <button className="btn btn-danger" onClick={handleLeaveGroup}>Yes, leave</button>
+                        </WarningButtonsWrapper>
                     </div>
                 );
             case "group-control-designation": 
@@ -87,28 +89,37 @@ function Group() {
                 )
             case "head-admin-leave-group-confirmation":
                 return (
-                    <div>
+                    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                         {groupMemberIds.length > 1 ? 
                             <>
-                            <p>Are you sure you want to leave {groupName}? You will need to select a member of the group to be a new Head Administrator</p>
-                            <button data-modalcontent="group-control-designation" onClick={handleSelectModalContent}>Yes, choose a member</button>
-                            <button data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Delete Group Instead</button>
+                            <WarningMessage>Are you sure you want to leave {groupName}? You will need to select a member of the group to be a new Head Administrator</WarningMessage>
+                            <WarningButtonsWrapper>
+                                <button className="btn btn-secondary" onClick={hideModal} >Cancel</button>
+                                <button className="btn btn-primary" data-modalcontent="group-control-designation" onClick={handleSelectModalContent}>Yes, choose a member</button>
+                                <button className="btn btn-danger" data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Delete Group Instead</button>
+                            </WarningButtonsWrapper>
                             </>
                             :
                             <>
-                            <p>Since there are no other members leaving the group will cause the group to be deleted</p>
-                            <button data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Leave and Delete Group</button>
+                            <WarningMessage>Since there are no other members leaving the group will cause the group to be deleted</WarningMessage>
+                            <WarningButtonsWrapper>
+                                <button className="btn btn-secondary" onClick={hideModal}>Cancel</button>
+                                <button className="btn btn-danger" data-modalcontent="delete-group-confirmation" onClick={handleSelectModalContent}>Leave and Delete Group</button>
+                            </WarningButtonsWrapper>
                             </>
                         }
-                        <button onClick={hideModal}>Cancel</button>
                     </div>
                 );
             case "delete-group-confirmation":
                 return (
                     <form onSubmit={handleDeleteGroup}>
-                        <label htmlFor="confirm-delete-group">Type the group's name to delete. This action cannot be undone.</label>
-                        <input id="confirm-delete-group" name="confirm-delete-group" type="text" onChange={handleChangeDeleteConfirmation} value={deleteConfirmation} />
-                        {deleteConfirmation === groupName && <button type="submit">Delete</button>}
+                        {/* <label className="form-label" htmlFor="confirm-delete-group">Type the group's name to delete. This action cannot be undone.</label> */}
+                        <WarningMessage>Type the group's name to delete. This action cannot be undone.</WarningMessage>
+                        <input className="form-control" id="confirm-delete-group" name="confirm-delete-group" type="text" onChange={handleChangeDeleteConfirmation} value={deleteConfirmation} />
+                        <WarningButtonsWrapper>
+                            <button className="btn btn-secondary" onClick={hideModal}>Cancel</button>
+                            {deleteConfirmation === groupName && <button className="btn btn-danger" type="submit">Delete</button>}
+                        </WarningButtonsWrapper>
                     </form>
                 );
             default:
@@ -145,7 +156,11 @@ function Group() {
 
 
     if(groupDeletionInProgress) {
-        return (<p>Deleting Group</p>)
+        return (
+            <GroupWrapper>
+                <p>Deleting Group</p>
+            </GroupWrapper>
+        )
     }
 
     return (
@@ -155,7 +170,7 @@ function Group() {
                 <StyledNavLink className={({isActive}) => isActive ? "active" : ""} to={`/groups/${groupId}/decks`}>Decks</StyledNavLink> 
                 <StyledNavLink className={({isActive}) => isActive ? "active" : ""} to={`/groups/${groupId}/members`}>Members</StyledNavLink> 
             </GroupNavbar>
-            <StyledLeaveButton data-modalcontent={userId === headAdmin ? "head-admin-leave-group-confirmation" : "leave-group-confirmation"} onClick={handleSelectModalContent}>Leave Group</StyledLeaveButton>
+            <StyledLeaveButton className="btn btn-danger" data-modalcontent={userId === headAdmin ? "head-admin-leave-group-confirmation" : "leave-group-confirmation"} onClick={handleSelectModalContent}>Leave Group</StyledLeaveButton>
             {modalContent &&
                 <Modal hideModal={hideModal}>
                     {displayModalContent()}

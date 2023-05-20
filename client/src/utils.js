@@ -189,9 +189,9 @@ export const sortDecks = (sortCriteria, array) => {
           return array.slice().sort((a, b) => {
               let aDate = new Date(a.dateCreated);
               let bDate = new Date(b.dateCreated);
-              if(aDate < bDate) {
+              if(aDate > bDate) {
                   return -1;
-              } else if(aDate > bDate) {
+              } else if(aDate < bDate) {
                   return 1;
               } else {
                   return 0;
@@ -201,9 +201,9 @@ export const sortDecks = (sortCriteria, array) => {
           return array.slice().sort((a, b) => {
               let aDate = new Date(a.dateCreated);
               let bDate = new Date(b.dateCreated);
-              if(aDate > bDate) {
+              if(aDate < bDate) {
                   return -1;
-              } else if(aDate < bDate) {
+              } else if(aDate > bDate) {
                   return 1;
               } else {
                   return 0;

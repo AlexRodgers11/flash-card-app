@@ -1,11 +1,11 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router';
-import useFormInput from '../hooks/useFormInput';
-import { resetDeck } from '../reducers/deckSlice';
-import { addDeckToCurrentDeckList } from '../reducers/decksSlice';
-import { createDeck } from '../reducers/loginSlice';
-import styled from 'styled-components';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import useFormInput from "../hooks/useFormInput";
+import { resetDeck } from "../reducers/deckSlice";
+import { addDeckToCurrentDeckList } from "../reducers/decksSlice";
+import { createDeck } from "../reducers/loginSlice";
+import styled from "styled-components";
 
 const DeckFormWrapper = styled.form`
 	text-align: left;
@@ -37,8 +37,8 @@ const ButtonWrapper = styled.div`
 
 function DeckForm() {
 	const privacyDefault = useSelector((state) => state.login.privacy.newDecks);
-	const [nameInput, clearNameInput, handleNameInputChange] = useFormInput('');
-  	const [publiclyAvailable, clearPubliclyAvailable, handlePubliclyAvailableChange] = useFormInput(privacyDefault === "public" ? false : true, "checkbox");
+	const [nameInput, clearNameInput, handleNameInputChange] = useFormInput("");
+  	const [publiclyAvailable, clearPubliclyAvailable, handlePubliclyAvailableChange] = useFormInput(privacyDefault === "public" ? true : false, "checkbox");
 	const [allowCopies, clearAllowCopies, handleAllowCopiesChange] = useFormInput(false, "checkbox");
 	const listType = useSelector((state) => state.decks.listType);
 	const userId = useSelector((state) => state.login.userId);
@@ -50,8 +50,8 @@ function DeckForm() {
 		evt.preventDefault();
 		let newDeck = {
 			deckName: nameInput,
-			publiclyAvailable: publiclyAvailable === "true",
-			allowCopies: allowCopies === "true" && publiclyAvailable === "true",
+			publiclyAvailable: publiclyAvailable,
+			allowCopies: allowCopies && publiclyAvailable,
 			creator: userId,
 			dateCreated: new Date().toString()
 		}

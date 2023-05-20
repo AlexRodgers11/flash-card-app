@@ -12,7 +12,12 @@ const ModalWrapper = styled.div`
 	top: 0;
 	height: 100vh;
 	width: 100%;
-	z-index: 3;
+	z-index: 100;
+	-webkit-transform: translate3d(0,0,0);
+	transform: translateZ(1000px);
+	-webkit-transform: translateZ(1000px);
+	transform-style: preserve-3d;
+	-webkit-transform-style: preserve-3d;
 `;
 
 const ModalBackdrop = styled.div`
@@ -26,7 +31,7 @@ const ModalContent = styled.div`
 	position: fixed;
 	background: white;
 	color: black;
-	z-index: 3;
+	z-index: 101;
 	opacity: 1;
 	border: 3px solid black;
 	border-radius: 1rem;
@@ -46,6 +51,10 @@ const ModalContent = styled.div`
 	&::-web-kit-scrollbar {
 		display: none;
 	}
+	transform: translateZ(1000px);
+	-webkit-transform: translateZ(1000px);
+	transform-style: preserve-3d;
+	-webkit-transform-style: preserve-3d;
 `;
 
 const StyledCloseIcon = styled(IoClose)`

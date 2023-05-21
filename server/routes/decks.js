@@ -32,12 +32,12 @@ deckRouter.get("/", async (req, res, next) => {
             let categoryId = mongoose.Types.ObjectId(req.query.categoryId);
             if(req.query.searchString) {
                 let regExp = new RegExp(req.query.searchString, "i");
-                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}, {categories: {$in: [categoryId]}}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
+                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {name: {$regex: regExp}}, {category: categoryId}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
                 res.status(200).send(decks.map(deck => {
                     return {cardCount: deck.cards.length, dateCreated: deck.createdAt, deckId: deck._id, deckName: deck.name}
                 }));
             } else {
-                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {categories: {$in: [categoryId]}}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
+                const decks = await Deck.find({$and: [{publiclyAvailable: true}, {category: categoryId}]}, "_id name publiclyAvailable cards createdAt").skip(((page - 1) * limit)).limit(limit);
                 res.status(200).send(decks.map(deck => {
                     return {cardCount: deck.cards.length, dateCreated: deck.createdAt, deckId: deck._id, deckName: deck.name}
                 }));

@@ -67,7 +67,7 @@ export const copyDeck = async (deckId, userId, groupId) => {
             publiclyAvailable: false,
             creator: userId,
             attempts: [],
-            categories: foundDeck.categories.slice(),
+            category: foundDeck.category,
             cards: await Promise.all(foundDeck.cards.map(async card => {
                 let copiedCard;
                 switch(card.cardType) {

@@ -572,7 +572,7 @@ function LandingPage() {
     }
 
 	useEffect(() => {
-		if((userId && accountSetupStage === "complete") && location.pathname !== "/register/profile-pic-crop") {
+		if((userId && accountSetupStage === "complete") && (location.pathname !== "/register/profile-pic-crop" && location.pathname !== "/register/join-groups")) {
 			navigate("/dashboard");
 		}
 	}, [userId, accountSetupStage, location, navigate]);

@@ -4,6 +4,8 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import styled from "styled-components";
 import { sortDecks } from "../utils";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "../reducers/decksSlice";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -112,17 +114,18 @@ const StyledInfiniteScroll = styled(InfiniteScroll)`
 `
 
 function BrowseDecks() {
-    const [categories, setCategories] = useState([]);
     const [decks, setDecks] = useState([]);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [sort, setSort] = useState("");
-    
     const [criteria, setCriteria] = useState({
         categoryId: "",
         searchString: "",
     });
+    const categories = useSelector((state) => state.decks.categories);
+    
+    const dispatch = useDispatch();
 
 
     const handleSortChange = evt => {
@@ -165,16 +168,11 @@ function BrowseDecks() {
     
     useEffect(() => {
         console.log("in useEffect to get category list for dropdown");
-        if(!categories.length) {
-            axios.get(`${baseURL}/categories`)
-            .then(categories => {
-                    setCategories(categories.data);
-                })
-                .catch(err => {
-                    console.error(err);
-                });
+        if(categories.length < 1) {
+            dispatch(fetchCategories());
+            console.log("categories fetched");
         }
-    }, [categories.length]);
+    }, [categories, dispatch]);
 
     const firstFetchDone = useRef(false);
     

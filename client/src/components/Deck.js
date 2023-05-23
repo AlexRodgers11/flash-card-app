@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useLocation, useNavigate, useParams } from 'react-router';
-import useFormInput from '../hooks/useFormInput';
-import { addCard, updateDeck, fetchDeck, resetDeck } from '../reducers/deckSlice';
-import { deleteDeck } from '../reducers/decksSlice';
-import useToggle from '../hooks/useToggle';
-import Card from './Card';
-import CardForm from './CardForm';
-import Modal from './Modal';
-import { removeDeckFromUser } from '../reducers/loginSlice';
+import React, { useEffect, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { useLocation, useNavigate, useParams } from "react-router";
+import useFormInput from "../hooks/useFormInput";
+import { addCard, updateDeck, fetchDeck, resetDeck } from "../reducers/deckSlice";
+import { deleteDeck } from "../reducers/decksSlice";
+import useToggle from "../hooks/useToggle";
+import Card from "./Card";
+import CardForm from "./CardForm";
+import Modal from "./Modal";
+import { removeDeckFromUser } from "../reducers/loginSlice";
 import { MdModeEditOutline } from "react-icons/md";
-import styled from 'styled-components';
-import { EmptyIndicator } from './StyledComponents/EmptyIndicator';
-import BackButton from './BackButton';
-import { submitCardForApproval } from '../reducers/communicationsSlice';
-import { WarningButtonsWrapper, WarningMessage } from './StyledComponents/Warning';
+import styled from "styled-components";
+import { EmptyIndicator } from "./StyledComponents/EmptyIndicator";
+import BackButton from "./BackButton";
+import { submitCardForApproval } from "../reducers/communicationsSlice";
+import { WarningButtonsWrapper, WarningMessage } from "./StyledComponents/Warning";
+import { fetchCategories } from "../reducers/decksSlice";
 
 const DeckWrapper = styled.div`
     display: flex;
@@ -23,6 +24,14 @@ const DeckWrapper = styled.div`
     min-height: calc(100vh - 5.5rem);
     background-color: #52B2FF; 
     padding-bottom: 3rem;
+    
+`;
+
+const SelectContainer = styled.div`
+    text-align: left;
+    & label {
+        color: white;
+    }
 `;
     
 const NameBlock = styled.div`
@@ -90,7 +99,6 @@ export const DeleteButton = styled.button`
     position: relative;
     top: 1rem;
     right: 1rem;
-    // background-color: black;
     color: white;
     @media (max-width: 750px) {
         font-size: .8rem;
@@ -107,7 +115,9 @@ function Deck() {
     const name = useSelector((state) => state.deck.name);
     const [nameEditMode, toggleNameEditMode] = useToggle(false);
     const administrators = useSelector((state) => state.group.administrators)
-    const [editedName, clearEditedName, handleChangeEditedName, setEditedName] = useFormInput('');
+    const category = useSelector((state) => state.deck.category);
+    const categories = useSelector((state) => state.decks.categories);
+    const [editedName, clearEditedName, handleChangeEditedName, setEditedName] = useFormInput("");
     const publiclyAvailable = useSelector((state) => state.deck.publiclyAvailable);
     const allowCopies = useSelector((state) => state.deck.allowCopies);
     const cards = useSelector((state) => state.deck.cards);
@@ -180,6 +190,10 @@ function Deck() {
     const handleChangeAllowCopies = evt => {
         dispatch(updateDeck({deckId, deckUpdates: {allowCopies: !allowCopies}}));
     }
+
+    const handleCategorySelectionChange = evt => {
+        dispatch(updateDeck({deckId, deckUpdates: {category: evt.target.value}}));
+    }
     
     const openNameEditMode = () => {
         setEditedName(name);
@@ -196,13 +210,14 @@ function Deck() {
     }
 
     useEffect(() => {
-        if(!storedDeckId || storedDeckId !== deckId) {
-            dispatch(fetchDeck(deckId));
+        if((!storedDeckId || storedDeckId !== deckId) || categories.length < 1) {
+            dispatch(fetchDeck(deckId)); 
+            dispatch(fetchCategories());
         }
-    }, [deckId, dispatch, storedDeckId]);
+    }, [categories, deckId, dispatch, storedDeckId]);
 
-    if(storedDeckId !== deckId) {
-        return <></>;
+    if(storedDeckId !== deckId || categories.length < 1) {
+        return <DeckWrapper></DeckWrapper>
     } 
     return (
         <DeckWrapper>
@@ -222,7 +237,7 @@ function Deck() {
             {unlockControl() &&
                 <>
                 <PublicControls>
-                    <label htmlFor='public'>Public</label>
+                    <label htmlFor="public">Public</label>
                     <input 
                         type="radio"
                         id="public"
@@ -231,7 +246,7 @@ function Deck() {
                         checked={publiclyAvailable}
                         onChange={handleChangePubliclyAvailable}
                     />
-                    <label htmlFor='private'>Private</label>
+                    <label htmlFor="private">Private</label>
                     <input 
                         type="radio"
                         id="private"
@@ -264,6 +279,15 @@ function Deck() {
                     </PublicControls>
                 }
                 </>
+            }
+            {unlockControl() && 
+                <SelectContainer>
+                    <label className="form-check-label">Category</label>
+                    <select className="form-select" name="categories" id="categories" onChange={handleCategorySelectionChange} value={category}>
+                        <option value="" default></option>
+                        {categories.map(category => <option key={category._id} value={category._id}>{category.name}</option>)}
+                    </select>
+                </SelectContainer>
             }
             <AddButton className="btn btn-primary btn-lg" data-action="add-card" onClick={handleSelectModalContent}>Add Card</AddButton>
             <CardContainer className="CardContainer">

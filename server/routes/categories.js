@@ -18,14 +18,14 @@ categoryRouter.param("categoryId", (req, res, next, categoryId) => {
     });
 });
 
-categoryRouter.get("/", (req, res, next) => {
-    Category.find({}, (err, categories) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-        } else {
-            res.status(200).send(categories);
-        }
-    });
+categoryRouter.get("/", async (req, res, next) => {
+    try {
+        const categories = await Category.find({}, "-decks");
+        res.status(200).send(categories);
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).send(err.message);
+    }
 });
 
 categoryRouter.get("/:categoryId/decks", (req, res, next) => {

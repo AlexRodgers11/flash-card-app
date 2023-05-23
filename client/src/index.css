@@ -38,3 +38,7 @@ input.form-check-input {
 .btn {
   border: 2px solid rgba(0, 0, 0, 0.35);
 }
+
+select {
+  cursor: pointer;
+}

@@ -359,17 +359,16 @@ deckRouter.patch("/:deckId", getUserIdFromJWTToken, async (req, res, next) => {
                 return res.status(401).send("You are not authorized to delete this deck");
             }
         }
+        const deck = await Deck.findByIdAndUpdate(req.deck._id, req.body, {new: true});
+        if(req.body.category) {
+            await Category.findByIdAndUpdate(req.deck.category, {$pull: {decks: req.deck._id}});
+            await Category.findByIdAndUpdate(req.body.category, {$push: {decks: req.deck._id}});
+        }
+        res.status(200).send(deck);
     } catch (err) {
         console.error(err.message);
         res.status(500).send(err.message);
     }
-    Deck.findByIdAndUpdate(req.deck._id, req.body, {new: true}, (err, deck) => {
-        if(err) {
-            res.status(500).send("There was an error with your request");
-        } else {
-            res.status(200).send(deck);
-        }
-    });
 });
 
 deckRouter.post("/:deckId/cards", getUserIdFromJWTToken, async (req, res, next) => {

@@ -49,7 +49,6 @@ const app = express();
 //use body-parsing middleware that only parses json
 app.use(bodyParser.json());
 
-
 //set response headers
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", process.env.CLIENT_ORIGIN || "http://localhost:3000");
@@ -98,13 +97,12 @@ app.get("/resume", async (req, res, next) => {
     }
 });
 
-
 app.listen(port, () => {
     console.log(`Node.js listening on port ${port}`);
 });
 
 if(process.env.NODE_ENV === "development") {
-    mongoose.connect("mongodb://localhost/flash-card-app-one", {
+    mongoose.connect("mongodb://localhost/flash-card-app-two", {
         useNewUrlParser: true,
         useUnifiedTopology: true
     });

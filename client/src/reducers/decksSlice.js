@@ -6,13 +6,14 @@ const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
 const initialState = {
     listType: "", //group/category/user
-    listId: "",//id of group/category/user that list of decks belongs to
+    listId: "", //id of group/category/user that list of decks belongs to
     deckIds: [],
     sort: "a-z",
     category: "",
     search: "",
     page: 0,
     hasMore: true,
+    categories: []
 };
 
 export const addAdminDeck = createAsyncThunk("decks/addAdminDeck", async ({deckId, groupId}) => {
@@ -30,6 +31,15 @@ export const deleteDeck = createAsyncThunk("decks/deleteDeck", async (deckId) =>
         return response.data;
     } catch (err) {
         console.error(err);
+    }
+});
+
+export const fetchCategories = createAsyncThunk("decks/fetchCategories", async() => {
+    try {
+        const response = await axios.get(`${baseURL}/categories`);
+        return response.data;
+    } catch(err) {
+
     }
 });
 
@@ -89,6 +99,9 @@ export const decksSlice = createSlice({
         });
         builder.addCase(deleteDeck.fulfilled, (state, action) => {
             state.deckIds = state.deckIds.filter(id => id !== action.payload);
+        });
+        builder.addCase(fetchCategories.fulfilled, (state, action) => {
+            state.categories = action.payload;
         });
         builder.addCase(fetchDecksOfUser.fulfilled, (state, action) => {
             state.listType = action.payload.listType;

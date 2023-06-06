@@ -27,18 +27,8 @@ const PracticeSessionWrapper = styled.div`
     align-items: center; 
     justify-content: center; 
     width: 100%; 
-    // height: 100%;
     height: calc(100vh - 5.5rem);
     background-color: #9DE59D;
-    // min-height: calc(100vh - 5.5rem);
-    // @media (min-width: 450px) {
-    //     min-height: 710px;
-    // }
-    // @media (min-width: 600px) {
-    //     min-height: 870px;
-    // }
-    // @media (max-width: 600px) {
-    // }
 `
 
 const CardWrapper = styled.div`
@@ -48,7 +38,6 @@ const CardWrapper = styled.div`
     background-color: #2C262C;
     width: 28rem;
     min-height: 32rem;
-    // min-height: 20em;
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
     @media (max-width: 600px) {
         width: 25rem;

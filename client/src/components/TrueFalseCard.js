@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import useToggle from '../hooks/useToggle';
 import Answer from './Answer';
 import styled from 'styled-components';
+import { HintBox, StyledHintIcon } from './StyledComponents/CardStyles';
 
 const TrueFalseCardWrapper = styled.div`
 	height: 100%;
@@ -14,23 +15,6 @@ const QuestionBox = styled.div`
 	border-bottom: 1px solid black;
 	background-color: #2C262C;
 	color: white;
-`
-
-const HintBox = styled.div`
-	position: absolute;
-	width: 28rem;
-	text-align: left;
-	& button {
-		margin: .5rem;
-	}
-	& p {
-		display: inline-block;
-		margin-left: .5rem;
-		font-style: italic;
-		font-size: .75rem 	;
-		word-wrap: break-word;
-		overflow-wrap: break-word; 
-	}
 `
 
 const AnswerBox = styled.div`
@@ -68,7 +52,7 @@ function TrueFalseCard() {
 				<HintBox>
 					{activeCard.hint && !answered ? 
 						<>
-							<button onClick={toggleShowHint}>Hint</button>
+							<StyledHintIcon onClick={toggleShowHint} />
 							{showHint ? <p>{activeCard.hint}</p> : null}
 						</>
 						:

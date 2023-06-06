@@ -4,31 +4,7 @@ import useToggle from '../hooks/useToggle';
 import { addCardAttempt } from '../reducers/practiceSessionSlice';
 import { GiRapidshareArrow } from "react-icons/gi";
 import styled from 'styled-components';
-
-// const FlashCardWrapper = styled.div`
-// 	display: flex;
-// 	flex-direction: column;
-// 	justify-content: space-between;
-// 	height: 100%;
-// 	padding: 15% 5%;
-// `
-
-const HintBox = styled.div`
-	position: absolute;
-	width: 28rem;
-	text-align: left;
-	& button {
-		margin: .5rem;
-	}
-	& p {
-		display: inline-block;
-		margin-left: .5rem;
-		font-style: italic;
-		font-size: .75rem 	;
-		word-wrap: break-word;
-		overflow-wrap: break-word; 
-	}
-`
+import { HintBox, StyledHintIcon } from './StyledComponents/CardStyles';
 
 const CardWrapper = styled.div`
 	display: flex;
@@ -37,7 +13,6 @@ const CardWrapper = styled.div`
 	align-items: center;
 	height: 100%;
 	padding: 30% 5%;
-	// background-color: white;
 	background-color:  #2C262C;
 	color: white;
 	& button {
@@ -119,15 +94,16 @@ function FlashCard() {
 		<>
 			{!showAnswer ?
 				<>	
-					{activeCard?.hint? 
-						<HintBox>
-							<button onClick={toggleShowHint}>Hint</button>
-							{showHint ? <p>{activeCard?.hint}</p> : null}
-							
-						</HintBox>
-						:
-						null
-					}
+					<HintBox>
+						{activeCard?.hint && !answered ? 
+							<div>
+								<StyledHintIcon onClick={toggleShowHint} />			
+								{showHint ? <p className="hint">{activeCard?.hint}</p> : null}
+							</div>
+							:
+							null
+						}
+					</HintBox>
 					<CardWrapper>
 						<div>{activeCard.question}</div>
 						<div>

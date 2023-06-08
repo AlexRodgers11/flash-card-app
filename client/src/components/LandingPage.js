@@ -3,7 +3,6 @@ import { Outlet, useLocation, useNavigate } from 'react-router';
 import Modal from './Modal';
 import styled, { keyframes } from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { GoLightBulb } from "react-icons/go";
 import { GiRapidshareArrow } from "react-icons/gi";
 import axios from 'axios';
 import { logout } from '../reducers/loginSlice';
@@ -15,8 +14,6 @@ const LandingPageWrapper = styled.div`
 `;
 
 const MainSection = styled.div`
-    // height: ${props => props.height};
-    // min-height: 500px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
@@ -35,21 +32,16 @@ const LoginControls = styled.div`
 	height: 100%;
 	width: 100%;
     background-color: #52B2FF;
-    // background-color: #FFD549;
 	border-left: 1px solid black;
 	& button {
 		font-size: 2.5rem;
 		width: 65%;
 		height: 14vw;
-		// width: 65%;
-		// height: 20vw;
 		max-height: 20vh;
 		min-height: 3rem;
 		margin: 1.5rem;
-		// background-color: #223843;
 		background-color: black;
 		color: white;
-		// @media (max-width: 950px) {
 		@media (max-width: 1024px) {
 			width: 25%;
 			max-height: 25%;
@@ -60,7 +52,6 @@ const LoginControls = styled.div`
 			padding: .25rem .5rem;
 		}
 	}
-	// @media (max-width: 950px) {
 	@media (max-width: 1024px) {
 		flex-direction: row;
         border: none;
@@ -75,7 +66,6 @@ const TitleBlock = styled.div`
 	width: 100%;
 	height: 100%;
 	background-color: #333333;
-	// background-color: #303030;
     & h4 {
         margin-top: 2rem;
         padding: 0 1rem;
@@ -95,15 +85,7 @@ const Section = styled.section`
     align-items: center;
     font-family: Georgia;
     font-family: 'Bookman Old Style', serif;
-    // font-family: Garamond, serif;
-
-    /* Sans-Serif Fonts */
-    // font-family: Arial, Helvetica, sans-serif;
-    // font-family: 'Arial Black', Gadget, sans-serif;
-    // font-family: 'Comic Sans MS', cursive, sans-serif;
-    // font-family: Impact, Charcoal, sans-serif;
     min-width: 100vw;
-    // min-height: ${props => props.height};
     background-color: ${props => props.backgroundColor};
     color: ${props => props.color};
     padding: .75rem;
@@ -163,7 +145,6 @@ const MiniSection = styled.div`
 
 const MiniSectionHeading = styled.p`
     text-align: left;
-    // display: inline-block;
     padding-top: .5rem;
 `;
 
@@ -176,99 +157,53 @@ const ListItem = styled.li`
     display: block;
     list-style-type: decimal;
     &:before {
-        // content: "• ";
         content: "- ";
     }
 `;
 
 const rotateCard1 = keyframes`
     0% {
-        transform: rotateX(0deg) rotateY(0deg); //(front correct) flip l/r blue to red
+        transform: rotateX(0deg) rotateY(0deg);
         -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
     4.17%, 25% {
-        transform: rotateX(0deg) rotateY(180deg); //(back correct)
+        transform: rotateX(0deg) rotateY(180deg);
         -webkit-transform: rotateX(0deg) rotateY(180deg);
     }
     29.17%, 50% {
-        transform: rotateX(180deg) rotateY(180deg);//(front backward and upside down)
+        transform: rotateX(180deg) rotateY(180deg);
         -webkit-transform: rotateX(180deg) rotateY(180deg);
     }
     54.17%, 75% {
-        transform: rotateX(180deg) rotateY(0deg);//(back backward and upside down)
+        transform: rotateX(180deg) rotateY(0deg);
         -webkit-transform: rotateX(180deg) rotateY(0deg);
     }
     79.17%, 100% {
-        transform: rotateX(0deg) rotateY(0deg);//(front correct)
+        transform: rotateX(0deg) rotateY(0deg);
         -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
 `;
 
 const rotateCard2 = keyframes`
     0% {
-        transform: rotateX(0deg) rotateY(0deg); //(front correct) flip l/r blue to red
+        transform: rotateX(0deg) rotateY(0deg);
         -webkit-transform: rotateX(0deg) rotateY(0deg);
     }
     4.17%, 25% {
-        transform: rotateX(180deg) rotateY(0deg); //(back correct)
+        transform: rotateX(180deg) rotateY(0deg);
         -webkit-transform: rotateX(180deg) rotateY(0deg);
     }
     29.17%, 50% {
-        transform: rotateX(180deg) rotateY(180deg);//(front backward and upside down)
+        transform: rotateX(180deg) rotateY(180deg);
         -webkit-transform: rotateX(180deg) rotateY(180deg);
     }
     54.17%, 75% {
-        transform: rotateX(0deg) rotateY(180deg);//(back backward and upside down)
+        transform: rotateX(0deg) rotateY(180deg);
         -webkit-transform: rotateX(0deg) rotateY(180deg);
     }
     79.17%, 100% {
-        transform: rotateX(0deg) rotateY(0deg);//(front correct)
+        transform: rotateX(0deg) rotateY(0deg);
         -webkit-transform: rotateX(0deg) rotateY(0deg);
-    }
-`;
-
-const TitleCard = styled.div`
-    position: relative;
-    display: inline-block;
-    transform-style: preserve-3d;
-    margin: 0 .5rem;
-    border: 2px solid black;
-    border-radius: 1.25rem;
-    background-color: white;
-    font-size: 6rem;
-    font-weight: 500;
-    color: black;
-    width: 15rem;
-    height: 20rem;
-    @media (max-width: 550px) {
-        width: 13.5rem;
-        height: 18rem;
-        font-size: 5.25rem;
-    }
-    @media (max-width: 470px) {
-        width: 12rem;
-        height: 16rem;
-        font-size: 5rem;
-    }
-    @media (max-width: 420px) {
-        width: 10.5rem;
-        height: 14rem;
-        font-size: 4.25rem;
-    }
-    @media (max-width: 370px) {
-        width: 9rem;
-        height: 12rem;
-        font-size: 3.75rem;
-    }
-    &.first {
-        animation: ${rotateCard1} 24s infinite;
-        -webkit-animation: ${rotateCard1} 24s infinite;
-    }
-    &.second {
-        animation: ${rotateCard2} 24s infinite;
-        -webkit-animation: ${rotateCard2} 24s infinite;
-        animation-delay: 3s;
-        -webkit-animation-delay: 3s;
     }
 `;
 
@@ -314,6 +249,51 @@ const rotateCardTwoBackText = keyframes`
     81%, 100% {
         transform: rotateX(180deg) rotateY(180deg);
         -webkit-transform: rotateX(180deg) rotateY(180deg);
+    }
+`;
+
+const TitleCard = styled.div`
+    position: relative;
+    display: inline-block;
+    transform-style: preserve-3d;
+    margin: 0 .5rem;
+    border: 2px solid black;
+    border-radius: 1.25rem;
+    background-color: white;
+    font-size: 6rem;
+    font-weight: 500;
+    color: black;
+    width: 15rem;
+    height: 20rem;
+    @media (max-width: 550px) {
+        width: 13.5rem;
+        height: 18rem;
+        font-size: 5.25rem;
+    }
+    @media (max-width: 470px) {
+        width: 12rem;
+        height: 16rem;
+        font-size: 5rem;
+    }
+    @media (max-width: 420px) {
+        width: 10.5rem;
+        height: 14rem;
+        font-size: 4.25rem;
+    }
+    @media (max-width: 370px) {
+        width: 9rem;
+        height: 12rem;
+        font-size: 3.75rem;
+    }
+    &.first {
+        animation: ${rotateCard1} 24s infinite;
+        -webkit-animation: ${rotateCard1} 24s infinite;
+    }
+    &.second {
+        animation: ${rotateCard2} 24s infinite;
+        -webkit-animation: ${rotateCard2} 24s infinite;
+        animation-delay: 3s;
+        -webkit-animation-delay: 3s;
     }
 `;
 
@@ -415,8 +395,6 @@ const CardWrapper = styled.div`
 
 const FlashCard = styled.div`
     position: relative;
-    // diplay: flex;
-    // flex-direction: column;
     height: 100%;
     width: 100%;
     & button {
@@ -430,25 +408,6 @@ const FlashCard = styled.div`
             font-size: .75rem
         }
 	}
-    @media (max-width: 1015px) {
-        // width: 17.5rem;
-        // height: 20rem;
-    }
-    @media (max-width: 850px) {
-        // width: 14rem;
-        // height: 16rem;
-    }
-    @media (max-width: 690px) {
-        // width: 10.5rem;
-        // height: 12rem;
-    }
-    @media (max-width: 515px) {
-        // display: block;
-        // width: 14rem;
-        // height: 16rem;
-        // margin-bottom: .5rem;
-        // align-self: center;
-    }
 `;
 
 const StyledFlipArrow = styled(GiRapidshareArrow)`
@@ -538,9 +497,6 @@ const AnswerWrapper = styled.div`
 	}
     &.True-False {
         height: 50%;
-        // &:nth-of-type(2) {
-        //     height: calc(50% + 1px);
-        // }
     }
 `
 
@@ -632,13 +588,6 @@ function LandingPage() {
                 <CardsContainer>
                     <CardWrapper>
                         <FlashCard className="FlashCard">
-                            {/* <HintBox>
-                                
-                                <div>
-                                    <button>Hint</button>
-                                    <p>Hint</p>
-                                </div>
-                            </HintBox> */}
                             <QuestionWrapper className="QuestionWrapper FlashCard">
                                 How many bones are there in the human body?
                                 <button className="btn btn-primary">View Answer<StyledFlipArrow /></button>
@@ -647,12 +596,6 @@ function LandingPage() {
                     </CardWrapper>
                     <CardWrapper>
                         <QuestionBox className="True-False">
-                            {/* <HintBox>
-                                <div>
-                                    <GoLightBulb />
-                                    <p>Hint</p>
-                                </div>
-                            </HintBox> */}
                             <QuestionWrapper>Mount Everest is located in the Andes</QuestionWrapper>
                         </QuestionBox>
                         <AnswerBox className="True-False">
@@ -662,13 +605,6 @@ function LandingPage() {
                     </CardWrapper>
                     <CardWrapper>
                         <QuestionBox>
-                            {/* <HintBox>
-                                
-                                <div>
-                                    <button>Hint</button>
-                                    <p>Hint</p>
-                                </div>
-                            </HintBox> */}
                             <QuestionWrapper>What is the hotest planet in the Milky Way?</QuestionWrapper>
                         </QuestionBox>
                         <AnswerBox>

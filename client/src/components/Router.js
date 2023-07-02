@@ -30,6 +30,7 @@ import DeckStats from './DeckStats';
 import { CookiePolicy } from './CookiePolicy';
 import { PrivacyPolicy } from './PrivacyPolicy';
 import PasswordReset from './PasswordReset';
+import DeckPreview from './DeckPreview';
 
 function Router() {
     const { pathname } = useLocation();
@@ -76,7 +77,8 @@ function Router() {
                 </Route>
                 <Route exact path="/groups/:groupId/decks/:deckId" element={<Deck />} />
                 <Route exact path="/decks/public" element={<BrowseDecks />}/>
-                {/* <Route exact path="/decks/:deckId" element={<Deck />} /> */}
+                <Route exact path="/decks/:deckId" element={<Deck />} />
+                <Route path="/decks/:deckId/review" element={<DeckPreview />} />
                 <Route exact path="/users/:userId/decks/:deckId" element={<Deck />} />
                 <Route exact path="/users/:userId/decks" element={<UserDecksPage />} />
                 <Route exact path="/users/:userId/groups" element={<UserGroupsPage />} />
@@ -84,7 +86,6 @@ function Router() {
                 <Route exact path="/users/:userId/settings" element={<UserSettings />} />
                 <Route exact path="/users/:userId/statistics/" element={<StatisticsPage />}>
                     <Route exact path="decks" element={<DeckStats />} />
-                    <Route exact path="decks/:deckId" element />
                     <Route exact path="cards" element={<CardStatsTable />} />
                     <Route exact path="sessions/decks/:deckId" element={<DeckAttemptsTable />} />
                     <Route exact path="cards/:cardId" element={<CardAttemptsTable />} />

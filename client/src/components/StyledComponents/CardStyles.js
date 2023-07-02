@@ -20,12 +20,19 @@ export const HintBox = styled.div`
 `
 
 export const StyledHintIcon = styled(IoBulbSharp).attrs({
-	className: "hint-icon"
+	className: "hint-icon",
+	role: "button"
 })`
 	height: 1.75rem;
 	width: 1.75rem;
 	cursor: pointer;
 	&:hover {
 		color: yellow;
+	}
+	@media (max-width: 600px) {
+		height: 1.5rem;
+	}
+	@media (max-width: 550px) {
+		height: 1.25rem;
 	}
 `;

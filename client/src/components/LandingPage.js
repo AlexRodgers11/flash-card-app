@@ -285,17 +285,18 @@ const TitleCard = styled.div`
         height: 12rem;
         font-size: 3.75rem;
     }
-    &.first {
-        animation: ${rotateCard1} 24s infinite;
-        -webkit-animation: ${rotateCard1} 24s infinite;
-    }
-    &.second {
-        animation: ${rotateCard2} 24s infinite;
-        -webkit-animation: ${rotateCard2} 24s infinite;
-        animation-delay: 3s;
-        -webkit-animation-delay: 3s;
-    }
 `;
+
+// &.first {
+//     animation: ${rotateCard1} 24s infinite;
+//     -webkit-animation: ${rotateCard1} 24s infinite;
+// }
+// &.second {
+//     animation: ${rotateCard2} 24s infinite;
+//     -webkit-animation: ${rotateCard2} 24s infinite;
+//     animation-delay: 3s;
+//     -webkit-animation-delay: 3s;
+// }
 
 const Side = styled.div`
     display: flex;
@@ -309,40 +310,40 @@ const Side = styled.div`
 `;
 
 const CardOneFront = styled(Side)`
-    animation: ${rotateCardFrontText} 24s infinite;
-    -webkit-animation: ${rotateCardFrontText} 24s infinite;
+    // animation: ${rotateCardFrontText} 24s infinite;
+    // -webkit-animation: ${rotateCardFrontText} 24s infinite;
 `;
 const CardTwoFront = styled(Side)`
-    animation: ${rotateCardFrontText} 24s infinite;
-    -webkit-animation: ${rotateCardFrontText} 24s infinite;
-    animation-delay: 6s;
-    -webkit-animation-delay: 6s;
+    // animation: ${rotateCardFrontText} 24s infinite;
+    // -webkit-animation: ${rotateCardFrontText} 24s infinite;
+    // animation-delay: 6s;
+    // -webkit-animation-delay: 6s;
 `;
     
-const CardOneBack = styled(Side)`
-    z-index: -1;
-    transform: rotateY(180deg);
-    -webkit-transform: rotateY(180deg);
-`;
+// const CardOneBack = styled(Side)`
+//     z-index: -1;
+//     transform: rotateY(180deg);
+//     -webkit-transform: rotateY(180deg);
+// `;
 
-const CardTwoBack = styled(Side)`
-    z-index: -1;
-    transform: rotateY(180deg);
-    -webkit-transform: rotateY(180deg);
-`;
+// const CardTwoBack = styled(Side)`
+//     z-index: -1;
+//     transform: rotateY(180deg);
+//     -webkit-transform: rotateY(180deg);
+// `;
 
-const BackOneText = styled.div`
-    animation: ${rotateCardOneBackText} 24s infinite;
-    -webkit-animation: ${rotateCardOneBackText} 24s infinite;
-`;
-const BackTwoText = styled.div`
-    transform: rotateX(180deg) rotateY(180deg);
-    -webkit-transform: rotateX(180deg) rotateY(180deg);
-    animation: ${rotateCardTwoBackText} 24s infinite;
-    -webkit-animation: ${rotateCardTwoBackText} 24s infinite;
-    animation-delay: 6s;
-    -webkit-animation-delay: 6s;
-`;
+// const BackOneText = styled.div`
+//     animation: ${rotateCardOneBackText} 24s infinite;
+//     -webkit-animation: ${rotateCardOneBackText} 24s infinite;
+// `;
+// const BackTwoText = styled.div`
+//     transform: rotateX(180deg) rotateY(180deg);
+//     -webkit-transform: rotateX(180deg) rotateY(180deg);
+//     animation: ${rotateCardTwoBackText} 24s infinite;
+//     -webkit-animation: ${rotateCardTwoBackText} 24s infinite;
+//     animation-delay: 6s;
+//     -webkit-animation-delay: 6s;
+// `;
 
 const CardsContainer = styled.div`
     display: flex;
@@ -563,11 +564,11 @@ function LandingPage() {
                     <SiteTitle>
                         <TitleCard className="first">
                             <CardOneFront>Flish</CardOneFront>
-                            <CardOneBack><BackOneText>Flish</BackOneText></CardOneBack>
+                            {/* <CardOneBack><BackOneText>Flish</BackOneText></CardOneBack> */}
                         </TitleCard>
                         <TitleCard className="second">
                             <CardTwoFront>Flash</CardTwoFront>
-                            <CardTwoBack><BackTwoText>Flash</BackTwoText></CardTwoBack>
+                            {/* <CardTwoBack><BackTwoText>Flash</BackTwoText></CardTwoBack> */}
                         </TitleCard>
                     </SiteTitle>
                     <h4>A customizable flash card experience that lets you study smarter, shorter, and more efficiently</h4>

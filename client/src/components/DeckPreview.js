@@ -10,6 +10,7 @@ import { EmptyIndicator } from "./StyledComponents/EmptyIndicator";
 import { fetchCategories } from "../reducers/decksSlice";
 import { fetchDecksOfGroup } from '../reducers/decksSlice';
 import { makeDeckSubmissionDecision } from '../reducers/communicationsSlice';
+import Modal from "./Modal";
 
 const DeckWrapper = styled.div`
     display: flex;
@@ -18,12 +19,23 @@ const DeckWrapper = styled.div`
     min-height: calc(100vh - 5.5rem);
     background-color: #52B2FF; 
     padding-bottom: 3rem;
-    
+    & textarea {
+        width: 100%;
+        height: 7rem;
+    }
 `;
 
 const ButtonBlock = styled.div`
     & button {
-        margin: 1rem .5rem 2.5rem .5rem;
+        margin: 1rem .5rem 0rem .5rem;
+        @media (max-width: 750px) {
+            font-size: .875rem;
+            padding: .25rem;
+            margin: 1rem .125rem 0rem .125rem;
+        }
+        @media (max-width: 450px) {
+            font-size: .75rem;
+        }
     }
 `;
     
@@ -51,27 +63,18 @@ const CardContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 100%;
+    padding-top: 2.5rem;
 `;
 
-function DeckPreview(props) {
-    const userId = useSelector((state) => state.login.userId);
+function DeckPreview() {
     const deckListType = useSelector((state) => state.decks.listType);
     const deckListId = useSelector((state) => state.decks.listId);
     const storedDeckId = useSelector((state) => state.deck.deckId);
-    const userDecks = useSelector((state) => state.login.decks);
     const name = useSelector((state) => state.deck.name);
-    const [nameEditMode, toggleNameEditMode] = useToggle(false);
     const [decision, setDecision] = useState("");
 	const [comment, clearComment, handleCommentChange, setComment] = useFormInput("");
-    const [loading, setLoading] = useState(true);
-    const administrators = useSelector((state) => state.group.administrators)
-    const category = useSelector((state) => state.deck.category);
     const categories = useSelector((state) => state.decks.categories);
-    const [editedName, clearEditedName, handleChangeEditedName, setEditedName] = useFormInput("");
-    const publiclyAvailable = useSelector((state) => state.deck.publiclyAvailable);
-    const allowCopies = useSelector((state) => state.deck.allowCopies);
     const cards = useSelector((state) => state.deck.cards);
-    const groupDeckBelongsTo = useSelector((state) => state.deck.groupDeckBelongsTo);
     const [modalContent, setModalContent] = useState("");
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -83,10 +86,11 @@ function DeckPreview(props) {
     const messageId = searchParams.get("message");
     
     const displayModalContent = () => {
-        switch(modalContent) {
-            default:
-                return;
-        }
+        // switch(decision) {
+        //     case "approved":
+        //     default:
+        //         return;
+        // }
     }
 
     const acceptDeck = () => {
@@ -97,9 +101,9 @@ function DeckPreview(props) {
         setDecision("denied");
     }
 
-    const handleSelectModalContent = (evt) =>  {
-        setModalContent(evt.target.dataset.action);
-    }
+    // const handleSelectModalContent = (evt) =>  {
+    //     setModalContent(evt.target.dataset.action);
+    // }
 
     const hideModal = () => {
         setModalContent("");
@@ -114,6 +118,7 @@ function DeckPreview(props) {
                 if((response.payload.acceptanceStatus === "approved" && deckListType === "group") && deckListId === groupId) {
                     dispatch(fetchDecksOfGroup({groupId: groupId}));
                 }
+                clearComment();
                 navigate(-1);
             });
         
@@ -141,28 +146,26 @@ function DeckPreview(props) {
                 <h1>{name}</h1> 
             </NameBlock>
 
-            {!decision ?
-                <ButtonBlock>
-                    <button className="btn btn-success btn-md" onClick={acceptDeck}>Accept</button><button className="btn btn-danger btn-md" onClick={denyDeck}>Decline</button>
-                </ButtonBlock>
-                :
-                <div>
-                    <textarea name="comments" id="comments" onChange={handleCommentChange} value={comment} placeholder="Add a comment (optional)"></textarea>
-                    <button className="btn btn-primary btn-md" onClick={submitDeckDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button><button className="btn btn-danger btn-md" onClick={clearDecision}>Cancel</button>
-                </div>
-            }
-            
+            <ButtonBlock>
+                <button className="btn btn-success" onClick={acceptDeck}>Accept</button><button className="btn btn-danger btn-md" onClick={denyDeck}>Decline</button>
+            </ButtonBlock>
                 
             <CardContainer className="CardContainer">
                 {!cards.length && <EmptyIndicator>No cards have been created yet</EmptyIndicator>}
                 {cards.map(card => <Card cardId={card} allowedToEdit={false} />
                 )}
 
-                {/* {modalContent && 
+                {decision && 
                     <Modal hideModal={hideModal}>
-                        {displayModalContent()}
+                        <div>
+                            <textarea name="comments" id="comments" onChange={handleCommentChange} value={comment} placeholder="Add a comment (optional)"></textarea>
+                            <ButtonBlock>
+                                <button className="btn btn-primary" onClick={submitDeckDecision}>Submit decision to {decision === "approved" ? "approve" : "deny"} the request</button>
+                                <button className="btn btn-danger" onClick={clearDecision}>Cancel</button>
+                            </ButtonBlock>
+                        </div>                        
                     </Modal>
-                } */}
+                }
             </CardContainer>
         </DeckWrapper>
     )

@@ -37,7 +37,7 @@ function Router() {
     const userId = useSelector((state) => state.login.userId);
     const accountSetupStage = useSelector((state) => state.login.accountSetupStage);
 
-    const pathnamesThatDoNotNeedUserId = ["/", "/login", "/register/credentials", "/decks/public", "/cookie-policy", "/privacy-policy", "/reset-password"];
+    const pathnamesThatDoNotNeedUserId = ["/", "/login", "/register/credentials", "/decks/public", "/cookie-policy", "/privacy-policy", "/reset-password", "register/profile-pic-crop"];
 
     useEffect(() => {
         window.scrollTo(0, 0);

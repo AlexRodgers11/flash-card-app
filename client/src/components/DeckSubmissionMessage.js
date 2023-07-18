@@ -7,6 +7,7 @@ import { makeDeckSubmissionDecision } from '../reducers/communicationsSlice';
 import { MessageContentContainer } from './StyledComponents/MessageContentContainer';
 import { MessagePreviewContent } from './StyledComponents/MessagePreviewContent';
 import { client } from '../utils';
+import { useNavigate } from 'react-router';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -16,12 +17,14 @@ function DeckSubmissionMessage(props) {
 	const deckListType = useSelector((state) => state.decks.listType);
     const deckListId = useSelector((state) => state.decks.listId);
 	const [sender, setSender] = useState({});
+    const [targetDeck, setTargetDeck] = useState({});
     const [targetGroup, setTargetGroup] = useState({});
     const [deckName, setDeckName] = useState({});
 	const [read, setRead] = useState(false);
     const [decision, setDecision] = useState("");
 	const [comment, clearComment, handleCommentChange, setComment] = useFormInput("");
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const acceptDeck = () => {
         setDecision("approved");
@@ -51,8 +54,8 @@ function DeckSubmissionMessage(props) {
     }
 
 	const reviewDeck = () => {
-		// props.hideModal();
-		// navigate(`decks/${targetDeck._id}?review=true`);
+		props.hideModal();
+		navigate(`decks/${targetDeck._id}/review?message=${props.messageId}&group=${targetGroup._id}`);
 	}
 
 	useEffect(() => {
@@ -65,6 +68,7 @@ function DeckSubmissionMessage(props) {
 					setRead(data.read.includes(userId));
 					setTargetGroup(data.targetGroup);
                     setDeckName(data.deckName);
+                    setTargetDeck(data.targetDeck);
                     setLoading(false);
                     props.setMessageRendered(true);
 				} catch (err) {

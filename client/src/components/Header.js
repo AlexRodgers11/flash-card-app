@@ -102,6 +102,11 @@ function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+
+    useEffect(() => {
+        console.log("profilePic changed");
+        console.log({profilePic});
+    }, [profilePic]);
         
     const expandMessage = (id, type, direction) => {
         setModalContent("message");
@@ -159,7 +164,8 @@ function Header() {
 
     useEffect(() => {
             if(!communicationsFetchInterval.current && (accountSetupStage === "complete" && token)) {
-                communicationsFetchInterval.current = setInterval(() => dispatchWithExpiredTokenCatch(dispatch, logout, fetchCommunications), 10000);
+                // communicationsFetchInterval.current = setInterval(() => dispatchWithExpiredTokenCatch(dispatch, logout, fetchCommunications), 10000);
+                communicationsFetchInterval.current = setInterval(() => dispatchWithExpiredTokenCatch(dispatch, logout, fetchCommunications), 1000000);
 
                 return () => clearInterval(communicationsFetchInterval.current);
             }

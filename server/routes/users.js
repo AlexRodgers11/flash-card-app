@@ -248,12 +248,15 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
     const patchObj = {};
     
     if(req.file) {
+        console.log("in first req.file block");
         const file = req.file;
         let photoName;
         photoName = generateRandomFileName();
         patchObj.photo = photoName;
+        console.log("photo", patchObj.photo)
         
         await uploadFile(file.buffer, photoName, file.mimetype);
+        console.log("photo uploaded");
         if(req.user.photo) {
             await deleteFile(req.user.photo);
         }
@@ -311,7 +314,9 @@ userRouter.patch("/:protectedUserId", upload.single("photo"), async (req, res, n
         }
 
         if(req.file) {
+            console.log("a file exists");
             let photoUrl = await getObjectSignedUrl(user.photo);
+            console.log({photoUrl});
             responseData.photo = photoUrl;
         }
         res.status(200).send(responseData);

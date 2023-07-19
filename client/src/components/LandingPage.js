@@ -530,32 +530,33 @@ function LandingPage() {
 
 	useEffect(() => {
 		if((userId && accountSetupStage === "complete") && (location.pathname !== "/register/profile-pic-crop" && location.pathname !== "/register/join-groups")) {
-			navigate("/dashboard");
+			console.log("navigating to dashboard from LandingPage");
+            navigate("/dashboard");
 		}
 	}, [userId, accountSetupStage, location, navigate]);
 
     
     const getPublicDeckCountInterval = useRef();
 
-    useEffect(() => {
-        if(!getPublicDeckCountInterval.current) {
-            const getPublicDeckCount = async () => {
-                const response = await axios.get(`${baseURL}/decks/public-count`);
-                return response.data.deckCount;
-            }
+    // useEffect(() => {
+    //     if(!getPublicDeckCountInterval.current) {
+    //         const getPublicDeckCount = async () => {
+    //             const response = await axios.get(`${baseURL}/decks/public-count`);
+    //             return response.data.deckCount;
+    //         }
 
-            getPublicDeckCount();
+    //         getPublicDeckCount();
 
-            getPublicDeckCountInterval.current = setInterval(async () => {
-                const deckCount = await getPublicDeckCount();
-                setPublicDeckCount(deckCount);
-            }, 3000);
+    //         getPublicDeckCountInterval.current = setInterval(async () => {
+    //             const deckCount = await getPublicDeckCount();
+    //             setPublicDeckCount(deckCount);
+    //         }, 3000);
             
-            return () => {
-                clearInterval(getPublicDeckCountInterval.current);
-            }
-        }
-    }, []);
+    //         return () => {
+    //             clearInterval(getPublicDeckCountInterval.current);
+    //         }
+    //     }
+    // }, []);
 
 	return (
 		<LandingPageWrapper className="LandingPageWrapper">

@@ -173,13 +173,17 @@ export const updateDirectMessagePreference = createAsyncThunk("login/updateDirec
 });
 
 export const updateProfilePic = createAsyncThunk("login/updateProfilePic", async({userId, photo}) => {
+    console.log("in updateProfilePic");
+    console.log({userId, photo});
     const formData = new FormData();
     formData.append("photo", photo);
     if(!photo) {
+        console.log("no photo");
         formData.append("deleteProfilePic", true);
     }
     const response = await client.patch(`${baseURL}/users/${userId}`, formData, { headers: {"Content-Type": "multipart/form-data"}});
 
+    console.log({response});
     return response.data.photo;
 });
 

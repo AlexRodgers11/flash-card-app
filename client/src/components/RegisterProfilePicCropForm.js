@@ -132,11 +132,19 @@ function RegisterProfilePicCropForm(props) {
 
     const saveCroppedImage = useCallback(async () => {
         try {
+            console.log("in saveCroppedImage");
+            if(props.photo) {
+                console.log("props.photo exists");
+                console.log({propsDotPhoto: props.photo});
+            } else {
+                console.log({nonPropsPhoto: photo});
+            }
             const croppedImage = await getCroppedImg(
                 props.photo || photo,
                 croppedAreaPixels,
                 rotation
             );
+            console.log("made it past getCroppedImg");
             console.log("donee", { croppedImage });
             console.log(croppedImage);
             console.log(typeof croppedImage);
@@ -147,8 +155,10 @@ function RegisterProfilePicCropForm(props) {
                 props.saveCrop(fileFromURL);
                 console.log("should be done here");
             } else {
+                console.log("in else block");
                 dispatch(updateProfilePic({userId: userId, photo: fileFromURL}))
                     .then(() => {
+                        console.log("dispatch complete");
                         navigate("/register/join-groups");
                     });
             }

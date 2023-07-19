@@ -54,6 +54,7 @@ function RegisterIdentificationForm() {
         let usernameResponse = await axios.get(`${baseURL}/login/usernames?username=${username}`);
         if(usernameResponse.data.usernameAvailable) {
             if(photo) {
+                console.log({photoInIdentificationForm: photo});
                 dispatch(updateProfilePic({userId, photo}));
             }
             dispatch(updateUser({userId, userUpdates: {login: {username: username, email: email}, name: {first: firstName, last: lastName}}}))

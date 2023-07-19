@@ -20,14 +20,24 @@ export const generateJoinCode = () => {
     return code;
 }
 
-/////////////////////////////////Copied from https://github.com/clarencepenz/easy-crop////////////////////////////////////
+/////////////////////////////////Copied from https://github.com/clarencepenz/easy-crop////////////////////////////////////---look at this github for changes
 export const createImage = (url) =>
   new Promise((resolve, reject) => {
+    console.log("in createImage");
+    console.log({url});
     const image = new Image();
-    image.addEventListener("load", () => resolve(image));
-    image.addEventListener("error", (error) => reject(error));
+    console.log({image});
+    image.addEventListener("load", () => {
+        resolve(image)
+    });
+    image.addEventListener("error", (error) => {
+        console.log({message: error});
+        reject(error)
+    });
+    console.log("event listener added");
     image.setAttribute("crossOrigin", "anonymous"); // needed to avoid cross-origin issues on CodeSandbox
     image.src = url;
+    console.log({url: image.src});
   });
 
 export function getRadianAngle(degreeValue) {
@@ -57,7 +67,10 @@ export async function getCroppedImg(
   rotation = 0,
   flip = { horizontal: false, vertical: false }
 ) {
+    console.log("in getCroppedImg");
   const image = await createImage(imageSrc);
+  //this is where it stops
+  console.log("image created");
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 

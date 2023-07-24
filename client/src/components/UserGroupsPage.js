@@ -37,6 +37,7 @@ const ButtonRow = styled.div`
 const StyledButton = styled.button`
     display: inline-block;
     margin: 4rem 1rem 3rem 1rem;
+    border: 2px solid black;
     width: 45%;
     max-width: 14rem;
     height: 5rem;
@@ -45,6 +46,11 @@ const StyledButton = styled.button`
         height: 4rem;
     }
     border-radius: 1rem;
+    &:hover {
+        background-color: black;
+        color: white;
+        border-color: grey;
+    }
 `;
 
 function UserGroupsPage() {

@@ -83,7 +83,6 @@ const Section = styled.section`
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: Georgia;
     font-family: 'Bookman Old Style', serif;
     min-width: 100vw;
     background-color: ${props => props.backgroundColor};

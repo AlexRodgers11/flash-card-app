@@ -29,6 +29,11 @@ const GroupTileWrapper = styled.div`
     height: 10rem;
     margin-bottom: 1rem;
     cursor: pointer;
+    border-radius: .8rem;
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0px 2px 4px #000000;
+    }   
 `;
 
 const LabelSection = styled.section`
@@ -111,6 +116,8 @@ const Name = styled.h1`
 `;
 
 const DateJoined = styled.p`
+    font-family: 'Bookman Old Style', sans-serif;
+    font-weight: 600;
     @media (max-width: 750px) {
         color: white;
         align-self: flex-end;

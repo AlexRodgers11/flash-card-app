@@ -6,13 +6,11 @@ import styled from 'styled-components';
 
 const GroupMemberListWrapper = styled.div`
     min-width: 350px;
-    // min-height: calc(100vh - 4.5rem);
     min-height: 100%;
-    width: 98%;
     display: grid;
-    // place-items: center;
     margin-bottom: 3rem;
     border: ${(props) => props.extraStyling ? "2px solid black" : "none"};
+    border-radius: ${(props) => props.extraStyling ? "3rem" : "none"};
     background-color: ${(props) => props.extraStyling ? "#e3e3e3" : "inherit"};
 
     grid-template-columns: repeat(1, 1fr);
@@ -53,7 +51,8 @@ const GroupMemberListWrapper = styled.div`
         grid-template-columns: repeat(10, 1fr);
     }
 
-    @media (min-width: 1410px) {
+    // @media (min-width: 1410px) {
+    @media (min-width: 1530px) {
         grid-template-columns: repeat(11, 1fr);
     }
 

@@ -21,7 +21,7 @@ const UserTileWrapper = styled.div`
 const TitleWrapper = styled.div`
     height: 1.25rem;
     font-weight: 600;
-`
+`;
 
 const Button = styled.button`
     font-size: .65rem;
@@ -107,6 +107,7 @@ function UserTile(props) {
     const loggedInUserId = useSelector((state) => state.login.userId);
     const [userData, setUserData] = useState({});
     const headAdmin = useSelector((state) => state.group.headAdmin);
+    const administrators = useSelector((state) => state.group.administrators);
     
 
     useEffect(() => {
@@ -149,6 +150,7 @@ function UserTile(props) {
                     {(((props.listType==="members") && props.memberId !== headAdmin) && (loggedInUserId === headAdmin || !props.isAdmin)) && <Button className="btn btn-danger" onClick={handleRemoveMember}>Remove From Group</Button>}
                     {(!props.isAdmin && props.listType==="members") && <Button className="btn btn-primary" onClick={addMemberToAdmins}>Make Administrator</Button>}
                     {(loggedInUserId === headAdmin && props.isAdmin) && <Button className="btn btn-danger" onClick={removeMemberFromAdmins}>Remove From Administrators</Button>}
+                    {administrators.slice(1).includes(loggedInUserId) && <TitleWrapper>{props.memberId === headAdmin ? "Head Admin" : props.isAdmin ? "Admin" : ""}</TitleWrapper>}
                 </EditOptionsWrapper>
                 :
                 <TitleWrapper>{props.memberId === headAdmin ? "Head Admin" : props.isAdmin ? "Admin" : ""}</TitleWrapper>

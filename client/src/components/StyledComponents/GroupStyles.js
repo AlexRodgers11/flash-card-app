@@ -135,17 +135,23 @@ export const GroupMemberOptionsContainer = styled.div`
 `;
 
 export const JoinOptionContainer = styled.div`
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: column;
     margin-bottom: 3.75rem;
     & label {
         margin-right: .5rem;
         font-size: 1.125rem;
-        justify-self: flex-start;
+        // justify-self: flex-start;
+        display: block;
     }
     & select {
         display: inline-block;
-        padding: .275rem .55rem;
-        margin-bottom: .25rem;
+        // padding: .275rem .55rem;
+        // margin-bottom: .25rem;
+        width: 100%;
+    }
+    & .btn {
+        margin-top: .25rem;
     }
     @media (max-width: 500px) {
         font-size: .85rem;

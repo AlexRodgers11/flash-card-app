@@ -33,7 +33,7 @@ const GroupEditControlsContainer = styled.div`
 `;
 
 const JoinCodeContainer = styled.div`
-
+    width: 100%;
 `;
 
 const EmailInput = styled.input.attrs({
@@ -42,6 +42,13 @@ const EmailInput = styled.input.attrs({
 })`
     min-width: 17rem;
     margin-top: 1rem;
+`;
+
+const ButtonGroup = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
 `;
 
 const BlockTextArea = styled.textarea`
@@ -58,6 +65,40 @@ const InvitationForm = styled.form`
 
 const CenteredButtonGroup = styled.div`
     align-self: center;
+`;
+
+const JoinCodeBlock = styled.div`
+    // display: flex;
+    & p {
+        margin-top: .25rem;
+        color: white;
+        background-color: black;
+        padding: 6px 2px;
+        border: 2px solid black;
+        // border-radius: 4px;
+    }
+`;
+
+const JoinCodeButtons = styled.div`
+    display: inline-block;    
+    // margin-top: .25rem;
+    & button {
+        margin-right: .125rem;
+        display: block;
+        padding: 6px .5rem !important;
+        @media (min-width: 576px) {
+            display: inline-block;
+            padding: .25rem .5rem;
+        }
+
+        @media (min-width: 768px) {
+            padding: .5rem 1rem;
+        }
+
+        @media (min-width: 992px) {
+            padding: .75rem 1.5rem;
+        }
+    }
 `;
 
 export function GroupAdminSection() {
@@ -159,27 +200,31 @@ export function GroupAdminSection() {
             <GroupEditControlsContainer>
                 <JoinOptionContainer>
                     <label className="form-label" htmlFor="join-code-options">Select how new members can join:</label>
-                    <select className="form-select" id="join-code-options" name="join-code-options" onChange={handleChangeJoinOptions}>
+                    <select style={{display: "inline-block"}} className="form-select" id="join-code-options" name="join-code-options" onChange={handleChangeJoinOptions}>
                         <option selected={joinOptions === "invite"} value="invite">Invite Only</option>
                         <option selected={joinOptions === "code"} value="code">Join Code</option>
                         <option selected={joinOptions === "request"} value="request">Request by User</option>
                         <option selected={joinOptions === "code-and-request"} value="code-and-request">Join Code and Request by User</option>
                     </select>
-                    <button onClick={toggleShowInviteModal} className="btn btn-success"><MdGroupAdd /> Invite</button>
-                    {(joinOptions === "code" || joinOptions === "code-and-request") &&
-                        <JoinCodeContainer>
-                            {!joinCodeVisible ? 
-                                <button className="btn btn-success" onClick={toggleJoinCodeVisible}>Show Group Join Code</button>
-                                :
-                                <div>
-                                    <span>Join Code: {joinCode} </span>
-                                    <CopyButton onClick={copyCode}>Copy Code <BsClipboardPlus /></CopyButton>
-                                    <button onClick={getNewJoinCode}>Get New Code</button>
-                                    <button onClick={toggleJoinCodeVisible}>Hide Join Code</button>
-                                </div>
-                            }
-                        </JoinCodeContainer>
-                    }
+                        <button style={{display: "inline-block"}} onClick={toggleShowInviteModal} className="btn btn-success"><MdGroupAdd /> Invite</button>
+                    <ButtonGroup>
+                        {(joinOptions === "code" || joinOptions === "code-and-request") &&
+                            <JoinCodeContainer>
+                                {!joinCodeVisible ? 
+                                    <button style={{width: "100%"}} className="btn btn-success" onClick={toggleJoinCodeVisible}>Show Group Join Code</button>
+                                    :
+                                    <JoinCodeBlock>
+                                        <p>Join Code: {joinCode} </p>
+                                        <JoinCodeButtons>
+                                            <CopyButton className="btn btn-primary" onClick={copyCode}>Copy Code <BsClipboardPlus /></CopyButton>
+                                            <button className="btn btn-secondary" onClick={getNewJoinCode}>Get New Code</button>
+                                            <button className="btn btn-danger" onClick={toggleJoinCodeVisible}>Hide Join Code</button>
+                                        </JoinCodeButtons>
+                                    </JoinCodeBlock>
+                                }
+                            </JoinCodeContainer>
+                        }
+                    </ButtonGroup>
                 </JoinOptionContainer>
             </GroupEditControlsContainer>
             <GroupMemberList editMode={true} listType="members" extraStyling={true}/>

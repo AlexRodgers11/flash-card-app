@@ -15,23 +15,18 @@ const CardWrapper = styled.div`
 	padding: 30% 5%;
 	background-color:  #2C262C;
 	color: white;
-	& button {
-		// margin: .25rem;
-		// padding: .5rem 1.25rem;
+	& .answered-correctly, .answered-incorrectly {
+		color: white;
+		&:hover {
+			background-color: black;
+		}
+		margin: .25rem;
 	}
 	& .answered-correctly {
-		color: white;
 		background-color: #333FFF;
-		&:hover {
-			background-color: black;
-		}
 	}
 	& .answered-incorrectly {
-		color: white;
 		background-color: #FF3333;
-		&:hover {
-			background-color: black;
-		}
 	}
 `
 
@@ -117,8 +112,8 @@ function FlashCard() {
 						<div>{activeCard.correctAnswer}</div>
 						<div>
 							<h3>Did you answer correctly?</h3>
-							<button className="answered-correctly" data-answeredcorrectly="true" onClick={!answered ? submitAnswer : undefined}>Yes</button>
-							<button className="answered-incorrectly" data-answeredcorrectly="false" onClick={!answered ? submitAnswer : undefined}>No</button>
+							<button className="answered-correctly btn btn-primary" data-answeredcorrectly="true" onClick={!answered ? submitAnswer : undefined}>Yes</button>
+							<button className="answered-incorrectly btn btn-danger" data-answeredcorrectly="false" onClick={!answered ? submitAnswer : undefined}>No</button>
 						</div>
 					</CardWrapper>
 				</>

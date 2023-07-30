@@ -6,11 +6,21 @@ import styled from "styled-components";
 import DeckAttemptCardsTable from "./DeckAttemptCardsTable";
 
 const DeckAttemptWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     position: relative;
-    top: 4rem;
+    padding-top: 4rem;
     @media (max-width: 515px) {
-        top: 6rem;
+        padding-top: 6rem;
     }
+`;
+
+const DeckTitle = styled.div`
+    background-color: white;
+    padding: 1rem;
+    border: 2px solid black;
+    border-radius: 1rem;
 `;
 
 function DeckAttempt() {
@@ -28,7 +38,9 @@ function DeckAttempt() {
     if(deckAttempt._id === sessionId) {
         return (
             <DeckAttemptWrapper className="DeckAttemptWrapper">
-                <h1>Deck: {deckAttempt.deck?.name}</h1>
+                <DeckTitle>
+                    <h1><strong>Deck:</strong> {deckAttempt.deck?.name}</h1>
+                </DeckTitle>
                 <DeckAttemptCardsTable />
             </DeckAttemptWrapper>
         );

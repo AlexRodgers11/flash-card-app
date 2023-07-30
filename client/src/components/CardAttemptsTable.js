@@ -32,7 +32,7 @@ const CardAttemptTableContainer = styled.div`
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    // background-color: red;
+    margin-top: 1rem;
     width: 80%;
     @media (max-width: 650px) {
         width: 85%;
@@ -72,6 +72,13 @@ const HeaderBlock = styled.thead`
     @media (max-width: 550px) {
         height: 3rem;
     }
+`;
+
+const CardIdentifiers = styled.div`
+    background-color: white;
+    padding: 1rem;
+    border: 2px solid black;
+    border-radius: 1rem;
 `;
 
 const Header = styled.th.attrs({
@@ -142,9 +149,12 @@ function CardAttemptsTable() {
 
     return (
         <CardAttemptsTableWrapper className="CardAttemptsTableWrapper">
-            <h1>{selectedCard.question}</h1>
-            <h4>{selectedCard.answer}</h4>
-            <h4>{selectedCard.cardType === "FlashCard" ? "Flash" : selectedCard.cardType === "TrueFalseCard" ? "True/False" : "Multiple Choice"}</h4>
+            <CardIdentifiers>
+                <h1><strong>Question: </strong>{selectedCard.question}</h1>
+                <h4><strong>Answer: </strong>{selectedCard.answer}</h4>
+                <h4><strong>Card Type: </strong>{selectedCard.cardType === "FlashCard" ? "Flash" : selectedCard.cardType === "TrueFalseCard" ? "True/False" : "Multiple Choice"}</h4>
+
+            </CardIdentifiers>
             <CardAttemptTableContainer className="CardAttemptTableContainer">
                 <AttemptsTable className="CardAttemptTable">
                     <HeaderBlock className="QuestionHeaderBlock">

@@ -83,10 +83,12 @@ function DeckForm() {
 				<input style={{display: "inline-block"}} role="button" onChange={handlePubliclyAvailableChange} checked={publiclyAvailable} className="form-control form-check-input" type="checkbox" id="publicly-available-switch" />
 				<label className="form-check-label" htmlFor="publicly-available-switch">{publiclyAvailable ? "Public" : "Private"}</label>
 			</div>
-			<div className="form-check form-switch">
-				<input style={{display: "inline-block"}} role="button" onChange={handleAllowCopiesChange} checked={allowCopies} className="form-control form-check-input" type="checkbox" id="allow-copies-switch" />
-				<label className="form-check-label" htmlFor="allow-copies-switch">{allowCopies ? "Allow Copies" : "Don't Allow Copies"}</label>
-			</div>
+			{publiclyAvailable && 
+				<div className="form-check form-switch">
+					<input style={{display: "inline-block"}} role="button" onChange={handleAllowCopiesChange} checked={allowCopies} className="form-control form-check-input" type="checkbox" id="allow-copies-switch" />
+					<label className="form-check-label" htmlFor="allow-copies-switch">{allowCopies ? "Allow Copies" : "Don't Allow Copies"}</label>
+				</div>
+			}
 			<ButtonWrapper>
 				<button className="btn btn-danger" onClick={handleCancelCreateDeck}>Cancel</button>
 				<button className="btn btn-primary" type="submit">Create</button>

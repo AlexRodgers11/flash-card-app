@@ -318,6 +318,8 @@ function UserSettings() {
                 break
             case "display-pronouns":
                 resetSettingSelectedValueToCurrentStateValue(displayPronouns, displayPronounsInputValue, setDisplayPronounsInputValue);
+                break;
+            case "pronouns":
                 resetSettingSelectedValueToCurrentStateValue(pronouns, pronounsInputValue, setPronounsInputValue);
                 break;
             case "password":
@@ -546,6 +548,16 @@ function UserSettings() {
                     }
                 }}));
                 break;
+            case "pronouns":
+                dispatchActionThenClearEditField(updateUser({userId, userUpdates: {name: 
+                    {
+                        first: firstNameInputValue,
+                        last: lastNameInputValue,
+                        displayPronouns: displayPronounsInputValue,
+                        pronouns: pronounsInputValue
+                    }
+                }}));
+                break;
             case "password":
                 if(passwordInputValue === passwordConfirmInputValue) {
                     dispatchActionThenClearEditField(updateUser({userId, userUpdates: {login: {password: passwordInputValue}}}));
@@ -733,33 +745,35 @@ function UserSettings() {
                                 }
                             </div>
                             {editField !== "display-pronouns" && <div><StyledEditIcon role="button" data-editfield="display-pronouns" onClick={handleEditSelection}/></div>}
-                        </SettingCategoryOption>
-                        {(editField !== "display-pronouns" || !displayPronounsInputValue) && <hr />}
-                        {displayPronounsInputValue &&
-                            <>
-                            <SettingCategoryOption>
+                            {editField === "display-pronouns" && 
                                 <div>
-                                    <span>Pronouns: </span>
-                                    {editField !== "display-pronouns" && <span>{pronouns === "he" ? "He/Him/His" : pronouns === "she" ? "She/Her/Hers" : "They/Them/Theirs"}</span>}
-                                    {editField === "display-pronouns" && 
-                                        <select name="pronouns-select" id="pronouns-select" value={pronounsInputValue} onChange={handlePronounsInputValueChange} >
-                                            <option value="he">He/Him/His</option>
-                                            <option value="she">She/Her/Hers</option>
-                                            <option value="they">They/Them/Theirs</option>
-                                        </select>
-                                    }
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="display-pronouns" onClick={handleSave}>Save</button>
                                 </div>
-                                {editField !== "display-pronouns" && <div><StyledEditIcon role="button" data-editfield="display-pronouns" onClick={handleEditSelection}/></div>}
-                                {editField === "display-pronouns" && 
-                                    <div>
-                                        <button onClick={handleCancel}>Cancel</button>
-                                        <button data-editfield="display-pronouns" onClick={handleSave}>Save</button>
-                                    </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
+                        <SettingCategoryOption>
+                            <div>
+                                <span>Pronouns: </span>
+                                {editField !== "pronouns" && <span>{pronouns === "he" ? "He/Him/His" : pronouns === "she" ? "She/Her/Hers" : "They/Them/Theirs"}</span>}
+                                {editField === "pronouns" && 
+                                    <select name="pronouns-select" id="pronouns-select" value={pronounsInputValue} onChange={handlePronounsInputValueChange} >
+                                        <option value="he">He/Him/His</option>
+                                        <option value="she">She/Her/Hers</option>
+                                        <option value="they">They/Them/Theirs</option>
+                                    </select>
                                 }
-                            </SettingCategoryOption>
-                            <hr />
-                            </>
-                        }
+                            </div>
+                            {editField !== "pronouns" && <div><StyledEditIcon role="button" data-editfield="pronouns" onClick={handleEditSelection}/></div>}
+                            {editField === "pronouns" && 
+                                <div>
+                                    <button onClick={handleCancel}>Cancel</button>
+                                    <button data-editfield="pronouns" onClick={handleSave}>Save</button>
+                                </div>
+                            }
+                        </SettingCategoryOption>
+                        <hr />
                         <SettingCategoryOption>
                             <div>
                                 <span>Password: </span>

@@ -1,5 +1,4 @@
-import React from "react"
-import { useDispatch } from "react-redux";
+import React, { Fragment } from "react"
 import PropTypes from "prop-types"
 import NewMemberJoinedNotification from "./NewMemberJoinedNotification";
 import DeckAddedNotification from "./DeckAddedNotification";
@@ -7,31 +6,9 @@ import AdminChangeNotification from "./AdminChangeNotification";
 import RemovedFromGroupNotification from "./RemovedFromGroupNotification";
 import GroupDeletedNotification from "./GroupDeletedNotification";
 import HeadAdminChangeNotification from "./HeadAdminChangeNotification";
-import { FaTrashAlt } from "react-icons/fa";
-import { deleteNotification } from "../reducers/communicationsSlice";
-import styled from "styled-components";
-
-const NotificationWrapper = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	text-align: left;
-	padding: .75rem 1.25rem;
-	border: 1px solid black;
-	border-bottom: none;
-	&:last-of-type {
-		border-bottom: 1px solid black;
-	}
-`;
 
 
 function Notification(props) {
-	const dispatch = useDispatch();
-
-	const handleDeleteNotification = () => {
-		dispatch(deleteNotification({notificationId: props.notificationId}));
-	}
-
 	const renderNotification = () => {
 		switch(props.notificationType) {
 			case "NewMemberJoined": 
@@ -52,10 +29,9 @@ function Notification(props) {
 	}
 
 	return (
-		<NotificationWrapper>
-			{renderNotification()}
-			<FaTrashAlt role="button" onClick={handleDeleteNotification} />
-		</NotificationWrapper>
+			<Fragment>
+				{renderNotification()}
+			</Fragment>
 	)
 }
 

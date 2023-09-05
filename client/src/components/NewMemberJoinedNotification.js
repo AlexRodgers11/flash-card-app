@@ -4,6 +4,9 @@ import { client } from '../utils';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
+import { deleteNotification } from '../reducers/communicationsSlice';
+import { useDispatch } from 'react-redux';
+import { FaTrashAlt } from 'react-icons/fa';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -13,6 +16,7 @@ function NewMemberJoinedNotification(props) {
 	const [newMember, setNewMember] = useState();
     const [group, setGroup] = useState();
     const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if(loading) {
@@ -29,7 +33,10 @@ function NewMemberJoinedNotification(props) {
         }
     }, [loading, props.notificationId]);
 
-
+    const handleDeleteNotification = () => {
+		dispatch(deleteNotification({notificationId: props.notificationId}));
+	}
+    
     const goToNewMemberPage = () => {
         navigate(`/users/${newMember._id}`);
         props.hideModal();
@@ -46,6 +53,7 @@ function NewMemberJoinedNotification(props) {
         return (
             <NotificationContentContainer>
                 <p><NavigationSpan onClick={newMember?._id && goToNewMemberPage}>{newMember?.login?.username || (newMember?.name?.first && newMember?.name?.last ? `${newMember.name.first} ${newMember.name.last}` : "Deleted User")}</NavigationSpan> joined group <NavigationSpan onClick={group?._id && goToGroupPage}>{group?.name || "Deleted Group"}</NavigationSpan></p>
+                <FaTrashAlt role="button" onClick={handleDeleteNotification} />
             </NotificationContentContainer>
         );
     }

@@ -4,6 +4,9 @@ import { client } from '../utils';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
+import { useDispatch } from 'react-redux';
+import { deleteNotification } from '../reducers/communicationsSlice';
+import { FaTrashAlt } from 'react-icons/fa';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -13,6 +16,7 @@ function AdminChangeNotification(props) {
 	const [decidingUser, setDecidingUser] = useState();
     const [action, setAction] = useState();
     const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if(loading) {
@@ -31,6 +35,10 @@ function AdminChangeNotification(props) {
     }, [loading, props.notificationId]);
 
 
+    const handleDeleteNotification = () => {
+		dispatch(deleteNotification({notificationId: props.notificationId}));
+	}
+    
     const goToDecidingUserPage = () => {
         navigate(`/users/${decidingUser._id}`);
         props.hideModal();
@@ -47,6 +55,7 @@ function AdminChangeNotification(props) {
         return (
             <NotificationContentContainer>
                 <p><NavigationSpan onClick={decidingUser?._id && goToDecidingUserPage}>{decidingUser?.login?.username || (decidingUser?.name?.first && decidingUser?.name?.last ? `${decidingUser.name.first} ${decidingUser.name.last}` : "Deleted User")}</NavigationSpan> has {action === "grant" ? "added you to" : "removed you from"} the admins of group <NavigationSpan onClick={group?._id && goToGroupPage}>{group?.name || "Deleted Group"}</NavigationSpan></p>
+                <FaTrashAlt role="button" onClick={handleDeleteNotification} />
             </NotificationContentContainer>
         );
     }

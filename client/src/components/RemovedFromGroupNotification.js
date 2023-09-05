@@ -4,6 +4,9 @@ import { client } from '../utils';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
+import { deleteNotification } from '../reducers/communicationsSlice';
+import { useDispatch } from 'react-redux';
+import { FaTrashAlt } from 'react-icons/fa';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -12,6 +15,7 @@ function RemovedFromGroupNotification(props) {
     const [decidingUser, setDecidingUser] = useState();
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if(loading) {
@@ -29,6 +33,10 @@ function RemovedFromGroupNotification(props) {
         }
     }, [loading, props.notificationId]);
 
+    const handleDeleteNotification = () => {
+		dispatch(deleteNotification({notificationId: props.notificationId}));
+	}
+    
     const goToDecidingUserPage = () => {
         navigate(`/users/${decidingUser._id}`);
         props.hideModal();
@@ -40,6 +48,7 @@ function RemovedFromGroupNotification(props) {
         return (
             <NotificationContentContainer>
                 <p><NavigationSpan onClick={decidingUser?._id && goToDecidingUserPage}>{decidingUser?.login?.username || (decidingUser?.name?.first && decidingUser?.name?.last ? `${decidingUser.name.first} ${decidingUser.name.last}` : "Deleted User")}</NavigationSpan> has removed you from group {groupName || "Deleted Group"}</p>
+                <FaTrashAlt role="button" onClick={handleDeleteNotification} />
             </NotificationContentContainer>
         );
     }

@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { client } from '../utils';
 import { useNavigate } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
+import { deleteNotification } from '../reducers/communicationsSlice';
+import { FaTrashAlt } from 'react-icons/fa';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -15,6 +17,7 @@ function HeadAdminChangeNotification(props) {
     const [newHeadAdmin, setNewHeadAdmin] = useState();
     const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
+    const dispatch = useDispatch
 
     useEffect(() => {
         if(loading) {
@@ -32,6 +35,9 @@ function HeadAdminChangeNotification(props) {
         }
     }, [loading, props.notificationId]);
 
+    const handleDeleteNotification = () => {
+		dispatch(deleteNotification({notificationId: props.notificationId}));
+	}
 
     const goToPreviousHeadAdminPage = () => {
         navigate(`/users/${previousHeadAdmin._id}`);
@@ -60,6 +66,7 @@ function HeadAdminChangeNotification(props) {
                         Group <NavigationSpan onClick={group?.name ? goToGroupPage : null}>{group?.name || "deleted group"}</NavigationSpan> has a new head admin, <NavigationSpan onClick={newHeadAdmin?.name ? goToNewHeadAdminPage : null}>{newHeadAdmin?.login?.username || (newHeadAdmin?.name?.first && newHeadAdmin?.name?.last ? `${newHeadAdmin.name.first} ${newHeadAdmin.name.last}` : "deleted user")}</NavigationSpan>
                     </p>
                 }
+                <FaTrashAlt role="button" onClick={handleDeleteNotification} />
             </NotificationContentContainer>
         );
     }

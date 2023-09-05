@@ -4,6 +4,10 @@ import { client } from '../utils';
 import { useNavigate } from 'react-router';
 import { NavigationSpan } from './StyledComponents/NavigationSpan';
 import { NotificationContentContainer } from './StyledComponents/NotificationContentContainer';
+import { deleteNotification } from "../reducers/communicationsSlice";
+import { useDispatch } from "react-redux";
+import { FaTrashAlt } from "react-icons/fa";
+
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -12,6 +16,7 @@ function DeckAddedNotification(props) {
 	const [newDeck, setNewDeck] = useState();
     const [group, setGroup] = useState();
     const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if(loading) {
@@ -38,6 +43,11 @@ function DeckAddedNotification(props) {
         navigate(`/groups/${group._id}`);
         props.hideModal();
     }
+
+    const handleDeleteNotification = () => {
+		dispatch(deleteNotification({notificationId: props.notificationId}));
+	}
+
 	
     if(loading) {
         return <>Loading</>
@@ -45,6 +55,7 @@ function DeckAddedNotification(props) {
         return (
             <NotificationContentContainer>
                 <p>Deck <NavigationSpan onClick={newDeck?._id && goToNewDeckPage}>{newDeck?.name || "Deleted Deck"}</NavigationSpan> was added to group <NavigationSpan onClick={group?._id && goToGroupPage}>{group?.name || "Deleted Group"}</NavigationSpan></p>
+                <FaTrashAlt role="button" onClick={handleDeleteNotification} />
             </NotificationContentContainer>
         );
     }

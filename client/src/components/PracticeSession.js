@@ -185,12 +185,11 @@ function PracticeSession() {
                         navigate("/dashboard");
                     }
                 })
-        } 
+        }
     }, [activeCard, deckId, deckIdInSetup, dispatch, filters, quickPracticeNumCards, quickPracticeSelection, sessionType, navigate, numCards, stats]);
     
     useEffect(() => {
         return () => {
-            console.log("resetting session");
             localStorage.removeItem("persist:practiceSession");
             dispatch(resetSession());
         }
@@ -256,16 +255,17 @@ function PracticeSession() {
                 {activeCard?.cardType ? 
                     createCard(activeCard.cardType) 
                     : 
-                    <WrapUpButtonsContainer>
-                        <WrapUpButton onClick={handlePracticeDeckAgain}>Practice Deck Again</WrapUpButton>
-                        {stats.numberWrong ? 
-                            <WrapUpButton onClick={handleRetryMissedCards}>Retry Missed Cards</WrapUpButton>
-                            :
-                            null
-                        }
-                        <WrapUpButton value="practice" onClick={navigateAway}>Select Another Deck</WrapUpButton>
-                        <WrapUpButton value="dashboard" onClick={navigateAway}>Home</WrapUpButton>
-                    </WrapUpButtonsContainer>
+                    (numCards - (stats.numberCorrect + stats.numberWrong) === 0) && (stats.numberCorrect > 0 || stats.numberWrong > 0) && 
+                        <WrapUpButtonsContainer>
+                            <WrapUpButton onClick={handlePracticeDeckAgain}>Practice Deck Again</WrapUpButton>
+                            {stats.numberWrong ? 
+                                <WrapUpButton onClick={handleRetryMissedCards}>Retry Missed Cards</WrapUpButton>
+                                :
+                                null
+                            }
+                            <WrapUpButton value="practice" onClick={navigateAway}>Select Another Deck</WrapUpButton>
+                            <WrapUpButton value="dashboard" onClick={navigateAway}>Home</WrapUpButton>
+                        </WrapUpButtonsContainer>
                 }
             </CardWrapper>
         </PracticeSessionWrapper>

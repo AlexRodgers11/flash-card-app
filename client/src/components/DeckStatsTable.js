@@ -115,13 +115,9 @@ function DeckStatsTable() {
     const userId = useSelector((state) => state.login.userId);
     const navigate = useNavigate();
     
-    const decksStatsRetrieved = useRef(false);
     useEffect(() => {
-        if(!decksStats.length && !decksStatsRetrieved.current) {
-            dispatch(fetchAllDecksStats({userId}));
-            decksStatsRetrieved.current = true;
-        }
-    }, [decksStats, dispatch, userId]);
+        dispatch(fetchAllDecksStats({userId}));
+    }, [dispatch, userId]);
 
     const handleSelectDeck = (evt) => {
         console.log({path: `/users/${userId}/statistics/sessions/decks/${evt.currentTarget.dataset.deckid}`});

@@ -406,7 +406,7 @@ userRouter.get("/:protectedUserId/decks/statistics", async (req, res, next) => {
             return {
                 name: deck.name,
                 _id: deck._id,
-                dateLastPracticed: deck.attempts[0]?.datePracticed || undefined,
+                dateLastPracticed: deck.attempts[deck.attempts.length - 1]?.datePracticed || undefined,
                 accuracyRate: deck.attempts.length > 0 ? Math.round(deck.attempts.reduce((acc, curr) => acc + curr.accuracyRate, 0) / deck.attempts.length) : undefined,
             }
         });

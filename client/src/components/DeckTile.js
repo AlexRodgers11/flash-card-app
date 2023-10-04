@@ -11,8 +11,24 @@ import { setDeckIdInSetup, setPracticeDeckGroup } from '../reducers/practiceSess
 import useToggle from '../hooks/useToggle';
 import Modal from './Modal';
 import { DeckTileWrapper, TopWrapper, IndicatorsWrapper, StyledOptionsIcon, RightBlock, StyledOpenEye, StyledClosedEye, CardCountWrapper, Options, Option, ContentWrapper } from './StyledComponents/DeckTileStyles';
+import styled from 'styled-components';
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+
+const ButtonWrapper = styled.div`
+	display: flex;
+	justify-content: center;
+	padding-top: 2.5rem;
+	& button {
+		margin: 0 .75rem;
+		@media (max-width: 330px) {
+			margin: 0 .375rem;
+		}
+	}
+	@media (max-width: 330px) {
+		padding-top: 2rem;
+	}
+`;
 
 function DeckTile(props) {
     const userId = useSelector((state) => state.login.userId);
@@ -283,8 +299,10 @@ function DeckTile(props) {
         {showStatsNotTrackedModal && 
             <Modal hideModal={toggleShowStatsNotTrackedModal}>
                 <p>Statistics for practice sessions with other users' decks aren't tracked. If the user allows copies to be made adding a copy to your decks will allow you to practice it there and have your attempts tracked.</p>
-                <button onClick={toggleShowStatsNotTrackedModal}>Cancel</button>
-                <button onClick={practicePublicDeck}>Practice Anyway</button>
+                <ButtonWrapper>
+                    <button className="btn btn-danger" onClick={toggleShowStatsNotTrackedModal}>Cancel</button>
+                    <button className="btn btn-primary" onClick={practicePublicDeck}>Practice Anyway</button>
+                </ButtonWrapper>
             </Modal>
         }
         <DeckTileWrapper ref={rootRef} role="button" id="tile" className="DeckTileWrapper" tabIndex={0} onKeyDown={handleKeyPress} onClick={handleSelection} >

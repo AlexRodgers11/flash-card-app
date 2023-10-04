@@ -182,6 +182,21 @@ const StyledHiOutlineUserCircle = styled(HiOutlineUserCircle)`
     }    
 `;
 
+const ButtonWrapper = styled.div`
+	display: flex;
+	justify-content: center;
+	padding-top: 2.5rem;
+	& button {
+		margin: 0 .75rem;
+		@media (max-width: 330px) {
+			margin: 0 .375rem;
+		}
+	}
+	@media (max-width: 330px) {
+		padding-top: 2rem;
+	}
+`;
+
 function UserSettings() {
     const userId = useSelector((state) => state.login.userId);
     const [modalContent, setModalContent] = useState("");
@@ -451,8 +466,10 @@ function UserSettings() {
                     <div>
                         <h3>Are you sure you want to delete statistics for all of your previous practice sessions of your own decks ? This action cannot be undone.</h3>
                         <p><em>(Note: statistics for practice sessions of group decks can only be reset or deleted by the group's administrators)</em></p>
-                        <button onClick={hideModal}>Cancel</button>
-                        <button onClick={confirmResetAllStats}>Delete</button>
+                        <ButtonWrapper>
+                            <button className="btn btn-secondary" onClick={hideModal}>Cancel</button>
+                            <button className="btn btn-danger" onClick={confirmResetAllStats}>Delete</button>
+                        </ButtonWrapper>
                     </div>
                 );
             case "photo-options":

@@ -115,7 +115,7 @@ function RegisterJoinGroupsForm(props) {
     const selectGroup = (evt) => {
         dispatch(fetchGroupJoinOptions({groupId: evt.currentTarget.dataset.id}));
         setContent("join-options");
-        setSelectedGroupId(evt.target.dataset.id);
+        setSelectedGroupId(evt.currentTarget.dataset.id);
     }
 
     const joinGroup = (evt) => {

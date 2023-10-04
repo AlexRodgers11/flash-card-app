@@ -61,7 +61,6 @@ function DeckTile(props) {
             navigate(`/groups/${groupId}/decks/${props.deckId}`);
         } else if(location.pathname.includes("practice")) {
             if(deckData.cardCount > 0) {
-                // navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
                 dispatch(setDeckIdInSetup({deckId: props.deckId}));
                 if(deckData.groupDeckBelongsTo) {
                     dispatch(setPracticeDeckGroup({groupId: deckData.groupDeckBelongsTo}));
@@ -110,10 +109,10 @@ function DeckTile(props) {
                         toggleShowStatsNotTrackedModal();
                     } else {
                         dispatch(setDeckIdInSetup({deckId: props.deckId}));
-                        // navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
                         if(deckData.groupDeckBelongsTo) {
                             dispatch(setPracticeDeckGroup({groupId: deckData.groupDeckBelongsTo}));
                         }
+                        navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
                     }
                 } else {
                     toggleShowNoCardsModal();
@@ -157,6 +156,7 @@ function DeckTile(props) {
         if(deckData.groupDeckBelongsTo) {
             dispatch(setPracticeDeckGroup({groupId: deckData.groupDeckBelongsTo}));
         }
+        dispatch(setDeckIdInSetup({deckId: props.deckId}));
         navigate(`/users/${userId}/decks/${props.deckId}/practice-session`);
     }
     

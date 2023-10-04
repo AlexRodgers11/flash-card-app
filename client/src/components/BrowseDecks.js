@@ -150,7 +150,7 @@ function BrowseDecks() {
             setLoading(true);
             const response = await axios.get(`${baseURL}/decks${queryString}`);
             setTimeout(() => {
-                setDecks(decks => newCriteria ? sortDecks(sort, response.data) : [...decks, ...sortDecks(sort, response.data)]);
+                setDecks(decks => newCriteria ? sortDecks(sort, response.data) : [...decks, ...sortDecks(sort, response.data).filter(deck => deck.cardCount > 0)]);
                 setPage(page => newCriteria ? 2 : page + 1);
                 setHasMore(response.data.length === 25)
                 setLoading(false);

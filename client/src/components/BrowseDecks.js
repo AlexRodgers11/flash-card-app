@@ -5,7 +5,7 @@ import axios from "axios";
 import styled from "styled-components";
 import { sortDecks } from "../utils";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCategories } from "../reducers/decksSlice";
+import { fetchCategories, setListType } from "../reducers/decksSlice";
 
 const baseURL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
 
@@ -178,6 +178,7 @@ function BrowseDecks() {
     
     useEffect(() => {
         if(decks.length < 1 && !firstFetchDone.current) {
+            dispatch(setListType({listType: ""}));
             console.log("this should make first pull");
             fetchDecks();
             firstFetchDone.current = true;

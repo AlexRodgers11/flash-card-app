@@ -90,7 +90,10 @@ export const decksSlice = createSlice({
     initialState,
     reducers: {
         addDeckToCurrentDeckList: (state, action) => {
-            state.deckIds = [...state.deckIds, action.payload.deckId]
+            state.deckIds = [...state.deckIds, action.payload.deckId];
+        },
+        setListType: (state, action) => {
+            state.listType = action.payload.listType;
         }
     },
     extraReducers: (builder) => {
@@ -122,7 +125,7 @@ export const decksSlice = createSlice({
 
 });
 
-export const { addDeckToCurrentDeckList } = decksSlice.actions;
+export const { addDeckToCurrentDeckList, setListType } = decksSlice.actions;
 
 
 export default decksSlice.reducer;

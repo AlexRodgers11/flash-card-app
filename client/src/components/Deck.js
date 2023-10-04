@@ -111,6 +111,7 @@ export const DeleteButton = styled.button`
 function Deck() {
     const userId = useSelector((state) => state.login.userId);
     const storedDeckId = useSelector((state) => state.deck.deckId);
+    const deckListType = useSelector((state) => state.decks.listType);
     const userDecks = useSelector((state) => state.login.decks);
     const name = useSelector((state) => state.deck.name);
     const [nameEditMode, toggleNameEditMode] = useToggle(false);
@@ -221,7 +222,7 @@ function Deck() {
     } 
     return (
         <DeckWrapper>
-            <BackButton route={location.pathname.slice(0, location.pathname.lastIndexOf("/"))}>All Decks</BackButton>
+            <BackButton route={-1}>{deckListType === "user" ? "My Decks" : "Browse Decks"}</BackButton>
             {unlockControl() && <DeleteButton className="btn btn-danger" data-action="delete-deck-confirmation" onClick={handleSelectModalContent}>Delete Deck</DeleteButton>}
             {!nameEditMode ? 
                 <NameBlock>

@@ -149,15 +149,15 @@ function BrowseDecks() {
         try {
             setLoading(true);
             const response = await axios.get(`${baseURL}/decks${queryString}`);
-            console.log({response});
-            const filteredResponse = response.data.filter(deck => deck.cardCount > 0);
-            console.log({filteredResponse})
+            // console.log({response});
+            // const filteredResponse = response.data.filter(deck => deck.cardCount > 0);
+            // console.log({filteredResponse})
             setTimeout(() => {
-                // setDecks(decks => newCriteria ? sortDecks(sort, response.data) : [...decks, ...sortDecks(sort, response.data).filter(deck => deck.cardCount > 0)]);
-                // setDecks(decks => newCriteria ? sortDecks(sort, response.data) : [...decks, ...sortDecks(sort, response.data.filter(deck => deck.cardCount > 0))]);
-                setDecks(decks => newCriteria ? sortDecks(sort, filteredResponse) : [...decks, ...sortDecks(sort, filteredResponse)]);
+                setDecks(decks => newCriteria ? sortDecks(sort, response.data) : [...decks, ...sortDecks(sort, response.data)]);
+                // setDecks(decks => newCriteria ? sortDecks(sort, filteredResponse) : [...decks, ...sortDecks(sort, filteredResponse)]);
                 setPage(page => newCriteria ? 2 : page + 1);
-                setHasMore(filteredResponse.length === 25)
+                // setHasMore(filteredResponse.length === 25)
+                setHasMore(response.data.length === 25)
                 setLoading(false);
             }, 150);
         } catch(err) {

@@ -457,8 +457,10 @@ function UserSettings() {
                 return (
                     <div>
                         <h3>Are you sure you want to delete your profile? All of your deck data, group memberships, and statistics will be erased. This action cannot be undone. If you are the head administrator of any groups you would like to give control of over to someone else you should do so before deleting your account.</h3>
-                        <button onClick={hideModal}>Cancel</button>
-                        <button onClick={confirmDeleteProfile}>Delete</button>
+                        <ButtonWrapper>
+                            <button className="btn btn-md btn-secondary" onClick={hideModal}>Cancel</button>
+                            <button className="btn btn-md btn-danger" onClick={confirmDeleteProfile}>Delete</button>
+                        </ButtonWrapper>
                     </div>
                 );
             case "reset-stats-confirmation":

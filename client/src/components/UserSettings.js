@@ -924,7 +924,7 @@ function UserSettings() {
                                 </div>
                             }
                         </SettingCategoryOption>
-                        <hr />
+                        {/* <hr />
                         <SettingCategoryOption>
                             <div>
                                 <span>Groups: </span>
@@ -943,7 +943,7 @@ function UserSettings() {
                                     <button data-editfield="groups-privacy" onClick={handleSave}>Save</button>
                                 </div>
                             }
-                        </SettingCategoryOption>
+                        </SettingCategoryOption> */}
                         <hr />
                         <SettingCategoryOption>
                             <div>

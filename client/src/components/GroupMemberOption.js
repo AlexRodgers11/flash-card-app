@@ -19,6 +19,7 @@ const GroupMemberOptionWrapper = styled.div`
 `;
 
 const ImageContainer = styled.div`
+    position: relative;
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
@@ -33,6 +34,22 @@ const StyledImage  = styled.img`
     width: 100%;
     height: 100%;
     object-fit: cover;
+`;
+
+const InitialsCircle = styled.div`
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    background-color: #008CBA;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
 `;
 
 const NameWrapper = styled.span`
@@ -59,7 +76,11 @@ function GroupMemberOption(props) {
             {memberData && 
             <>
                 <ImageContainer>
-                    <StyledImage alt={`${memberData.firstName}-${memberData.lastName}`} src={memberData.photo}/>
+                    {memberData.photo ?
+                        <StyledImage alt={`${memberData.firstName}-${memberData.lastName}`} src={memberData.photo}/>
+                        :
+                        <InitialsCircle className="initials-overlay">{`${memberData.firstName[0]}.${memberData.lastName[0]}.`}</InitialsCircle>
+                    }
                 </ImageContainer>
                 <NameWrapper>{memberData.firstName} {memberData.lastName}</NameWrapper>
             </>

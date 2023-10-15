@@ -13,11 +13,12 @@ const ModalWrapper = styled.div`
 	height: 100vh;
 	width: 100%;
 	z-index: 100;
-	-webkit-transform: translate3d(0,0,0);
-	transform: translateZ(1000px);
-	-webkit-transform: translateZ(1000px);
-	transform-style: preserve-3d;
-	-webkit-transform-style: preserve-3d;
+	// -webkit-transform: translate3d(0,0,0);
+	// transform: translateZ(1000px);
+	// -webkit-transform: translateZ(1000px);
+	// transform-style: preserve-3d;
+	// -webkit-transform-style: preserve-3d;
+	transform: none;
 `;
 
 const ModalBackdrop = styled.div`

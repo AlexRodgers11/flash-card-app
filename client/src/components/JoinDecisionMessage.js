@@ -54,9 +54,9 @@ function JoinDecisionMessage(props) {
                         {comment && <p>Comment: "{comment}"</p>}
                     </div>
                     :
-                    <MessagePreviewContent>
+                    <MessagePreviewContent read={read}>
                         {props.direction === "received" ? <p>From: {sender?.login?.username || `${sender.name.first} ${sender.name.last}`}</p> : <p>To: {targetUser.login.username || `${targetUser.name.first} ${targetUser.name.last}`}</p>}
-                        <p><span>{read ? 'Read': 'Unread'}:</span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> {acceptanceStatus} your request to join group: <span>{targetGroup?.name || "deleted group"}</span>.</p>
+                        <p><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> {acceptanceStatus} your request to join group: <span>{targetGroup?.name || "deleted group"}</span>.</p>
                         {/* <hr /> */}
                     </MessagePreviewContent>
                 }

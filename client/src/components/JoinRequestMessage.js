@@ -97,9 +97,9 @@ function JoinRequestMessage(props) {
                                                 
                     </div>
                     :
-                    <MessagePreviewContent>
+                    <MessagePreviewContent read={read}>
                         {props.direction === "received" ? <p className="MessageContent">From: {sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</p> : <p className="MessageContent">To: {targetGroup?.name || "deleted user"} admins</p>}
-                        <p className="MessageContent"><span>{read ? 'Read': 'Unread'}: </span><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to join: {targetGroup?.name || "deleted group"}</p>
+                        <p className="MessageContent"><span>{sender?.login?.username || sender ? `${sender.name.first} ${sender.name.last}` : "deleted user"}</span> would like to join: {targetGroup?.name || "deleted group"}</p>
                         {/* <hr /> */}
                     </MessagePreviewContent>
                 }

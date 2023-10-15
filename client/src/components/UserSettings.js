@@ -470,7 +470,7 @@ function UserSettings() {
                         <p><em>(Note: statistics for practice sessions of group decks can only be reset or deleted by the group's administrators)</em></p>
                         <ButtonWrapper>
                             <button className="btn btn-secondary" onClick={hideModal}>Cancel</button>
-                            <button className="btn btn-danger" onClick={confirmResetAllStats}>Delete</button>
+                            <button className="btn btn-danger" onClick={confirmResetAllStats}>Reset</button>
                         </ButtonWrapper>
                     </div>
                 );
